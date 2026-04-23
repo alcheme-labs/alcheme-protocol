@@ -4,7 +4,11 @@ import { Prisma, type PrismaClient } from '@prisma/client';
 import { generateGhostDraft } from '../../ai/ghost-draft';
 import { createDraftVersionSnapshot } from '../draftLifecycle/versionSnapshots';
 import { requireCircleManagerRole } from '../membership/checks';
-import type { AuthorAnnotationKind, SemanticFacet } from './analysis/types';
+import {
+    DISCUSSION_SEMANTIC_FACETS,
+    type AuthorAnnotationKind,
+    type SemanticFacet,
+} from './analysis/types';
 import { publishDraftCandidateSystemNotices } from './systemNoticeProducer';
 
 type PrismaLike = PrismaClient | Prisma.TransactionClient;
@@ -110,18 +114,8 @@ function normalizeStringArray(value: unknown): string[] {
 }
 
 function normalizeSemanticFacets(value: unknown): SemanticFacet[] {
-    const allowed: SemanticFacet[] = [
-        'fact',
-        'explanation',
-        'emotion',
-        'question',
-        'problem',
-        'criteria',
-        'proposal',
-        'summary',
-    ];
     const normalized = normalizeStringArray(value);
-    return allowed.filter((label) => normalized.includes(label));
+    return DISCUSSION_SEMANTIC_FACETS.filter((label) => normalized.includes(label));
 }
 
 function normalizeAuthorAnnotations(value: unknown): AuthorAnnotationKind[] {

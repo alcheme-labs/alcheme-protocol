@@ -1847,8 +1847,8 @@
       "fact": "事实",
       "explanation": "解释",
       "emotion": "情绪",
-      "question": "问题",
-      "problem": "卡点",
+      "question": "提问",
+      "problem": "问题",
       "criteria": "条件",
       "proposal": "提案",
       "summary": "总结"
@@ -1894,8 +1894,8 @@
       "fact": "事实",
       "explanation": "解释",
       "emotion": "情绪",
-      "question": "问题",
-      "problem": "卡点",
+      "question": "提问",
+      "problem": "问题",
       "criteria": "条件",
       "proposal": "提案",
       "summary": "总结"
@@ -2632,8 +2632,8 @@
       "fact": "事实",
       "explanation": "解释",
       "emotion": "情绪",
-      "question": "问题",
-      "problem": "卡点",
+      "question": "提问",
+      "problem": "问题",
       "criteria": "条件",
       "proposal": "提案",
       "summary": "总结"

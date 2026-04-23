@@ -18,6 +18,10 @@ Facet definitions:
 - `proposal`: a suggested action, plan, or concrete direction.
 - `summary`: a concise recap, synthesis, or restatement of prior discussion.
 
+Examples:
+- A message about capable people not being recognized, unclear growth paths, or knowledge depth not being seen can be `problem`.
+- A message explaining why a circle, product, or structure should exist can be `explanation`.
+
 Important constraints:
 - Use only facets that are clearly present; prefer fewer facets over over-labeling.
 - Do not infer a facet from one keyword alone.

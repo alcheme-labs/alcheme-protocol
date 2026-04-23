@@ -11,6 +11,10 @@ const circlesPageSource = readFileSync(
   new URL('../src/app/(main)/circles/[id]/page.tsx', import.meta.url),
   'utf8',
 );
+const feedTabSource = readFileSync(
+  new URL('../src/components/circle/FeedTab/FeedTab.tsx', import.meta.url),
+  'utf8',
+);
 
 test('regular feed posts can be reposted when not pending', () => {
   const state = resolveFeedRepostState({
@@ -98,4 +102,10 @@ test('circle feed wiring uses the derived pending-membership gate instead of onl
   assert.match(circlesPageSource, /const repostMembershipPending = useMemo\(\(\) => deriveFeedRepostMembershipPending\(/);
   assert.match(circlesPageSource, /repostMembershipPending=\{repostMembershipPending\}/);
   assert.doesNotMatch(circlesPageSource, /repostMembershipPending=\{activeCircleMembershipSnapshot\?\.joinState === 'pending'\}/);
+});
+
+test('feed repost cards hide synthetic repost uri bodies from the visible post text', () => {
+  assert.match(feedTabSource, /content:\\\/\\\/repost\\\//);
+  assert.match(feedTabSource, /visiblePostText/);
+  assert.match(feedTabSource, /isSyntheticRepostText/);
 });

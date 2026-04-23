@@ -1,6 +1,7 @@
-import type {
-    AuthorAnnotationKind,
-    SemanticFacet,
+import {
+    SEMANTIC_FACET_VALUES,
+    type AuthorAnnotationKind,
+    type SemanticFacet,
 } from '@/features/discussion-intake/labels/structuredMetadata';
 
 export const DRAFT_CANDIDATE_STATES = [
@@ -102,16 +103,7 @@ function normalizeSemanticFacets(value: unknown): SemanticFacet[] {
         ) continue;
         seen.add(normalized as SemanticFacet);
     }
-    const ordered: SemanticFacet[] = [];
-    if (seen.has('fact')) ordered.push('fact');
-    if (seen.has('explanation')) ordered.push('explanation');
-    if (seen.has('emotion')) ordered.push('emotion');
-    if (seen.has('question')) ordered.push('question');
-    if (seen.has('problem')) ordered.push('problem');
-    if (seen.has('criteria')) ordered.push('criteria');
-    if (seen.has('proposal')) ordered.push('proposal');
-    if (seen.has('summary')) ordered.push('summary');
-    return ordered;
+    return SEMANTIC_FACET_VALUES.filter((label) => seen.has(label));
 }
 
 function normalizeAuthorAnnotations(value: unknown): AuthorAnnotationKind[] {

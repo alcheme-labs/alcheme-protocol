@@ -1,4 +1,5 @@
 import { getPromptSchema, getSystemPrompt } from '../prompts/registry';
+import { DISCUSSION_SEMANTIC_FACETS } from '../../services/discussion/analysis/types';
 import { generateStructuredOutput } from './llm';
 import { normalizeScore01 } from './rules';
 
@@ -180,16 +181,7 @@ function buildRelevanceUserPrompt(input: MessageAnalysisInput, rule: RuleSignal)
     ].join('\n');
 }
 
-const ALLOWED_SEMANTIC_FACETS = new Set([
-    'fact',
-    'explanation',
-    'emotion',
-    'question',
-    'problem',
-    'criteria',
-    'proposal',
-    'summary',
-]);
+const ALLOWED_SEMANTIC_FACETS = new Set<string>(DISCUSSION_SEMANTIC_FACETS);
 
 function normalizeSemanticFacets(value: unknown): string[] | null {
     if (!Array.isArray(value)) return null;
@@ -264,7 +256,13 @@ export async function analyzeDiscussionSemanticFacets(
         maxOutputTokens: 180,
     });
     if (!raw) return null;
-    return normalizeSemanticFacets(raw.semantic_facets);
+    const facets = normalizeSemanticFacets(raw.semantic_facets);
+    if (!facets) {
+        console.warn('[discussion-intelligence] semantic facets output malformed', {
+            fieldType: Array.isArray(raw.semantic_facets) ? 'array' : typeof raw.semantic_facets,
+        });
+    }
+    return facets;
 }
 
 export async function analyzeDiscussionMessage(

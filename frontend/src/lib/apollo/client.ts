@@ -65,8 +65,8 @@ const cache = new InMemoryCache({
             fields: {
                 posts: {
                     keyArgs: false,
-                    merge(existing = [], incoming) {
-                        return [...existing, ...incoming];
+                    merge(_existing = [], incoming) {
+                        return incoming;
                     },
                 },
             },

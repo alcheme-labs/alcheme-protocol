@@ -247,6 +247,109 @@ describe('canonical discussion analysis service', () => {
         }));
     });
 
+    test('uses recent context LLM pass for low-embedding follow-up questions', async () => {
+        const prisma = {
+            $queryRaw: jest.fn(async () => ([
+                {
+                    payloadText: 'Progression is a structure for knowledge, not a hierarchy for people.',
+                    senderHandle: 'A',
+                    senderPubkey: 'sender-a',
+                    focusScore: 0.47,
+                    semanticFacets: ['explanation'],
+                    createdAt: new Date('2026-04-05T20:00:00.000Z'),
+                },
+                {
+                    payloadText: 'Real contribution should stay visible across the whole chain of participation.',
+                    senderHandle: 'B',
+                    senderPubkey: 'sender-b',
+                    focusScore: 0.45,
+                    semanticFacets: [],
+                    createdAt: new Date('2026-04-05T20:01:00.000Z'),
+                },
+            ])),
+        } as any;
+        (loadDiscussionTopicProfileMock as any).mockResolvedValue({
+            topicProfileVersion: 'topic:189:thin',
+            snapshotText: '圈层主题：Alcheme Founder Vision Interview\n圈层描述：How discussion becomes knowledge',
+            embedding: [1, 0],
+        });
+        (analyzeDiscussionMessageMock as any)
+            .mockResolvedValueOnce({
+                semanticScore: 0.26,
+                qualityScore: 0.55,
+                spamScore: 0.01,
+                confidence: 0.55,
+                isOnTopic: false,
+                method: 'rule',
+                rationale: 'rule_fallback',
+            })
+            .mockResolvedValueOnce({
+                semanticScore: 0.72,
+                qualityScore: 0.76,
+                spamScore: 0.01,
+                confidence: 0.84,
+                isOnTopic: true,
+                method: 'hybrid',
+                rationale: 'recent_context_confirms_follow_up',
+                semanticFacets: ['question'],
+            });
+        (embedDiscussionTextMock as any).mockResolvedValue({
+            embedding: [0.36, Math.sqrt(1 - 0.36 * 0.36)],
+            providerMode: 'builtin',
+            model: 'BAAI/bge-m3',
+        });
+
+        const result = await analyzeDiscussionMessageCanonical({
+            prisma,
+            circleId: 189,
+            envelopeId: 'env-contribution-question',
+            text: 'Then why does contribution need to be part of the structure too?',
+            authorAnnotations: [],
+        });
+
+        expect(analyzeDiscussionMessageMock).toHaveBeenNthCalledWith(2, expect.objectContaining({
+            useLLM: true,
+            recentContext: expect.stringContaining('Real contribution should stay visible'),
+        }));
+        expect(result.actualMode).toBe('embedding_llm');
+        expect(result.semanticScore).toBeGreaterThan(0.5);
+        expect(result.focusLabel).toBe('contextual');
+    });
+
+    test('uses storage precision before assigning the contextual boundary label', async () => {
+        (loadDiscussionTopicProfileMock as any).mockResolvedValue({
+            topicProfileVersion: 'topic:51:precision',
+            snapshotText: '圈层主题：讨论沉淀实验室',
+            embedding: [1, 0],
+        });
+        (analyzeDiscussionMessageMock as any).mockResolvedValue({
+            semanticScore: 0.3496,
+            qualityScore: 0.72,
+            spamScore: 0,
+            confidence: 0.55,
+            isOnTopic: false,
+            method: 'rule',
+            rationale: 'rule_fallback',
+        });
+        (embedDiscussionTextMock as any).mockResolvedValue({
+            embedding: [0.3496, Math.sqrt(1 - 0.3496 * 0.3496)],
+            providerMode: 'builtin',
+            model: 'BAAI/bge-m3',
+        });
+
+        const result = await analyzeDiscussionMessageCanonical({
+            prisma: {} as any,
+            circleId: 51,
+            envelopeId: 'env-precision',
+            text: 'Contribution structure sits near the topic boundary.',
+            authorAnnotations: [],
+        });
+
+        expect(analyzeDiscussionMessageMock).toHaveBeenCalledTimes(1);
+        expect(result.focusScore).toBe(0.35);
+        expect(result.focusLabel).toBe('contextual');
+    });
+
     test('prefers llm semantic facets over regex fallback when second-pass returns them', async () => {
         (loadDiscussionTopicProfileMock as any).mockResolvedValue({
             topicProfileVersion: 'topic:51:llm-facets',
@@ -325,6 +428,43 @@ describe('canonical discussion analysis service', () => {
 
         expect(result.actualMode).toBe('embedding');
         expect(result.semanticFacets).toEqual(['proposal']);
+    });
+
+    test('passes circle topic context to semantic-facets pass and keeps an explicit empty AI result', async () => {
+        (loadDiscussionTopicProfileMock as any).mockResolvedValue({
+            topicProfileVersion: 'topic:51:facet-empty',
+            snapshotText: '圈层主题：讨论沉淀实验室',
+            embedding: [1, 0],
+        });
+        (analyzeDiscussionMessageMock as any).mockResolvedValue({
+            semanticScore: 0.12,
+            qualityScore: 0.74,
+            spamScore: 0.03,
+            confidence: 0.55,
+            isOnTopic: false,
+            method: 'rule',
+            rationale: 'rule_fallback',
+        });
+        (analyzeDiscussionSemanticFacetsMock as any).mockResolvedValue([]);
+        (embedDiscussionTextMock as any).mockResolvedValue({
+            embedding: [1, 0],
+            providerMode: 'builtin',
+            model: 'BAAI/bge-m3',
+        });
+
+        const result = await analyzeDiscussionMessageCanonical({
+            prisma: {} as any,
+            circleId: 51,
+            text: '这个问题为什么会阻塞主线程？',
+            authorAnnotations: [],
+        });
+
+        expect(result.actualMode).toBe('embedding');
+        expect(analyzeDiscussionSemanticFacetsMock).toHaveBeenCalledWith(expect.objectContaining({
+            circleContext: '圈层主题：讨论沉淀实验室',
+            text: '这个问题为什么会阻塞主线程？',
+        }));
+        expect(result.semanticFacets).toEqual([]);
     });
 
     test('promotes strong proposal-and-question messages to focused when semantic score is mid-high', async () => {

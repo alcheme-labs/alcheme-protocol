@@ -1,4 +1,5 @@
 import { resolveNodeRoute, type NodeRoutingSurface } from '@/lib/config/nodeRouting';
+import type { SemanticFacet } from '@/features/discussion-intake/labels/structuredMetadata';
 
 export interface DiscussionMessageDto {
     envelopeId: string;
@@ -24,7 +25,7 @@ export interface DiscussionMessageDto {
     actualMode?: string | null;
     analysisVersion?: string | null;
     topicProfileVersion?: string | null;
-    semanticFacets?: Array<'fact' | 'explanation' | 'emotion' | 'question' | 'proposal' | 'summary'> | null;
+    semanticFacets?: SemanticFacet[] | null;
     focusScore?: number | null;
     focusLabel?: 'focused' | 'contextual' | 'off_topic' | null;
     analysisCompletedAt?: string | null;

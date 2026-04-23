@@ -144,6 +144,7 @@ function ComposePageInner() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const appliedRoutePresetRef = useRef<string | null>(null);
+    const submitInFlightRef = useRef(false);
     const [content, setContent] = useState('');
     const [selectedCircle, setSelectedCircle] = useState<number | null>(null);
     const [publishIntent, setPublishIntent] = useState<PublishIntent>('feed');
@@ -234,7 +235,7 @@ function ComposePageInner() {
     }, [circleTargetById, hasCircleChoices, requestedCircleId, requestedIntent, selectedCircle]);
 
     const handleSubmit = useCallback(async () => {
-        if (!canSubmit || isSubmitting || selectedCircle === null || !selectedCircleInfo) return;
+        if (!canSubmit || isSubmitting || submitInFlightRef.current || selectedCircle === null || !selectedCircleInfo) return;
 
         const intentValidationError = resolvePublishIntentValidationError(selectedCircleInfo, effectiveIntent, t);
         if (intentValidationError) {
@@ -242,6 +243,8 @@ function ComposePageInner() {
             return;
         }
 
+        submitInFlightRef.current = true;
+        let releaseSubmitLock = true;
         try {
             const tx = await createContent({
                 text: content.trim(),
@@ -252,6 +255,7 @@ function ComposePageInner() {
             });
 
             if (tx) {
+                releaseSubmitLock = false;
                 setSubmitted(true);
                 setTimeout(() => {
                     router.push(
@@ -263,8 +267,12 @@ function ComposePageInner() {
             }
         } catch (err) {
             console.error('Failed to create content:', err);
+        } finally {
+            if (releaseSubmitLock) {
+                submitInFlightRef.current = false;
+            }
         }
-    }, [canSubmit, isSubmitting, selectedCircle, selectedCircleInfo, content, createContent, effectiveIntent, router]);
+    }, [canSubmit, isSubmitting, selectedCircle, selectedCircleInfo, content, createContent, effectiveIntent, router, t]);
 
     if (submitted) {
         return (

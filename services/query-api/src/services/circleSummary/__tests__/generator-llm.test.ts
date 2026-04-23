@@ -154,4 +154,75 @@ describe('circle summary llm generation', () => {
             },
         });
     });
+
+    test('keeps zero-output circles on projection snapshots instead of asking the LLM for formal narrative', async () => {
+        const now = new Date('2026-03-24T22:00:00.000Z');
+        const prisma = {
+            $queryRaw: jest.fn(async (query: any) => {
+                const queryText = getQueryText(query);
+
+                if (queryText.includes('FROM circle_summary_snapshots')) {
+                    return [];
+                }
+                if (queryText.includes('latestSourceUpdatedAt')) {
+                    return [{ latestSourceUpdatedAt: new Date('2026-03-24T21:30:00.000Z') }];
+                }
+                if (queryText.includes('FROM knowledge k')) {
+                    return [];
+                }
+                if (queryText.includes('FROM draft_workflow_state dws')) {
+                    return [];
+                }
+                if (queryText.includes('FROM draft_discussion_threads')) {
+                    return [{
+                        openThreadCount: 0,
+                        totalThreadCount: 0,
+                    }];
+                }
+                if (queryText.includes('FROM circle_discussion_messages')) {
+                    throw new Error('zero-output summaries should not load recent messages for LLM narration');
+                }
+                if (queryText.includes('SELECT COALESCE(MAX(version), 0) + 1')) {
+                    return [{ nextVersion: 1 }];
+                }
+
+                throw new Error(`unexpected query: ${queryText}`);
+            }),
+            $queryRawUnsafe: jest.fn(async () => ([{
+                summaryId: 'circle-7-v1',
+                circleId: 7,
+                version: 1,
+                issueMap: [],
+                conceptGraph: { nodes: [], edges: [] },
+                viewpointBranches: [],
+                factExplanationEmotionBreakdown: { facts: [], explanations: [], emotions: [] },
+                emotionConflictContext: { tensionLevel: 'low', notes: [] },
+                sedimentationTimeline: [],
+                openQuestions: [],
+                generatedAt: now,
+                generatedBy: 'system_projection',
+                generationMetadata: {
+                    providerMode: 'projection',
+                    model: 'projection',
+                    promptAsset: 'circle-summary-projection',
+                    promptVersion: 'v1',
+                    sourceDigest: 'projection-digest',
+                },
+            }])),
+        } as any;
+
+        const snapshot = await ensureLatestCircleSummarySnapshot(prisma, {
+            circleId: 7,
+            now,
+        });
+
+        expect(generateTextMock).not.toHaveBeenCalled();
+        expect(snapshot).toMatchObject({
+            generatedBy: 'system_projection',
+            generationMetadata: {
+                providerMode: 'projection',
+                promptAsset: 'circle-summary-projection',
+            },
+        });
+    });
 });

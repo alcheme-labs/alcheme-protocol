@@ -353,13 +353,15 @@ export default function HomePage() {
                             <p className={styles.cardMeta}>{t('discover.empty')}</p>
                         ) : (
                             circles.map((circle) => (
-                                <Card key={circle.id} state="ore">
-                                    <h3 className={styles.cardTitle}>{circle.name}</h3>
-                                    <p className={styles.cardDesc}>{circle.description || t('discover.noDescription')}</p>
-                                    <p className={styles.cardMeta}>
-                                        {t('discover.meta', {members: circle.stats.members, posts: circle.stats.posts})}
-                                    </p>
-                                </Card>
+                                <Link key={circle.id} href={`/circles/${circle.id}`} className={styles.cardLink}>
+                                    <Card state="ore">
+                                        <h3 className={styles.cardTitle}>{circle.name}</h3>
+                                        <p className={styles.cardDesc}>{circle.description || t('discover.noDescription')}</p>
+                                        <p className={styles.cardMeta}>
+                                            {t('discover.meta', {members: circle.stats.members, posts: circle.stats.posts})}
+                                        </p>
+                                    </Card>
+                                </Link>
                             ))
                         )}
                     </div>

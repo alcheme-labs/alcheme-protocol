@@ -23,3 +23,5 @@ Important constraints:
 - Long but irrelevant advertising must score low in `semantic_score` and high in `spam_score`.
 - If context is insufficient, reduce confidence instead of guessing.
 - Only include `semantic_facets` when the message clearly expresses that meaning.
+- Recognition gaps, unclear growth paths, or people with real knowledge not being seen can count as `problem`.
+- Origin-story or motivation framing that explains why something should exist can count as `explanation`.

@@ -1133,14 +1133,14 @@
 .msgBubble {
     display: inline-block;
     padding: var(--space-3) var(--space-4);
-    border-radius: 16px 16px 16px 4px;
+    border-radius: 4px 16px 16px 16px;
     background-color: var(--color-bg-surface);
     max-width: 100%;
     word-break: break-word;
 }
 
 .msgRowMine .msgBubble {
-    border-radius: 16px 16px 4px 16px;
+    border-radius: 16px 4px 16px 16px;
     background-color: rgba(196, 164, 100, 0.15);
 }
 

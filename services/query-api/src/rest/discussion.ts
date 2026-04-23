@@ -24,6 +24,7 @@ import {
     enqueueDiscussionMessageAnalyzeJob,
 } from '../services/discussion/analysis/enqueue';
 import {
+    DISCUSSION_SEMANTIC_FACETS,
     type DiscussionAnalysisStatus,
     type DiscussionFocusLabel,
     type SemanticFacet,
@@ -620,9 +621,9 @@ function normalizeDiscussionFocusLabel(value: string | null | undefined): Discus
     return null;
 }
 
-function normalizeDiscussionSemanticFacets(value: Prisma.JsonValue | null | undefined): SemanticFacet[] {
+export function normalizeDiscussionSemanticFacets(value: Prisma.JsonValue | null | undefined): SemanticFacet[] {
     if (!Array.isArray(value)) return [];
-    const allowed = new Set<SemanticFacet>(['fact', 'explanation', 'emotion', 'question', 'proposal', 'summary']);
+    const allowed = new Set<SemanticFacet>(DISCUSSION_SEMANTIC_FACETS);
     return value.filter((item): item is SemanticFacet => typeof item === 'string' && allowed.has(item as SemanticFacet));
 }
 

@@ -33,6 +33,10 @@ import {
     sendDiscussionMessage,
     tombstoneDiscussionMessage,
 } from '@/lib/discussion/api';
+import {
+    runWithDiscussionSessionRecovery,
+    type DiscussionSessionTokenOptions,
+} from '@/lib/discussion/sessionRecovery';
 import { subscribeToCircleDiscussionStream, type DiscussionRealtimeSubscription } from '@/lib/discussion/realtime';
 import { createIdentityCopy, normalizeIdentityCopy } from '@/lib/circle/identityCopy';
 import { canHighlightPlazaMessage } from '@/lib/circle/plazaHighlightPermissions';
@@ -347,11 +351,18 @@ function PlazaTab({
         }
     }, [discussionSessionStorageKey, walletPubkey]);
 
-    const ensureDiscussionSessionToken = useCallback(async (): Promise<string | null> => {
+    const resetDiscussionSession = useCallback(() => {
+        setDiscussionSession(null);
+        persistDiscussionSession(null);
+    }, [persistDiscussionSession]);
+
+    const ensureDiscussionSessionToken = useCallback(async (
+        options: DiscussionSessionTokenOptions = {},
+    ): Promise<string | null> => {
         if (!useSessionTokenAuth) return null;
         if (!walletPubkey) throw new Error(t('errors.walletRequired'));
 
-        const current = discussionSession;
+        const current = options.forceNew ? null : discussionSession;
         const now = Date.now();
         const expiresAtMs = current ? Date.parse(current.expiresAt) : 0;
         const isUsableCurrent =
@@ -363,7 +374,7 @@ function PlazaTab({
             return current.discussionAccessToken;
         }
 
-        if (sessionBootstrapRef.current) {
+        if (sessionBootstrapRef.current && !options.forceNew) {
             return sessionBootstrapRef.current;
         }
 
@@ -429,6 +440,7 @@ function PlazaTab({
         discussionSession,
         persistDiscussionSession,
         signMessage,
+        t,
         useSessionTokenAuth,
         walletPubkey,
     ]);
@@ -905,16 +917,20 @@ function PlazaTab({
         }
 
         try {
-            const discussionAccessToken = await ensureDiscussionSessionToken();
-            const response = await sendDiscussionMessage({
-                circleId: discussionCircleId,
-                senderPubkey: walletPubkey,
-                senderHandle: fallbackAuthor,
-                text: outgoingText,
-                metadata: structuredMetadata,
-                prevEnvelopeId: lastEnvelopeId,
-                signMessage: shouldSignEachMessage ? signMessage : undefined,
-                discussionAccessToken: discussionAccessToken || undefined,
+            const response = await runWithDiscussionSessionRecovery({
+                useSessionTokenAuth,
+                getToken: ensureDiscussionSessionToken,
+                resetSession: resetDiscussionSession,
+                run: (discussionAccessToken) => sendDiscussionMessage({
+                    circleId: discussionCircleId,
+                    senderPubkey: walletPubkey,
+                    senderHandle: fallbackAuthor,
+                    text: outgoingText,
+                    metadata: structuredMetadata,
+                    prevEnvelopeId: lastEnvelopeId,
+                    signMessage: shouldSignEachMessage ? signMessage : undefined,
+                    discussionAccessToken: discussionAccessToken || undefined,
+                }),
             });
 
             const mapped = mapDiscussionDtoToPlazaMessage(response.message, {
@@ -947,8 +963,10 @@ function PlazaTab({
         discussionCircleId,
         ensureDiscussionSessionToken,
         lastEnvelopeId,
+        resetDiscussionSession,
         shouldSignEachMessage,
         signMessage,
+        useSessionTokenAuth,
         viewerJoined,
         walletPubkey,
         replyTarget,
@@ -1153,14 +1171,20 @@ function PlazaTab({
             return;
         }
 
+        const senderPubkey = walletPubkey;
+        const envelopeId = target.envelopeId;
         try {
-            const discussionAccessToken = await ensureDiscussionSessionToken();
-            const result = await tombstoneDiscussionMessage({
-                circleId: discussionCircleId,
-                envelopeId: target.envelopeId,
-                senderPubkey: walletPubkey,
-                signMessage: shouldSignEachMessage ? signMessage : undefined,
-                discussionAccessToken: discussionAccessToken || undefined,
+            const result = await runWithDiscussionSessionRecovery({
+                useSessionTokenAuth,
+                getToken: ensureDiscussionSessionToken,
+                resetSession: resetDiscussionSession,
+                run: (discussionAccessToken) => tombstoneDiscussionMessage({
+                    circleId: discussionCircleId,
+                    envelopeId,
+                    senderPubkey,
+                    signMessage: shouldSignEachMessage ? signMessage : undefined,
+                    discussionAccessToken: discussionAccessToken || undefined,
+                }),
             });
             const mapped = mapDiscussionDtoToPlazaMessage(result.message, {
                 locale,
@@ -1188,8 +1212,10 @@ function PlazaTab({
         discussionCircleId,
         ensureDiscussionSessionToken,
         localMessages,
+        resetDiscussionSession,
         shouldSignEachMessage,
         signMessage,
+        useSessionTokenAuth,
         walletPubkey,
     ]);
 

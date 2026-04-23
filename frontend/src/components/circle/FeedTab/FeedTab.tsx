@@ -35,6 +35,10 @@ export interface FeedPost {
     } | null;
 }
 
+function isSyntheticRepostText(text: string, repostOfAddress?: string | null): boolean {
+    return Boolean(repostOfAddress) && /^content:\/\/repost\//.test(text.trim());
+}
+
 interface FeedTabProps {
     posts: FeedPost[];
     circleName: string;
@@ -62,6 +66,29 @@ export default function FeedTab({
 }: FeedTabProps) {
     const t = useI18n('FeedTab');
 
+    const renderComposer = () => (
+        <div className={styles.feedCompose}>
+            <button
+                type="button"
+                className={styles.feedComposeInput}
+                onClick={onCompose}
+                disabled={!onCompose}
+            >
+                {t('composer.placeholder', {circleName})}
+            </button>
+            <button
+                className={styles.feedComposeBtn}
+                type="button"
+                onClick={onCompose}
+                disabled={!onCompose}
+                aria-label={onCompose ? t('composer.aria', {circleName}) : t('composer.unavailable')}
+                title={onCompose ? t('composer.aria', {circleName}) : t('composer.unavailable')}
+            >
+                <SendHorizonal size={16} />
+            </button>
+        </div>
+    );
+
     if (posts.length === 0) {
         return (
             <div className={styles.feedContainer}>
@@ -69,6 +96,7 @@ export default function FeedTab({
                     <Rss size={40} className={styles.feedEmptyIcon} />
                     <p className={styles.feedEmptyText}>{t('states.empty')}</p>
                 </div>
+                {renderComposer()}
             </div>
         );
     }
@@ -91,6 +119,9 @@ export default function FeedTab({
                 const repostReason = repostState.reason
                     ? t(`actions.repostReasons.${repostState.reason}`)
                     : null;
+                const visiblePostText = isSyntheticRepostText(post.text, post.repostOfAddress)
+                    ? ''
+                    : post.text;
 
                 return (
                 <motion.div
@@ -117,8 +148,8 @@ export default function FeedTab({
                     </div>
 
                     {/* Content */}
-                    {post.text ? (
-                        <p className={styles.feedContent}>{post.text}</p>
+                    {visiblePostText ? (
+                        <p className={styles.feedContent}>{visiblePostText}</p>
                     ) : null}
 
                     {post.repostOf ? (
@@ -190,26 +221,7 @@ export default function FeedTab({
             })}
 
             {/* Compose Bar */}
-            <div className={styles.feedCompose}>
-                <button
-                    type="button"
-                    className={styles.feedComposeInput}
-                    onClick={onCompose}
-                    disabled={!onCompose}
-                >
-                    {t('composer.placeholder', {circleName})}
-                </button>
-                <button
-                    className={styles.feedComposeBtn}
-                    type="button"
-                    onClick={onCompose}
-                    disabled={!onCompose}
-                    aria-label={onCompose ? t('composer.aria', {circleName}) : t('composer.unavailable')}
-                    title={onCompose ? t('composer.aria', {circleName}) : t('composer.unavailable')}
-                >
-                    <SendHorizonal size={16} />
-                </button>
-            </div>
+            {renderComposer()}
         </div>
     );
 }

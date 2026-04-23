@@ -5,7 +5,7 @@ import {
     analyzeDiscussionMessage,
     analyzeDiscussionSemanticFacets,
 } from '../../../ai/discussion-intelligence/analyzer';
-import { normalizeScore01 } from '../../../ai/discussion-intelligence/rules';
+import { hasQuestionSignal, normalizeScore01 } from '../../../ai/discussion-intelligence/rules';
 import { decideFeatured } from './featured';
 import { inferSemanticFacets, normalizeAuthorAnnotations } from './facets';
 import type { DiscussionAnalysisResult, DiscussionFocusLabel, SemanticFacet } from './types';
@@ -14,6 +14,10 @@ import { loadDiscussionTopicProfile } from '../topicProfile';
 function clamp01(value: number): number {
     if (!Number.isFinite(value)) return 0;
     return Math.max(0, Math.min(1, value));
+}
+
+function roundScoreForStorage(value: number): number {
+    return Math.round(clamp01(value) * 1000) / 1000;
 }
 
 function classifyEmbeddingFallbackError(error: unknown): {
@@ -235,24 +239,30 @@ export async function analyzeDiscussionMessageCanonical(input: {
             actualMode = 'embedding';
             decisionConfidence = Math.max(decisionConfidence, 0.62);
 
-            const shouldUseSecondPass = semanticBase >= 0.42 && semanticBase <= 0.72;
-            if (shouldUseSecondPass) {
+            const shouldUseStandardSecondPass = semanticBase >= 0.42 && semanticBase <= 0.72;
+            const shouldReviewLowScoreFollowUp = semanticBase >= 0.30
+                && semanticBase < 0.42
+                && spamScore < 0.6
+                && hasQuestionSignal(input.text);
+            if (shouldUseStandardSecondPass || shouldReviewLowScoreFollowUp) {
                 const recentContext = await getRecentContext();
-                const secondPass = await analyzeDiscussionMessage({
-                    text: input.text,
-                    circleContext: topicProfile.snapshotText,
-                    recentContext: recentContext || undefined,
-                    useLLM: true,
-                });
-                if (secondPass.method === 'hybrid') {
-                    semanticScore = clamp01(semanticBase * 0.35 + normalizeScore01(secondPass.semanticScore, semanticBase) * 0.65);
-                    qualityScore = clamp01(qualityScore * 0.2 + normalizeScore01(secondPass.qualityScore, qualityScore) * 0.8);
-                    spamScore = clamp01(spamScore * 0.2 + normalizeScore01(secondPass.spamScore, spamScore) * 0.8);
-                    decisionConfidence = Math.max(decisionConfidence, normalizeScore01(secondPass.confidence, decisionConfidence));
-                    relevanceMethod = 'embedding_llm';
-                    actualMode = 'embedding_llm';
-                    if (Array.isArray(secondPass.semanticFacets)) {
-                        llmSemanticFacets = secondPass.semanticFacets as SemanticFacet[];
+                if (shouldUseStandardSecondPass || recentContext) {
+                    const secondPass = await analyzeDiscussionMessage({
+                        text: input.text,
+                        circleContext: topicProfile.snapshotText,
+                        recentContext: recentContext || undefined,
+                        useLLM: true,
+                    });
+                    if (secondPass.method === 'hybrid') {
+                        semanticScore = clamp01(semanticBase * 0.35 + normalizeScore01(secondPass.semanticScore, semanticBase) * 0.65);
+                        qualityScore = clamp01(qualityScore * 0.2 + normalizeScore01(secondPass.qualityScore, qualityScore) * 0.8);
+                        spamScore = clamp01(spamScore * 0.2 + normalizeScore01(secondPass.spamScore, spamScore) * 0.8);
+                        decisionConfidence = Math.max(decisionConfidence, normalizeScore01(secondPass.confidence, decisionConfidence));
+                        relevanceMethod = 'embedding_llm';
+                        actualMode = 'embedding_llm';
+                        if (Array.isArray(secondPass.semanticFacets)) {
+                            llmSemanticFacets = secondPass.semanticFacets as SemanticFacet[];
+                        }
                     }
                 }
             }
@@ -292,7 +302,7 @@ export async function analyzeDiscussionMessageCanonical(input: {
         authorAnnotations,
     });
     const semanticFacets = dedicatedSemanticFacets ?? llmSemanticFacets ?? fallbackSemanticFacets;
-    const focusScore = clamp01(semanticScore * (1 - spamScore * 0.25));
+    const focusScore = roundScoreForStorage(semanticScore * (1 - spamScore * 0.25));
     const focusLabel = inferFocusLabel({
         score: focusScore,
         semanticFacets,

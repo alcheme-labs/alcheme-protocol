@@ -437,7 +437,8 @@ export async function generateCircleSummarySnapshot(
     const outputs = await loadSummaryOutputs(prisma, input.circleId);
     const primaryDraft = await loadPrimaryDraft(prisma, input.circleId);
     const threadStats = await loadDraftThreadStats(prisma, primaryDraft?.draftPostId ?? null);
-    const recentMessages = input.useLLM
+    const shouldUseLLM = Boolean(input.useLLM && outputs.length > 0);
+    const recentMessages = shouldUseLLM
         ? [...await loadRecentDiscussionMessages(prisma, input.circleId)].reverse()
         : [];
     const recentFacets = recentMessages.flatMap((row) => Array.isArray(row.semanticFacets) ? row.semanticFacets : []);
@@ -581,7 +582,7 @@ export async function generateCircleSummarySnapshot(
         generationMetadata: projectionMetadata,
     };
 
-    if (!input.useLLM) {
+    if (!shouldUseLLM) {
         return projectionSnapshot;
     }
 

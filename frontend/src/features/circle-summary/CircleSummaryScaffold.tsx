@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 
 import {
+    buildCircleSummaryMapViewModel,
     buildSummaryDependencyViewModel,
     createCircleSummaryCopy,
     formatCircleSummaryGeneratedByLabel,
@@ -59,7 +60,17 @@ export function CircleSummaryScaffold({
         outputs,
         copy: summaryCopy,
     });
-    const summaryMap = presentation.summaryMap;
+    const pendingLocaleSummaryMap = useMemo(() => buildCircleSummaryMapViewModel({
+        circleId,
+        draft,
+        outputs,
+        copy: summaryCopy,
+    }), [circleId, draft, outputs, summaryCopy]);
+    const shouldUsePendingLocaleSummaryMap = Boolean(presentation.summaryMap && outputs.length === 0);
+    const summaryMap = shouldUsePendingLocaleSummaryMap
+        ? pendingLocaleSummaryMap
+        : presentation.summaryMap;
+    const emptyRouteBody = t('sections.primaryRoutes.empty.bodyFallback');
     const snapshotSourceDraftPostId = snapshot
         ? snapshot.viewpointBranches
             .map((branch) => {
@@ -220,7 +231,7 @@ export function CircleSummaryScaffold({
                             <div className={styles.branchSummaryRow}>
                                 <span className={styles.branchStatus}>{t('sections.primaryRoutes.empty.status')}</span>
                                 <p className={styles.branchBody}>
-                                    {summaryMap.issueMap[0]?.body || t('sections.primaryRoutes.empty.bodyFallback')}
+                                    {emptyRouteBody}
                                 </p>
                             </div>
 

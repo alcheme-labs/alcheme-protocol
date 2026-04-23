@@ -31,6 +31,7 @@ describe('discussion semantic facets llm pass', () => {
     });
 
     test('returns null when llm output is missing or malformed', async () => {
+        const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
         (generateStructuredOutputMock as any).mockResolvedValue({
             semantic_facets: 'proposal',
         });
@@ -41,5 +42,10 @@ describe('discussion semantic facets llm pass', () => {
         });
 
         expect(result).toBeNull();
+        expect(warnSpy).toHaveBeenCalledWith(
+            '[discussion-intelligence] semantic facets output malformed',
+            { fieldType: 'string' },
+        );
+        warnSpy.mockRestore();
     });
 });

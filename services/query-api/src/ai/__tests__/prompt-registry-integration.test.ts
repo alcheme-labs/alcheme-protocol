@@ -21,12 +21,42 @@ import { generateGhostDraft } from '../ghost-draft';
 import { summarizeDiscussionThread } from '../discussion-summary';
 import { judgeDiscussionTrigger } from '../discussion-intelligence/trigger-judge';
 import { getPromptSchema, getSystemPrompt } from '../prompts/registry';
+import { DISCUSSION_SEMANTIC_FACETS } from '../../services/discussion/analysis/types';
 import * as draftDiscussionLifecycleService from '../../services/draftDiscussionLifecycle';
+
+function readSemanticFacetEnum(schema: unknown): string[] {
+    const value = schema as {
+        properties?: {
+            semantic_facets?: {
+                items?: {
+                    enum?: string[];
+                };
+            };
+        };
+    };
+    return value.properties?.semantic_facets?.items?.enum ?? [];
+}
 
 describe('prompt registry integration', () => {
     afterEach(() => {
         jest.clearAllMocks();
         jest.restoreAllMocks();
+    });
+
+    test('discussion prompt schemas use the canonical semantic facet enum', () => {
+        expect(readSemanticFacetEnum(getPromptSchema('discussion-relevance'))).toEqual([
+            ...DISCUSSION_SEMANTIC_FACETS,
+        ]);
+        expect(readSemanticFacetEnum(getPromptSchema('discussion-semantic-facets'))).toEqual([
+            ...DISCUSSION_SEMANTIC_FACETS,
+        ]);
+    });
+
+    test('discussion semantic facet system prompt documents every canonical facet', () => {
+        const systemPrompt = getSystemPrompt('discussion-semantic-facets');
+        for (const facet of DISCUSSION_SEMANTIC_FACETS) {
+            expect(systemPrompt).toContain(`\`${facet}\``);
+        }
     });
 
     test('ghost draft generation uses the registry-backed system prompt asset', async () => {
