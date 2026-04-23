@@ -1,0 +1,33 @@
+/* ═══════════════════════════════════════════
+   Time Patina Styles
+   Design Doc §8: "活物会留下痕迹"
+   
+   These are applied via CSS variables set by
+   the usePatina hook. All changes are extremely
+   subtle and cumulative.
+   ═══════════════════════════════════════════ */
+
+/* Base patina variables */
+:root {
+    --patina-edge-clarity: 0;
+    --patina-surface-depth: 0;
+    --patina-warmth: 0;
+    --patina-transition: 2000ms;
+}
+
+/* Curiosity engine variables */
+:root {
+    --curiosity-contrast: 1.0;
+    --curiosity-sharpness: 0;
+    --curiosity-edge-glow: 0;
+    --curiosity-transition: 1200ms;
+}
+
+/* Dynamic color temperature variables */
+:root {
+    --dynamic-bg-tint: rgba(231, 228, 221, 0.02);
+    --dynamic-contrast: 1.0;
+    --dynamic-warmth: 0.01;
+    --dynamic-gold-opacity: 0.6;
+    --dynamic-transition: 900ms;
+}

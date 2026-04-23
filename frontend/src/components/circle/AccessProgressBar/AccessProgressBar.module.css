@@ -1,0 +1,55 @@
+/* ══════════════════════════════════════
+   AccessProgressBar — Tier Progression
+   Crystal count → next tier threshold
+   ══════════════════════════════════════ */
+
+.bar {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: var(--space-3) var(--space-4);
+    background: rgba(231, 228, 221, 0.03);
+    border: 1px solid rgba(231, 228, 221, 0.06);
+    border-radius: 12px;
+}
+
+.info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.label {
+    font-size: 12px;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+}
+
+.hint {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+}
+
+.track {
+    height: 4px;
+    background: rgba(231, 228, 221, 0.06);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg,
+            rgba(199, 168, 107, 0.4),
+            rgba(199, 168, 107, 0.7));
+    transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.complete {
+    background: linear-gradient(90deg,
+            rgba(199, 168, 107, 0.5),
+            rgba(199, 168, 107, 0.8));
+    box-shadow: 0 0 6px rgba(199, 168, 107, 0.3);
+}

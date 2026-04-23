@@ -1,0 +1,2968 @@
+{
+  "Metadata": {
+    "title": "Alcheme — Convierte el ruido en oro",
+    "description": "Un protocolo descentralizado para el orden y los activos de conocimiento. Convierte discusiones fragmentadas en cristales digitales valiosos y rastreables."
+  },
+  "LanguageSwitcher": {
+    "label": "Idioma",
+    "ariaLabel": "Cambiar idioma",
+    "statusPending": "Actualizando…",
+    "options": {
+      "zh": "中文",
+      "en": "English",
+      "es": "Español",
+      "fr": "Français"
+    }
+  },
+  "BottomNav": {
+    "ariaLabel": "Navegación principal",
+    "items": {
+      "home": "Inicio",
+      "circles": "Círculos",
+      "compose": "Publicar",
+      "notifications": "Alertas",
+      "profile": "Yo"
+    }
+  },
+  "IdentityRegistrationEntry": {
+    "eyebrow": "Identidad on-chain",
+    "primaryLabel": "Crear identidad"
+  },
+  "LandingPage": {
+    "tagline": "Convierte el ruido en oro"
+  },
+  "HeatGauge": {
+    "meterLabel": "Calor {state} {value} grados",
+    "displayLabel": "{state} · {value}°",
+    "states": {
+      "active": "Activo",
+      "cooling": "Enfriando",
+      "frozen": "Congelado"
+    }
+  },
+  "ConnectPage": {
+    "title": "Vuelve a tu lugar",
+    "walletHint": "Funciona con billeteras Solana como Phantom y Solflare",
+    "common": {
+      "skip": "Solo mirar →"
+    },
+    "states": {
+      "connectingSession": {
+        "subtitle": "Comprobando si esta billetera ya tiene una identidad on-chain.",
+        "primaryLabel": "Comprobando…"
+      },
+      "unregistered": {
+        "subtitle": "Tu billetera está conectada, pero todavía no tienes una identidad on-chain. Crea una para unirte a círculos y entrar en el flujo completo de contribución.",
+        "primaryLabel": "Crear identidad",
+        "skipLabel": "Luego, llévame al inicio →"
+      },
+      "sessionError": {
+        "subtitle": "No pudimos confirmar tu identidad. Inténtalo de nuevo.",
+        "primaryLabel": "Reintentar",
+        "skipLabel": "Ir al inicio por ahora →"
+      },
+      "registered": {
+        "subtitle": "Identidad confirmada. Te llevamos al inicio.",
+        "primaryLabel": "Entrando al inicio"
+      },
+      "default": {
+        "subtitle": "Conecta tu billetera y empieza tu recorrido en Alcheme.",
+        "primaryLabel": "Conectar billetera"
+      }
+    }
+  },
+  "RegisterIdentitySheet": {
+    "helper": {
+      "default": "El handle debe tener entre 3 y 32 caracteres, usar letras, números o guiones bajos, y no puede empezar con un número.",
+      "syncing": {
+        "joinCircle": "Tu identidad ya está en cadena. Esperando a que el índice se actualice para seguir con la unión al círculo.",
+        "onboarding": "Tu identidad ya está en cadena. Esperando a que el índice se actualice para completar el inicio de sesión."
+      }
+    },
+    "title": {
+      "joinCircle": "Crear identidad y unirse al círculo",
+      "onboarding": "Crear identidad on-chain"
+    },
+    "lead": {
+      "joinCircle": "Esta billetera está conectada, pero todavía no tiene una identidad on-chain lista para iniciar sesión. Completa este paso y seguiremos con la unión al círculo actual automáticamente.",
+      "onboarding": "Esta billetera está conectada, pero todavía no tiene una identidad on-chain lista para iniciar sesión. Cuando termines, podrás unirte a círculos y empezar a participar de verdad."
+    },
+    "actions": {
+      "cancel": "Cancelar",
+      "notNow": "Más tarde",
+      "submittingJoin": "Uniendo…",
+      "submittingCreate": "Creando…",
+      "registeringJoin": "Registrando…",
+      "registeringCreate": "Creando…",
+      "createAndJoin": "Crear y unirse",
+      "create": "Crear identidad",
+      "close": "Cerrar"
+    },
+    "handle": {
+      "label": "Handle de identidad",
+      "placeholder": "Por ejemplo alice_01"
+    }
+  },
+  "HomePage": {
+    "reminder": {
+      "sessionError": {
+        "title": "No pudimos confirmar tu identidad",
+        "description": "La verificación de identidad falló. Inténtalo de nuevo.",
+        "primaryLabel": "Reintentar"
+      },
+      "unregistered": {
+        "title": "Billetera conectada, identidad pendiente",
+        "description": "Crea una identidad para unirte a círculos, hablar dentro de ellos y entrar en el flujo completo de contribución.",
+        "primaryLabel": "Crear identidad",
+        "secondaryLabel": "Más tarde"
+      }
+    },
+    "header": {
+      "title": "Retoma el hilo",
+      "subtitle": "El conocimiento se asienta dentro de los círculos. El flujo público solo muestra señales destacadas de Lv0.",
+      "flow": {
+        "public": "Público",
+        "following": "Siguiendo"
+      },
+      "walletConnected": "● Billetera conectada"
+    },
+    "public": {
+      "discussions": {
+        "title": "Debates destacados de Lv0",
+        "empty": "Todavía no hay debates destacados"
+      },
+      "crystals": {
+        "title": "Últimos cristales de Lv0",
+        "empty": "Todavía no hay cristales",
+        "openAria": "Abrir cristal {title}"
+      },
+      "meta": "{circleName} · @{authorHandle}"
+    },
+    "following": {
+      "title": "Flujo de seguidos",
+      "empty": {
+        "following": "La gente que sigues todavía no ha publicado nada visible. Vuelve en un rato.",
+        "none": "Todavía no sigues a ningún creador. Encuentra algunos para empezar."
+      },
+      "untitled": "Publicación sin título",
+      "postMeta": "@{authorHandle} · {circleName} · Calor {heatLabel} {heat}°"
+    },
+    "heat": {
+      "states": {
+        "active": "Activo",
+        "cooling": "Enfriando",
+        "frozen": "Congelado"
+      }
+    },
+    "discover": {
+      "title": "Descubrir círculos",
+      "empty": "Todavía no hay círculos",
+      "noDescription": "Todavía no hay descripción",
+      "meta": "{members} miembros · {posts} publicaciones"
+    },
+    "common": {
+      "circleFallback": "Círculo"
+    }
+  },
+  "ComposePage": {
+    "title": "Publicar una idea",
+    "validation": {
+      "feedNotAllowed": "Los círculos en modo conocimiento solo admiten borradores.",
+      "draftNotAllowed": "Los círculos en modo social solo admiten publicaciones en el feed."
+    },
+    "status": {
+      "joinedCircles": "Unido a {count} círculos",
+      "guest": "Modo invitado (sin círculo)",
+      "label": "Estado actual"
+    },
+    "success": {
+      "title": "Publicado",
+      "text": "Enviado a {circleName} · {target}"
+    },
+    "common": {
+      "circleFallback": "Círculo"
+    },
+    "actions": {
+      "backHomeAria": "Volver al inicio",
+      "publish": "Publicar"
+    },
+    "composer": {
+      "placeholder": "Escribe tu idea, pregunta o hallazgo…",
+      "charCount": "{count} caracteres"
+    },
+    "empty": {
+      "title": "Todavía no tienes un círculo donde publicar",
+      "description": "Ahora mismo estás navegando como invitado. Las publicaciones rápidas deben pertenecer a un círculo, así que primero crea uno o únete a uno existente.",
+      "createCircle": "Crear círculo",
+      "joinCircle": "Unirse a un círculo"
+    },
+    "selectors": {
+      "chooseRequired": "Elige el círculo de destino (obligatorio)",
+      "createOrJoinFirst": "Primero crea o únete a un círculo",
+      "auxiliaryPrefix": "Aux",
+      "levelLabel": "Nivel {level}"
+    },
+    "intent": {
+      "feed": "Feed",
+      "draft": "Borrador",
+      "feedArea": "feed",
+      "draftArea": "zona de borradores",
+      "feedTitleEnabled": "Publicar en el feed",
+      "feedTitleDisabled": "Solo los círculos sociales admiten feed",
+      "draftTitleEnabled": "Publicar en borradores",
+      "draftTitleDisabled": "Solo los círculos de conocimiento admiten borradores"
+    },
+    "hint": "💡 La publicación rápida admite dos intenciones: feed y borrador. Los círculos sociales van al feed por defecto; los círculos de conocimiento pueden convertir una idea en borrador para seguir puliéndola en colaboración."
+  },
+  "CirclesPage": {
+    "title": "Círculos",
+    "subtitle": "Encuentra el territorio donde tu conocimiento puede echar raíces",
+    "empty": "No encontramos círculos que coincidan",
+    "actions": {
+      "createAria": "Crear un círculo"
+    },
+    "search": {
+      "placeholder": "Buscar círculos…",
+      "relatedResults": "También encontramos {count} resultados relacionados en el contenido"
+    },
+    "circle": {
+      "noDescription": "Aún no hay descripción",
+      "meta": "{members} miembros · {posts} publicaciones",
+      "type": {
+        "closed": "🔒 Acceso controlado",
+        "secret": "🔒 Secreto",
+        "open": "Abierto"
+      }
+    }
+  },
+  "CreateCircleSheet": {
+    "header": {
+      "defaultTitle": "Crear círculo",
+      "createAuxiliaryWithParent": "Crear círculo lateral · {parentCircleName}"
+    },
+    "steps": {
+      "basicInfo": "Información básica",
+      "circleMode": "Modo del círculo",
+      "accessSettings": "Acceso",
+      "confirmCreate": "Revisar y crear"
+    },
+    "stepIndicator": "Paso {current} / {total}",
+    "fields": {
+      "creationScope": "Tipo de creación",
+      "name": "Nombre del círculo",
+      "namePlaceholder": "Por ejemplo: Grupo de programación asíncrona",
+      "description": "Descripción (opcional)",
+      "descriptionPlaceholder": "Describe el tema y el propósito de este círculo…",
+      "genesis": "Punto de partida",
+      "seededFiles": "Archivos fuente de SEEDED",
+      "seededFilesHint": "En esta fase, estos archivos solo sirven como referencias de origen y contexto para la IA. No convierten el borrador en un espacio de trabajo multifichero.",
+      "seededFilesSelected": "{count} archivos seleccionados:",
+      "aiCollaboration": "Colaboración con IA",
+      "draftAndReview": "Borrador y revisión",
+      "workflowPermissions": "Permisos del flujo de incidencias"
+    },
+    "creationScope": {
+      "auxiliary": {
+        "name": "Círculo lateral",
+        "line1": "Lv.x.y",
+        "line2": "Grupo de discusión / célula temática"
+      },
+      "nextLevel": {
+        "name": "Círculo del siguiente nivel",
+        "line1": "Lv.x+1",
+        "line2": "Expansión del círculo principal"
+      },
+      "fork": {
+        "name": "Fork",
+        "line1": "Rama a nivel de círculo",
+        "line2": "Futuro independiente y lineage menos acoplado"
+      },
+      "nextLevelDisabledReason": "Ahora mismo no cumples las condiciones para crear el siguiente nivel.",
+      "nextLevelUnavailable": "Esta cuenta no puede crear el siguiente nivel por ahora."
+    },
+    "mode": {
+      "social": {
+        "name": "Modo social",
+        "line1": "Discusión + feed",
+        "line2": "Ideal para grupos de interés y conversación cotidiana"
+      },
+      "knowledge": {
+        "name": "Modo de conocimiento",
+        "line1": "Discusión + borradores + biblioteca",
+        "line2": "Ideal para documentos estructurados y subproyectos"
+      }
+    },
+    "genesis": {
+      "blank": {
+        "line1": "Empezar desde un borrador vacío",
+        "line2": "Mejor para un tema completamente nuevo"
+      },
+      "seeded": {
+        "line1": "Entrar con material semilla",
+        "line2": "Mejor cuando el tema ya tiene fuentes o material previo"
+      },
+      "seededHint": "SEEDED sigue creando un borrador de un solo documento; simplemente permite citar materiales subidos y archivos fuente más adelante."
+    },
+    "tabs": {
+      "plaza": "Discusión",
+      "feed": "Feed",
+      "crucible": "Borradores",
+      "sanctuary": "Biblioteca"
+    },
+    "roles": {
+      "Initiate": "Iniciado",
+      "Member": "Miembro",
+      "Elder": "Anciano",
+      "Moderator": "Moderador",
+      "Admin": "Admin senior",
+      "Owner": "Propietario"
+    },
+    "reviewEntryModeHelp": {
+      "auto_only": "Cuando se agota el tiempo, la edición se cierra sola y entra directamente en revisión de incidencias.",
+      "manual_only": "Solo quienes tengan permiso pueden cerrar la edición manualmente y pasar a la revisión.",
+      "auto_or_manual": "Puede entrar en revisión automáticamente al terminar el tiempo, o cerrarse antes de forma manual."
+    },
+    "ai": {
+      "summaryUseLlm": {
+        "title": "Usar IA para generar un resumen de la discusión",
+        "hint": "Si se activa, el sistema organizará la discusión reciente y generará un resumen breve.",
+        "warning": "Si se desactiva, el sistema volverá a reglas para resumir la discusión, y el resultado puede ser menos preciso."
+      },
+      "draftTriggerMode": {
+        "title": "Qué hacer después de activarlo",
+        "hint": "Cuando el sistema decide que la discusión ya está lista para entrar en el flujo de borrador, ¿solo avisamos o creamos un borrador de inmediato?",
+        "notifyOnly": "Solo avisar",
+        "autoDraft": "Crear borrador automáticamente"
+      },
+      "triggerSummaryUseLlm": {
+        "title": "Usar IA para decidir si debe activarse un borrador",
+        "hint": "Si se activa, el sistema primero organiza la discusión reciente y luego usa IA para ayudar a decidir si debe entrar en el flujo de borrador.",
+        "warning": "Si se desactiva, el sistema volverá a reglas para decidir si debe activarse un borrador, y el resultado puede ser menos preciso."
+      }
+    },
+    "review": {
+      "entryMode": {
+        "title": "Cómo empieza la revisión",
+        "autoOnly": "Cierre automático",
+        "manualOnly": "Cierre manual",
+        "autoOrManual": "Ambas opciones"
+      },
+      "autoEntryWindow": {
+        "title": "Temporizador de entrada automática",
+        "hint": "Cuando termina este tiempo, el editor pasa del borrador a la revisión de incidencias."
+      },
+      "reviewWindow": {
+        "title": "Duración de la revisión",
+        "hint": "Al acabarse el tiempo, termina la ronda actual y el equipo decide si revisar de nuevo o cristalizar."
+      },
+      "maxRevisionRounds": {
+        "title": "Máximo de rondas de revisión"
+      }
+    },
+    "workflow": {
+      "createIssueMinRole": "Quién puede crear incidencias",
+      "followupIssueMinRole": "Quién puede añadir seguimiento",
+      "reviewIssueMinRole": "Quién puede revisar incidencias",
+      "retagIssueMinRole": "Quién puede cambiar el tipo de incidencia",
+      "applyIssueMinRole": "Quién puede marcarla como resuelta",
+      "manualEndDraftingMinRole": "Quién puede cerrar la edición",
+      "advanceFromReviewMinRole": "Quién puede cerrar la ronda de revisión",
+      "enterCrystallizationMinRole": "Quién puede iniciar la cristalización",
+      "allowAuthorWithdrawBeforeReview": "El autor puede retirarla antes de la revisión",
+      "allowModeratorRetagIssue": "Quien revisa puede cambiar el tipo"
+    },
+    "access": {
+      "free": {
+        "name": "Abierto",
+        "description": "Cualquier miembro del círculo principal puede entrar libremente"
+      },
+      "crystal": {
+        "name": "Umbral de cristales",
+        "description": "Requiere tener una cantidad mínima de cristales"
+      },
+      "invite": {
+        "name": "Solo por invitación",
+        "description": "Solo las personas invitadas pueden unirse"
+      }
+    },
+    "confirm": {
+      "labels": {
+        "creationScope": "Tipo de creación",
+        "name": "Nombre",
+        "description": "Descripción",
+        "mode": "Modo",
+        "genesis": "Punto de partida",
+        "review": "Borrador y revisión",
+        "access": "Acceso",
+        "ai": "Colaboración con IA"
+      },
+      "creationScope": {
+        "auxiliary": "🧩 Círculo lateral",
+        "nextLevel": "🪜 Círculo del siguiente nivel"
+      },
+      "mode": {
+        "social": "🌐 Modo social",
+        "knowledge": "📚 Modo de conocimiento"
+      },
+      "genesis": {
+        "seeded": "🌱 SEEDED · Con material semilla",
+        "blank": "📝 BLANK · Desde cero"
+      },
+      "seededFilesAttached": "{count} archivos SEEDED adjuntos",
+      "reviewEntry": {
+        "autoOnly": "Entrada automática a revisión",
+        "manualOnly": "Entrada manual a revisión",
+        "autoOrManual": "Entrada automática o manual a revisión"
+      },
+      "reviewSummary": {
+        "withAuto": " · entrada automática en {draftingWindowMinutes} min · revisión de {reviewWindowMinutes} min · hasta {maxRevisionRounds} rondas",
+        "manualOnly": " · revisión de {reviewWindowMinutes} min · hasta {maxRevisionRounds} rondas"
+      },
+      "access": {
+        "free": "🌍 Abierto",
+        "crystal": "💎 Requiere ≥ {minCrystals} cristales",
+        "invite": "🔒 Solo por invitación"
+      },
+      "ai": {
+        "summary": "Resumen de discusión: {mode}",
+        "draftTrigger": "Activación del borrador: {mode}",
+        "triggerSummary": "Resumen de activación: {mode}",
+        "llm": "LLM",
+        "rule": "Reglas",
+        "autoDraft": "Borrador automático",
+        "notifyOnly": "Solo avisar"
+      }
+    },
+    "common": {
+      "minutes": "min"
+    },
+    "actions": {
+      "cancel": "Cancelar",
+      "back": "Atrás",
+      "next": "Siguiente",
+      "create": "✨ Crear círculo",
+      "creating": "Creando…"
+    },
+    "errors": {
+      "seededRequired": "Selecciona al menos un archivo fuente de SEEDED."
+    }
+  },
+  "FeedTab": {
+    "states": {
+      "empty": "Todavía no hay novedades en este círculo"
+    },
+    "repost": {
+      "fromAuthor": "Reposteado desde @{author}",
+      "emptyBody": "La publicación original no tenía texto",
+      "fromOriginal": "Reposteado desde una publicación original",
+      "unavailable": "La publicación original no está disponible aquí"
+    },
+    "actions": {
+      "like": "Me gusta",
+      "liked": "Ya te gusta",
+      "comment": "Comentar",
+      "openReplies": "Abrir respuestas",
+      "commentUnavailable": "Las respuestas no están disponibles",
+      "repost": "Repostear",
+      "repostReasons": {
+        "connect_wallet": "Conecta tu wallet primero",
+        "join_circle": "Únete al círculo para repostear",
+        "pending_membership": "Tu solicitud de acceso está esperando revisión",
+        "pending": "Reposteando…",
+        "already_reposted": "Ya se reposteo una vez"
+      }
+    },
+    "composer": {
+      "placeholder": "Comparte el siguiente paso en {circleName}",
+      "aria": "Publica algo en {circleName}",
+      "unavailable": "El compositor no está disponible"
+    }
+  },
+  "SanctuaryTab": {
+    "meta": {
+      "citedCount": "Citas: {count}"
+    },
+    "patina": {
+      "ancient": "🏛 Clásico",
+      "weathering": "📜 Madurando"
+    }
+  },
+  "ForkReadiness": {
+    "defaults": {
+      "sourceCircleFallback": "Círculo #{sourceCircleId}",
+      "sourceLevelPending": "Nivel pendiente",
+      "sourceLevel": "Nivel {level}",
+      "identityFloor": "Piso: {roleLabel}",
+      "contributionProgress": "{current} / {required} contribuciones",
+      "prefillSourceLabel": "Se crea con el perfil por defecto (v{configVersion}).",
+      "slogan": "Cuando el desacuerdo apunta a otro futuro, bifurcarse es más honesto que forzar una sola dirección.",
+      "declarationPlaceholder": "Explica qué necesita proteger este fork y por qué debería empezar separado del círculo actual.",
+      "hintTitle": "Condiciones para el fork",
+      "hintBody": "Aquí se ve la barra de contribución, el piso de identidad, el modo de herencia y el alcance de la línea de conocimiento. La entrada real para crear sigue en la página del círculo."
+    },
+    "threshold": {
+      "disabled": "Este círculo todavía no abrió la opción de fork.",
+      "base": "Al menos {minimumContributions} contribuciones, con estado igual o superior a {roleLabel}",
+      "withGovernance": "{base}, más una aprobación de gobernanza.",
+      "ready": "{base}, y ya puedes hacer fork."
+    },
+    "inheritance": {
+      "locked": "El nuevo círculo empieza con la configuración aguas arriba y queda bloqueada.",
+      "editable": "El nuevo círculo empieza con la configuración aguas arriba y luego sigue siendo editable.",
+      "independent": "El nuevo círculo empieza con configuración independiente en lugar de heredar la de arriba."
+    },
+    "knowledgeLineage": {
+      "upstreamUntilForkNode": "La línea de conocimiento sigue aguas arriba hasta que aparezca el nuevo nodo del fork."
+    },
+    "roles": {
+      "Owner": "Propietario",
+      "Admin": "Admin",
+      "Moderator": "Moderador",
+      "Member": "Miembro",
+      "Elder": "Veterano",
+      "Initiate": "Iniciado"
+    },
+    "qualification": {
+      "qualified": "Ya cumples las condiciones actuales y puedes hacer fork.",
+      "forkDisabled": "Este círculo todavía no abrió la opción de fork.",
+      "identityShortfall": "Tu rol o identidad actual todavía está por debajo del piso de {roleLabel}.",
+      "contributionShortfall": "Te faltan {missing} contribuciones para poder enviarlo.",
+      "fallback": "Todavía no cumples las condiciones para enviarlo."
+    },
+    "statusBadge": {
+      "qualified": "Listo para fork",
+      "forkDisabled": "Cerrado",
+      "identityShortfall": "Identidad insuficiente",
+      "contributionShortfall": "Faltan contribuciones"
+    }
+  },
+  "ForkReadinessPanel": {
+    "eyebrow": "Condiciones del fork",
+    "labels": {
+      "sourceCircle": "Círculo origen",
+      "currentQualification": "Calificación actual",
+      "contributionThreshold": "Umbral de contribución",
+      "identityFloor": "Piso de identidad",
+      "level": "Nivel",
+      "entryThreshold": "Condición de entrada",
+      "inheritance": "Herencia",
+      "knowledgeLineage": "Línea de conocimiento",
+      "originMarker": "Marca de origen",
+      "retentionRhythm": "Ritmo de retención",
+      "prefill": "Carga inicial"
+    },
+    "values": {
+      "originMarker": "Aparece más tarde en la vista general o en lineage, no en la estructura principal.",
+      "retentionRhythm": "Se revisa en los días 2 / 7 / 30 / 90 / 180 y se oculta tras dos revisiones inactivas."
+    }
+  },
+  "ForkCreateSheet": {
+    "header": {
+      "eyebrow": "Configuración del fork",
+      "title": "Fork · {sourceCircleName}"
+    },
+    "defaults": {
+      "name": "{sourceCircleName} Fork"
+    },
+    "roles": {
+      "Initiate": "Iniciado",
+      "Member": "Miembro",
+      "Elder": "Veterano",
+      "Moderator": "Moderador",
+      "Admin": "Admin sénior",
+      "Owner": "Propietario"
+    },
+    "eligibility": {
+      "title": "Por qué este fork ya puede avanzar",
+      "hint": "El círculo origen, la fotografía de requisitos y la razón de la separación se guardarán juntos en este registro.",
+      "fallbackSlogan": "Cuando el desacuerdo apunta a otro futuro, bifurcarse es más honesto que forzar una sola dirección.",
+      "loading": "Comprobando las condiciones actuales del fork…",
+      "pendingTarget": "El círculo fork #{targetCircleId} ya existe. Completar este registro no volverá a crearlo."
+    },
+    "setup": {
+      "title": "Cómo arranca el nuevo círculo",
+      "hint": "Estos campos se convierten en la configuración inicial del nuevo círculo. Todo salvo la fork policy sigue usando la vía de escritura actual."
+    },
+    "fields": {
+      "declaration": "Razón de la separación",
+      "declarationPlaceholder": "Explica con claridad qué cambio de rumbo justifica este fork.",
+      "name": "Nombre",
+      "description": "Descripción",
+      "joinRequirement": "Requisito de acceso",
+      "minCrystals": "Mínimo de cristales",
+      "draftLifecycleTemplate": "Ciclo del borrador",
+      "draftWorkflowPolicy": "Flujo del borrador",
+      "ghostPolicy": "Política Ghost",
+      "forkPolicy": "Fork policy"
+    },
+    "access": {
+      "free": "Acceso libre",
+      "crystal": "Umbral de cristal",
+      "invite": "Solo invitación",
+      "approval": "Requiere aprobación"
+    },
+    "reviewEntryMode": {
+      "auto_or_manual": "Automático o manual",
+      "auto_only": "Solo automático",
+      "manual_only": "Solo manual"
+    },
+    "ghostPolicy": {
+      "notify_only": "Solo avisar",
+      "auto_draft": "Borrador automático"
+    },
+    "forkPolicy": {
+      "minimumContributions": "Contribuciones mínimas: {count}",
+      "minimumRole": "Rol mínimo: {role}",
+      "requiresGovernanceVote": "Necesita voto de gobernanza: {value}"
+    },
+    "common": {
+      "true": "Sí",
+      "false": "No"
+    },
+    "actions": {
+      "closeAria": "Cerrar configuración del fork",
+      "close": "Más tarde",
+      "resumeSubmit": "Terminar el registro",
+      "disabled": "Aún no disponible",
+      "create": "Crear círculo fork"
+    }
+  },
+  "CircleDetailPage": {
+    "defaults": {
+      "unknownCircle": "Círculo desconocido",
+      "publicCircle": "Círculo público",
+      "circleWithId": "Círculo #{circleId}",
+      "unknownMember": "miembro desconocido"
+    },
+    "tabs": {
+      "plaza": "Discusión",
+      "feed": "Feed",
+      "crucible": "Borradores",
+      "sanctuary": "Conocimiento"
+    },
+    "header": {
+      "backToCirclesAria": "Volver a círculos",
+      "meta": "{memberCount} miembros · {crystalCount} cristales",
+      "notificationsAria": "Abrir notificaciones",
+      "settingsAria": "Abrir ajustes del círculo"
+    },
+    "join": {
+      "processing": "Procesando…",
+      "banner": {
+        "connectWallet": "Conectar billetera",
+        "connectWalletHint": "Conecta tu billetera antes de unirte a este círculo.",
+        "registerIdentity": "Crear identidad",
+        "registerIdentityHint": "Crea una identidad antes de unirte a este círculo.",
+        "retrySession": "Reintentar",
+        "retrySessionHint": "No pudimos confirmar tu identidad. Vuelve a intentarlo."
+      },
+      "button": {
+        "join": "Unirse al círculo",
+        "createIdentity": "Crear identidad",
+        "joined": "Unido",
+        "pending": "Pendiente",
+        "approvalRequired": "Solicitar acceso",
+        "inviteRequired": "Solo con invitación",
+        "crystalRequirement": "Faltan {missingCrystals} cristales",
+        "restricted": "Restringido",
+        "rejoin": "Volver a unirse"
+      },
+      "hint": {
+        "visitorDefault": "Los visitantes pueden publicar mensajes efímeros, pero solo los miembros entran en el archivo formal.",
+        "createIdentity": "Crea una identidad antes de unirte a este círculo.",
+        "pending": "Tu solicitud ya fue enviada y está en revisión.",
+        "approvalRequired": "Este círculo revisa las solicitudes antes de aprobarlas.",
+        "inviteRequired": "Este círculo es solo por invitación. Pide acceso a un administrador.",
+        "insufficientCrystals": "Necesitas {required} cristales y ahora tienes {current}.",
+        "banned": "Tu acceso a este círculo está restringido por ahora."
+      },
+      "errors": {
+        "walletRequired": "Conecta tu identidad antes de unirte al círculo.",
+        "inviteRequired": "Este círculo es solo por invitación. Pide acceso a un administrador.",
+        "insufficientCrystals": "Todavía no tienes suficientes cristales para entrar.",
+        "banned": "Tu acceso a este círculo está restringido por ahora.",
+        "requestStateChanged": "El estado de la solicitud cambió. Actualiza la página e inténtalo otra vez.",
+        "membershipBridgeUnavailable": "La identidad ya se creó, pero la finalización para entrar al círculo no está disponible por ahora. Vuelve a intentar unirte.",
+        "fallback": "No se pudo unir al círculo. Inténtalo de nuevo."
+      }
+    },
+    "levels": {
+      "Visitor": "Visitante",
+      "Initiate": "Iniciado",
+      "Member": "Miembro",
+      "Elder": "Anciano"
+    },
+    "states": {
+      "visitor": "Visitante",
+      "initiate": "Iniciado",
+      "member": "Miembro",
+      "curator": "Curador",
+      "owner": "Propietario"
+    },
+    "identityProgress": {
+      "label": "Identidad en el círculo",
+      "labelInline": "Identidad",
+      "nextLevel": "Siguiente: {levelLabel}",
+      "summaryLink": "Ver resumen"
+    },
+    "identityTransition": {
+      "badge": "Cambio de identidad",
+      "dismissAria": "Cerrar aviso de cambio de identidad"
+    },
+    "memberDirectory": {
+      "notice": {
+        "connectAndJoin": "Conéctate y únete a este círculo para ver miembros y roles.",
+        "joinRequired": "Los detalles de los miembros se muestran después de unirte al círculo."
+      },
+      "errors": {
+        "profileUnavailable": "El perfil del miembro no está disponible por ahora.",
+        "loadFailed": "No se pudo cargar el perfil del miembro. Inténtalo de nuevo."
+      },
+      "actionErrors": {
+        "forbidden": "Tu rol actual no puede realizar esta acción.",
+        "memberGone": "Ese miembro ya no está aquí o su estado ya cambió. Actualiza e inténtalo de nuevo.",
+        "activeInviteExists": "Ese miembro ya tiene una invitación activa.",
+        "alreadyMember": "Ese miembro ya está en este círculo.",
+        "protectedRole": "Ese rol de miembro no se puede cambiar aquí por ahora.",
+        "selfRemovalUnsupported": "No puedes eliminarte desde aquí. Usa la opción de salir del círculo.",
+        "selfRoleChangeUnsupported": "Cambiar tu propio rol no está disponible aquí por ahora."
+      },
+      "followSyncing": "La actualización on-chain ya existe, pero el índice todavía se está sincronizando."
+    },
+    "boundary": {
+      "back": "Volver",
+      "backToMain": "Volver al círculo principal",
+      "next": "Continuar",
+      "nextLevel": "Siguiente nivel",
+      "previousLevel": "Nivel anterior"
+    },
+    "settings": {
+      "forwardPolicyNotice": "La política de reenvío sigue gestionándose a nivel de círculo y todavía no se puede editar aquí.",
+      "deleteNotice": "Eliminar un círculo todavía está bloqueado detrás de un flujo de revisión más seguro y aún no está disponible.",
+      "errors": {
+        "invalidCircleForAi": "Este círculo no es válido, así que los ajustes de IA aún no se pueden guardar.",
+        "invalidCircleForDraftLifecycle": "Este círculo no es válido, así que los ajustes del ciclo del borrador aún no se pueden guardar.",
+        "invalidCircleForWorkflow": "Este círculo no es válido, así que los permisos del flujo todavía no se pueden guardar.",
+        "invalidCircleForAgents": "Este círculo no es válido, así que la gobernanza de agentes aún no se puede guardar.",
+        "loadAiFallback": "No se pudieron cargar los ajustes de IA, así que por ahora se usan los valores predeterminados.",
+        "loadDraftPolicyFallback": "No se pudieron cargar los ajustes del flujo del borrador, así que por ahora se usan los valores predeterminados.",
+        "loadAgentPolicyFallback": "No se pudieron cargar los ajustes de gobernanza de agentes, así que por ahora se usan los valores predeterminados.",
+        "saveAiFailed": "No se pudieron guardar los ajustes de IA. Inténtalo de nuevo.",
+        "saveDraftLifecycleFailed": "No se pudieron guardar los ajustes del ciclo del borrador. Inténtalo de nuevo.",
+        "saveWorkflowFailed": "No se pudieron guardar los permisos del flujo. Inténtalo de nuevo.",
+        "saveAgentsFailed": "No se pudieron guardar los ajustes de gobernanza de agentes. Inténtalo de nuevo.",
+        "invalidCircleForRoleChange": "Este círculo no es válido, así que no se puede cambiar el rol del miembro.",
+        "memberWalletMissingForRoleChange": "A este miembro le falta la dirección de billetera, así que no se puede completar el cambio de rol on-chain.",
+        "roleChangeFailed": "No se pudo cambiar el rol del miembro. Inténtalo de nuevo.",
+        "invalidCircleForRemoveMember": "Este círculo no es válido, así que no se puede quitar al miembro.",
+        "memberWalletMissingForRemoveMember": "A este miembro le falta la dirección de billetera, así que no se puede completar la eliminación on-chain.",
+        "removeMemberFailed": "No se pudo quitar al miembro. Inténtalo de nuevo.",
+        "invalidCircleForLeave": "Este círculo no es válido, así que todavía no puedes salir de él.",
+        "leaveFailed": "No se pudo salir del círculo. Inténtalo de nuevo."
+      }
+    },
+    "createCircle": {
+      "title": "Crear círculo · {name} (Nv.{level})",
+      "parentCircleName": "{name} (Nivel {level})",
+      "errors": {
+        "invalidParentCircle": "Este círculo no es válido, así que la creación todavía no puede empezar.",
+        "noNextLevelPermission": "Esta cuenta todavía no puede crear el siguiente nivel desde aquí."
+      }
+    },
+    "invite": {
+      "errors": {
+        "selectMember": "Selecciona al menos un miembro para invitar.",
+        "sendFailed": "No se pudo enviar la invitación. Inténtalo de nuevo."
+      }
+    },
+    "fork": {
+      "nextLevelPermission": {
+        "connectWallet": "Conecta tu billetera antes de crear el círculo del siguiente nivel.",
+        "insufficientRole": "Solo el creador, los administradores del círculo o el mayor contribuyente actual de cristales pueden crear el siguiente nivel."
+      },
+      "errors": {
+        "invalidSourceCircle": "Este círculo no es válido, así que el fork todavía no puede empezar.",
+        "loadRequirementsFailed": "No se pudieron cargar los requisitos del fork. Inténtalo de nuevo.",
+        "pendingFinalizationDetected": "El círculo fork #{targetCircleId} ya existe. Solo falta el registro final, y completarlo no volverá a crearlo.",
+        "notQualified": "Todavía no cumples con los requisitos actuales para hacer fork.",
+        "pendingFinalizationStillReconciling": "El círculo fork #{targetCircleId} ya existe. El registro final todavía se está conciliando, así que prueba otra vez el último paso en un momento.",
+        "pendingFinalizationRetryLastStep": "El círculo fork #{targetCircleId} ya existe. Solo falta el último paso del registro, así que repítelo.",
+        "prepareFilingFailed": "No se pudo registrar la relación del fork, así que el nuevo círculo todavía no ha empezado.",
+        "finalizationStillReconciling": "El círculo fork #{targetCircleId} ya existe. El registro final todavía se está conciliando, así que prueba otra vez el último paso en un momento.",
+        "finalizationRetryLastStep": "El círculo fork #{targetCircleId} ya existe. Solo falta el último paso del registro, así que repítelo."
+      }
+    },
+    "forkLineage": {
+      "eyebrow": "Linaje del fork",
+      "title": "Origen y linaje del fork",
+      "syncing": "Sincronizando…",
+      "errors": {
+        "loadFailed": "La vista de linaje del fork no está disponible por ahora. Inténtalo más tarde."
+      },
+      "badges": {
+        "currentFrom": "Círculo actual desde",
+        "sourceFork": "Fork originado aquí"
+      },
+      "meta": {
+        "originAnchor": "Ancla de origen {anchor}",
+        "executionDigest": "Resumen de ejecución {digest}"
+      },
+      "status": {
+        "completed": "Completado",
+        "reconciliationPending": "Conciliando",
+        "prepared": "Preparado"
+      },
+      "marker": {
+        "permanentWithDate": "Marcador permanente desde {date}",
+        "permanent": "Marcador permanente",
+        "hiddenWithDate": "Marcador oculto desde {date}",
+        "hidden": "Marcador oculto",
+        "visibleWithCheckpoint": "Marcador visible · día de control {day}",
+        "visible": "Marcador visible",
+        "pendingInit": "Estado del marcador pendiente"
+      },
+      "schedule": {
+        "inactiveWithNextCheck": "{count} controles inactivos · próxima revisión {date}",
+        "inactiveOnly": "{count} controles inactivos",
+        "nextCheck": "Próxima revisión {date}",
+        "waitingNextCheck": "Esperando la siguiente revisión del linaje"
+      }
+    }
+  },
+  "CircleSummaryPage": {
+    "errors": {
+      "fetchSnapshot": "No se pudo cargar la instantánea del resumen.",
+      "fetchOutputs": "No se pudieron cargar los resultados ya asentados.",
+      "fetchDraft": "No se pudo cargar la base del borrador.",
+      "fetchDraftCandidates": "No se pudieron cargar los borradores candidatos del círculo."
+    },
+    "warnings": {
+      "formalOutputReadFailed": "La salida formal de CrystalOutput para el conocimiento {knowledgeId} no está disponible ahora mismo.",
+      "partialOutputs": "Hay {count} resultados formales de CrystalOutput no disponibles en este momento, así que solo se muestran los que sí se pueden leer. {firstWarning}"
+    }
+  },
+  "CircleSummaryReadinessPanel": {
+    "eyebrow": "Superficie de resumen",
+    "title": "De qué se alimenta esta página",
+    "status": {
+      "snapshotVersion": "Instantánea v{version}",
+      "waiting": "Esperando la instantánea formal"
+    },
+    "cards": {
+      "truthSource": {
+        "title": "Fuente actual de verdad",
+        "snapshotNote": "Esta página prioriza CircleSummarySnapshot v{version}, generado por {generatedBy}.",
+        "pendingSnapshotOnly": "Esta página solo acepta la CircleSummarySnapshot formal como verdad del resumen. Hasta que esa instantánea sea legible, aquí solo se muestran límites y no se vuelve a la verdad del scaffold.",
+        "snapshotTruthLive": "Esta página ya está conectada a la verdad formal del resumen."
+      },
+      "knowledgePath": {
+        "title": "Lee directamente la ruta de conocimiento asentado",
+        "items": {
+          "identityAndVersion": "Identidad y versión de cada conclusión asentada",
+          "snapshotLineage": "La línea de procedencia que dejan las instantáneas de contribución",
+          "citations": "Relaciones de citas y referencias de vuelta",
+          "versionHeat": "Historial de versiones y cambios de intensidad"
+        }
+      },
+      "draftBaseline": {
+        "title": "Añade la base del borrador solo cuando hace falta",
+        "items": {
+          "draftIdentity": "Identidad del borrador y estado actual",
+          "stableVersion": "Versión estable y huella de origen",
+          "workingCopy": "Versión editable del texto y hora de actualización"
+        },
+        "noteWithDraft": "Los campos estables del borrador #{draftPostId} ya están disponibles y pueden servir como base de esta página.",
+        "noteWithoutDraft": "Todavía no hay una única base de borrador, así que la página se apoya primero en la línea de conocimiento asentado.",
+        "degradationLead": "Estas etiquetas de degradación son deliberadas; no significan que la página haya fallado."
+      },
+      "references": {
+        "title": "Preparación de referencias",
+        "note": "Aquí se listan los campos estables de los que depende la UI de referencias. La página de referencias los lee por la vía dedicada de DraftReferenceLink."
+      }
+    },
+    "chips": {
+      "version": "Versión v{version}",
+      "model": "Modelo: {model}",
+      "providerMode": "Modo: {providerMode}",
+      "promptVersion": "Prompt: {promptAsset}@{promptVersion}",
+      "contextFingerprint": "Huella de contexto: {digest}"
+    },
+    "degradation": {
+      "prefix": "Degradación actual: {label}"
+    }
+  },
+  "CircleSummaryScaffold": {
+    "common": {
+      "backToCircle": "Volver al círculo"
+    },
+    "pending": {
+      "heroLead": "Los resúmenes formales solo provienen de CircleSummarySnapshot. Mientras esa instantánea no sea legible, esta página deja claros los límites en vez de fingir que ya es el resumen final.",
+      "snapshotLoading": "Cargando la CircleSummarySnapshot formal…",
+      "snapshotEmpty": "Todavía no hay una CircleSummarySnapshot legible; esta página no volverá a usar el mapa scaffold como si fuera la verdad formal del resumen."
+    },
+    "appendix": {
+      "title": "Notas de apoyo",
+      "meta": "No roba protagonismo; solo explica el límite actual cuando hace falta.",
+      "loadingSnapshot": "Cargando la instantánea formal del resumen…",
+      "loadingDraft": "Comprobando si esta página tiene una única base estable de borrador…",
+      "loadingOutputs": "Cargando la lista de resultados ya asentados de este círculo…",
+      "sourceDraftReady": "Esta página ya puede volver a los campos estables del borrador #{draftPostId} para completar la base de conocimiento.",
+      "forkLineageNote": "Las marcas de origen de un fork aparecen más tarde y no entran en la estructura principal. Solo se revisan en la vista general o de lineage en los días 2, 7, 30, 90 y 180; se ocultan tras dos revisiones inactivas y se conservan para siempre si siguen vivas en la última.",
+      "degradationPrefix": "Degradación actual: {label}",
+      "snapshotPriorityLead": "Esta página prioriza la instantánea formal v{version}, generada por",
+      "snapshotPriorityWithMode": ", y el modo real de obtención fue {providerMode}.",
+      "snapshotPriorityWithoutMode": "."
+    },
+    "sections": {
+      "primaryRoutes": {
+        "title": "Empieza por la ruta principal",
+        "meta": "Sigue primero una línea principal y luego decide si hace falta abrir otras ramas.",
+        "loading": "Ordenando las líneas ya asentadas de este círculo…",
+        "degradationPrefix": "Aún falta: {label}",
+        "facts": {
+          "source": "De dónde viene",
+          "impact": "Qué alcance tiene",
+          "stabilizedAt": "Cuándo se asentó"
+        },
+        "empty": {
+          "routeLabel": "La línea principal aún se está formando",
+          "title": "Este círculo todavía no tiene una sedimentación estable",
+          "hint": "Primero sigue sumando hechos, explicaciones y desacuerdos verificables alrededor del tema actual.",
+          "currentStartingPoint": "Punto de partida actual",
+          "cardTitle": "Haz crecer la primera línea que realmente se sostenga",
+          "cardHint": "Cuando aparezca el primer resultado asentado, aquí sí se abrirá un mapa de rutas de verdad.",
+          "status": "Todavía convergiendo",
+          "bodyFallback": "Aún no hay una sedimentación estable, así que conviene seguir enfocando el tema desde la discusión y los borradores.",
+          "facts": {
+            "missingLabel": "Qué falta más",
+            "missingValue": "Una conclusión que se sostenga sola",
+            "draftBaselineLabel": "Base del borrador",
+            "draftBaselineValueWithDraft": "Ya se puede volver al borrador #{draftPostId}",
+            "draftBaselineValueWithoutDraft": "Aún no hay una base única de borrador",
+            "nextStepLabel": "Qué hacer ahora",
+            "nextStepValue": "Añadir hechos, explicaciones y desacuerdos verificables"
+          }
+        }
+      },
+      "issueMap": {
+        "title": "Qué leer primero",
+        "meta": "Empieza por las conclusiones que ya se sostienen y luego decide si merece la pena profundizar."
+      },
+      "situation": {
+        "title": "Situación actual",
+        "meta": "Mira el progreso actual de un solo vistazo."
+      },
+      "coverage": {
+        "title": "Qué tan firmes son estas líneas",
+        "meta": "No todas tienen la misma solidez, así que conviene ver primero la fuerza de la evidencia."
+      },
+      "timeline": {
+        "title": "Cómo se fue asentando",
+        "meta": "Une la base del borrador y los resultados cristalizados en orden temporal.",
+        "empty": "Todavía no hay nodos de sedimentación lo bastante estables como para formar una línea de tiempo."
+      },
+      "questions": {
+        "title": "Lo que aún no está claro",
+        "meta": "Pon sobre la mesa, sin adornos, lo que sigue difuso.",
+        "empty": "Ya se distinguen las líneas principales de sedimentación. El mapa completo, el contexto del conflicto y la instantánea de preguntas abiertas pueden venir después."
+      },
+      "entry": {
+        "title": "Cómo entrar ahora",
+        "meta": "Cada tipo de persona entra mejor por un punto distinto.",
+        "newcomer": {
+          "role": "Quien llega por primera vez",
+          "body": "Empieza por el tema principal actual y por la rama asentada más madura; luego comprueba si ya existe una única base de borrador."
+        },
+        "participant": {
+          "role": "Participante",
+          "body": "Da prioridad a los huecos de evidencia señalados en las preguntas abiertas, sobre todo las instantáneas estables y los vínculos con borradores de origen."
+        }
+      }
+    }
+  },
+  "CircleSummaryAdapter": {
+    "common": {
+      "timeTbd": "Fecha pendiente",
+      "unresolvedSource": "Origen aún sin resolver"
+    },
+    "hero": {
+      "eyebrow": "Mapa cognitivo",
+      "title": "Mapa de conocimiento del círculo {circleId}",
+      "lead": "Empieza viendo dónde converge el tema, qué ramas ya se asentaron y qué partes todavía necesitan más evidencia."
+    },
+    "issueMap": {
+      "stableConclusionTitle": "Empieza por la conclusión que ya se sostiene",
+      "stableConclusionBodyWithOutput": "Ahora mismo el hilo asentado más claro es “{title}”, así que ese es el mejor punto de entrada al mapa del círculo.",
+      "stableConclusionBodyWithoutOutput": "Todavía no hay un resultado asentado estable, así que esta página primero te ayuda a ver qué está convergiendo y qué sigue en formación.",
+      "draftBaselineTitle": "Luego vuelve a la base del borrador",
+      "draftBaselineBodyWithDraft": "Ya puedes volver al borrador #{draftPostId} y a su instantánea estable v{draftVersion} para entender cómo se formó esta sedimentación.",
+      "draftBaselineBodyWithoutDraft": "Aún no existe una base única y estable de borrador, así que conviene entrar desde los resultados asentados en lugar de fingir una verdad de borrador que todavía no existe."
+    },
+    "route": {
+      "primaryLabel": "Ruta principal",
+      "parallelLabel": "Rama paralela {index}",
+      "primaryHint": "Si es tu primera vez en este círculo, empieza aquí.",
+      "parallelHint": "Usa esta rama cuando quieras comparar otra interpretación."
+    },
+    "branch": {
+      "statusPrimary": "La más madura ahora",
+      "statusParallel": "Rama paralela {index}",
+      "bindingWithDraft": "Vuelve al borrador #{draftPostId}",
+      "bindingMissing": "Todavía no hay un borrador de origen estable",
+      "evidenceSnapshot": "Respaldada por snapshot",
+      "evidenceSettlementFallback": "Reproducción de sedimentación",
+      "evidenceUnknown": "Origen pendiente",
+      "evidenceSummarySnapshot": "Esta rama ya tiene evidencia estable de snapshot y puede servir como punto de entrada fiable al resumen.",
+      "evidenceSummarySettlementFallback": "La rama está claramente asentada, pero su cadena de origen todavía se queda en evidencia de replay.",
+      "evidenceSummaryUnknown": "La rama ya es visible, pero su evidencia de origen a nivel snapshot aún está incompleta.",
+      "citationSummary": "Citada {citationCount} veces · refs previas {outboundReferenceCount} / citada por {inboundReferenceCount}",
+      "versionPending": "Versión pendiente"
+    },
+    "situation": {
+      "formedConclusionsLabel": "Conclusiones asentadas",
+      "formedConclusionsDescription": "Empieza por lo que ya se estabilizó.",
+      "visibleEntriesLabel": "Entradas visibles",
+      "visibleEntriesDescription": "Esto cuenta las rutas a las que puedes entrar ahora, no el grafo completo de ramas.",
+      "draftBaselineLabel": "Base del borrador",
+      "draftBaselinePending": "Pendiente",
+      "draftBaselineDescription": "Cuando exista un único borrador resuelto, podrás rastrear cómo creció realmente la línea."
+    },
+    "coverage": {
+      "snapshotLabel": "Respaldadas por snapshot",
+      "snapshotDescription": "Resultados asentados que ya apuntan a evidencia estable de snapshot.",
+      "settlementLabel": "Replay de sedimentación",
+      "settlementDescription": "El resultado está asentado, pero la cadena completa de snapshots sigue incompleta.",
+      "unresolvedLabel": "Origen pendiente",
+      "unresolvedDescription": "El resultado ya es visible, pero su evidencia de origen aún necesita más base."
+    },
+    "timeline": {
+      "outputSummarySnapshot": "Se asentó como resultado de conocimiento y ya se puede rastrear hasta evidencia estable de snapshot.",
+      "outputSummaryFallback": "Se asentó como resultado de conocimiento, pero la cadena de origen aún necesita más evidencia.",
+      "draftTitle": "Base estable del borrador v{draftVersion}",
+      "draftSummary": "El borrador #{draftPostId} es ahora la base del cuerpo para este mapa de conocimiento."
+    },
+    "questions": {
+      "noStableOutputTitle": "La primera salida estable todavía no ha aparecido",
+      "noStableOutputBody": "Ahora mismo es más honesto seguir sumando hechos, explicaciones y desacuerdos que fingir que ya existe una conclusión clara.",
+      "noDraftBaselineTitle": "Sigue sin haber una única base de borrador",
+      "noDraftBaselineBody": "La página todavía no puede anclarlo todo con fiabilidad a una sola versión de borrador, así que conviene entrar primero por los resultados asentados.",
+      "missingSnapshotTitle": "Algunos resultados asentados aún no tienen snapshots estables",
+      "missingSnapshotBody": "Estos resultados ya son visibles, pero su evidencia trazable de snapshot aún está incompleta.",
+      "missingDraftBindingTitle": "Algunos resultados todavía no vuelven a un borrador de origen",
+      "missingDraftBindingBody": "Está claro que se asentaron, pero aún no se anclan de forma estable a un punto de entrada del borrador."
+    },
+    "generatedBy": {
+      "systemLlm": "LLM del sistema",
+      "userRequested": "Solicitud manual",
+      "systemProjection": "Proyección del sistema"
+    },
+    "providerMode": {
+      "builtin": "LLM integrado",
+      "projection": "Proyección del sistema",
+      "rule": "Resumen por reglas",
+      "fallback": "Origen pendiente"
+    },
+    "reference": {
+      "note": "La página de referencias consume estos campos estables a través de la superficie pública dedicada de DraftReferenceLink y no mediante una ventana temporal de Team 00.",
+      "fields": {
+        "referenceId": "ID de referencia",
+        "draftPostId": "Borrador de origen",
+        "draftVersion": "Versión del borrador",
+        "sourceBlockId": "Bloque de origen",
+        "crystalName": "Nombre del cristal",
+        "crystalBlockAnchor": "Fragmento del cristal",
+        "status": "Estado de análisis"
+      }
+    },
+    "degradation": {
+      "selectedDraft": "Todavía no se ha resuelto una única base de borrador",
+      "snapshotEvidence": "Esta conclusión aún no tiene evidencia estable de snapshot",
+      "draftBinding": "Esta conclusión aún no tiene un vínculo estable con un borrador"
+    }
+  },
+  "CrystalOutputEvidencePanel": {
+    "binding": {
+      "snapshot": "Origen por snapshot",
+      "settlementFallback": "Replay de sedimentación",
+      "unresolved": "Origen pendiente"
+    },
+    "compact": {
+      "citations": "Citadas {count}",
+      "draft": "Borrador #{draftPostId}"
+    },
+    "eyebrow": "Resultado cristalizado",
+    "title": "Origen y evidencia",
+    "metrics": {
+      "version": {
+        "label": "Versión"
+      },
+      "contributors": {
+        "label": "Colaboradores"
+      },
+      "citations": {
+        "label": "Citas totales"
+      },
+      "preview": {
+        "label": "Vista previa de referencias (esta página)",
+        "value": "Refs {outboundReferenceCount} / citada por {inboundReferenceCount}"
+      }
+    },
+    "rows": {
+      "common": {
+        "missing": "No disponible"
+      },
+      "sourceDraft": {
+        "label": "Borrador de origen",
+        "empty": "Todavía no hay un vínculo estable con el borrador"
+      },
+      "anchor": {
+        "label": "Ancla de discusión"
+      },
+      "summaryHash": {
+        "label": "Huella del resumen"
+      },
+      "messageDigest": {
+        "label": "Huella de mensajes"
+      }
+    },
+    "degradationPrefix": "Degradación actual: {label}"
+  },
+  "NotificationsPage": {
+    "title": "Notificaciones",
+    "actions": {
+      "markAllRead": "Marcar todo como leído"
+    },
+    "states": {
+      "loading": "Cargando…",
+      "error": "No se pudieron cargar las notificaciones. Inténtalo de nuevo en un momento.",
+      "empty": "Todavía no hay notificaciones"
+    }
+  },
+  "ProfilePage": {
+    "fallbacks": {
+      "anonymous": "Anónimo",
+      "unknownHandle": "desconocido",
+      "unknownCircle": "Círculo desconocido"
+    },
+    "common": {
+      "loading": "Cargando…"
+    },
+    "errors": {
+      "walletIdentityNotReady": "La identidad de esta cartera todavía no está lista para actualizar el perfil on-chain.",
+      "indexerLagging": "Tu perfil ya se actualizó on-chain, pero el indexador aún se está poniendo al día. Vuelve a intentarlo en un momento.",
+      "missingEditableIdentity": "Esta cartera aún no tiene una identidad on-chain editable. Crea una o refresca tu sesión y vuelve a intentarlo.",
+      "invalidUpdatePayload": "El programa on-chain rechazó esta actualización del perfil. Recarga la página y vuelve a intentarlo.",
+      "saveFailed": "No pudimos guardar tu perfil ahora mismo. Inténtalo más tarde."
+    },
+    "identityStates": {
+      "sessionError": {
+        "displayName": "Identidad no disponible",
+        "bio": "No pudimos confirmar el estado de tu identidad. Inténtalo de nuevo."
+      },
+      "connecting": {
+        "displayName": "Comprobando identidad…",
+        "bio": "Estamos verificando la identidad on-chain de esta cartera.",
+        "headerHandle": "Verificando la identidad on-chain"
+      },
+      "unregistered": {
+        "displayName": "Todavía no tienes identidad",
+        "bio": "Crea primero una identidad on-chain. Después podrás unirte a círculos, hablar dentro de ellos y entrar en el flujo completo de settlement.",
+        "headerHandle": "Esperando una identidad on-chain"
+      }
+    },
+    "identityEntry": {
+      "sessionError": {
+        "title": "No pudimos confirmar tu identidad",
+        "description": "La identidad de esta cartera no está disponible temporalmente. Inténtalo de nuevo.",
+        "primaryLabel": "Intentar de nuevo"
+      },
+      "unregistered": {
+        "title": "La cartera está conectada, pero aún no hay identidad",
+        "description": "La cartera {wallet} sigue en modo invitado. Hasta que te unas a un círculo, tus publicaciones siguen siendo mensajes de polvo.",
+        "primaryLabel": "Crear identidad"
+      }
+    },
+    "empty": {
+      "totem": {
+        "sessionError": "Cuando se confirme tu identidad, aquí aparecerá la evolución de tu tótem.",
+        "connecting": "Estamos comprobando tu identidad. Cuando termine, aquí aparecerá la evolución de tu tótem.",
+        "unregistered": "Crea una identidad y aquí aparecerá la evolución de tu tótem."
+      },
+      "crystals": {
+        "sessionError": "Cuando se confirme tu identidad y entres en un círculo, aquí aparecerá tu historial de cristales.",
+        "connecting": "Estamos comprobando tu identidad. Cuando termine y entres en un círculo, aquí aparecerá tu historial de cristales.",
+        "unregistered": "Únete a un círculo y aporta algo valioso para empezar a formar cristales aquí."
+      },
+      "noCrystals": "Todavía no tienes cristales. Aporta conocimiento dentro de los círculos para empezar a crearlos."
+    },
+    "actions": {
+      "connectWallet": "Conectar cartera",
+      "editProfile": "Editar perfil",
+      "disconnect": "Desconectar",
+      "openSettings": "Abrir ajustes"
+    },
+    "stats": {
+      "posts": "Publicaciones",
+      "circles": "Círculos",
+      "followers": "Seguidores",
+      "reputation": "Reputación"
+    },
+    "sections": {
+      "totem": "Tótem",
+      "myCrystals": "Mis cristales"
+    },
+    "crystals": {
+      "citationCount": "Citado {count} veces"
+    }
+  },
+  "ProfileSettingsSheet": {
+    "eyebrow": "Ajustes",
+    "title": "Preferencias",
+    "actions": {
+      "closeAria": "Cerrar el panel de ajustes"
+    },
+    "language": {
+      "label": "Idioma",
+      "title": "Elegir idioma",
+      "hint": "Por defecto seguimos el idioma de tu dispositivo y tu navegador. También puedes cambiarlo aquí manualmente.",
+      "openAria": "Abrir ajustes de idioma",
+      "backAria": "Volver a ajustes",
+      "backLabel": "Volver",
+      "currentLabel": "Idioma actual",
+      "tapToSwitch": "Toca para cambiar a este idioma",
+      "pending": "Cambiando idioma…",
+      "options": {
+        "zh": "中文",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français"
+      }
+    }
+  },
+  "EditProfileModal": {
+    "title": "Editar perfil",
+    "errors": {
+      "saveFailed": "No pudimos guardar tu perfil ahora mismo. Inténtalo más tarde."
+    },
+    "fields": {
+      "displayName": {
+        "label": "Nombre visible",
+        "placeholder": "Escribe un nombre visible"
+      },
+      "bio": {
+        "label": "Bio",
+        "placeholder": "Preséntate en una sola línea",
+        "charCount": "{count}/120"
+      }
+    },
+    "actions": {
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "closeAria": "Cerrar el modal de editar perfil"
+    }
+  },
+  "TotemDisplay": {
+    "stages": {
+      "seed": {
+        "name": "Seed",
+        "description": "Seed: un mineral latente que vela por la primera capa de orden."
+      },
+      "sprout": {
+        "name": "Sprout",
+        "description": "Sprout: el pensamiento asoma y las vetas ámbar empiezan a latir."
+      },
+      "bloom": {
+        "name": "Bloom",
+        "description": "Bloom: un cristal estable donde la lógica geométrica empieza a asentarse."
+      },
+      "radiant": {
+        "name": "Radiant",
+        "description": "Radiant: varias verdades se entrelazan hasta volverse una intuición nítida."
+      },
+      "legendary": {
+        "name": "Legendary",
+        "description": "Legendary: el tiempo ya pesa — cristal frío por fuera, corriente viva por dentro."
+      }
+    }
+  },
+  "KnowledgeDetailPage": {
+    "header": {
+      "title": "Cristal de conocimiento"
+    },
+    "fallbacks": {
+      "unknownMember": "miembro desconocido"
+    },
+    "states": {
+      "notFound": {
+        "title": "No se encontró el cristal de conocimiento",
+        "description": "Puede que este cristal aún no se haya asentado o que ya se haya eliminado."
+      }
+    },
+    "meta": {
+      "citationCount": "Citado {count} veces",
+      "heat": "Heat {label} {score}°",
+      "crystallizedDaysAgo": "Cristalizado hace {count} días"
+    },
+    "sections": {
+      "timeline": "Cronología de versiones",
+      "sourceCircle": "Círculo de origen",
+      "citationLineage": "Linaje de citas"
+    },
+    "heat": {
+      "active": "Activo",
+      "cooling": "En enfriamiento",
+      "frozen": "Congelado"
+    },
+    "timeline": {
+      "systemActor": "Sistema",
+      "eventTitle": {
+        "contributorsUpdated": "Libro de contribuciones actualizado · {actor}",
+        "initialCrystal": "Cristal enviado · {actor}"
+      },
+      "detail": {
+        "contributors": "{count} contribuidores",
+        "initialPublish": "Publicación inicial"
+      },
+      "fallback": {
+        "initialTitle": "Cristalización inicial",
+        "currentTitle": "Versión actual",
+        "currentDetail": "Versión legible actual"
+      },
+      "hint": {
+        "recorded": "Esta cronología se arma a partir de los eventos de versión registrados.",
+        "partial": "Por ahora mostramos la cristalización inicial y la última versión. Los cambios intermedios aún no se despliegan por separado.",
+        "initialOnly": "Todavía sigue siendo la versión inicial."
+      },
+      "currentBadge": "Actual"
+    },
+    "errors": {
+      "fetchDraftReferenceLinks": "No pudimos cargar las referencias al borrador.",
+      "fetchFormalOutput": "No pudimos cargar el CrystalOutput formal."
+    },
+    "formalOutput": {
+      "label": "Salida formal de cristalización",
+      "status": {
+        "loading": "Cargando",
+        "error": "Temporalmente no disponible",
+        "unavailable": "Aún no se puede leer"
+      },
+      "loadingMessage": "Cargando el CrystalOutput formal…",
+      "emptyMessage": "Todavía no hay un CrystalOutput formal consumible, así que esta página no finge que el libro de contribuciones sea el contrato final."
+    },
+    "contributors": {
+      "title": "Contribuidores ({count})",
+      "roles": {
+        "author": "Autor",
+        "discussant": "Participante",
+        "reviewer": "Revisor",
+        "cited": "Contribuidor citado",
+        "unknown": "Contribuidor"
+      }
+    },
+    "lineage": {
+      "sourceTypeLabel": "Tipo de fuente",
+      "sourceTypes": {
+        "snapshot": "Instantánea del ancla de discusión",
+        "settlementFallback": "Fallback de reproducción del settlement",
+        "unlabeled": "Sin etiqueta"
+      },
+      "rows": {
+        "sourceDraft": "Borrador de origen",
+        "discussionAnchor": "Ancla de discusión",
+        "summaryHash": "Huella del resumen",
+        "messageDigest": "Huella del mensaje"
+      }
+    },
+    "summaryLink": {
+      "title": "Abrir el resumen del círculo",
+      "withDraft": "Abrir la vista de resumen de esta conclusión con el borrador #{draftPostId} →",
+      "default": "Abrir la vista de resumen asentada del círculo →",
+      "referencesLoading": "Cargando las referencias al borrador desde la superficie formal de citas…",
+      "referencesReady": "Se cargaron {totalCount} referencias formales en {sourceBlockCount} bloques de origen.",
+      "referencesEmpty": "Todavía no hay entradas formales de DraftReferenceLink."
+    },
+    "sourceCircle": {
+      "open": "Abrir círculo →"
+    },
+    "citations": {
+      "referencesTitle": "Este cristal cita",
+      "referencesEmpty": "Este cristal todavía no cita a ningún otro.",
+      "citedByTitle": "Citan este cristal",
+      "citedByEmpty": "Todavía no hay nada aguas arriba que cite este cristal.",
+      "entryMeta": "{circleName} · Heat {heatLabel} {heatScore}° · Citado {citationCount}"
+    }
+  },
+  "KnowledgeDiscussionPanel": {
+    "fallbackSummary": "Este cristal ya se asentó. El hilo de abajo debería seguir centrado en sus afirmaciones, su derivación y su impacto.",
+    "errors": {
+      "loadThread": "El hilo temático no está disponible por ahora. Inténtalo más tarde.",
+      "connectWalletFirst": "Conecta tu cartera primero.",
+      "permissionDenied": "Esta sesión no puede publicar aquí ahora mismo. Reconecta tu cartera o vuelve a unirte al círculo de origen y prueba otra vez.",
+      "postFailed": "No pudimos publicar este piso ahora mismo. Inténtalo de nuevo más tarde."
+    },
+    "title": "Hilo temático",
+    "lead": "Este cristal actúa como la publicación raíz. Las respuestas de abajo solo deberían ampliar, cuestionar o anotar el conocimiento en sí.",
+    "topic": {
+      "kicker": "Publicación raíz",
+      "rule": "A diferencia del chat rápido de Plaza, este espacio debe conservar argumentos, objeciones y anotaciones que valga la pena revisar de nuevo."
+    },
+    "states": {
+      "membershipLoading": {
+        "title": "Comprobando acceso",
+        "description": "Solo los miembros activos del círculo de origen pueden ver el hilo temático de este cristal."
+      },
+      "locked": {
+        "title": "Hilo temático bloqueado",
+        "description": "Únete al círculo de origen para leer o contribuir en el hilo de este cristal."
+      },
+      "threadLoading": {
+        "title": "Abriendo los pisos",
+        "description": "Estamos desplegando la discusión alrededor de este cristal como un hilo legible."
+      },
+      "unavailable": {
+        "title": "Hilo no disponible"
+      },
+      "empty": {
+        "description": "Todavía nadie ha dejado un piso. La primera respuesta debería aportar una derivación, plantear una objeción o registrar un nuevo juicio surgido al reutilizar este cristal."
+      }
+    },
+    "message": {
+      "floorLabel": "piso",
+      "unknownAuthor": "desconocido"
+    },
+    "composer": {
+      "title": "Añade el siguiente piso",
+      "hint": "Añade aquí una anotación, una objeción, una derivación o una ruta de cita, en lugar de una charla casual.",
+      "placeholder": "Por ejemplo: ¿cómo se está interpretando este cristal en un círculo nuevo y qué supuestos siguen necesitando respaldo?",
+      "walletRequired": "Conecta tu cartera antes de dejar un piso.",
+      "boundHint": "Esta respuesta queda vinculada al cristal actual y conserva su propio heat."
+    },
+    "actions": {
+      "connectWallet": "Conectar cartera",
+      "posting": "Publicando…",
+      "submit": "Añadir este piso"
+    }
+  },
+  "KnowledgeCitationPanel": {
+    "title": "Citar este cristal",
+    "lead": "Gestiona o complementa las citas de este elemento ya cristalizado eligiendo otro de tus cristales.",
+    "target": {
+      "label": "Objetivo actual"
+    },
+    "errors": {
+      "sourceNotFound": "No se encontró una fuente de cita utilizable. Actualiza la página e inténtalo de nuevo.",
+      "engineUnavailable": "El motor de citas no está disponible en este entorno, así que no podemos enviar una cita on-chain.",
+      "submitFailed": "No pudimos enviar la cita. Inténtalo de nuevo más tarde."
+    },
+    "status": {
+      "submitted": "Cita enviada. El indexador actualizará pronto los contadores y las notificaciones. tx: {signature}..."
+    },
+    "states": {
+      "loading": {
+        "title": "Cargando tus cristales",
+        "description": "Las fuentes de cita se eligen entre los cristales que ya has cristalizado para complementar este resultado."
+      },
+      "error": {
+        "title": "No pudimos cargar tus cristales ahora mismo",
+        "description": "Asegúrate de que la sesión actual esté iniciada y vuelve a intentarlo."
+      },
+      "empty": {
+        "title": "Todavía no hay fuente de cita",
+        "description": "Necesitas al menos otro cristal antes de poder citar este."
+      }
+    },
+    "sourceList": {
+      "ariaLabel": "Fuentes de cita disponibles",
+      "unassignedCircle": "Sin círculo asignado",
+      "heat": "Heat {label} {score}°",
+      "citations": "Citado {count}"
+    },
+    "footer": {
+      "connectHint": "Conecta tu cartera para enviar una cita on-chain.",
+      "defaultHint": "Este panel gestiona las citas formales de un resultado ya cristalizado. Las citas usan una transacción on-chain real y luego el indexador escribe el resultado de vuelta."
+    },
+    "actions": {
+      "connectWallet": "Conectar cartera",
+      "submitting": "Enviando…",
+      "submit": "Enviar cita"
+    },
+    "heat": {
+      "active": "Activo",
+      "cooling": "En enfriamiento",
+      "frozen": "Congelado"
+    }
+  },
+  "KnowledgeVersionDiffPanel": {
+    "title": "Comparar versiones",
+    "subtitle": "Por ahora este panel muestra una comparación estructurada a partir de eventos de versión, sin inventar instantáneas históricas del cuerpo.",
+    "controls": {
+      "fromVersion": "Versión inicial",
+      "toVersion": "Versión final"
+    },
+    "states": {
+      "notEnoughVersions": "Todavía no hay suficientes puntos de versión para comparar.",
+      "loading": "Cargando diff de versiones…",
+      "error": "El diff de versiones no está disponible por ahora: {message}",
+      "noDiff": "Las versiones seleccionadas todavía no tienen un diff legible.",
+      "noFieldChanges": "No hay diferencias legibles entre estas dos versiones."
+    },
+    "notes": {
+      "metadataOnly": "Todavía no se guardan instantáneas históricas del cuerpo, así que este panel prioriza las diferencias de metadatos de los eventos. Si uno de los lados coincide con la versión actual, se incluyen el título legible, la descripción y el hash de contenido actuales."
+    },
+    "snapshot": {
+      "eventType": "Tipo de evento: {value}",
+      "actor": "Actor: {value}",
+      "eventAt": "Hora del evento: {value}",
+      "contentSnapshot": "Instantánea del cuerpo: {value}",
+      "system": "Sistema",
+      "readable": "Legible",
+      "unreadable": "Ilegible"
+    },
+    "labels": {
+      "from": "Desde",
+      "to": "Hasta"
+    }
+  },
+  "DiscussionDiagnosticsPage": {
+    "title": "Diagnóstico de discussion",
+    "subtitle": "Esta es la vista completa de depuración de discussion AI: no solo muestra el resultado, sino también la entrada, el runtime, la salida, la ruta de decisión y el estado de fallo.",
+    "errors": {
+      "authentication_required": "Inicia sesión con una cuenta que tenga acceso de gestión a este círculo antes de cargar el diagnóstico.",
+      "private_sidecar_required": "Esta ruta de diagnóstico solo funciona en un nodo private sidecar. Asegúrate de estar conectado al nodo privado de diagnóstico.",
+      "discussion_message_not_found": "No pudimos encontrar ese mensaje, o no gestionas este círculo.",
+      "discussion_trigger_not_found": "Este círculo todavía no tiene ejecuciones de trigger.",
+      "discussion_analysis_diagnostics_failed": "No pudimos cargar la instantánea del análisis del mensaje. Revisa los logs de query-api y tu sesión actual.",
+      "discussion_summary_diagnostics_failed": "No pudimos cargar la instantánea del resumen de discussion. Revisa la ruta de summary, la caché y tu sesión actual.",
+      "discussion_trigger_diagnostics_failed": "No pudimos cargar la instantánea del trigger. Revisa ghost_runs y los logs del worker relacionado.",
+      "discussion_analysis_reanalyze_failed": "No pudimos volver a poner este análisis en cola. Revisa permisos, tipo de nodo y estado del worker.",
+      "invalidCircleId": "Introduce un circle id válido."
+    },
+    "controls": {
+      "circleId": "Circle ID",
+      "circlePlaceholder": "Introduce un circle id para cargar los mensajes recientes",
+      "envelopeId": "Envelope ID",
+      "envelopePlaceholder": "Introduce un discussion envelope id"
+    },
+    "actions": {
+      "loadingMessages": "Cargando…",
+      "loadRecentMessages": "Cargar mensajes recientes",
+      "loadingAnalysis": "Cargando…",
+      "loadAnalysis": "Cargar snapshot del análisis",
+      "reanalyzing": "Reencolando…",
+      "reanalyze": "Reencolar análisis"
+    },
+    "status": {
+      "reanalyzeQueued": "Reencolado: job #{jobId} ({status})"
+    },
+    "sample": {
+      "title": "Muestra actual",
+      "emptyMessage": "[mensaje vacío]",
+      "currentBadge": "Muestra actual"
+    },
+    "recentMessages": {
+      "title": "Mensajes recientes",
+      "deleted": "eliminado"
+    },
+    "keyDiagnosticsTitle": "Diagnóstico clave",
+    "blocks": {
+      "input": "Entrada",
+      "runtime": "Runtime",
+      "output": "Salida",
+      "decision": "Decisión",
+      "failure": "Fallo"
+    },
+    "metrics": {
+      "status": "Estado",
+      "actualMode": "Modo real",
+      "focusLabel": "Etiqueta de foco",
+      "semanticScore": "Puntuación semántica",
+      "embedding": "Embedding",
+      "featured": "Destacado"
+    },
+    "sections": {
+      "analysis": {
+        "title": "Análisis del mensaje",
+        "scope": "message-scoped"
+      },
+      "summary": {
+        "title": "Resumen de discussion",
+        "scope": "circle-scoped"
+      },
+      "trigger": {
+        "title": "Trigger",
+        "scope": "circle-scoped"
+      },
+      "ghostDraft": {
+        "title": "Ghost draft",
+        "scope": "draft-scoped"
+      },
+      "humanOverrides": {
+        "title": "Sobrescrituras humanas",
+        "scope": "message-scoped"
+      }
+    },
+    "analysis": {
+      "topicProfileLabel": "Perfil temático",
+      "decision": {
+        "offTopic": "Marcado como off-topic porque la puntuación semántica quedó por debajo del umbral de foco.",
+        "focused": "Marcado como focused porque tanto la señal semántica como la de foco superaron el umbral.",
+        "contextual": "Marcado como contextual porque el mensaje siguió dentro del contexto del tema, pero no alcanzó el umbral de focused."
+      },
+      "errorLabel": "Detalles del error",
+      "rawJsonTitle": "Ver el JSON bruto del análisis"
+    },
+    "summary": {
+      "metrics": {
+        "method": "Método",
+        "cache": "Caché",
+        "inputFidelity": "Fidelidad de entrada",
+        "model": "Modelo"
+      },
+      "cacheHit": "cache hit",
+      "cacheMiss": "cache miss",
+      "ruleBased": "rule-based",
+      "notLoaded": "el diagnóstico del resumen todavía no se ha cargado",
+      "decision": {
+        "cacheHit": "El resumen vino de la caché.",
+        "cacheMiss": "El resumen se generó a partir de la ventana actual.",
+        "currentConfig": "El resumen se generó bajo la configuración actual ({source}).",
+        "cachedVsCurrentConfig": "El resumen en caché se generó bajo {cachedSource}, mientras que la configuración actual es {currentSource}.",
+        "exactFidelity": "La ventana de origen coincide exactamente con la entrada original del resumen en caché.",
+        "metadataOnlyFidelity": "Solo está disponible la ventana actual. El resumen en caché proviene de un payload antiguo sin los mensajes fuente exactos."
+      },
+      "rawJsonTitle": "Ver el JSON bruto del resumen"
+    },
+    "trigger": {
+      "metrics": {
+        "status": "Estado",
+        "reason": "Motivo",
+        "summaryMethod": "Método del resumen",
+        "messageCount": "Mensajes en ventana"
+      },
+      "notLoaded": "el diagnóstico del trigger todavía no se ha cargado",
+      "decision": {
+        "scopeNotice": "El diagnóstico del trigger es circle-scoped. El mensaje seleccionado solo sirve para comprobar si aparece en windowEnvelopeIds."
+      },
+      "rawJsonTitle": "Ver el JSON bruto del trigger"
+    },
+    "ghostDraft": {
+      "notConnected": "La ruta de diagnóstico de ghost draft se conectará en la Task 4.",
+      "failure": "El diagnóstico de generación de ghost draft todavía no está conectado en esta tanda."
+    },
+    "humanOverrides": {
+      "notConnected": "La superficie admin-only de overrides llegará en la Task 6.",
+      "currentRule": "Las authorAnnotations históricas siguen siendo solo de visualización legacy; los admin overrides todavía no están conectados.",
+      "failure": "La superficie de gobernanza para overrides humanos todavía no está disponible en esta tanda."
+    }
+  },
+  "CrystalDemoPage": {
+    "title": "Prototipo visual de cristales",
+    "subtitle": "Cada cristal se impulsa con ocho parámetros de conocimiento y cada renderizado sigue siendo determinista.",
+    "loading": "Cargando 3D…",
+    "parameters": {
+      "title": "Parámetros visuales",
+      "hue": "tono",
+      "clarity": "claridad",
+      "facets": "facetas",
+      "texture": "textura",
+      "radiance": "radiancia",
+      "patina": "pátina",
+      "warmth": "calidez"
+    },
+    "variants": {
+      "title": "Todas las variantes"
+    },
+    "presets": {
+      "gold": {
+        "label": "🥇 Gold · cristal joven",
+        "circleName": "Filosofía blockchain"
+      },
+      "sapphire": {
+        "label": "💎 Sapphire · cristal maduro",
+        "circleName": "Investigación DeFi"
+      },
+      "amethyst": {
+        "label": "🔮 Amethyst · clásico duradero",
+        "circleName": "Fundamentos de criptografía"
+      },
+      "jade": {
+        "label": "🌿 Jade · aún en discusión",
+        "circleName": "Ecosistema de Solana"
+      }
+    }
+  },
+  "MemberCard": {
+    "roles": {
+      "owner": "Fundador",
+      "curator": "Curador",
+      "member": "Miembro"
+    },
+    "meta": {
+      "handle": "@{handle} · Se unió {joinedAgo}"
+    },
+    "followHint": {
+      "profileUnavailable": "Este perfil todavía no está listo, así que seguirlo no está disponible por ahora."
+    },
+    "states": {
+      "loading": "Cargando perfil del miembro…"
+    },
+    "stats": {
+      "citations": "Citas",
+      "crystals": "Cristales",
+      "circles": "Círculos"
+    },
+    "sections": {
+      "sharedCircles": "Círculos en común",
+      "recentActivity": "Actividad reciente"
+    },
+    "actions": {
+      "followPending": "Procesando…",
+      "following": "Siguiendo",
+      "follow": "Seguir",
+      "message": "Mensaje",
+      "invite": "Invitar"
+    }
+  },
+  "InviteMemberSheet": {
+    "title": "Invitar miembros",
+    "target": {
+      "label": "Invitar a"
+    },
+    "search": {
+      "placeholder": "Buscar miembros…"
+    },
+    "states": {
+      "empty": "No se encontraron miembros",
+      "alreadyIn": "Ya está en el círculo"
+    },
+    "roles": {
+      "curator": "Curador",
+      "member": "Miembro"
+    },
+    "actions": {
+      "cancel": "Cancelar",
+      "sending": "Enviando…",
+      "send": "Enviar invitación{count, plural, =0 {} other { ({count})}}"
+    },
+    "toast": {
+      "success": "Se enviaron {count} invitaciones",
+      "partialSuccess": "Se enviaron {successCount} invitaciones y {failureCount} fallaron"
+    },
+    "errors": {
+      "sendFailed": "No pudimos enviar las invitaciones ahora. Inténtalo de nuevo."
+    }
+  },
+  "MessageActionSheet": {
+    "actions": {
+      "reply": "Responder",
+      "highlight": "Destacar",
+      "forward": "Reenviar",
+      "copy": "Copiar",
+      "delete": "Eliminar",
+      "cancel": "Cancelar"
+    }
+  },
+  "FeedThreadSheet": {
+    "header": {
+      "eyebrow": "Hilo del feed",
+      "title": "Respuestas alrededor de esta publicación",
+      "closeAria": "Cerrar hilo del feed"
+    },
+    "states": {
+      "noBody": "(Sin contenido)",
+      "empty": "Deja la primera respuesta para que esta publicación siga avanzando."
+    },
+    "thread": {
+      "replyCount": "{count} respuestas",
+      "noReplies": "Todavía no hay respuestas"
+    },
+    "composer": {
+      "placeholder": "Escribe tu respuesta…",
+      "disabledPlaceholder": "Conecta tu cartera para responder",
+      "helper": "La respuesta se guardará dentro del hilo de esta publicación.",
+      "readOnly": "Por ahora solo puedes leer las respuestas."
+    },
+    "actions": {
+      "sending": "Enviando…",
+      "sendReply": "Enviar respuesta"
+    }
+  },
+  "AccessProgressBar": {
+    "states": {
+      "topTier": "Ya estás en el nivel más alto"
+    },
+    "progress": {
+      "crystals": "{currentCrystals}/{nextTierCrystals} cristales",
+      "remaining": "Te faltan {remaining} para entrar en «{nextTierName}»"
+    }
+  },
+  "IdentityBadge": {
+    "labels": {
+      "visitor": "Visitante",
+      "initiate": "Participante",
+      "member": "Miembro",
+      "curator": "Curador",
+      "owner": "Fundador"
+    }
+  },
+  "DraftCandidateInlineCard": {
+    "states": {
+      "open": {
+        "label": "Candidato",
+        "title": "Esta discusión fue identificada como un borrador candidato",
+        "hint": "El candidato está listo. Las personas gestoras del círculo pueden revisar la discusión de origen y crear un borrador formal."
+      },
+      "proposal_active": {
+        "label": "Propuesta activa",
+        "title": "La propuesta para generar el borrador sigue en curso",
+        "hint": "El candidato está avanzando por la gobernanza. El enlace al borrador aparecerá solo cuando termine la generación."
+      },
+      "accepted": {
+        "label": "Generado",
+        "title": "El borrador candidato ya se convirtió en un borrador formal"
+      },
+      "generation_failed": {
+        "label": "Generación fallida",
+        "title": "La generación del borrador no se completó"
+      },
+      "rejected": {
+        "label": "Rechazado",
+        "title": "La propuesta para generar el borrador fue rechazada"
+      },
+      "expired": {
+        "label": "Expirado",
+        "title": "La propuesta para generar el borrador expiró"
+      },
+      "cancelled": {
+        "label": "Cancelado",
+        "title": "El flujo de generación del borrador fue cancelado"
+      },
+      "default": {
+        "label": "Estado del candidato",
+        "title": "Actualización del estado del borrador candidato"
+      }
+    },
+    "semanticFacets": {
+      "fact": "Hecho",
+      "explanation": "Explicación",
+      "emotion": "Emoción",
+      "question": "Pregunta",
+      "problem": "Problema",
+      "criteria": "Criterios",
+      "proposal": "Propuesta",
+      "summary": "Resumen"
+    },
+    "meta": {
+      "sourceMessages": "{count} mensajes de origen",
+      "authorAnnotation": "Intención del autor · {label}"
+    },
+    "errors": {
+      "failureReason": "Motivo del fallo: {error}"
+    },
+    "recovery": {
+      "summary": "Recuperación de gobernanza: {action}.",
+      "reusePassedProposal": "se puede reintentar reutilizando una propuesta aprobada",
+      "reproposalRequired": "hay que crear una nueva propuesta antes de reintentar"
+    },
+    "actions": {
+      "viewSource": "Ver origen",
+      "createDraft": "Crear borrador",
+      "createDraftBusy": "Creando…",
+      "expandDetails": "Mostrar detalles",
+      "collapseDetails": "Ocultar detalles",
+      "openDraft": "Abrir borrador",
+      "retry": "Reintentar",
+      "cancel": "Cancelar",
+      "retryTitle": "Reintentar esta generación",
+      "retryDisabledTitle": "El permiso para reintentar depende de la gobernanza",
+      "cancelTitle": "Cancelar este flujo candidato",
+      "cancelDisabledTitle": "El permiso para cancelar depende de la gobernanza"
+    }
+  },
+  "PlazaTab": {
+    "actions": {
+      "forward": "Reenviar"
+    },
+    "levels": {
+      "Visitor": "Visitante",
+      "Initiate": "Iniciado",
+      "Member": "Miembro",
+      "Elder": "Veterano"
+    },
+    "semanticFacets": {
+      "fact": "Hecho",
+      "explanation": "Explicación",
+      "emotion": "Emoción",
+      "question": "Pregunta",
+      "problem": "Problema",
+      "criteria": "Criterios",
+      "proposal": "Propuesta",
+      "summary": "Resumen"
+    },
+    "time": {
+      "justNow": "justo ahora"
+    },
+    "filters": {
+      "title": "Filtros",
+      "scopeLabel": "Alcance",
+      "contentLabel": "Contenido",
+      "scope": {
+        "all": "Todo",
+        "focused": "En foco",
+        "mine": "Solo míos"
+      }
+    },
+    "states": {
+      "visitor": "Visitante",
+      "initiate": "Iniciado",
+      "member": "Miembro",
+      "curator": "Curador",
+      "owner": "Propietario",
+      "syncing": "Sincronizando la discusión…",
+      "hiddenNoiseCount": "{count} mensajes de baja señal ocultos",
+      "sending": "Enviando…"
+    },
+    "messages": {
+      "deleted": "[mensaje eliminado]",
+      "deletedVisibleToSender": "Este mensaje fue eliminado (visible para quien lo envió).",
+      "ephemeral": "Mensaje efímero · desaparece en 24 h",
+      "offTopicReveal": "Fuera de tema · toca para ver",
+      "authorAnnotations": "Anotación del autor: {labels}"
+    },
+    "reply": {
+      "emptyBody": "El mensaje está vacío",
+      "quoted": "↪ Respuesta a @{author}: {preview}\n{body}",
+      "banner": "Responder a @{author}",
+      "cancelAria": "Cancelar respuesta"
+    },
+    "composer": {
+      "identityHint": "Publicando como {stateLabel} · {hint}",
+      "identityHintOpenAria": "Mostrar la pista de identidad al publicar",
+      "replyPlaceholder": "Responder a @{author}…",
+      "placeholderJoined": "Comparte algo en la plaza…",
+      "placeholderEphemeral": "Enviar un mensaje efímero (no entrará al archivo formal)…",
+      "placeholderDisconnected": "Conecta tu wallet para enviar mensajes",
+      "sendAria": "Enviar",
+      "moreAria": "Más acciones",
+      "actions": {
+        "emoji": "Emoji",
+        "attachments": "Archivos pronto",
+        "attachmentsUnavailable": "La carga de archivos de discusión todavía no está disponible",
+        "mention": "Mencionar"
+      },
+      "authorAnnotations": {
+        "title": "Anotaciones del autor",
+        "clear": "Limpiar",
+        "hint": "Estas anotaciones solo reflejan la intención del autor. El filtrado del sistema sigue el análisis semántico del backend."
+      }
+    },
+    "errors": {
+      "walletRequired": "Conecta tu wallet antes de enviar un mensaje.",
+      "syncFailed": "No se pudieron sincronizar los mensajes de la discusión.",
+      "loadFailed": "No se pudieron cargar los mensajes de la discusión.",
+      "sendFailed": "No se pudo enviar el mensaje.",
+      "forwardFailed": "No se pudo reenviar.",
+      "deleteFailed": "No se pudo eliminar el mensaje."
+    },
+    "status": {
+      "forwardedToCircle": "Reenviado a {circleName}. Esperando a que el círculo de destino lo sincronice.",
+      "localDeleteOnly": "La wallet no está conectada, así que esta eliminación solo se marcó de forma local."
+    },
+    "candidate": {
+      "avatar": "✦",
+      "retryDenied": "La candidatura {candidateId} no se puede reintentar con la política actual.",
+      "proposalId": " la propuesta {proposalId}.",
+      "currentProposal": " la propuesta actual.",
+      "retryReusePassedProposal": "El reintento reutilizará{proposalHint}",
+      "retryNeedsNewProposal": "El reintento necesita una propuesta nueva en lugar de{proposalHint}",
+      "createDenied": "La candidatura {candidateId} necesita que una persona gestora del círculo cree el borrador formal.",
+      "createSucceeded": "La candidatura {candidateId} ya es un borrador formal.",
+      "createExistingDraft": "La candidatura {candidateId} ya tiene un borrador formal.",
+      "createNotReady": "La candidatura {candidateId} todavía no está lista para generar un borrador formal.",
+      "createMissingSources": "La candidatura {candidateId} no tiene mensajes de origen, así que todavía no se puede crear un borrador.",
+      "cancelDenied": "La candidatura {candidateId} no se puede cancelar con la política actual.",
+      "relatedProposal": " Propuesta relacionada {proposalId}.",
+      "cancelAvailable": "La candidatura {candidateId} puede cancelarse ahora.{proposalHint}",
+      "sourceUnavailable": "Este candidato todavía no tiene mensajes de origen a los que puedas ir.",
+      "sourceFocused": "Saltaste a la discusión de origen del candidato {candidateId}.",
+      "systemTag": "Sistema",
+      "persistedNotice": "Aviso guardado"
+    },
+    "forward": {
+      "cardLabel": "Tarjeta reenviada",
+      "sourceCircleFallback": "Círculo de origen",
+      "sourceLevel": "Nivel {level}",
+      "unknownSourceAuthor": "miembro desconocido",
+      "forwardedBy": "Reenviado por @{handle}",
+      "viewSource": "Ver origen",
+      "sourceDeleted": "Mensaje original eliminado",
+      "reason": {
+        "viewerNotJoined": "Únete al círculo antes de reenviar mensajes.",
+        "missingEnvelopeId": "Este mensaje todavía no tiene un ID estable para reenviarlo.",
+        "deleted": "Los mensajes eliminados no se pueden reenviar.",
+        "ephemeral": "Los mensajes efímeros no entran en el archivo formal, así que no se pueden reenviar.",
+        "forwardCard": "Las tarjetas reenviadas no se pueden volver a reenviar. Vuelve al mensaje original para hacerlo.",
+        "noTargets": "Ahora mismo no hay círculos de destino válidos."
+      }
+    },
+    "auxShortcut": {
+      "crystals": " · {count} cristales"
+    }
+  },
+  "AccessGate": {
+    "description": "Necesitas al menos <strong>{required}</strong> cristales para entrar en este nivel.",
+    "actions": {
+      "dismiss": "Entendido"
+    }
+  },
+  "CirclePicker": {
+    "title": "Reenviar a",
+    "hint": "{count} mensajes seleccionados · solo se muestran los círculos de destino válidos",
+    "meta": {
+      "level": "Nivel {level}"
+    },
+    "actions": {
+      "cancel": "Cancelar"
+    }
+  },
+  "ChatRecordBubble": {
+    "source": "Registro de chat de {circle}",
+    "more": "{count} mensajes más…",
+    "count": "{count} mensajes en total",
+    "actions": {
+      "viewAll": "Ver todo →"
+    }
+  },
+  "NotificationPanel": {
+    "title": "Notificaciones",
+    "empty": "Todavía no hay notificaciones",
+    "actions": {
+      "markAllRead": "Marcar todo como leído"
+    }
+  },
+  "TierPill": {
+    "hint": "← Desliza para cambiar →",
+    "meta": {
+      "level": "Nivel {level}",
+      "childLevel": "Nivel {parentLevel}.{childLevel}"
+    },
+    "actions": {
+      "createCircle": "Crear círculo"
+    }
+  },
+  "CollaborativeEditor": {
+    "placeholder": "Empieza a escribir el borrador…",
+    "toolbar": {
+      "bold": "Negrita",
+      "italic": "Cursiva",
+      "strike": "Tachado",
+      "heading": "Título",
+      "subheading": "Subtítulo",
+      "bulletList": "Lista con viñetas",
+      "orderedList": "Lista numerada",
+      "blockquote": "Cita",
+      "codeBlock": "Bloque de código",
+      "highlight": "Resaltar"
+    }
+  },
+  "CrucibleEditor": {
+    "fallback": {
+      "untitledDraft": "Borrador sin título",
+      "emptyParagraph": "Este párrafo todavía no tiene cuerpo."
+    },
+    "anchorStatus": {
+      "anchored": "Anclado",
+      "failed": "Falló el anclaje",
+      "skipped": "Anclaje omitido",
+      "syncing": "Anclando…",
+      "idle": "Esperando conexión"
+    },
+    "errors": {
+      "applyAcceptedIssues": "No se pudieron aplicar los issues aceptados.",
+      "requestTemporaryGrant": "No se pudo solicitar el acceso temporal de edición.",
+      "issueTemporaryGrant": "No se pudo aprobar el acceso temporal.",
+      "revokeTemporaryGrant": "No se pudo revocar el acceso temporal."
+    },
+    "blocks": {
+      "title": "Párrafo {index}",
+      "typeLabel": "Bloque de párrafo",
+      "statusLabel": "Listo para refinarse",
+      "editabilityEditable": "Cuerpo editable",
+      "editabilityReadOnly": "Solo lectura",
+      "editabilityLocked": "Cuerpo bloqueado",
+      "sourceVersion": "V{version}",
+      "statusLocked": "Bloqueado",
+      "statusResolved": "Resuelto",
+      "statusAcceptedPending": "Aceptado, pendiente de aplicar",
+      "statusInReview": "En revisión",
+      "statusSubmitted": "Enviado",
+      "statusReadyForMoreEdits": "Listo para seguir editando",
+      "editabilitySelected": "Seleccionado"
+    },
+    "heat": {
+      "active": "Activo",
+      "cooling": "Enfriándose",
+      "frozen": "Congelado"
+    },
+    "meta": {
+      "onlineCount": "{count} en línea",
+      "editCount": "{count} ediciones",
+      "contributorCount": "{count} contribuidores",
+      "commentCount": "{count} comentarios",
+      "issueCount": "{count} issues"
+    },
+    "actions": {
+      "completeEditingResolve": "Terminar edición y resolver {count} issues",
+      "completeEditing": "Terminar edición",
+      "editing": "Editando…",
+      "editParagraph": "Editar párrafo",
+      "viewDiscussion": "Ver discusión",
+      "submitting": "Enviando…",
+      "requestTemporaryGrant": "Solicitar acceso temporal",
+      "processing": "Procesando…",
+      "issueTemporaryGrant": "Aprobar acceso temporal",
+      "revokeTemporaryGrant": "Revocar acceso temporal",
+      "completing": "Terminando…",
+      "send": "Enviar"
+    },
+    "temporaryGrant": {
+      "title": "Acceso temporal de edición",
+      "hint": "Este párrafo no está abierto para edición directa ahora mismo. Usa una autorización temporal para entrar en su flujo de revisión.",
+      "requested": "Ya solicitaste acceso temporal para este párrafo y está esperando aprobación.",
+      "managerRequested": "Hay una solicitud de acceso temporal pendiente de aprobación para este párrafo.",
+      "managerActive": "Hay un acceso temporal activo para este párrafo."
+    },
+    "issueCarry": {
+      "title": "Este párrafo tiene issues aceptados que puedes resolver durante esta edición",
+      "hint": "Cuando termines de editar, cada issue marcado se escribirá en el registro de aplicación de este párrafo para mantener la trazabilidad. Si este párrafo acaba de usar una revisión por incidencias, las incidencias relacionadas empezarán preseleccionadas y aún podrás desmarcarlas."
+    },
+    "placeholders": {
+      "continueParagraph": "Sigue refinando {title}…"
+    },
+    "readOnly": {
+      "editorDisconnected": "El editor colaborativo está desconectado, así que la edición del párrafo no está disponible por ahora.",
+      "commentLocked": "🔒 Necesitas acceso de participante o superior para dejar comentarios.",
+      "contentLocked": "🔒 Tu rol actual solo puede ver el cuerpo y no puede editar párrafos directamente."
+    },
+    "comments": {
+      "title": "Comentarios del párrafo {index}",
+      "empty": "Todavía no hay comentarios en este párrafo.",
+      "placeholder": "Deja un comentario sobre este párrafo…"
+    }
+  },
+  "IdentityOnboardingProvider": {
+    "errors": {
+      "sessionConfirmation": "No pudimos confirmar el estado de tu identidad. Inténtalo de nuevo.",
+      "invalidSignature": "La verificación de la firma de la cartera falló. Inténtalo de nuevo."
+    }
+  },
+  "AgentAdminPanel": {
+    "title": "Gobernanza y auditoría de agentes",
+    "subtitle": "Revisa el registro actual de agentes y define límites de gobernanza para disparadores automáticos, descuentos y umbrales de revisión.",
+    "ownerOnly": "Solo la persona propietaria del círculo puede cambiar esto",
+    "sections": {
+      "registeredAgents": "Agentes registrados",
+      "policy": "Política de agentes"
+    },
+    "states": {
+      "loading": "Cargando el registro de agentes…",
+      "empty": "Todavía no hay agentes registrados en este círculo."
+    },
+    "fields": {
+      "triggerScope": {
+        "label": "Alcance del disparador del agente",
+        "options": {
+          "disabled": "Desactivado",
+          "draftOnly": "Solo borradores",
+          "circleWide": "Todo el círculo"
+        }
+      },
+      "costDiscount": {
+        "label": "Descuento de coste (bps)",
+        "aria": "Descuento del agente"
+      },
+      "reviewMode": {
+        "label": "Umbral de revisión",
+        "aria": "Umbral de revisión del agente",
+        "options": {
+          "ownerReview": "Revisión del owner",
+          "adminReview": "Revisión del admin",
+          "selfServe": "Autogestión"
+        }
+      }
+    },
+    "auditNote": "El alcance del disparador define si los agentes pueden participar en la automatización del círculo, el descuento regula la política de costes y el umbral de revisión decide si hace falta aprobación de Owner/Admin.",
+    "actions": {
+      "saving": "Guardando…",
+      "save": "Guardar política de agentes"
+    }
+  },
+  "CircleSettingsSheet": {
+    "header": {
+      "title": "{circleName} · Ajustes"
+    },
+    "sections": {
+      "basicInfo": "Información básica",
+      "permissions": "Permisos",
+      "aiCollab": "Colaboración con IA",
+      "dangerZone": "Zona de riesgo"
+    },
+    "basic": {
+      "modeLabel": "Modo",
+      "modeSocial": "🌐 Modo social",
+      "modeKnowledge": "📚 Modo de conocimiento",
+      "accessLabel": "Acceso",
+      "accessFree": "🌍 Abierto",
+      "accessCrystal": "💎 ≥{count} cristales",
+      "accessInvite": "🔒 Solo con invitación"
+    },
+    "permissions": {
+      "forwardTitle": "Permitir reenvío hacia fuera",
+      "forwardDescription": "Los miembros pueden reenviar mensajes a otros círculos."
+    },
+    "common": {
+      "collapse": "Ocultar",
+      "expand": "Ver detalles"
+    },
+    "identityRules": {
+      "title": "Reglas de identidad del círculo",
+      "lead": "Para hablar de forma oficial primero hay que crear una identidad y unirse al círculo.",
+      "initiateStep": "Invitado → Iniciado",
+      "initiateText": "Pasa a iniciado después de enviar {count} mensajes.",
+      "memberStep": "Iniciado → Miembro",
+      "memberText": "Pasa a miembro después de recibir {count} citas.",
+      "elderStep": "Miembro → Anciano",
+      "elderText": "Entrar en el {percentile}% superior de reputación del círculo permite subir a anciano.",
+      "footnote": "La identidad puede bajar de nivel tras {count} días seguidos de inactividad."
+    },
+    "draftLifecycle": {
+      "title": "Ajustes del flujo de borradores",
+      "reviewEntryLabel": "Cómo entra en revisión",
+      "reviewEntry": {
+        "autoOnly": "Finalización automática",
+        "manualOnly": "Finalización manual",
+        "autoOrManual": "Ambas opciones"
+      },
+      "help": {
+        "autoOnly": "Cuando se agota el tiempo, la edición del cuerpo termina automáticamente y pasa a revisión de issues.",
+        "manualOnly": "Solo quien tenga permisos puede terminar manualmente la edición del cuerpo y abrir la revisión.",
+        "autoOrManual": "La revisión entra sola cuando termina el tiempo, pero también se puede cerrar antes de forma manual."
+      },
+      "autoReviewTimeLabel": "Entrar automáticamente en revisión después de",
+      "autoReviewTimeHint": "Cuando termina el tiempo, la edición del cuerpo pasa a revisión de issues.",
+      "reviewWindowLabel": "Duración de la fase de revisión",
+      "reviewWindowHint": "Cuando termina el tiempo, la ronda se da por cerrada y queda a la espera de la siguiente revisión o de la cristalización.",
+      "maxRoundsLabel": "Máximo de rondas de revisión",
+      "save": "Guardar ajustes del flujo de borradores"
+    },
+    "draftWorkflow": {
+      "title": "Permisos de issues y etapas",
+      "createIssue": "Quién puede enviar issues",
+      "followupIssue": "Quién puede añadir seguimiento",
+      "reviewIssue": "Quién puede revisar issues",
+      "retagIssue": "Quién puede cambiar el tipo de issue",
+      "applyIssue": "Quién puede confirmar la resolución",
+      "manualEndDrafting": "Quién puede terminar la edición",
+      "advanceFromReview": "Quién puede cerrar esta ronda de revisión",
+      "enterCrystallization": "Quién puede entrar en cristalización",
+      "allowAuthorWithdraw": "La persona autora puede retirarlo antes de la revisión",
+      "allowModeratorRetag": "Quien revisa puede cambiar el tipo de issue",
+      "save": "Guardar permisos de issues y etapas"
+    },
+    "ghost": {
+      "source": {
+        "circle": "Actual: configuración propia del círculo",
+        "pending": "Actual: configuración temporal pendiente (se activa cuando el círculo quede indexado)",
+        "globalDefault": "Actual: hereda la configuración global"
+      },
+      "loading": "Cargando configuración…",
+      "summaryUseLlmTitle": "Usar IA para generar un resumen de la discusión",
+      "summaryUseLlmDescription": "Si se activa, el sistema organizará la discusión reciente y generará un resumen breve.",
+      "summaryUseLlmWarning": "Si se desactiva, el sistema volverá a reglas para resumir la discusión, y el resultado puede ser menos preciso.",
+      "triggerModeLabel": "Qué hacer después de activarlo",
+      "triggerModeHint": "Cuando el sistema decide que la discusión ya está lista para entrar en el flujo de borrador, ¿solo avisamos o creamos un borrador de inmediato?",
+      "triggerModeNotifyOnly": "Solo aviso",
+      "triggerModeAutoDraft": "Crear borrador automáticamente",
+      "triggerSummaryUseLlmTitle": "Usar IA para decidir si debe activarse un borrador",
+      "triggerSummaryUseLlmDescription": "Si se activa, el sistema primero organiza la discusión reciente y luego usa IA para ayudar a decidir si debe entrar en el flujo de borrador.",
+      "triggerSummaryUseLlmWarning": "Si se desactiva, el sistema volverá a reglas para decidir si debe activarse un borrador, y el resultado puede ser menos preciso.",
+      "save": "Guardar ajustes de IA"
+    },
+    "roleOptions": {
+      "initiate": "Iniciado",
+      "member": "Miembro",
+      "elder": "Anciano",
+      "moderator": "Moderador",
+      "admin": "Admin",
+      "owner": "Owner"
+    },
+    "memberRoles": {
+      "owner": "Owner",
+      "curator": "Curador",
+      "member": "Miembro"
+    },
+    "members": {
+      "directoryTitle": "Directorio de miembros",
+      "title": "Miembros ({count})",
+        "actions": {
+          "setCurator": "Nombrar curador",
+          "unsetCurator": "Quitar rol de curador",
+          "remove": "Eliminar miembro",
+          "invite": "Invitar miembros",
+          "leave": "Salir del círculo"
+        }
+      },
+    "danger": {
+      "deleteCircle": "Disolver este círculo"
+    },
+    "errors": {
+      "roleChange": "No se pudo actualizar el rol. Inténtalo de nuevo.",
+      "removeMember": "No se pudo eliminar al miembro. Inténtalo de nuevo.",
+      "leaveCircle": "No se pudo salir del círculo. Inténtalo de nuevo."
+    },
+    "actions": {
+      "saving": "Guardando…"
+    },
+    "units": {
+      "minutes": "minutos"
+    },
+    "reviewEntry": {
+      "help": {
+        "autoOnly": "La edición del cuerpo termina automáticamente al expirar el temporizador y pasa a revisión de incidencias.",
+        "manualOnly": "Solo los miembros autorizados pueden cerrar manualmente la edición del cuerpo y entrar en revisión de incidencias.",
+        "autoOrManual": "La revisión empieza automáticamente al expirar el tiempo, pero también puede cerrarse manualmente antes."
+      }
+    }
+  },
+  "CrystalDetailSheet": {
+    "errors": {
+      "loadFormalOutput": "No se pudo leer el CrystalOutput formal."
+    },
+    "roles": {
+      "author": "Autor",
+      "discussant": "Participante de la discusión",
+      "reviewer": "Revisor",
+      "cited": "Contribuidor citado",
+      "unknown": "Contribuidor"
+    },
+    "lineage": {
+      "sourceDraft": "Borrador de origen",
+      "discussionAnchor": "Ancla de discusión",
+      "summaryHash": "Hash del resumen",
+      "messagesDigest": "Resumen de mensajes",
+      "sourceType": "Tipo de origen",
+      "snapshotSource": "Instantánea del ancla de discusión",
+      "settlementFallback": "Reproducción de liquidación (fallback)",
+      "unlabeled": "Sin etiquetar"
+    },
+    "patina": {
+      "ancient": "🏛 Clásico",
+      "settling": "📜 Sedimentando",
+      "fresh": "✨ Cristal nuevo"
+    },
+    "meta": {
+      "citedBy": "Citado {count} veces",
+      "ageDays": "Cristalizado hace {count} días"
+    },
+    "formalOutput": {
+      "label": "Resultado cristalizado formal",
+      "loading": "Cargando",
+      "unavailable": "No disponible",
+      "pending": "Todavía no está listo",
+      "loadingBody": "Cargando el CrystalOutput formal…",
+      "pendingBody": "Todavía no hay un CrystalOutput formal consumible; por ahora este panel no toma el libro de contribuciones inferido como contrato final del resultado."
+    },
+    "sections": {
+      "provenance": "Proveniencia",
+      "contributionLedger": "Libro de contribuciones"
+    },
+    "actions": {
+      "copy": "Copiar",
+      "cite": "Citar",
+      "citePending": "La cita del cristal todavía no está disponible"
+    }
+  },
+  "DraftCard": {
+    "meta": {
+      "editors": "{count} editores",
+      "comments": "{count} comentarios"
+    }
+  },
+  "DraftDiscussionPanel": {
+    "fallback": {
+      "pendingTime": "Hora pendiente"
+    },
+    "messages": {
+      "create": "Incidencia abierta",
+      "followup": "Seguimiento añadido",
+      "propose": "Resolución propuesta",
+      "accept": "Resolución aceptada",
+      "reject": "Resolución rechazada",
+      "apply": "Resolución aplicada",
+      "withdraw": "Hilo retirado",
+      "retag": "Tipo de incidencia cambiado",
+      "update": "Actualizado",
+      "meta": "{authorId} · {time}",
+      "content": {
+        "retag": "Se cambió el tipo de incidencia.",
+        "withdraw": "Este hilo fue retirado.",
+        "accept": "La propuesta fue aceptada.",
+        "reject": "La propuesta fue rechazada.",
+        "apply": "El cambio aceptado se aplicó al borrador.",
+        "empty": "No se añadieron más detalles.",
+        "retagWithType": "El tipo de incidencia cambió a {issueType}."
+      }
+    },
+    "issueTypes": {
+      "fact_correction": "Corrección de hechos",
+      "expression_improvement": "Mejora de redacción",
+      "knowledge_supplement": "Suplemento de conocimiento",
+      "question_and_supplement": "Pregunta y suplemento",
+      "fallback": "Incidencia"
+    },
+    "states": {
+      "open": "Enviado",
+      "proposed": "En revisión",
+      "accepted": "Aceptado",
+      "rejected": "Rechazado",
+      "withdrawn": "Retirado",
+      "applied": "Aplicado"
+    },
+    "targetTypes": {
+      "paragraph": "Párrafo",
+      "structure": "Estructura",
+      "document": "Documento"
+    },
+    "targetLabels": {
+      "paragraphNumber": "Párrafo {index}",
+      "paragraphRaw": "Párrafo · {value}",
+      "structureParagraphs": "Estructura · párrafos {values}",
+      "generic": "{type} · {value}"
+    },
+    "errors": {
+      "loadRevisionDirections": "No se pudieron cargar las directrices aceptadas.",
+      "revisionSummaryRequired": "Hace falta un resumen de la directriz aceptada.",
+      "createRevisionDirection": "No se pudo guardar la directriz aceptada.",
+      "acceptRevisionDirection": "No se pudo marcar la directriz como aceptada.",
+      "rejectRevisionDirection": "No se pudo rechazar la directriz aceptada.",
+      "selectParagraph": "Elige un párrafo antes de abrir esta incidencia.",
+      "selectStructureRange": "Elige al menos un párrafo para esta incidencia estructural.",
+      "createDescriptionRequired": "Describe la incidencia antes de enviarla.",
+      "createThread": "No se pudo crear el hilo de incidencia.",
+      "followupRequired": "Escribe el seguimiento antes de enviarlo.",
+      "reply": "No se pudo enviar la respuesta de seguimiento.",
+      "propose": "No se pudo enviar la propuesta de resolución.",
+      "resolve": "No se pudo registrar la decisión de resolución.",
+      "withdraw": "No se pudo retirar este hilo.",
+      "apply": "No se pudo registrar la resolución aplicada."
+    },
+    "aria": {
+      "panel": "Panel de discusión del borrador"
+    },
+    "header": {
+      "eyebrow": "Discusión de revisión",
+      "title": "Incidencias y resoluciones"
+    },
+    "governance": {
+      "eyebrow": "Gobernanza",
+      "labels": {
+        "target": "Objetivo",
+        "actor": "Actor",
+        "audit": "Rastro de auditoría"
+      },
+      "actions": {
+        "drafting": "Iteración en curso",
+        "review": "Revisión en curso",
+        "crystallizationActive": "Votación de cristalización en curso",
+        "crystallizationFailed": "Recuperándose del fallo de cristalización",
+        "crystallized": "Cristalización completada",
+        "archived": "Archivado",
+        "default": "Flujo del borrador en curso"
+      },
+      "values": {
+        "targetVersion": "Versión estable v{version}"
+      },
+      "capabilities": {
+        "create": "Puede enviar incidencias",
+        "resolve": "Puede revisar incidencias",
+        "apply": "Puede aplicar incidencias aceptadas",
+        "crystallize": "Puede entrar en cristalización"
+      },
+      "viewOnly": "Solo lectura",
+      "progress": {
+        "submitted": "Enviadas",
+        "inReview": "En revisión",
+        "accepted": "Aceptadas",
+        "resolved": "Resueltas"
+      }
+    },
+    "revisionDirections": {
+      "title": "Directrices aceptadas",
+      "hint": "Cuando una propuesta de gobernanza se aprueba, registra aquí la dirección aceptada antes de aplicar cambios al borrador.",
+      "summaryLabel": "Dirección aceptada",
+      "summaryPlaceholder": "Resume lo que exige la propuesta aprobada.",
+      "acceptanceMode": {
+        "label": "Modo de aceptación",
+        "managerConfirm": "Confirmación del gestor",
+        "roleConfirm": "Confirmación por rol",
+        "governanceVote": "Votación de gobernanza"
+      },
+      "status": {
+        "accepted": "Aceptada",
+        "rejected": "Rechazada",
+        "expired": "Caducada",
+        "open": "Abierta"
+      },
+      "scope": {
+        "paragraph": "Párrafo {index}",
+        "document": "Documento completo"
+      },
+      "submit": "Guardar dirección aceptada",
+      "acceptedTitle": "Directrices aceptadas listas para aplicar",
+      "scopeMeta": "{scope} · {status} · {mode}",
+      "listTitle": "Todas las directrices aceptadas",
+      "governanceMeta": "Propuesta de gobernanza {id}",
+      "actions": {
+        "accept": "Aceptar",
+        "reject": "Rechazar"
+      },
+      "governanceHint": "La aprobación de la propuesta no edita el borrador por sí sola. Primero registra aquí la dirección aceptada."
+    },
+    "create": {
+      "title": "Abrir una incidencia nueva",
+      "bindingHint": "Esta incidencia quedará vinculada a la versión estable v{version}.",
+      "targetTypeLabel": "Tipo de objetivo",
+      "issueTypeLabel": "Tipo de incidencia",
+      "paragraphTargetLabel": "Párrafo objetivo",
+      "selectParagraph": "Selecciona un párrafo",
+      "paragraphOption": "Párrafo {index} · {preview}",
+      "paragraphSelectedHint": "La incidencia se vinculará al párrafo {index}.",
+      "paragraphSelectHint": "Elige el párrafo al que se refiere esta incidencia.",
+      "structureLabel": "Estructura objetivo",
+      "structureHint": "Elige los párrafos que definen este cambio estructural.",
+      "paragraphShort": "P{index}",
+      "selectedStructure": "Párrafos seleccionados: {values}",
+      "documentLabel": "Documento completo",
+      "documentHint": "Úsalo cuando la incidencia afecte al borrador entero.",
+      "boundVersionLabel": "Versión estable vinculada",
+      "boundVersionHint": "Las incidencias abiertas aquí apuntarán a v{version}.",
+      "descriptionLabel": "Descripción de la incidencia",
+      "descriptionPlaceholder": "Describe la corrección factual, el cambio de redacción, la laguna de conocimiento o la pregunta abierta.",
+      "insertCurrentReference": "Insertar referencia actual",
+      "submit": "Enviar incidencia"
+    },
+    "threads": {
+      "title": "Hilos de incidencia",
+      "loading": "Cargando hilos de incidencia…",
+      "empty": "Todavía no hay hilos de incidencia.",
+      "targetVersion": "v{version} · hilo {id}",
+      "noMessages": "Todavía no hay mensajes en este hilo.",
+      "evidence": {
+        "title": "Evidencia aplicada",
+        "editAnchor": "Ancla de edición: {id}",
+        "snapshotHash": "Hash de snapshot: {hash}",
+        "draftVersion": "Versión del borrador: v{version}"
+      },
+      "issueTypeLabel": "Tipo de incidencia",
+      "replyPlaceholder": "Añade una respuesta de seguimiento…",
+      "proposePlaceholder": "Describe la resolución propuesta…",
+      "resolvePlaceholder": "Explica por qué esta incidencia debe aceptarse o rechazarse…",
+      "applyPlaceholder": "Describe cómo se aplicó la resolución aceptada…",
+      "actions": {
+        "reply": "Responder",
+        "withdraw": "Retirar",
+        "propose": "Proponer resolución",
+        "accept": "Aceptar",
+        "reject": "Rechazar",
+        "apply": "Aplicar resolución"
+      },
+      "emptySummary": "Todavía no se añadió más contexto a esta incidencia."
+    }
+  },
+  "SeededFileTree": {
+    "aria": {
+      "section": "Referencias sembradas"
+    },
+    "title": "Referencias sembradas",
+    "hint": "Explora los archivos indexados y elige una referencia de línea para insertarla en la discusión del borrador.",
+    "currentRef": "Referencia actual: {reference}",
+    "loading": "Cargando archivos sembrados…",
+    "empty": "Todavía no hay archivos sembrados.",
+    "preview": {
+      "unselected": "Selecciona un archivo y una línea"
+    }
+  },
+  "ReferencesPanel": {
+    "aria": {
+      "section": "Referencias"
+    },
+    "eyebrow": "Referencias",
+    "title": "Referencias",
+    "hint": "Mantén juntas las referencias rastreables de este borrador.",
+    "formal": {
+      "title": "Referencias formales",
+      "hint": "Las referencias formales visibles provienen de los marcadores @crystal(...) que ya existen en el cuerpo del borrador.",
+      "insertAction": "Insertar referencia",
+      "loading": "Cargando referencias formales…",
+      "empty": "Todavía no hay referencias formales en este borrador.",
+      "summary": "Ahora se ven {count} referencias formales en {sourceBlockCount} bloques de origen.",
+      "note": "Estas entradas provienen de marcadores @crystal(...) ya presentes en el cuerpo del borrador. Un selector más completo para la etapa de borrador queda diferido por ahora."
+    },
+    "seeded": {
+      "title": "Evidencia de archivos sembrados",
+      "hint": "Los círculos seeded todavía pueden elegir aquí evidencia por archivo y línea, e insertar la referencia actual @file:path:line en la discusión del borrador."
+    }
+  },
+  "KnowledgeReferencePicker": {
+    "title": "Insertar referencia",
+    "hint": "Elige entre hasta 50 elementos de conocimiento cristalizado ya cargados para este círculo.",
+    "searchPlaceholder": "Buscar conocimiento ya cargado del círculo",
+    "searchAriaLabel": "Buscar conocimiento ya cargado del círculo",
+    "empty": "Ningún conocimiento del círculo coincide con este filtro.",
+    "close": "Cerrar",
+    "version": "v{version}"
+  },
+  "CrucibleLifecycleHeader": {
+    "fallback": {
+      "notProvided": "Sin dato"
+    },
+    "facets": {
+      "none": "Nada detectado",
+      "fact": "Hecho",
+      "explanation": "Explicación",
+      "emotion": "Emoción",
+      "question": "Pregunta",
+      "problem": "Problema",
+      "criteria": "Criterios",
+      "proposal": "Propuesta",
+      "summary": "Resumen"
+    },
+    "annotations": {
+      "none": "Ninguna",
+      "fact": "Hecho",
+      "explanation": "Explicación",
+      "emotion": "Emoción"
+    },
+    "sourceKind": {
+      "unavailable": "Origen no disponible",
+      "acceptedCandidate": "Semilla de candidatura aceptada",
+      "reviewBoundSnapshot": "Snapshot vinculado a revisión",
+      "pending": "Origen pendiente de confirmar"
+    },
+    "warnings": {
+      "missingDraftSource": "Falta el traspaso de origen original, así que por ahora el origen del borrador aparece como no disponible.",
+      "missingAnchorEvidence": "Al snapshot estable actual le falta evidencia de ancla del borrador, por lo que los detalles del origen se apoyan en los metadatos registrados.",
+      "legacyApplicationEvidence": "Algunas aplicaciones históricas de incidencias aún usan evidencia heredada y se están normalizando.",
+      "boundVersionOnly": "La evidencia de aplicación del snapshot estable actual todavía no está completa, así que por ahora se muestra la versión vinculada.",
+      "fallback": "Este borrador todavía tiene un detalle de ciclo de vida sin resolver."
+    },
+    "status": {
+      "drafting": "Redacción",
+      "review": "En revisión",
+      "crystallizationActive": "Cristalización activa",
+      "crystallizationFailed": "Cristalización incompleta",
+      "crystallized": "Cristalizado",
+      "archived": "Archivado",
+      "inProgress": "En curso"
+    },
+    "meta": {
+      "pendingTime": "Hora pendiente",
+      "latestUpdatePending": "Última actualización pendiente",
+      "updated": "Actualizado {date}"
+    },
+    "reviewLead": "{count} incidencias están vinculadas ahora a v{version}",
+    "summary": {
+      "drafting": {
+        "manualWithIssues": "La ronda de revisión {round} está en curso. {count} incidencias avanzan alrededor de v{version} y la revisión puede iniciarse manualmente cuando el equipo esté listo.",
+        "manualNoIssues": "La ronda de revisión {round} está en curso y la revisión puede iniciarse manualmente cuando el equipo esté listo.",
+        "autoWithIssues": "La ronda de revisión {round} está en curso. {count} incidencias avanzan alrededor de v{version} y se espera que la revisión empiece hacia {window}.",
+        "autoNoIssues": "La ronda de revisión {round} está en curso y se espera que la revisión empiece hacia {window}."
+      },
+      "review": {
+        "expiredWithIssues": "El cuerpo está bloqueado. La revisión terminó para {count} incidencias vinculadas a v{version}; ahora toca decidir si se inicia otra ronda o si se entra en cristalización.",
+        "expiredNoIssues": "El cuerpo está bloqueado. La revisión de v{version} terminó; ahora toca decidir si se inicia otra ronda o si se entra en cristalización.",
+        "activeWithIssues": "El cuerpo está bloqueado. {count} incidencias vinculadas a v{version} están en revisión y se espera que esta ronda termine hacia {window}.",
+        "activeNoIssues": "El cuerpo está bloqueado. La ronda de revisión de v{version} está esperando incidencias y se espera que termine hacia {window}."
+      },
+      "archived": {
+        "withStableVersion": "Este borrador archivado conserva la versión estable v{version} y su historial de discusión. Restáuralo para continuar con una nueva ronda de revisión.",
+        "withoutStableVersion": "Este borrador archivado conserva el cuerpo actual y el historial de discusión. Restáuralo para continuar con una nueva ronda de revisión."
+      },
+      "crystallizationActive": "El cuerpo está bloqueado y v{version} está en cristalización.",
+      "crystallizationFailed": "La cristalización no terminó para v{version}. Puedes seguir resolviendo incidencias y volver a intentarlo más tarde.",
+      "crystallized": "Este borrador se cristalizó con éxito y el resultado estable es v{version}.",
+      "default": "Este borrador sigue avanzando alrededor de v{version}."
+    },
+    "headline": "{status} · v{version}",
+    "header": {
+      "eyebrow": "Ciclo de vida del borrador"
+    },
+    "actions": {
+      "enterReview": {
+        "pending": "Entrando en revisión…",
+        "idle": "Entrar en revisión"
+      },
+      "advanceReview": {
+        "pending": "Abriendo la siguiente ronda…",
+        "idle": "Iniciar siguiente ronda"
+      },
+      "enterCrystallization": {
+        "pending": "Entrando en cristalización…",
+        "idle": "Entrar en cristalización"
+      },
+      "executeCrystallization": {
+        "pending": "Cristalizando…",
+        "idle": "Ejecutar cristalización"
+      },
+      "retryCrystallization": {
+        "pending": "Reintentando cristalización…",
+        "idle": "Reintentar cristalización"
+      },
+      "rollbackCrystallization": {
+        "pending": "Volviendo atrás…",
+        "idle": "Volver a revisión"
+      },
+      "archive": {
+        "pending": "Archivando…",
+        "idle": "Archivar borrador"
+      },
+      "restore": {
+        "pending": "Restaurando…",
+        "idle": "Restaurar borrador"
+      }
+    },
+    "details": {
+      "collapse": "Ocultar detalles",
+      "expand": "Mostrar detalles"
+    },
+    "cards": {
+      "source": {
+        "title": "Traspaso de origen",
+        "lead": "Traspaso de origen desde {count} mensajes",
+        "candidateId": "Candidatura {id}",
+        "messageCount": "{count} mensajes de origen",
+        "semanticFacets": "Facetas del sistema: {labels}",
+        "authorAnnotations": "Anotaciones del autor: {labels}",
+        "lastProposal": "Última propuesta: {id}",
+        "missingTitle": "Falta el traspaso de origen",
+        "missingHint": "El borrador puede seguir avanzando, pero el registro original de origen no está disponible ahora mismo."
+      },
+      "baseline": {
+        "title": "Base estable",
+        "lead": "El snapshot estable v{version} es la base actual de revisión.",
+        "source": "Origen: {label}",
+        "createdAt": "Creado {date}",
+        "anchorId": "Ancla {id}"
+      },
+      "workingCopy": {
+        "title": "Copia de trabajo",
+        "draftingLead": "La copia de trabajo es editable y ahora mismo se basa en el snapshot estable v{version}.",
+        "lockedLead": "El cuerpo está bloqueado, así que la copia de trabajo sigue fijada a v{version}.",
+        "basedOnVersion": "Basada en el snapshot estable v{version}",
+        "updatedAt": "Última edición {date}"
+      },
+      "reviewProgress": {
+        "title": "Progreso de revisión",
+        "submittedInReview": "{submitted} enviadas en revisión",
+        "acceptedResolved": "{accepted} aceptadas o resueltas"
+      }
+    }
+  },
+  "CrucibleTab": {
+    "errors": {
+      "loadTemporaryEditGrants": "No se pudo cargar el acceso temporal de edición.",
+      "fetchDraftReferenceLinks": "No se pudieron cargar las referencias del borrador.",
+      "loadSourceMaterials": "No se pudieron cargar los materiales de origen.",
+      "loadSeededReferences": "No se pudieron cargar las referencias sembradas.",
+      "missingDraftContextForUpload": "Abre primero un borrador antes de subir materiales de origen.",
+      "uploadWithoutEditPermission": "Necesitas acceso de edición antes de subir materiales de origen.",
+      "unsupportedSourceMaterial": "Ese tipo de archivo no está soportado como material de origen.",
+      "uploadSourceMaterial": "No se pudo subir el material de origen.",
+      "loadDraftLifecycle": "No se pudo cargar el ciclo de vida del borrador.",
+      "loadDiscussionThreads": "No se pudieron cargar los hilos de incidencia.",
+      "saveDraft": "No se pudo guardar el cuerpo del borrador.",
+      "reviewRequiresBody": "Añade contenido antes de entrar en revisión.",
+      "enterReview": "No se pudo entrar en revisión.",
+      "advanceReview": "No se pudo iniciar la siguiente ronda.",
+      "enterCrystallization": "No se pudo entrar en cristalización.",
+      "retryCrystallization": "No se pudo reintentar la cristalización.",
+      "rollbackCrystallization": "No se pudo devolver este borrador a revisión.",
+      "archiveRequiresBody": "Añade contenido antes de archivar este borrador.",
+      "archiveDraft": "No se pudo archivar el borrador.",
+      "restoreDraft": "No se pudo restaurar el borrador.",
+      "refreshDiscussionThreads": "No se pudieron refrescar los hilos de incidencia.",
+      "discussionOperation": "No se pudo completar esa acción de discusión.",
+      "missingDraftContextForCreateThread": "Abre primero un borrador antes de crear un hilo de incidencia.",
+      "missingDraftContextForPropose": "Abre primero un borrador antes de proponer una resolución.",
+      "missingDraftContextForResolve": "Abre primero un borrador antes de registrar la resolución.",
+      "missingDraftContextForReply": "Abre primero un borrador antes de responder.",
+      "missingDraftContextForWithdraw": "Abre primero un borrador antes de retirar un hilo.",
+      "missingDraftContextForApply": "Abre primero un borrador antes de registrar una aplicación.",
+      "missingDraftContextForApplyAcceptedIssues": "Abre primero un borrador antes de aplicar incidencias aceptadas.",
+      "applyAcceptedIssuesRequiresBody": "Añade contenido antes de aplicar incidencias aceptadas.",
+      "applyAcceptedIssues": "No se pudieron aplicar las incidencias aceptadas.",
+      "sendComment": "No se pudo enviar el comentario del párrafo.",
+      "requestTemporaryEditGrant": "No se pudo solicitar acceso temporal de edición.",
+      "issueTemporaryEditGrant": "No se pudo aprobar el acceso temporal de edición.",
+      "revokeTemporaryEditGrant": "No se pudo revocar el acceso temporal de edición.",
+      "crystallizeRequiresBody": "Añade contenido antes de cristalizar.",
+      "executeCrystallization": "No se pudo ejecutar la cristalización."
+    },
+    "confirm": {
+      "applyAcceptedGhostThreads": "Este cambio de etapa también marcará como aplicados {count} hilos aceptados por IA porque sus cambios ya están en el borrador. ¿Continuar?"
+    },
+    "notices": {
+      "enterReviewSuccess": "El borrador entró en revisión.",
+      "advanceReviewSuccess": "Se inició la siguiente ronda de revisión.",
+      "enterCrystallizationSuccess": "El borrador entró en cristalización.",
+      "retryCrystallizationSuccess": "Se inició el reintento de cristalización.",
+      "rollbackCrystallizationSuccess": "El borrador volvió a revisión.",
+      "archiveSuccess": "Borrador archivado.",
+      "restoreSuccess": "Borrador restaurado.",
+      "requestTemporaryEditGrantSuccess": "Solicitud de acceso temporal enviada.",
+      "issueTemporaryEditGrantSuccess": "Acceso temporal concedido.",
+      "revokeTemporaryEditGrantSuccess": "Acceso temporal revocado."
+    },
+    "fallback": {
+      "unknownMember": "Miembro desconocido",
+      "untitledDraft": "Borrador sin título"
+    },
+    "disabled": {
+      "maxRevisionRounds": "Se alcanzó el máximo de rondas de revisión ({count}).",
+      "walletRequiredForCrystallization": "Conecta tu wallet antes de entrar en cristalización.",
+      "policyProfileRequiredForCrystallization": "Se necesita un perfil de política antes de que este borrador pueda entrar en cristalización.",
+      "editAnchorRequiredForCrystallization": "Haz primero una edición colaborativa y espera a que se cree el ancla de edición antes de cristalizar.",
+      "editAnchorPendingForCrystallization": "La última ancla de edición colaborativa aún no termina de confirmarse on-chain. Vuelve a intentarlo en un momento.",
+      "policyProfileRequiredForRetryCrystallization": "Se necesita un perfil de política antes de reintentar la cristalización.",
+      "walletRequiredForArchive": "Conecta tu wallet antes de archivar este borrador.",
+      "policyProfileRequiredForArchive": "Se necesita un perfil de política antes de archivar este borrador.",
+      "walletRequiredForRestore": "Conecta tu wallet antes de restaurar este borrador.",
+      "policyProfileRequiredForRestore": "Se necesita un perfil de política antes de restaurar este borrador."
+    },
+    "loading": {
+      "draftContent": "Cargando borrador…",
+      "draftLifecycle": "Cargando ciclo de vida…"
+    },
+    "actions": {
+      "backToDraftList": "Volver a borradores"
+    },
+    "editor": {
+      "bodyEyebrow": "Cuerpo del borrador",
+      "bodyTitle": "Copia de trabajo",
+      "bodyHint": "Edita el cuerpo actual y aplica las incidencias aceptadas directamente en el texto.",
+      "discussionEyebrow": "Discusión",
+      "discussionTitle": "Hilos de incidencia",
+      "discussionHint": "Sigue las incidencias, propuestas y resoluciones aplicadas que afectan a este borrador."
+    },
+    "ghostReveal": {
+      "title": "Plan de revisión por incidencias"
+    },
+    "permissions": {
+      "inactiveReason": "Solo los miembros activos del círculo pueden realizar esta acción.",
+      "roles": {
+        "owner": "propietario",
+        "admin": "administrador",
+        "moderator": "moderador",
+        "elder": "anciano",
+        "member": "miembro",
+        "initiate": "iniciado",
+        "higher": "un rol superior"
+      },
+      "reasons": {
+        "createIssue": "Este círculo exige al menos el rol de {role} para enviar una incidencia.",
+        "followupIssue": "Este círculo exige al menos el rol de {role} para añadir contexto de seguimiento a una incidencia.",
+        "withdrawOwnIssue": "Este círculo no permite retirar tu propia incidencia antes de que empiece la revisión.",
+        "reviewIssue": "Este círculo exige al menos el rol de {role} para iniciar o gestionar la revisión de incidencias.",
+        "retagIssue": "Este círculo exige al menos el rol de {role} para cambiar el tipo de una incidencia.",
+        "applyAcceptedIssue": "Este círculo exige al menos el rol de {role} para marcar una incidencia aceptada como aplicada al borrador.",
+        "endDraftingEarly": "Este círculo exige al menos el rol de {role} para terminar antes la redacción y pasar a revisión.",
+        "advanceFromReview": "Este círculo exige al menos el rol de {role} para cerrar la ronda de revisión actual y pasar a la siguiente iteración.",
+        "enterCrystallization": "Este círculo exige al menos el rol de {role} para entrar en cristalización.",
+        "retagIssueDisabled": "Este círculo no permite actualmente cambiar el tipo de una incidencia durante la revisión."
+      }
+    }
+  },
+  "GhostReveal": {
+    "metadata": {
+      "model": "Modelo: {model}",
+      "promptVersion": "{asset} · v{version}",
+      "sourceDigest": "Huella de origen {digest}"
+    },
+    "errors": {
+      "missingDraftContext": "Falta el contexto del borrador, así que todavía no se puede generar la sugerencia de revisión.",
+      "missingArtifact": "La IA no devolvió un artefacto de revisión legible.",
+      "missingContent": "La IA no devolvió contenido de revisión utilizable.",
+      "generateFailed": "No se pudo generar la sugerencia de revisión. Vuelve a intentarlo.",
+      "acceptFailed": "No se pudo aceptar el plan de revisión. Vuelve a intentarlo."
+    },
+    "states": {
+      "pending": {
+        "title": "Generando una revisión por incidencias",
+        "hint": "El sistema está leyendo {count} incidencias pendientes y preparando una revisión estructurada."
+      },
+      "error": {
+        "title": "Falló la revisión por incidencias",
+        "fallback": "La generación falló. Vuelve a intentarlo."
+      },
+      "applied": {
+        "title": "Revisión escrita en el borrador",
+        "hint": "Esta revisión basada en incidencias ya se escribió en el cuerpo actual. Las incidencias aceptadas relacionadas se preseleccionarán en ediciones posteriores y aún podrás desmarcarlas."
+      },
+      "accepted": {
+        "title": "Plan de revisión aceptado",
+        "hint": "Este plan de revisión fue aceptado, pero el borrador cambió antes de escribirse. Actualiza el borrador e inténtalo de nuevo."
+      },
+      "candidate": {
+        "title": "Borrador de revisión por incidencias",
+        "emptyDraftHint": "El sistema generó sugerencias de revisión por párrafo a partir de {count} incidencias pendientes.",
+        "existingDraftHint": "Estas sugerencias de revisión se generaron a partir de {count} incidencias pendientes. Aplicar una actualizará de inmediato su párrafo objetivo en el borrador actual.",
+        "carryHint": "Aplicar un plan también registra el contexto de los hilos vinculados para que las ediciones posteriores sigan alineadas."
+      },
+      "idle": {
+        "title": "Asistente de revisión por incidencias",
+        "hint": "Esto solo aparece durante la revisión y convierte {count} incidencias pendientes en planes de revisión por párrafo para la siguiente ronda."
+      }
+    },
+    "actions": {
+      "retry": "Reintentar",
+      "accept": "Aplicar al borrador",
+      "ignore": "Ignorar",
+      "generate": "Generar revisión"
+    },
+    "candidate": {
+      "targetLabel": "{targetRef} · {count} hilos de incidencias vinculados"
+    },
+    "defaultTitle": "Plan de revisión por incidencias"
+  },
+  "SourceMaterialsPanel": {
+    "status": {
+      "aiReadable": "Legible por IA",
+      "extracting": "Extrayendo",
+      "processing": "Procesando"
+    },
+    "aria": {
+      "section": "Materiales de origen",
+      "fileInput": "Subir archivo de material de origen"
+    },
+    "title": "Materiales de origen",
+    "hint": "Sube archivos de base que la IA pueda leer durante la redacción y la revisión.",
+    "actions": {
+      "uploadAndExtract": "Subir y extraer"
+    },
+    "notices": {
+      "uploadDisabled": "Necesitas acceso de edición antes de subir materiales de origen."
+    },
+    "loading": "Cargando materiales de origen…",
+    "empty": "Todavía no hay materiales de origen.",
+    "meta": {
+      "chunkDigest": "{chunkCount} fragmentos · huella {digest}"
+    }
+  },
+  "CreateCircleFlow": {
+    "errors": {
+      "metadataSyncFailed": "El círculo se creó, pero no se pudo guardar la descripción. Puedes reintentarlo desde la página de ajustes del círculo.",
+      "metadataSyncFailedSuffix": "No se pudo guardar la descripción del círculo. Puedes reintentarlo desde la página de ajustes del círculo."
+    }
+  }
+}

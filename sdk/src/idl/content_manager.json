@@ -1,0 +1,5498 @@
+{
+  "address": "FEut65PCemjUt7dRPe4GJhaj1u5czWndvgp7LCEbiV7y",
+  "metadata": {
+    "name": "content_manager",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Content Manager Program for SocialHub Protocol"
+  },
+  "docs": [
+    "Content Manager Program - 内容管理器程序"
+  ],
+  "instructions": [
+    {
+      "name": "archive_content_v2",
+      "docs": [
+        "归档内容（v2 生命周期）"
+      ],
+      "discriminator": [
+        0,
+        227,
+        100,
+        160,
+        38,
+        239,
+        71,
+        172
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "v2_content_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "enter_draft_crystallization_v2",
+      "docs": [
+        "锚定草稿进入结晶里程碑（v2 事件锚点）"
+      ],
+      "discriminator": [
+        92,
+        212,
+        147,
+        210,
+        46,
+        24,
+        57,
+        164
+      ],
+      "accounts": [
+        {
+          "name": "actor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "draft_post_id",
+          "type": "u64"
+        },
+        {
+          "name": "policy_profile_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "archive_draft_lifecycle_v2",
+      "docs": [
+        "锚定草稿生命周期归档里程碑（v2 事件锚点）"
+      ],
+      "discriminator": [
+        144,
+        73,
+        185,
+        174,
+        105,
+        18,
+        156,
+        186
+      ],
+      "accounts": [
+        {
+          "name": "actor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "draft_post_id",
+          "type": "u64"
+        },
+        {
+          "name": "policy_profile_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "batch_update_interactions",
+      "docs": [
+        "批量更新互动统计"
+      ],
+      "discriminator": [
+        60,
+        26,
+        108,
+        87,
+        203,
+        159,
+        56,
+        19
+      ],
+      "accounts": [
+        {
+          "name": "content_stats",
+          "writable": true
+        },
+        {
+          "name": "caller_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "interactions",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "ContentInteraction"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "cpi_add_content_reference",
+      "docs": [
+        "通过扩展程序添加内容引用（需要 ContributionRead 权限）"
+      ],
+      "discriminator": [
+        50,
+        88,
+        203,
+        128,
+        89,
+        49,
+        250,
+        75
+      ],
+      "accounts": [
+        {
+          "name": "content_post",
+          "writable": true
+        },
+        {
+          "name": "content_stats",
+          "writable": true
+        },
+        {
+          "name": "caller_program"
+        },
+        {
+          "name": "extension_registry"
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "reference_type",
+          "type": "string"
+        },
+        {
+          "name": "reference_id",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "cpi_update_content_status",
+      "docs": [
+        "通过扩展程序更新内容状态（需要 ContentStatusUpdate 权限）"
+      ],
+      "discriminator": [
+        19,
+        215,
+        244,
+        46,
+        198,
+        178,
+        163,
+        96
+      ],
+      "accounts": [
+        {
+          "name": "content_post",
+          "writable": true
+        },
+        {
+          "name": "caller_program"
+        },
+        {
+          "name": "extension_registry"
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_status",
+          "type": {
+            "defined": {
+              "name": "ContentStatus"
+            }
+          }
+        },
+        {
+          "name": "reason",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_content",
+      "docs": [
+        "创建内容"
+      ],
+      "discriminator": [
+        196,
+        78,
+        200,
+        14,
+        158,
+        190,
+        68,
+        223
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "content_post",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  112,
+                  111,
+                  115,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "content_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "content_post"
+              }
+            ]
+          }
+        },
+        {
+          "name": "content_storage",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  115,
+                  116,
+                  111,
+                  114,
+                  97,
+                  103,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "content_post"
+              }
+            ]
+          }
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "identity_program"
+        },
+        {
+          "name": "user_identity"
+        },
+        {
+          "name": "access_program"
+        },
+        {
+          "name": "access_controller_account"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        },
+        {
+          "name": "content_data",
+          "type": {
+            "defined": {
+              "name": "ContentData"
+            }
+          }
+        },
+        {
+          "name": "content_type",
+          "type": {
+            "defined": {
+              "name": "ContentType"
+            }
+          }
+        },
+        {
+          "name": "metadata",
+          "type": {
+            "defined": {
+              "name": "ContentMetadata"
+            }
+          }
+        },
+        {
+          "name": "visibility_settings",
+          "type": {
+            "defined": {
+              "name": "VisibilitySettings"
+            }
+          }
+        },
+        {
+          "name": "external_uri",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_content_v2",
+      "docs": [
+        "创建内容（v2 最小锚点）"
+      ],
+      "discriminator": [
+        234,
+        246,
+        104,
+        173,
+        123,
+        250,
+        46,
+        161
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "v2_content_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "identity_program"
+        },
+        {
+          "name": "user_identity"
+        },
+        {
+          "name": "access_program"
+        },
+        {
+          "name": "access_controller_account"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        },
+        {
+          "name": "content_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "uri_ref",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "create_content_v2_with_access",
+      "docs": [
+        "创建内容（v2 最小锚点，显式 access/status）"
+      ],
+      "discriminator": [
+        202,
+        57,
+        113,
+        139,
+        126,
+        28,
+        63,
+        57
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "v2_content_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "identity_program"
+        },
+        {
+          "name": "user_identity"
+        },
+        {
+          "name": "access_program"
+        },
+        {
+          "name": "access_controller_account"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        },
+        {
+          "name": "content_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "uri_ref",
+          "type": "string"
+        },
+        {
+          "name": "visibility",
+          "type": {
+            "defined": {
+              "name": "AccessLevel"
+            }
+          }
+        },
+        {
+          "name": "status",
+          "type": {
+            "defined": {
+              "name": "ContentStatus"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_content_v2_with_audience",
+      "docs": [
+        "创建内容（v2 最小锚点，显式 raw audience/status）"
+      ],
+      "discriminator": [
+        41,
+        171,
+        222,
+        58,
+        230,
+        210,
+        191,
+        176
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "v2_content_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "identity_program"
+        },
+        {
+          "name": "user_identity"
+        },
+        {
+          "name": "access_program"
+        },
+        {
+          "name": "access_controller_account"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        },
+        {
+          "name": "content_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "uri_ref",
+          "type": "string"
+        },
+        {
+          "name": "audience_kind",
+          "type": {
+            "defined": {
+              "name": "V2AudienceKind"
+            }
+          }
+        },
+        {
+          "name": "audience_ref",
+          "type": "u8"
+        },
+        {
+          "name": "status",
+          "type": {
+            "defined": {
+              "name": "ContentStatus"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_quote",
+      "docs": [
+        "创建引用"
+      ],
+      "discriminator": [
+        101,
+        16,
+        105,
+        216,
+        14,
+        173,
+        161,
+        168
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "quoted_content_post"
+        },
+        {
+          "name": "content_post",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  112,
+                  111,
+                  115,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "content_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "content_post"
+              }
+            ]
+          }
+        },
+        {
+          "name": "content_storage",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  115,
+                  116,
+                  111,
+                  114,
+                  97,
+                  103,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "content_post"
+              }
+            ]
+          }
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        },
+        {
+          "name": "quoted_content",
+          "type": "pubkey"
+        },
+        {
+          "name": "content_data",
+          "type": {
+            "defined": {
+              "name": "ContentData"
+            }
+          }
+        },
+        {
+          "name": "metadata",
+          "type": {
+            "defined": {
+              "name": "ContentMetadata"
+            }
+          }
+        },
+        {
+          "name": "external_uri",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_quote_v2",
+      "docs": [
+        "创建引用（v2 最小锚点）"
+      ],
+      "discriminator": [
+        131,
+        244,
+        31,
+        249,
+        44,
+        132,
+        197,
+        11
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "v2_content_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "quoted_content_post",
+          "docs": [
+            "v2 受控例外：只读被引用帖子账户（用于存在性与权限语义校验）"
+          ]
+        },
+        {
+          "name": "target_follow_relationship"
+        },
+        {
+          "name": "target_circle_membership"
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "identity_program"
+        },
+        {
+          "name": "user_identity"
+        },
+        {
+          "name": "access_program"
+        },
+        {
+          "name": "access_controller_account"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        },
+        {
+          "name": "quoted_content",
+          "type": "pubkey"
+        },
+        {
+          "name": "content_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "uri_ref",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "create_quote_v2_by_id",
+      "docs": [
+        "创建引用（v2 最小锚点，by_id 关系）"
+      ],
+      "discriminator": [
+        35,
+        18,
+        173,
+        99,
+        70,
+        114,
+        131,
+        124
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "v2_content_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "quoted_author"
+        },
+        {
+          "name": "quoted_v2_content_anchor",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "quoted_author"
+              },
+              {
+                "kind": "arg",
+                "path": "quoted_content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "target_follow_relationship"
+        },
+        {
+          "name": "target_circle_membership"
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "identity_program"
+        },
+        {
+          "name": "user_identity"
+        },
+        {
+          "name": "access_program"
+        },
+        {
+          "name": "access_controller_account"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        },
+        {
+          "name": "quoted_content_id",
+          "type": "u64"
+        },
+        {
+          "name": "content_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "uri_ref",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "create_reply",
+      "docs": [
+        "创建回复"
+      ],
+      "discriminator": [
+        249,
+        250,
+        0,
+        203,
+        206,
+        162,
+        33,
+        179
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "parent_content_post"
+        },
+        {
+          "name": "content_post",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  112,
+                  111,
+                  115,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "content_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "content_post"
+              }
+            ]
+          }
+        },
+        {
+          "name": "content_storage",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  115,
+                  116,
+                  111,
+                  114,
+                  97,
+                  103,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "content_post"
+              }
+            ]
+          }
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        },
+        {
+          "name": "parent_content",
+          "type": "pubkey"
+        },
+        {
+          "name": "content_data",
+          "type": {
+            "defined": {
+              "name": "ContentData"
+            }
+          }
+        },
+        {
+          "name": "metadata",
+          "type": {
+            "defined": {
+              "name": "ContentMetadata"
+            }
+          }
+        },
+        {
+          "name": "external_uri",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_reply_v2",
+      "docs": [
+        "创建回复（v2 最小锚点）"
+      ],
+      "discriminator": [
+        106,
+        153,
+        251,
+        107,
+        128,
+        145,
+        72,
+        212
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "v2_content_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "parent_content_post",
+          "docs": [
+            "v2 受控例外：只读父帖账户（用于存在性与权限语义校验）"
+          ]
+        },
+        {
+          "name": "target_follow_relationship"
+        },
+        {
+          "name": "target_circle_membership"
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "identity_program"
+        },
+        {
+          "name": "user_identity"
+        },
+        {
+          "name": "access_program"
+        },
+        {
+          "name": "access_controller_account"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        },
+        {
+          "name": "parent_content",
+          "type": "pubkey"
+        },
+        {
+          "name": "content_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "uri_ref",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "create_reply_v2_by_id",
+      "docs": [
+        "创建回复（v2 最小锚点，by_id 关系）"
+      ],
+      "discriminator": [
+        239,
+        27,
+        57,
+        242,
+        188,
+        4,
+        129,
+        197
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "v2_content_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "parent_author"
+        },
+        {
+          "name": "parent_v2_content_anchor",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "parent_author"
+              },
+              {
+                "kind": "arg",
+                "path": "parent_content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "target_follow_relationship"
+        },
+        {
+          "name": "target_circle_membership"
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "identity_program"
+        },
+        {
+          "name": "user_identity"
+        },
+        {
+          "name": "access_program"
+        },
+        {
+          "name": "access_controller_account"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        },
+        {
+          "name": "parent_content_id",
+          "type": "u64"
+        },
+        {
+          "name": "content_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "uri_ref",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "create_repost",
+      "docs": [
+        "创建转发"
+      ],
+      "discriminator": [
+        242,
+        236,
+        246,
+        245,
+        209,
+        27,
+        193,
+        169
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "original_content_post"
+        },
+        {
+          "name": "content_post",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  112,
+                  111,
+                  115,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "content_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "content_post"
+              }
+            ]
+          }
+        },
+        {
+          "name": "content_storage",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  115,
+                  116,
+                  111,
+                  114,
+                  97,
+                  103,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "content_post"
+              }
+            ]
+          }
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        },
+        {
+          "name": "original_content",
+          "type": "pubkey"
+        },
+        {
+          "name": "additional_comment",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_repost_v2",
+      "docs": [
+        "创建转发（v2 最小锚点）"
+      ],
+      "discriminator": [
+        87,
+        33,
+        159,
+        172,
+        159,
+        63,
+        133,
+        186
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "v2_content_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "original_content_post",
+          "docs": [
+            "v2 受控例外：只读原帖账户（用于存在性与权限语义校验）"
+          ]
+        },
+        {
+          "name": "target_follow_relationship"
+        },
+        {
+          "name": "target_circle_membership"
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "identity_program"
+        },
+        {
+          "name": "user_identity"
+        },
+        {
+          "name": "access_program"
+        },
+        {
+          "name": "access_controller_account"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        },
+        {
+          "name": "original_content",
+          "type": "pubkey"
+        },
+        {
+          "name": "content_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "uri_ref",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "create_repost_v2_by_id",
+      "docs": [
+        "创建转发（v2 最小锚点，by_id 关系）"
+      ],
+      "discriminator": [
+        252,
+        100,
+        75,
+        222,
+        206,
+        247,
+        29,
+        184
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "v2_content_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "original_author"
+        },
+        {
+          "name": "original_v2_content_anchor",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "original_author"
+              },
+              {
+                "kind": "arg",
+                "path": "original_content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "target_follow_relationship"
+        },
+        {
+          "name": "target_circle_membership"
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "identity_program"
+        },
+        {
+          "name": "user_identity"
+        },
+        {
+          "name": "access_program"
+        },
+        {
+          "name": "access_controller_account"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        },
+        {
+          "name": "original_content_id",
+          "type": "u64"
+        },
+        {
+          "name": "content_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "uri_ref",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "delete_content",
+      "docs": [
+        "删除内容"
+      ],
+      "discriminator": [
+        5,
+        233,
+        219,
+        88,
+        173,
+        220,
+        96,
+        213
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "content_post",
+          "writable": true
+        },
+        {
+          "name": "content_stats",
+          "writable": true
+        },
+        {
+          "name": "content_storage",
+          "writable": true
+        },
+        {
+          "name": "author",
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "deletion_type",
+          "type": {
+            "defined": {
+              "name": "DeletionType"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "get_content_info",
+      "docs": [
+        "获取内容信息 (CPI)"
+      ],
+      "discriminator": [
+        108,
+        53,
+        163,
+        16,
+        101,
+        159,
+        157,
+        82
+      ],
+      "accounts": [
+        {
+          "name": "content_post"
+        },
+        {
+          "name": "caller_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "pubkey"
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "ContentPost"
+        }
+      }
+    },
+    {
+      "name": "get_content_stats",
+      "docs": [
+        "获取内容统计 (CPI)"
+      ],
+      "discriminator": [
+        12,
+        206,
+        11,
+        180,
+        110,
+        50,
+        236,
+        151
+      ],
+      "accounts": [
+        {
+          "name": "content_stats"
+        },
+        {
+          "name": "caller_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "pubkey"
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "ContentStats"
+        }
+      }
+    },
+    {
+      "name": "get_recommended_content",
+      "docs": [
+        "获取推荐内容"
+      ],
+      "discriminator": [
+        248,
+        56,
+        24,
+        162,
+        18,
+        16,
+        242,
+        204
+      ],
+      "accounts": [
+        {
+          "name": "content_manager"
+        }
+      ],
+      "args": [
+        {
+          "name": "user",
+          "type": "pubkey"
+        },
+        {
+          "name": "recommendation_context",
+          "type": {
+            "defined": {
+              "name": "RecommendationContext"
+            }
+          }
+        }
+      ],
+      "returns": {
+        "vec": {
+          "defined": {
+            "name": "ContentRecommendation"
+          }
+        }
+      }
+    },
+    {
+      "name": "get_trending_content",
+      "docs": [
+        "获取趋势内容"
+      ],
+      "discriminator": [
+        140,
+        196,
+        231,
+        125,
+        135,
+        146,
+        13,
+        60
+      ],
+      "accounts": [
+        {
+          "name": "content_manager"
+        }
+      ],
+      "args": [
+        {
+          "name": "time_range",
+          "type": {
+            "defined": {
+              "name": "TimeRange"
+            }
+          }
+        },
+        {
+          "name": "content_types",
+          "type": {
+            "option": {
+              "vec": {
+                "defined": {
+                  "name": "ContentType"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "limit",
+          "type": "u32"
+        }
+      ],
+      "returns": {
+        "vec": {
+          "defined": {
+            "name": "ContentPost"
+          }
+        }
+      }
+    },
+    {
+      "name": "initialize_content_manager",
+      "docs": [
+        "初始化内容管理器"
+      ],
+      "discriminator": [
+        224,
+        136,
+        190,
+        16,
+        210,
+        5,
+        123,
+        192
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  109,
+                  97,
+                  110,
+                  97,
+                  103,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "manager_config",
+          "type": {
+            "defined": {
+              "name": "ManagerConfig"
+            }
+          }
+        },
+        {
+          "name": "storage_config",
+          "type": {
+            "defined": {
+              "name": "StorageConfig"
+            }
+          }
+        },
+        {
+          "name": "moderation_config",
+          "type": {
+            "defined": {
+              "name": "ModerationConfig"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "interact_with_content",
+      "docs": [
+        "记录内容互动"
+      ],
+      "discriminator": [
+        52,
+        173,
+        40,
+        153,
+        236,
+        161,
+        22,
+        158
+      ],
+      "accounts": [
+        {
+          "name": "content_stats",
+          "writable": true
+        },
+        {
+          "name": "actor",
+          "signer": true
+        },
+        {
+          "name": "caller_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "interaction_type",
+          "type": {
+            "defined": {
+              "name": "InteractionType"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "migrate_storage_strategy",
+      "docs": [
+        "迁移存储策略"
+      ],
+      "discriminator": [
+        111,
+        70,
+        212,
+        111,
+        96,
+        135,
+        71,
+        132
+      ],
+      "accounts": [
+        {
+          "name": "content_post",
+          "writable": true
+        },
+        {
+          "name": "content_storage",
+          "writable": true
+        },
+        {
+          "name": "author",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_strategy",
+          "type": {
+            "defined": {
+              "name": "StorageStrategy"
+            }
+          }
+        },
+        {
+          "name": "new_primary_uri",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "publish_content_v2",
+      "docs": [
+        "发布内容（v2 生命周期）"
+      ],
+      "discriminator": [
+        156,
+        232,
+        229,
+        94,
+        16,
+        133,
+        104,
+        241
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "v2_content_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "restore_content_v2",
+      "docs": [
+        "恢复内容（v2 生命周期）"
+      ],
+      "discriminator": [
+        132,
+        20,
+        166,
+        9,
+        134,
+        94,
+        27,
+        227
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "v2_content_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "restore_draft_lifecycle_v2",
+      "docs": [
+        "锚定草稿生命周期恢复里程碑（v2 事件锚点）"
+      ],
+      "discriminator": [
+        230,
+        49,
+        121,
+        211,
+        206,
+        153,
+        97,
+        103
+      ],
+      "accounts": [
+        {
+          "name": "actor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "draft_post_id",
+          "type": "u64"
+        },
+        {
+          "name": "policy_profile_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "search_content",
+      "docs": [
+        "搜索内容"
+      ],
+      "discriminator": [
+        217,
+        147,
+        206,
+        157,
+        219,
+        141,
+        13,
+        152
+      ],
+      "accounts": [
+        {
+          "name": "content_manager"
+        }
+      ],
+      "args": [
+        {
+          "name": "query",
+          "type": {
+            "defined": {
+              "name": "SearchQuery"
+            }
+          }
+        },
+        {
+          "name": "filters",
+          "type": {
+            "defined": {
+              "name": "SearchFilters"
+            }
+          }
+        },
+        {
+          "name": "pagination",
+          "type": {
+            "defined": {
+              "name": "PaginationConfig"
+            }
+          }
+        }
+      ],
+      "returns": {
+        "vec": {
+          "defined": {
+            "name": "ContentPost"
+          }
+        }
+      }
+    },
+    {
+      "name": "set_content_monetization",
+      "docs": [
+        "设置内容变现"
+      ],
+      "discriminator": [
+        10,
+        81,
+        108,
+        63,
+        98,
+        115,
+        66,
+        184
+      ],
+      "accounts": [
+        {
+          "name": "content_post",
+          "writable": true
+        },
+        {
+          "name": "author",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "monetization_info",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "MonetizationInfo"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_content_visibility",
+      "docs": [
+        "设置内容可见性"
+      ],
+      "discriminator": [
+        37,
+        159,
+        198,
+        214,
+        250,
+        142,
+        196,
+        101
+      ],
+      "accounts": [
+        {
+          "name": "content_post",
+          "writable": true
+        },
+        {
+          "name": "author",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "visibility_settings",
+          "type": {
+            "defined": {
+              "name": "VisibilitySettings"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "tombstone_content_v2",
+      "docs": [
+        "墓碑化内容（v2 生命周期）"
+      ],
+      "discriminator": [
+        230,
+        227,
+        139,
+        16,
+        110,
+        37,
+        192,
+        75
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "v2_content_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "update_content",
+      "docs": [
+        "更新内容"
+      ],
+      "discriminator": [
+        201,
+        145,
+        238,
+        112,
+        36,
+        231,
+        69,
+        8
+      ],
+      "accounts": [
+        {
+          "name": "content_post",
+          "writable": true
+        },
+        {
+          "name": "author",
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "updates",
+          "type": {
+            "defined": {
+              "name": "ContentUpdate"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_content_anchor_v2",
+      "docs": [
+        "更新内容锚点（v2 链上控制链下内容）"
+      ],
+      "discriminator": [
+        196,
+        162,
+        81,
+        232,
+        228,
+        135,
+        14,
+        101
+      ],
+      "accounts": [
+        {
+          "name": "v2_content_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  116,
+                  101,
+                  110,
+                  116,
+                  95,
+                  118,
+                  50,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "content_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "identity_program"
+        },
+        {
+          "name": "user_identity"
+        },
+        {
+          "name": "access_program"
+        },
+        {
+          "name": "access_controller_account"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "u64"
+        },
+        {
+          "name": "content_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "uri_ref",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "update_content_scores",
+      "docs": [
+        "更新内容评分"
+      ],
+      "discriminator": [
+        227,
+        103,
+        101,
+        24,
+        150,
+        29,
+        156,
+        205
+      ],
+      "accounts": [
+        {
+          "name": "content_stats",
+          "writable": true
+        },
+        {
+          "name": "caller_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "engagement_score",
+          "type": {
+            "option": "f64"
+          }
+        },
+        {
+          "name": "quality_score",
+          "type": {
+            "option": "f64"
+          }
+        },
+        {
+          "name": "trending_score",
+          "type": {
+            "option": "f64"
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_content_status",
+      "docs": [
+        "更新内容状态"
+      ],
+      "discriminator": [
+        51,
+        184,
+        130,
+        228,
+        141,
+        177,
+        87,
+        130
+      ],
+      "accounts": [
+        {
+          "name": "content_post",
+          "writable": true
+        },
+        {
+          "name": "author",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_status",
+          "type": {
+            "defined": {
+              "name": "ContentStatus"
+            }
+          }
+        },
+        {
+          "name": "reason",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_manager_config",
+      "docs": [
+        "更新管理器配置"
+      ],
+      "discriminator": [
+        144,
+        159,
+        102,
+        22,
+        93,
+        138,
+        48,
+        88
+      ],
+      "accounts": [
+        {
+          "name": "content_manager",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_manager_config",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "ManagerConfig"
+              }
+            }
+          }
+        },
+        {
+          "name": "new_storage_config",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "StorageConfig"
+              }
+            }
+          }
+        },
+        {
+          "name": "new_moderation_config",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "ModerationConfig"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_storage_info",
+      "docs": [
+        "更新存储信息"
+      ],
+      "discriminator": [
+        64,
+        79,
+        223,
+        205,
+        141,
+        30,
+        224,
+        231
+      ],
+      "accounts": [
+        {
+          "name": "content_post",
+          "writable": true
+        },
+        {
+          "name": "content_storage",
+          "writable": true
+        },
+        {
+          "name": "author",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_primary_uri",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "backup_uris",
+          "type": {
+            "option": {
+              "vec": "string"
+            }
+          }
+        },
+        {
+          "name": "storage_status",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "StorageStatus"
+              }
+            }
+          }
+        },
+        {
+          "name": "cdn_uri",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "validate_content_ownership",
+      "docs": [
+        "验证内容所有权 (CPI)"
+      ],
+      "discriminator": [
+        23,
+        112,
+        138,
+        67,
+        118,
+        215,
+        162,
+        213
+      ],
+      "accounts": [
+        {
+          "name": "content_post"
+        },
+        {
+          "name": "caller_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "claimed_owner",
+          "type": "pubkey"
+        }
+      ],
+      "returns": "bool"
+    }
+  ],
+  "accounts": [
+    {
+      "name": "ContentManagerAccount",
+      "discriminator": [
+        31,
+        89,
+        131,
+        92,
+        197,
+        86,
+        86,
+        248
+      ]
+    },
+    {
+      "name": "ContentPostAccount",
+      "discriminator": [
+        11,
+        1,
+        238,
+        182,
+        195,
+        98,
+        134,
+        156
+      ]
+    },
+    {
+      "name": "ContentStatsAccount",
+      "discriminator": [
+        27,
+        37,
+        50,
+        18,
+        0,
+        38,
+        147,
+        124
+      ]
+    },
+    {
+      "name": "ContentStorageAccount",
+      "discriminator": [
+        130,
+        238,
+        157,
+        243,
+        144,
+        120,
+        91,
+        135
+      ]
+    },
+    {
+      "name": "V2ContentAnchorAccount",
+      "discriminator": [
+        154,
+        5,
+        7,
+        125,
+        248,
+        168,
+        122,
+        201
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "V2ContentIdInvalid",
+      "msg": "v2 content_id must be greater than 0"
+    },
+    {
+      "code": 6001,
+      "name": "V2ParentContentMismatch",
+      "msg": "v2 reply parent content account does not match parent_content"
+    },
+    {
+      "code": 6002,
+      "name": "V2OriginalContentMismatch",
+      "msg": "v2 repost original content account does not match original_content"
+    },
+    {
+      "code": 6003,
+      "name": "V2QuotedContentMismatch",
+      "msg": "v2 quote target content account does not match quoted_content"
+    },
+    {
+      "code": 6004,
+      "name": "V2RelationTargetInvalid",
+      "msg": "v2 relation target content id is invalid"
+    },
+    {
+      "code": 6005,
+      "name": "V2RelationSelfReference",
+      "msg": "v2 relation self reference is not allowed"
+    },
+    {
+      "code": 6006,
+      "name": "V2RelationTargetNotPublic",
+      "msg": "v2 relation target visibility must be public"
+    },
+    {
+      "code": 6007,
+      "name": "V2RelationTargetNotPublished",
+      "msg": "v2 relation target status must be published"
+    },
+    {
+      "code": 6008,
+      "name": "V2UnsupportedStatus",
+      "msg": "v2 status only supports Draft/Published/Archived"
+    },
+    {
+      "code": 6009,
+      "name": "V2StatusUnauthorized",
+      "msg": "v2 lifecycle update must be signed by the anchor author"
+    },
+    {
+      "code": 6010,
+      "name": "V2StatusAlreadyPublished",
+      "msg": "v2 content is already published"
+    },
+    {
+      "code": 6011,
+      "name": "V2StatusAlreadyArchived",
+      "msg": "v2 content is already archived"
+    },
+    {
+      "code": 6012,
+      "name": "V2StatusAlreadyTombstoned",
+      "msg": "v2 content is already tombstoned"
+    },
+    {
+      "code": 6013,
+      "name": "V2InvalidLifecycleTransition",
+      "msg": "v2 lifecycle transition is invalid"
+    },
+    {
+      "code": 6014,
+      "name": "V2ContentAnchorAlreadyDeleted",
+      "msg": "v2 content anchor cannot be updated after deletion"
+    },
+    {
+      "code": 6015,
+      "name": "V2UnsupportedAudience",
+      "msg": "v2 audience only supports Public/Private/Followers/CircleOnly"
+    },
+    {
+      "code": 6016,
+      "name": "V2AudienceRefMustBeZero",
+      "msg": "v2 non-circle audience must not carry audience_ref"
+    }
+  ],
+  "types": [
+    {
+      "name": "AccessLevel",
+      "docs": [
+        "访问级别"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Public"
+          },
+          {
+            "name": "Followers"
+          },
+          {
+            "name": "Friends"
+          },
+          {
+            "name": "Private"
+          },
+          {
+            "name": "Custom"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BillingCycle",
+      "docs": [
+        "计费周期"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Daily"
+          },
+          {
+            "name": "Weekly"
+          },
+          {
+            "name": "Monthly"
+          },
+          {
+            "name": "Quarterly"
+          },
+          {
+            "name": "Yearly"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CommentPermission",
+      "docs": [
+        "评论权限"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Anyone"
+          },
+          {
+            "name": "Followers"
+          },
+          {
+            "name": "Friends"
+          },
+          {
+            "name": "None"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentData",
+      "docs": [
+        "内容数据结构"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "content_id",
+            "type": "u64"
+          },
+          {
+            "name": "author",
+            "type": "pubkey"
+          },
+          {
+            "name": "content_type",
+            "type": {
+              "defined": {
+                "name": "ContentType"
+              }
+            }
+          },
+          {
+            "name": "text",
+            "type": "string"
+          },
+          {
+            "name": "media_attachments",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "MediaAttachment"
+                }
+              }
+            }
+          },
+          {
+            "name": "metadata",
+            "type": {
+              "defined": {
+                "name": "ContentMetadata"
+              }
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentInteraction",
+      "docs": [
+        "互动数据结构"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "content_id",
+            "type": "pubkey"
+          },
+          {
+            "name": "interaction_type",
+            "type": {
+              "defined": {
+                "name": "InteractionType"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentManager",
+      "docs": [
+        "内容管理器主账户"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated",
+            "type": "i64"
+          },
+          {
+            "name": "total_content",
+            "type": "u64"
+          },
+          {
+            "name": "active_content",
+            "type": "u64"
+          },
+          {
+            "name": "manager_config",
+            "type": {
+              "defined": {
+                "name": "ManagerConfig"
+              }
+            }
+          },
+          {
+            "name": "storage_config",
+            "type": {
+              "defined": {
+                "name": "StorageConfig"
+              }
+            }
+          },
+          {
+            "name": "moderation_config",
+            "type": {
+              "defined": {
+                "name": "ModerationConfig"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentManagerAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inner",
+            "type": {
+              "defined": {
+                "name": "ContentManager"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentMetadata",
+      "docs": [
+        "内容元数据"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "title",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "description",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "tags",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "language",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "content_warning",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "expires_at",
+            "type": {
+              "option": "i64"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentPost",
+      "docs": [
+        "主内容账户 - 核心不变数据 (~1-2KB)"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "content_id",
+            "type": "u64"
+          },
+          {
+            "name": "author_identity",
+            "type": "pubkey"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated",
+            "type": "i64"
+          },
+          {
+            "name": "content_version",
+            "type": "u32"
+          },
+          {
+            "name": "content_type",
+            "type": {
+              "defined": {
+                "name": "ContentType"
+              }
+            }
+          },
+          {
+            "name": "content_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "primary_storage_uri",
+            "type": "string"
+          },
+          {
+            "name": "content_preview",
+            "type": "string"
+          },
+          {
+            "name": "reply_to",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "quote_post",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "repost_of",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "thread_root",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "thread_depth",
+            "type": "u8"
+          },
+          {
+            "name": "moderation_status",
+            "type": {
+              "defined": {
+                "name": "ModerationStatus"
+              }
+            }
+          },
+          {
+            "name": "content_warnings",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "visibility_settings",
+            "type": {
+              "defined": {
+                "name": "VisibilitySettings"
+              }
+            }
+          },
+          {
+            "name": "tags",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "categories",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "language",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "content_length",
+            "type": "u32"
+          },
+          {
+            "name": "stats_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "storage_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "ContentStatus"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentPostAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inner",
+            "type": {
+              "defined": {
+                "name": "ContentPost"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentRecommendation",
+      "docs": [
+        "内容推荐"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "content_id",
+            "type": "pubkey"
+          },
+          {
+            "name": "recommendation_score",
+            "type": "f64"
+          },
+          {
+            "name": "recommendation_reason",
+            "type": "string"
+          },
+          {
+            "name": "predicted_engagement",
+            "type": "f64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentStats",
+      "docs": [
+        "互动统计账户 - 频繁更新数据 (~512 bytes)"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "content_id",
+            "type": "pubkey"
+          },
+          {
+            "name": "like_count",
+            "type": "u64"
+          },
+          {
+            "name": "comment_count",
+            "type": "u64"
+          },
+          {
+            "name": "repost_count",
+            "type": "u64"
+          },
+          {
+            "name": "view_count",
+            "type": "u64"
+          },
+          {
+            "name": "share_count",
+            "type": "u64"
+          },
+          {
+            "name": "bookmark_count",
+            "type": "u64"
+          },
+          {
+            "name": "report_count",
+            "type": "u64"
+          },
+          {
+            "name": "engagement_score",
+            "type": "f64"
+          },
+          {
+            "name": "quality_score",
+            "type": "f64"
+          },
+          {
+            "name": "trending_score",
+            "type": "f64"
+          },
+          {
+            "name": "virality_score",
+            "type": "f64"
+          },
+          {
+            "name": "last_24h_interactions",
+            "type": "u64"
+          },
+          {
+            "name": "last_7d_interactions",
+            "type": "u64"
+          },
+          {
+            "name": "peak_interaction_time",
+            "type": "i64"
+          },
+          {
+            "name": "interaction_velocity",
+            "type": "f64"
+          },
+          {
+            "name": "last_updated",
+            "type": "i64"
+          },
+          {
+            "name": "update_sequence",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentStatsAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inner",
+            "type": {
+              "defined": {
+                "name": "ContentStats"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentStatus",
+      "docs": [
+        "内容状态"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Draft"
+          },
+          {
+            "name": "Published"
+          },
+          {
+            "name": "Archived"
+          },
+          {
+            "name": "Deleted"
+          },
+          {
+            "name": "Moderated"
+          },
+          {
+            "name": "Suspended"
+          },
+          {
+            "name": "Flagged"
+          },
+          {
+            "name": "UnderReview"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentStorage",
+      "docs": [
+        "存储信息账户 - 存储策略数据 (~1KB)"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "content_id",
+            "type": "pubkey"
+          },
+          {
+            "name": "storage_strategy",
+            "type": {
+              "defined": {
+                "name": "StorageStrategy"
+              }
+            }
+          },
+          {
+            "name": "primary_uri",
+            "type": "string"
+          },
+          {
+            "name": "backup_uris",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "storage_cost",
+            "type": "u64"
+          },
+          {
+            "name": "retrieval_speed",
+            "type": {
+              "defined": {
+                "name": "StorageSpeed"
+              }
+            }
+          },
+          {
+            "name": "durability_score",
+            "type": "f64"
+          },
+          {
+            "name": "storage_status",
+            "type": {
+              "defined": {
+                "name": "StorageStatus"
+              }
+            }
+          },
+          {
+            "name": "arweave_tx_id",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "ipfs_hash",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "custom_storage_info",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "KeyValue"
+                }
+              }
+            }
+          },
+          {
+            "name": "access_permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "StoragePermission"
+                }
+              }
+            }
+          },
+          {
+            "name": "encryption_enabled",
+            "type": "bool"
+          },
+          {
+            "name": "encryption_key_ref",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "merkle_batch_id",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "merkle_leaf_index",
+            "type": {
+              "option": "u32"
+            }
+          },
+          {
+            "name": "merkle_proof",
+            "type": {
+              "option": {
+                "vec": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "name": "storage_provider_type",
+            "type": {
+              "defined": {
+                "name": "StorageProviderType"
+              }
+            }
+          },
+          {
+            "name": "is_verified_provider",
+            "type": "bool"
+          },
+          {
+            "name": "cdn_uri",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentStorageAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inner",
+            "type": {
+              "defined": {
+                "name": "ContentStorage"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentType",
+      "docs": [
+        "内容类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Text"
+          },
+          {
+            "name": "Image"
+          },
+          {
+            "name": "Video"
+          },
+          {
+            "name": "Audio"
+          },
+          {
+            "name": "Document"
+          },
+          {
+            "name": "Link"
+          },
+          {
+            "name": "Poll"
+          },
+          {
+            "name": "Event"
+          },
+          {
+            "name": "Live"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentUpdate",
+      "docs": [
+        "内容更新数据"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "content_preview",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "tags",
+            "type": {
+              "option": {
+                "vec": "string"
+              }
+            }
+          },
+          {
+            "name": "categories",
+            "type": {
+              "option": {
+                "vec": "string"
+              }
+            }
+          },
+          {
+            "name": "visibility_settings",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "VisibilitySettings"
+                }
+              }
+            }
+          },
+          {
+            "name": "content_warnings",
+            "type": {
+              "option": {
+                "vec": "string"
+              }
+            }
+          },
+          {
+            "name": "monetization",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "MonetizationInfo"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeletionType",
+      "docs": [
+        "删除类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SoftDelete"
+          },
+          {
+            "name": "HardDelete"
+          },
+          {
+            "name": "Archive"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Dimensions",
+      "docs": [
+        "尺寸信息"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "width",
+            "type": "u32"
+          },
+          {
+            "name": "height",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InteractionType",
+      "docs": [
+        "互动类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Like"
+          },
+          {
+            "name": "Dislike"
+          },
+          {
+            "name": "Share"
+          },
+          {
+            "name": "Comment"
+          },
+          {
+            "name": "Bookmark"
+          },
+          {
+            "name": "Report"
+          },
+          {
+            "name": "View"
+          }
+        ]
+      }
+    },
+    {
+      "name": "KeyValue",
+      "docs": [
+        "键值对数据结构"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "key",
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ManagerConfig",
+      "docs": [
+        "管理器配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "max_content_size",
+            "type": "u32"
+          },
+          {
+            "name": "max_media_attachments",
+            "type": "u8"
+          },
+          {
+            "name": "default_storage_strategy",
+            "type": {
+              "defined": {
+                "name": "StorageStrategy"
+              }
+            }
+          },
+          {
+            "name": "auto_moderation_enabled",
+            "type": "bool"
+          },
+          {
+            "name": "thread_depth_limit",
+            "type": "u8"
+          },
+          {
+            "name": "quote_chain_limit",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MediaAttachment",
+      "docs": [
+        "媒体附件"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "media_type",
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "type": "string"
+          },
+          {
+            "name": "file_size",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "dimensions",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "Dimensions"
+                }
+              }
+            }
+          },
+          {
+            "name": "duration",
+            "type": {
+              "option": "u32"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ModerationConfig",
+      "docs": [
+        "审核配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "auto_moderation",
+            "type": "bool"
+          },
+          {
+            "name": "spam_detection",
+            "type": "bool"
+          },
+          {
+            "name": "content_filtering",
+            "type": "bool"
+          },
+          {
+            "name": "community_moderation",
+            "type": "bool"
+          },
+          {
+            "name": "appeal_process",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ModerationStatus",
+      "docs": [
+        "审核状态"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Pending"
+          },
+          {
+            "name": "Approved"
+          },
+          {
+            "name": "Rejected"
+          },
+          {
+            "name": "Flagged"
+          },
+          {
+            "name": "UnderReview"
+          },
+          {
+            "name": "AutoApproved"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MonetizationInfo",
+      "docs": [
+        "变现信息"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "monetization_type",
+            "type": {
+              "defined": {
+                "name": "MonetizationType"
+              }
+            }
+          },
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "revenue_split",
+            "type": {
+              "defined": {
+                "name": "RevenueSplit"
+              }
+            }
+          },
+          {
+            "name": "payment_token",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "subscription_model",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "SubscriptionModel"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MonetizationType",
+      "docs": [
+        "变现类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Free"
+          },
+          {
+            "name": "OneTime"
+          },
+          {
+            "name": "Subscription"
+          },
+          {
+            "name": "PayPerView"
+          },
+          {
+            "name": "Donation"
+          },
+          {
+            "name": "NFT"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PaginationConfig",
+      "docs": [
+        "分页配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "page",
+            "type": "u32"
+          },
+          {
+            "name": "limit",
+            "type": "u32"
+          },
+          {
+            "name": "sort_by",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "sort_order",
+            "type": {
+              "defined": {
+                "name": "SortOrder"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "QuotePermission",
+      "docs": [
+        "引用权限"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Anyone"
+          },
+          {
+            "name": "Followers"
+          },
+          {
+            "name": "ExplicitApproval"
+          },
+          {
+            "name": "None"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RecommendationContext",
+      "docs": [
+        "推荐上下文"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user_identity",
+            "type": "pubkey"
+          },
+          {
+            "name": "recommendation_type",
+            "type": {
+              "defined": {
+                "name": "RecommendationType"
+              }
+            }
+          },
+          {
+            "name": "max_results",
+            "type": "u32"
+          },
+          {
+            "name": "diversity_factor",
+            "type": "f64"
+          },
+          {
+            "name": "freshness_weight",
+            "type": "f64"
+          },
+          {
+            "name": "quality_weight",
+            "type": "f64"
+          },
+          {
+            "name": "social_weight",
+            "type": "f64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RecommendationType",
+      "docs": [
+        "推荐类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ForYou"
+          },
+          {
+            "name": "Trending"
+          },
+          {
+            "name": "Following"
+          },
+          {
+            "name": "Similar"
+          },
+          {
+            "name": "Popular"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReplyPermission",
+      "docs": [
+        "回复权限"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Anyone"
+          },
+          {
+            "name": "Followers"
+          },
+          {
+            "name": "Mentioned"
+          },
+          {
+            "name": "None"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RepostPermission",
+      "docs": [
+        "转发权限"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Anyone"
+          },
+          {
+            "name": "Followers"
+          },
+          {
+            "name": "ExplicitApproval"
+          },
+          {
+            "name": "None"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RevenueSplit",
+      "docs": [
+        "收益分配"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator_percentage",
+            "type": "u8"
+          },
+          {
+            "name": "platform_percentage",
+            "type": "u8"
+          },
+          {
+            "name": "referrer_percentage",
+            "type": "u8"
+          },
+          {
+            "name": "community_percentage",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SearchFilters",
+      "docs": [
+        "搜索过滤器"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "visibility_levels",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "VisibilityLevel"
+                }
+              }
+            }
+          },
+          {
+            "name": "moderation_status",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "ModerationStatus"
+                }
+              }
+            }
+          },
+          {
+            "name": "has_media",
+            "type": {
+              "option": "bool"
+            }
+          },
+          {
+            "name": "min_interactions",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "max_interactions",
+            "type": {
+              "option": "u64"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SearchQuery",
+      "docs": [
+        "搜索查询"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "query_text",
+            "type": "string"
+          },
+          {
+            "name": "content_types",
+            "type": {
+              "option": {
+                "vec": {
+                  "defined": {
+                    "name": "ContentType"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name": "author_filter",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "time_range",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "TimeRange"
+                }
+              }
+            }
+          },
+          {
+            "name": "min_quality_score",
+            "type": {
+              "option": "f64"
+            }
+          },
+          {
+            "name": "tags",
+            "type": {
+              "option": {
+                "vec": "string"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SortOrder",
+      "docs": [
+        "排序顺序"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Ascending"
+          },
+          {
+            "name": "Descending"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StorageConfig",
+      "docs": [
+        "存储配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "text_threshold",
+            "type": "u32"
+          },
+          {
+            "name": "media_threshold",
+            "type": "u64"
+          },
+          {
+            "name": "arweave_enabled",
+            "type": "bool"
+          },
+          {
+            "name": "ipfs_enabled",
+            "type": "bool"
+          },
+          {
+            "name": "compression_enabled",
+            "type": "bool"
+          },
+          {
+            "name": "backup_enabled",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StoragePermission",
+      "docs": [
+        "存储权限"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Read"
+          },
+          {
+            "name": "Write"
+          },
+          {
+            "name": "Delete"
+          },
+          {
+            "name": "Share"
+          },
+          {
+            "name": "Migrate"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StorageProviderType",
+      "docs": [
+        "存储提供者类型 (用于前端 UI 标记和风险提示)"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Decentralized"
+          },
+          {
+            "name": "Centralized"
+          },
+          {
+            "name": "Personal"
+          },
+          {
+            "name": "Hybrid"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StorageSpeed",
+      "docs": [
+        "存储速度"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Instant"
+          },
+          {
+            "name": "Fast"
+          },
+          {
+            "name": "Medium"
+          },
+          {
+            "name": "Slow"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StorageStatus",
+      "docs": [
+        "存储状态"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Uploading"
+          },
+          {
+            "name": "Stored"
+          },
+          {
+            "name": "Failed"
+          },
+          {
+            "name": "Migrating"
+          },
+          {
+            "name": "Archived"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StorageStrategy",
+      "docs": [
+        "存储策略"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "OnChain"
+          },
+          {
+            "name": "Arweave"
+          },
+          {
+            "name": "IPFS"
+          },
+          {
+            "name": "Hybrid"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "SubscriptionModel",
+      "docs": [
+        "订阅模型"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "subscription_type",
+            "type": {
+              "defined": {
+                "name": "SubscriptionType"
+              }
+            }
+          },
+          {
+            "name": "billing_cycle",
+            "type": {
+              "defined": {
+                "name": "BillingCycle"
+              }
+            }
+          },
+          {
+            "name": "trial_period_days",
+            "type": {
+              "option": "u32"
+            }
+          },
+          {
+            "name": "auto_renewal",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SubscriptionType",
+      "docs": [
+        "订阅类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Basic"
+          },
+          {
+            "name": "Premium"
+          },
+          {
+            "name": "VIP"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "TimeRange",
+      "docs": [
+        "时间范围"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "start_time",
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "V2AudienceKind",
+      "docs": [
+        "v2 内容受众类型（紧凑控制面）"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Public"
+          },
+          {
+            "name": "Private"
+          },
+          {
+            "name": "FollowersOnly"
+          },
+          {
+            "name": "CircleOnly"
+          }
+        ]
+      }
+    },
+    {
+      "name": "V2ContentAnchorAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "state_flags",
+            "type": "u8"
+          },
+          {
+            "name": "packed_control",
+            "type": "u32"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VisibilityLevel",
+      "docs": [
+        "可见性级别"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Public"
+          },
+          {
+            "name": "Followers"
+          },
+          {
+            "name": "Friends"
+          },
+          {
+            "name": "Community",
+            "fields": [
+              "pubkey"
+            ]
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              {
+                "vec": "pubkey"
+              }
+            ]
+          },
+          {
+            "name": "Private"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VisibilitySettings",
+      "docs": [
+        "可见性设置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "visibility_level",
+            "type": {
+              "defined": {
+                "name": "VisibilityLevel"
+              }
+            }
+          },
+          {
+            "name": "quote_permission",
+            "type": {
+              "defined": {
+                "name": "QuotePermission"
+              }
+            }
+          },
+          {
+            "name": "reply_permission",
+            "type": {
+              "defined": {
+                "name": "ReplyPermission"
+              }
+            }
+          },
+          {
+            "name": "repost_permission",
+            "type": {
+              "defined": {
+                "name": "RepostPermission"
+              }
+            }
+          },
+          {
+            "name": "comment_permission",
+            "type": {
+              "defined": {
+                "name": "CommentPermission"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

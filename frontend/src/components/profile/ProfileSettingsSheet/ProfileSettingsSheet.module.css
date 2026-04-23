@@ -1,0 +1,195 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    background: rgba(8, 10, 9, 0.56);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.sheet {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100vw;
+    height: 100dvh;
+    padding-top: calc(var(--safe-area-top) + var(--space-3));
+    padding-bottom: calc(var(--safe-area-bottom) + var(--space-4));
+    background:
+        linear-gradient(180deg, rgba(31, 36, 33, 0.98) 0%, rgba(23, 28, 25, 0.98) 100%);
+}
+
+.viewport {
+    height: 100%;
+    overflow: hidden;
+}
+
+.track {
+    display: flex;
+    width: 200%;
+    height: 100%;
+    transition: transform var(--motion-normal) var(--easing-standard);
+}
+
+.panel {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: 0 var(--space-4) var(--space-4);
+}
+
+.eyebrow {
+    font-size: var(--font-size-small);
+    color: var(--color-accent-gold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-1);
+}
+
+.title {
+    font-size: var(--font-size-h3);
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
+}
+
+.iconButton,
+.backButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-button);
+}
+
+.iconButton {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--color-border-soft);
+    background: rgba(255, 255, 255, 0.02);
+    flex-shrink: 0;
+}
+
+.backButton {
+    min-height: 40px;
+    padding: 0 var(--space-2);
+    font-size: var(--font-size-caption);
+    color: var(--color-text-secondary);
+}
+
+.body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 var(--space-4);
+}
+
+.menuRow,
+.languageOption {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-align: left;
+    border-radius: 20px;
+    padding: var(--space-4);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(199, 168, 107, 0.12);
+}
+
+.menuRow + .menuRow,
+.languageOption + .languageOption {
+    margin-top: var(--space-3);
+}
+
+.menuIcon {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    color: var(--color-accent-gold);
+    background: rgba(199, 168, 107, 0.08);
+    flex-shrink: 0;
+}
+
+.menuCopy {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.menuTitle {
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+}
+
+.menuDescription {
+    font-size: var(--font-size-small);
+    color: var(--color-text-tertiary);
+    line-height: var(--line-height-body);
+}
+
+.chevron,
+.check {
+    color: var(--color-accent-gold);
+    flex-shrink: 0;
+}
+
+.languageHeader {
+    margin-bottom: var(--space-4);
+}
+
+.languageTitle {
+    font-size: var(--font-size-h3);
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-2);
+}
+
+.languageHint {
+    font-size: var(--font-size-caption);
+    color: var(--color-text-tertiary);
+    line-height: var(--line-height-body);
+}
+
+.languageList {
+    display: flex;
+    flex-direction: column;
+}
+
+.pending {
+    margin-top: var(--space-4);
+    font-size: var(--font-size-small);
+    color: var(--color-accent-gold);
+}
+
+.menuRow:active,
+.languageOption:active,
+.iconButton:active,
+.backButton:active {
+    transform: scale(0.98);
+}
+
+.languageOption:disabled {
+    opacity: 0.6;
+}
+
+@media (min-width: 768px) {
+    .sheet {
+        width: 380px;
+        border-left: 1px solid rgba(199, 168, 107, 0.18);
+        box-shadow: -18px 0 60px rgba(0, 0, 0, 0.28);
+    }
+}

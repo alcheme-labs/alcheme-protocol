@@ -1,0 +1,86 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Canvas wrapper ── */
+.canvasWrap {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dustNoiseOverlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transition: opacity 1s ease;
+    z-index: 20;
+    mix-blend-mode: soft-light;
+}
+
+.dustBlurOverlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transition: opacity 2s ease;
+    z-index: 10;
+    background-color: #1F2421;
+    mask-image: radial-gradient(circle, transparent 25%, black 120%);
+    -webkit-mask-image: radial-gradient(circle, transparent 25%, black 120%);
+}
+
+.canvas {
+    transition: filter 2.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ── Stage info ── */
+.info {
+    margin-top: var(--space-3);
+    text-align: center;
+    max-width: 280px;
+    min-height: 56px;
+    position: relative;
+    z-index: 30;
+}
+
+.stageName {
+    font-size: var(--font-size-body);
+    font-weight: 300;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+    margin: 0;
+    transition: all 1s ease;
+    overflow: hidden;
+    height: 1.6em;
+}
+
+.stageNameHidden {
+    transform: translateY(100%);
+    opacity: 0;
+}
+
+.divider {
+    width: 48px;
+    height: 1px;
+    background: #C7A86B;
+    opacity: 0.2;
+    margin: var(--space-2) auto;
+}
+
+.stageDesc {
+    font-size: 10px;
+    font-weight: 300;
+    font-style: italic;
+    letter-spacing: 0.15em;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 0;
+    padding: 0 var(--space-3);
+}

@@ -1,0 +1,48 @@
+{
+  "license": "Apache-2.0",
+  "scripts": {
+    "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
+    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
+    "audit:licenses": "node scripts/audit-node-license-risk.mjs",
+    "audit:licenses:strict": "node scripts/audit-node-license-risk.mjs --fail-on-strong --fail-on-unapproved-watchlist",
+    "check:covenant": "node scripts/check-consistency-covenant.js",
+    "validate:extension-manifest": "node scripts/validate-extension-manifest.js --all",
+    "test:manifest-validation": "mocha tests/manifest-validation.test.js --timeout 10000",
+    "test": "anchor test",
+    "test:unit": "TS_NODE_PREFER_TS_EXTS=1 ANCHOR_PROVIDER_URL=${ANCHOR_PROVIDER_URL:-http://127.0.0.1:8899} ANCHOR_WALLET=${ANCHOR_WALLET:-$HOME/.config/solana/id.json} mocha -r ts-node/register -r tsconfig-paths/register tests/unit-tests/**/*.test.ts --timeout 60000",
+    "test:integration": "TS_NODE_PREFER_TS_EXTS=1 ANCHOR_PROVIDER_URL=${ANCHOR_PROVIDER_URL:-http://127.0.0.1:8899} ANCHOR_WALLET=${ANCHOR_WALLET:-$HOME/.config/solana/id.json} mocha -r ts-node/register -r tsconfig-paths/register tests/integration-tests.ts --timeout 120000",
+    "test:cost:create-content-v2": "TS_NODE_PREFER_TS_EXTS=1 ANCHOR_PROVIDER_URL=${ANCHOR_PROVIDER_URL:-http://127.0.0.1:8899} ANCHOR_WALLET=${ANCHOR_WALLET:-$HOME/.config/solana/id.json} mocha -r ts-node/register -r tsconfig-paths/register tests/cost/create-content-v2-cost.test.ts --timeout 300000",
+    "test:cost:create-reply-v2": "TS_NODE_PREFER_TS_EXTS=1 ANCHOR_PROVIDER_URL=${ANCHOR_PROVIDER_URL:-http://127.0.0.1:8899} ANCHOR_WALLET=${ANCHOR_WALLET:-$HOME/.config/solana/id.json} mocha -r ts-node/register -r tsconfig-paths/register tests/cost/create-reply-v2-cost.test.ts --timeout 300000",
+    "test:cost:create-repost-v2": "TS_NODE_PREFER_TS_EXTS=1 ANCHOR_PROVIDER_URL=${ANCHOR_PROVIDER_URL:-http://127.0.0.1:8899} ANCHOR_WALLET=${ANCHOR_WALLET:-$HOME/.config/solana/id.json} mocha -r ts-node/register -r tsconfig-paths/register tests/cost/create-repost-v2-cost.test.ts --timeout 300000",
+    "test:cost:create-quote-v2": "TS_NODE_PREFER_TS_EXTS=1 ANCHOR_PROVIDER_URL=${ANCHOR_PROVIDER_URL:-http://127.0.0.1:8899} ANCHOR_WALLET=${ANCHOR_WALLET:-$HOME/.config/solana/id.json} mocha -r ts-node/register -r tsconfig-paths/register tests/cost/create-quote-v2-cost.test.ts --timeout 300000",
+    "test:all": "npm run test:unit && npm run test:integration",
+    "measure:create-content-v2-cost": "ts-node scripts/measure/create-content-v2-cost.ts",
+    "measure:create-reply-v2-cost": "ts-node scripts/measure/create-reply-v2-cost.ts",
+    "measure:create-repost-v2-cost": "ts-node scripts/measure/create-repost-v2-cost.ts",
+    "measure:create-quote-v2-cost": "ts-node scripts/measure/create-quote-v2-cost.ts",
+    "build": "anchor build",
+    "deploy:localnet": "anchor deploy --provider.cluster localnet",
+    "deploy:devnet": "anchor deploy --provider.cluster devnet",
+    "setup:test": "anchor test --skip-build --skip-deploy"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.31.1",
+    "@metaplex-foundation/js": "^0.20.1",
+    "@solana/spl-token": "^0.3.9",
+    "@solana/web3.js": "^1.87.6"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "chai": "^4.3.0",
+    "mocha": "^10.0.0",
+    "prettier": "^3.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "ts-mocha": "^11.1.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  }
+}

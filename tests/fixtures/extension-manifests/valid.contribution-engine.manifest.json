@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0.0",
+  "extension_id": "contribution-engine",
+  "display_name": "Contribution Engine",
+  "description": "Tracks crystal contribution roles, references, and reputation settlement signals.",
+  "program_id": "2Nu27qEettMe6v1uqb1Gz2LB38pfEM8u4ioVKA8xkWd8",
+  "version": "0.1.0",
+  "sdk_package": "@alcheme/sdk",
+  "min_core_sdk_version": "0.1.0",
+  "required_permissions": [
+    "ReputationWrite"
+  ],
+  "event_types": [
+    "ContributionRecorded",
+    "ContributionScoreUpdated",
+    "ReferenceAdded",
+    "ReputationSettled"
+  ],
+  "parser_contract_version": "v1",
+  "projection_tables": [
+    "contribution_ledgers",
+    "contribution_events",
+    "contribution_references"
+  ],
+  "rollback_strategy": "disable_parser_and_keep_core_path",
+  "compatibility": {
+    "indexer_min_version": "0.1.0",
+    "query_api_min_version": "0.1.0"
+  },
+  "maintainers": [
+    "Alcheme Protocol Team"
+  ],
+  "status": "active",
+  "tags": [
+    "reputation",
+    "contribution",
+    "crystal"
+  ]
+}

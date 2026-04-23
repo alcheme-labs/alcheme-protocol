@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "extension_id": "sample-third-party-extension",
+  "display_name": "Sample Third Party Extension",
+  "description": "Fixture used to prove non-official extensions cannot claim the core SDK package.",
+  "program_id": "2Nu27qEettMe6v1uqb1Gz2LB38pfEM8u4ioVKA8xkWd8",
+  "version": "0.1.0",
+  "sdk_package": "@alcheme/sdk",
+  "min_core_sdk_version": "0.1.0",
+  "required_permissions": [
+    "ReputationWrite"
+  ],
+  "event_types": [
+    "SampleEvent"
+  ],
+  "parser_contract_version": "v1",
+  "projection_tables": [
+    "sample_projection"
+  ],
+  "rollback_strategy": "disable_parser_and_keep_core_path",
+  "compatibility": {
+    "indexer_min_version": "0.1.0",
+    "query_api_min_version": "0.1.0"
+  },
+  "maintainers": [
+    "Third Party Developer"
+  ],
+  "status": "active",
+  "tags": [
+    "sample"
+  ]
+}

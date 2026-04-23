@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 数据库
+  postgres:
+    image: postgres:16-alpine
+    container_name: alcheme-postgres
+    environment:
+      POSTGRES_DB: alcheme_indexer
+      POSTGRES_USER: alcheme
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-alcheme_dev_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./shared/database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U alcheme"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: alcheme-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Rust 索引器核心
+  indexer-core:
+    build:
+      context: .
+      dockerfile: services/indexer-core/Dockerfile
+    container_name: alcheme-indexer
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      INDEXER_EVENT_SOURCE: ${INDEXER_EVENT_SOURCE:-yellowstone}
+      RPC_ENDPOINT: ${RPC_ENDPOINT:-}
+      YELLOWSTONE_ENDPOINT: ${YELLOWSTONE_ENDPOINT:-}
+      YELLOWSTONE_TOKEN: ${YELLOWSTONE_TOKEN:-}
+      EVENT_EMITTER_PROGRAM_ID: ${EVENT_EMITTER_PROGRAM_ID:-}
+      DATABASE_URL: postgresql://alcheme:${DB_PASSWORD:-alcheme_dev_password}@postgres:5432/alcheme_indexer
+      REDIS_URL: redis://redis:6379
+      RUST_LOG: ${RUST_LOG:-info}
+    restart: unless-stopped
+
+  # TypeScript Query API
+  query-api:
+    build:
+      context: .
+      dockerfile: services/query-api/Dockerfile
+    container_name: alcheme-query-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: postgresql://alcheme:${DB_PASSWORD:-alcheme_dev_password}@postgres:5432/alcheme_indexer
+      REDIS_URL: redis://redis:6379
+      PORT: 4000
+      NODE_ENV: development
+      CRYSTAL_MINT_ADAPTER: ${CRYSTAL_MINT_ADAPTER:-disabled}
+      CRYSTAL_MINT_RPC_URL: ${CRYSTAL_MINT_RPC_URL:-}
+      CRYSTAL_MINT_AUTHORITY_SECRET: ${CRYSTAL_MINT_AUTHORITY_SECRET:-}
+      CRYSTAL_MASTER_OWNER_PUBKEY: ${CRYSTAL_MASTER_OWNER_PUBKEY:-}
+      CRYSTAL_METADATA_BASE_URL: ${CRYSTAL_METADATA_BASE_URL:-}
+    restart: unless-stopped
+    volumes:
+      - ./services/query-api:/app
+      - /app/node_modules
+
+  # Prometheus 监控
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: alcheme-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+
+  # Grafana 可视化
+  grafana:
+    image: grafana/grafana:latest
+    container_name: alcheme-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_INSTALL_PLUGINS: grafana-clock-panel
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infra/monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:

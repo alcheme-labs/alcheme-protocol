@@ -1,0 +1,35 @@
+[toolchain]
+anchor_version = "0.31.1"
+solana_version = "3.0.11"
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+access_controller = "BNbDZu2djPT6rdqgsSEtyiCw4b8wteBNQDiyKS6GFxun"
+circle_manager = "GZswb1rGbZfoiapkvatDuMZrptVAX2p1pEVDSrMuyLqQ"
+content_manager = "FEut65PCemjUt7dRPe4GJhaj1u5czWndvgp7LCEbiV7y"
+contribution_engine = "2Nu27qEettMe6v1uqb1Gz2LB38pfEM8u4ioVKA8xkWd8"
+event_emitter = "uhPvVgDANHaUzUq2rYEVXJ9vGEBjWjNZ1E6gQJqdBUC"
+identity_registry = "75fXAp66PU3sgUcQCGJxdA4MKhFcyXXoGW8rhVk8zm4x"
+messaging_manager = "4MZjksSnfSNa25ttV4smquKE6ggAmpZKjK74eDQLdoLx"
+registry_factory = "AYrzTqFdxpiH3VhCBzLsJQtzFqjoSRKYUvk29d797AQC"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "localnet"
+wallet = "~/.config/solana/id.json"
+
+[workspace]
+members = ["programs/identity-registry", "programs/content-manager", "programs/access-controller", "programs/event-emitter", "programs/registry-factory", "programs/messaging-manager", "programs/circle-manager", "extensions/contribution-engine/program"]
+
+[scripts]
+test = "TS_NODE_PREFER_TS_EXTS=1 yarn run ts-mocha -r tsconfig-paths/register -p ./tsconfig.json -t 1000000 tests/**/*.ts extensions/**/tests/*.ts"
+
+[test]
+startup_wait = 10000
+shutdown_wait = 2000
+upgradeable = false

@@ -1,0 +1,136 @@
+/* ============================================================
+   Alcheme Animation System
+   Based on: 移动端设计最终版 §6 (呼吸机制) + §5 (状态变化)
+   ============================================================ */
+
+/* ── Breathing Background ──
+   14-22s cycle, ±1.5-2% brightness
+   "用户不应立即察觉呼吸存在" */
+@keyframes breathe {
+
+    0%,
+    100% {
+        opacity: 0.98;
+    }
+
+    50% {
+        opacity: 1.0;
+    }
+}
+
+/* ── Pulse (for important elements) ──
+   2-3s cycle, very subtle */
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.008);
+    }
+}
+
+/* ── Fade In (content appearance) ──
+   "新内容淡入过程中速度先稍快后缓慢减速" */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Fade In Scale (crystal formation) ── */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ── Glow Pulse (alloy heat indicator) ── */
+@keyframes glowPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 var(--color-alloy-glow);
+    }
+
+    50% {
+        box-shadow: 0 0 20px 4px var(--color-alloy-glow);
+    }
+}
+
+/* ── Crystal Shimmer ── */
+@keyframes crystalShimmer {
+    0% {
+        background-position: -200% center;
+    }
+
+    100% {
+        background-position: 200% center;
+    }
+}
+
+/* ── Warm Glow (温暖态: 共识达成) ── */
+@keyframes warmGlow {
+
+    0%,
+    100% {
+        border-color: var(--color-crystal-border);
+    }
+
+    50% {
+        border-color: var(--color-accent-gold);
+    }
+}
+
+/* ── Ripple (long-press) ── */
+@keyframes rippleExpand {
+    from {
+        transform: scale(0);
+        opacity: 0.4;
+    }
+
+    to {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+
+/* ── Slide Up (sheet/modal entrance) ── */
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ── Reduced Motion ──
+   低端机降级策略: "静态背景 + 关闭非必要装饰动效" */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

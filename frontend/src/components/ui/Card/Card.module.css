@@ -1,0 +1,138 @@
+/* Card.module.css */
+.card {
+    position: relative;
+    border-radius: var(--radius-card);
+    padding: var(--space-4);
+    transition:
+        background-color 800ms var(--easing-standard),
+        border-color 800ms var(--easing-standard),
+        box-shadow 800ms var(--easing-standard),
+        transform var(--motion-fast) var(--easing-standard);
+    overflow: hidden;
+}
+
+.card:active {
+    transform: scale(0.985);
+}
+
+/* ── Ore (原矿): 低对比、边缘柔、无光泽 ── */
+.ore {
+    background-color: var(--color-ore-bg);
+    border: 1px solid var(--color-ore-border);
+    box-shadow: var(--shadow-subtle);
+}
+
+/* 沙盒消息: opacity 0.6 */
+.ephemeral {
+    opacity: 0.6;
+}
+
+/* ── Alloy (合金): 微暖色边缘、略清晰 ── */
+.alloy {
+    background-color: var(--color-alloy-bg);
+    border: 1px solid var(--color-alloy-border);
+    box-shadow: var(--shadow-card);
+}
+
+/* 合金 Active 模式呼吸 */
+.alloyActive {
+    animation: glowPulse 4s var(--easing-emphasis) infinite;
+}
+
+/* 合金 Cooling 模式 */
+.alloyCooling {
+    opacity: 0.75;
+    border-color: rgba(185, 138, 84, 0.12);
+}
+
+/* 合金 Frozen 模式 */
+.alloyFrozen {
+    opacity: 0.45;
+    border-color: var(--color-ore-border);
+    filter: saturate(0.5);
+}
+
+/* ── Crystal (晶体): 更清晰边缘、柔光高亮、稳定 ── */
+.crystal {
+    background-color: var(--color-crystal-bg);
+    border: 1px solid var(--color-crystal-border);
+    box-shadow:
+        var(--shadow-card),
+        0 0 24px -8px var(--color-crystal-glow);
+}
+
+/* 晶体柔金高光边缘 */
+.crystal::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            var(--color-accent-ivory-glow) 50%,
+            transparent 100%);
+    opacity: 0.4;
+}
+
+/* ── Selected ── */
+.selected {
+    border-color: var(--color-accent-gold);
+    box-shadow:
+        var(--shadow-card),
+        0 0 0 1px var(--color-accent-gold);
+}
+
+/* ── Flippable Card ── */
+.flipContainer {
+    perspective: 1000px;
+}
+
+.flipInner {
+    position: relative;
+    transition: transform var(--motion-slow) var(--easing-emphasis);
+    transform-style: preserve-3d;
+}
+
+.flipped .flipInner {
+    transform: rotateY(180deg);
+}
+
+.flipFront,
+.flipBack {
+    backface-visibility: hidden;
+}
+
+.flipBack {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: rotateY(180deg);
+}
+
+/* ── Card Header ── */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+}
+
+/* ── Card Content ── */
+.content {
+    color: var(--color-text-primary);
+    line-height: var(--line-height-body);
+}
+
+/* ── Card Footer ── */
+.footer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+    color: var(--color-text-tertiary);
+    font-size: var(--font-size-caption);
+}

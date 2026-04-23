@@ -1,0 +1,21 @@
+{
+  "name": "alcheme-mobile-shell",
+  "private": true,
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "scripts": {
+    "sync": "npx cap sync",
+    "open:ios": "npx cap open ios",
+    "open:android": "npx cap open android",
+    "run:ios": "npx cap run ios",
+    "run:android": "npx cap run android"
+  },
+  "dependencies": {
+    "@capacitor/core": "^8.3.0"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.3.0",
+    "@capacitor/cli": "^8.3.0",
+    "@capacitor/ios": "^8.3.0"
+  }
+}

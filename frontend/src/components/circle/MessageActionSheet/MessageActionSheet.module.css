@@ -1,0 +1,91 @@
+.actionSheetOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.actionSheet {
+    width: 100%;
+    max-width: 500px;
+    padding: var(--space-2) var(--space-3) calc(var(--space-4) + var(--safe-area-bottom));
+    background: rgba(38, 45, 41, 0.92);
+    backdrop-filter: blur(var(--blur-sheet));
+    -webkit-backdrop-filter: blur(var(--blur-sheet));
+    border-top: 1px solid rgba(199, 168, 107, 0.15);
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.actionSheetHandle {
+    width: 36px;
+    height: 4px;
+    margin: 0 auto var(--space-3);
+    border-radius: 2px;
+    background: rgba(231, 228, 221, 0.2);
+}
+
+.actionSheetRow {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-2) 0;
+}
+
+.actionSheetBtn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: var(--space-3) var(--space-2);
+    background: rgba(231, 228, 221, 0.06);
+    border: 1px solid rgba(231, 228, 221, 0.08);
+    border-radius: var(--radius-card);
+    color: var(--color-text-primary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color var(--motion-fast) var(--easing-standard),
+        border-color var(--motion-fast) var(--easing-standard);
+}
+
+.actionSheetBtn:active {
+    background: rgba(199, 168, 107, 0.15);
+    border-color: rgba(199, 168, 107, 0.25);
+}
+
+.actionSheetBtnDisabled,
+.actionSheetBtn:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.actionSheetBtnDisabled:active,
+.actionSheetBtn:disabled:active {
+    background: rgba(231, 228, 221, 0.06);
+    border-color: rgba(231, 228, 221, 0.08);
+}
+
+.actionSheetIcon {
+    color: var(--color-accent-ivory-glow);
+    opacity: 0.85;
+}
+
+.actionSheetCancel {
+    width: 100%;
+    margin-top: var(--space-2);
+    padding: var(--space-3);
+    background: none;
+    border: 1px solid rgba(231, 228, 221, 0.1);
+    border-radius: var(--radius-card);
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color var(--motion-fast) var(--easing-standard);
+}
+
+.actionSheetCancel:active {
+    background: rgba(231, 228, 221, 0.06);
+}

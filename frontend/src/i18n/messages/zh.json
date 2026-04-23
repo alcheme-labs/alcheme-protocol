@@ -1,0 +1,2968 @@
+{
+  "Metadata": {
+    "title": "Alcheme — Turn Noise into Gold",
+    "description": "去中心化的秩序与知识资产协议。将碎片化讨论提炼为可溯源、有价值的数字晶体。"
+  },
+  "LanguageSwitcher": {
+    "label": "语言",
+    "ariaLabel": "切换语言",
+    "statusPending": "切换中…",
+    "options": {
+      "zh": "中文",
+      "en": "English",
+      "es": "Español",
+      "fr": "Français"
+    }
+  },
+  "BottomNav": {
+    "ariaLabel": "主导航",
+    "items": {
+      "home": "首页",
+      "circles": "圈层",
+      "compose": "发布",
+      "notifications": "通知",
+      "profile": "我的"
+    }
+  },
+  "IdentityRegistrationEntry": {
+    "eyebrow": "链上身份",
+    "primaryLabel": "创建身份"
+  },
+  "LandingPage": {
+    "tagline": "Turn noise into gold"
+  },
+  "HeatGauge": {
+    "meterLabel": "热度 {state} {value} 度",
+    "displayLabel": "{state} · {value}°",
+    "states": {
+      "active": "活跃",
+      "cooling": "冷却中",
+      "frozen": "已冻结"
+    }
+  },
+  "ConnectPage": {
+    "title": "归位",
+    "walletHint": "支持 Phantom、Solflare 等 Solana 钱包",
+    "common": {
+      "skip": "先看看 →"
+    },
+    "states": {
+      "connectingSession": {
+        "subtitle": "正在确认当前钱包是否已有链上身份。",
+        "primaryLabel": "确认中…"
+      },
+      "unregistered": {
+        "subtitle": "钱包已连接，但还没有链上身份。创建后你可以加入圈层；加入后进入正式沉淀链路。",
+        "primaryLabel": "创建身份",
+        "skipLabel": "稍后再说，先去首页 →"
+      },
+      "sessionError": {
+        "subtitle": "身份状态确认失败，请重试。",
+        "primaryLabel": "重试确认",
+        "skipLabel": "先去首页 →"
+      },
+      "registered": {
+        "subtitle": "身份已确认，正在进入首页。",
+        "primaryLabel": "正在进入首页"
+      },
+      "default": {
+        "subtitle": "连接你的钱包，开始知识炼金之旅",
+        "primaryLabel": "连接钱包"
+      }
+    }
+  },
+  "RegisterIdentitySheet": {
+    "helper": {
+      "default": "handle 需为 3-32 个字符，可包含字母、数字和下划线，且不能以数字开头。",
+      "syncing": {
+        "joinCircle": "身份已上链，正在等待索引同步并继续加入圈层。",
+        "onboarding": "身份已上链，正在等待索引同步并建立登录态。"
+      }
+    },
+    "title": {
+      "joinCircle": "创建身份并加入圈层",
+      "onboarding": "创建链上身份"
+    },
+    "lead": {
+      "joinCircle": "当前钱包已连接，但还没有可登录的链上身份。完成这一步后，会自动继续加入当前圈层。",
+      "onboarding": "当前钱包已连接，但还没有可登录的链上身份。完成这一步后，你可以加入圈层；加入后才能正式发言并进入沉淀链路。"
+    },
+    "actions": {
+      "cancel": "取消",
+      "notNow": "稍后再说",
+      "submittingJoin": "正在加入…",
+      "submittingCreate": "正在创建…",
+      "registeringJoin": "注册中…",
+      "registeringCreate": "创建中…",
+      "createAndJoin": "创建并加入",
+      "create": "创建身份",
+      "close": "关闭"
+    },
+    "handle": {
+      "label": "身份 handle",
+      "placeholder": "例如 alice_01"
+    }
+  },
+  "HomePage": {
+    "reminder": {
+      "sessionError": {
+        "title": "身份状态确认失败",
+        "description": "身份状态确认失败，请重试。",
+        "primaryLabel": "重试确认"
+      },
+      "unregistered": {
+        "title": "已连接钱包，但还没有链上身份",
+        "description": "创建身份后可加入圈层；加入圈层后才能正式发言并进入沉淀链路。",
+        "primaryLabel": "创建身份",
+        "secondaryLabel": "稍后再说"
+      }
+    },
+    "header": {
+      "title": "继续你的思考",
+      "subtitle": "知识在圈层中沉淀，公共流只展示 Lv0 精选",
+      "flow": {
+        "public": "公共流",
+        "following": "关注流"
+      },
+      "walletConnected": "● 钱包已连接"
+    },
+    "public": {
+      "discussions": {
+        "title": "Lv0 精选讨论",
+        "empty": "暂无精选讨论"
+      },
+      "crystals": {
+        "title": "Lv0 最新结晶",
+        "empty": "暂无结晶内容",
+        "openAria": "查看结晶 {title}"
+      },
+      "meta": "{circleName} · @{authorHandle}"
+    },
+    "following": {
+      "title": "关注动态",
+      "empty": {
+        "following": "你关注的人还没有发布可见内容，稍后再来看看。",
+        "none": "你还没有关注任何创作者，去关注一些创作者吧。"
+      },
+      "untitled": "无标题内容",
+      "postMeta": "@{authorHandle} · {circleName} · 热度 {heatLabel} {heat}°"
+    },
+    "heat": {
+      "states": {
+        "active": "活跃",
+        "cooling": "冷却中",
+        "frozen": "已冻结"
+      }
+    },
+    "discover": {
+      "title": "发现圈层",
+      "empty": "暂无圈层",
+      "noDescription": "暂无描述",
+      "meta": "{members} 成员 · {posts} 条内容"
+    },
+    "common": {
+      "circleFallback": "圈层"
+    }
+  },
+  "ComposePage": {
+    "title": "发布观点",
+    "validation": {
+      "feedNotAllowed": "知识模式圈层仅支持草稿发布",
+      "draftNotAllowed": "社交模式圈层仅支持动态发布"
+    },
+    "status": {
+      "joinedCircles": "已加入 {count} 个圈层",
+      "guest": "游客状态（未加入圈层）",
+      "label": "当前状态"
+    },
+    "success": {
+      "title": "观点已发布",
+      "text": "已发布到「{circleName}」的{target}"
+    },
+    "common": {
+      "circleFallback": "圈层"
+    },
+    "actions": {
+      "backHomeAria": "返回首页",
+      "publish": "发布"
+    },
+    "composer": {
+      "placeholder": "写下你的想法、问题或见解…",
+      "charCount": "{count} 字"
+    },
+    "empty": {
+      "title": "还没有可发布的圈层",
+      "description": "你当前是游客状态。快速发布必须归属于具体圈层，请先创建圈层或加入已有圈层。",
+      "createCircle": "创建圈层",
+      "joinCircle": "加入圈层"
+    },
+    "selectors": {
+      "chooseRequired": "选择发布圈层（必选）",
+      "createOrJoinFirst": "先创建或加入圈层",
+      "auxiliaryPrefix": "辅圈",
+      "levelLabel": "第 {level} 层"
+    },
+    "intent": {
+      "feed": "动态",
+      "draft": "草稿",
+      "feedArea": "动态区",
+      "draftArea": "草稿区",
+      "feedTitleEnabled": "发布到动态区",
+      "feedTitleDisabled": "仅社交模式圈层支持动态",
+      "draftTitleEnabled": "发布到草稿区",
+      "draftTitleDisabled": "仅知识模式圈层支持草稿"
+    },
+    "hint": "💡 快速发布支持“动态 / 草稿”两种意图：社交圈默认动态，知识圈可直接创建草稿并进入后续协同打磨。"
+  },
+  "CirclesPage": {
+    "title": "圈层",
+    "subtitle": "找到你的知识领地",
+    "empty": "没有找到匹配的圈层",
+    "actions": {
+      "createAria": "创建新圈层"
+    },
+    "search": {
+      "placeholder": "搜索圈层…",
+      "relatedResults": "同时在内容中找到了 {count} 条相关结果"
+    },
+    "circle": {
+      "noDescription": "暂无描述",
+      "meta": "{members} 成员 · {posts} 条内容",
+      "type": {
+        "closed": "🔒 准入制",
+        "secret": "🔒 秘密",
+        "open": "开放"
+      }
+    }
+  },
+  "CreateCircleSheet": {
+    "header": {
+      "defaultTitle": "创建新圈层",
+      "createAuxiliaryWithParent": "创建辅圈 · {parentCircleName}"
+    },
+    "steps": {
+      "basicInfo": "基本信息",
+      "circleMode": "圈层模式",
+      "accessSettings": "准入设置",
+      "confirmCreate": "确认创建"
+    },
+    "stepIndicator": "Step {current} / {total}",
+    "fields": {
+      "creationScope": "创建类型",
+      "name": "圈层名称",
+      "namePlaceholder": "如：异步编程讨论组",
+      "description": "简介（可选）",
+      "descriptionPlaceholder": "描述这个圈层的主题和目标…",
+      "genesis": "内容起点",
+      "seededFiles": "Seeded 源文件",
+      "seededFilesHint": "当前阶段只把这些文件作为源引用与 AI grounding 输入，不会把草稿升级成多文件 working copy。",
+      "seededFilesSelected": "已选择 {count} 个文件：",
+      "aiCollaboration": "AI 协作策略",
+      "draftAndReview": "草稿与审阅",
+      "workflowPermissions": "问题单与阶段权限"
+    },
+    "creationScope": {
+      "auxiliary": {
+        "name": "同级辅圈",
+        "line1": "Lv.x.y",
+        "line2": "讨论组 / 专题小组"
+      },
+      "nextLevel": {
+        "name": "下级圈层",
+        "line1": "Lv.x+1",
+        "line2": "主圈层升级扩展"
+      },
+      "fork": {
+        "name": "Fork",
+        "line1": "圈层级分叉",
+        "line2": "独立未来与低耦合 lineage"
+      },
+      "nextLevelDisabledReason": "当前不满足创建下一级圈层权限",
+      "nextLevelUnavailable": "当前账号暂无“创建下一级圈层”权限。"
+    },
+    "mode": {
+      "social": {
+        "name": "社交模式",
+        "line1": "讨论 + 动态",
+        "line2": "适合兴趣小组、日常沟通"
+      },
+      "knowledge": {
+        "name": "知识模式",
+        "line1": "讨论 + 草稿 + 知识库",
+        "line2": "适合结构化文档、子项目"
+      }
+    },
+    "genesis": {
+      "blank": {
+        "line1": "从空白草稿开始",
+        "line2": "适合全新议题"
+      },
+      "seeded": {
+        "line1": "先带入种子材料",
+        "line2": "更适合有资料沉淀的主题"
+      },
+      "seededHint": "Seeded 仍然会产出当前单文档草稿，只是后续可引用上传材料和源文件内容。"
+    },
+    "tabs": {
+      "plaza": "讨论",
+      "feed": "动态",
+      "crucible": "草稿",
+      "sanctuary": "知识库"
+    },
+    "roles": {
+      "Initiate": "见习成员",
+      "Member": "成员",
+      "Elder": "长老",
+      "Moderator": "管理员",
+      "Admin": "高级管理员",
+      "Owner": "圈主"
+    },
+    "reviewEntryModeHelp": {
+      "auto_only": "到时间后会自动结束正文编辑，进入问题单审阅。",
+      "manual_only": "只有具备权限的人可以手动结束正文编辑，进入问题单审阅。",
+      "auto_or_manual": "到时间会自动进入审阅，也可以提前手动结束编辑。"
+    },
+    "ai": {
+      "summaryUseLlm": {
+        "title": "用 AI 生成讨论总结",
+        "hint": "开启后，系统会自动整理最近讨论，生成一段讨论总结。",
+        "warning": "关闭后会改用规则整理讨论，结果可能不够准确。"
+      },
+      "draftTriggerMode": {
+        "title": "触发后怎么处理",
+        "hint": "当系统判断这段讨论已经值得进入草稿流程后，是只提醒，还是直接生成草稿。",
+        "notifyOnly": "仅提醒",
+        "autoDraft": "直接生成草稿"
+      },
+      "triggerSummaryUseLlm": {
+        "title": "用 AI 辅助判断是否触发草稿",
+        "hint": "开启后，系统会先自动整理最近讨论，再用 AI 辅助判断这段讨论是否该进入草稿流程。",
+        "warning": "关闭后会改用规则判断是否触发草稿，结果可能不够准确。"
+      }
+    },
+    "review": {
+      "entryMode": {
+        "title": "进入审阅方式",
+        "autoOnly": "自动结束",
+        "manualOnly": "手动结束",
+        "autoOrManual": "两者都可"
+      },
+      "autoEntryWindow": {
+        "title": "自动进入审阅时间",
+        "hint": "到时间后会从正文编辑切到问题单审阅"
+      },
+      "reviewWindow": {
+        "title": "审阅阶段时长",
+        "hint": "到时间后会提示本轮审阅已结束，等待决定下一轮或发起结晶"
+      },
+      "maxRevisionRounds": {
+        "title": "最多修订轮次"
+      }
+    },
+    "workflow": {
+      "createIssueMinRole": "谁可提交问题单",
+      "followupIssueMinRole": "谁可追加补充",
+      "reviewIssueMinRole": "谁可审议问题单",
+      "retagIssueMinRole": "谁可改问题类型",
+      "applyIssueMinRole": "谁可确认已解决",
+      "manualEndDraftingMinRole": "谁可结束编辑",
+      "advanceFromReviewMinRole": "谁可结束本轮审阅",
+      "enterCrystallizationMinRole": "谁可发起结晶",
+      "allowAuthorWithdrawBeforeReview": "提交者在审议前可撤回",
+      "allowModeratorRetagIssue": "审议者可改问题类型"
+    },
+    "access": {
+      "free": {
+        "name": "开放",
+        "description": "所有主圈成员可自由加入"
+      },
+      "crystal": {
+        "name": "💎 晶体门槛",
+        "description": "需持有一定数量晶体"
+      },
+      "invite": {
+        "name": "邀请制",
+        "description": "仅被邀请的成员可加入"
+      }
+    },
+    "confirm": {
+      "labels": {
+        "creationScope": "创建类型",
+        "name": "名称",
+        "description": "简介",
+        "mode": "模式",
+        "genesis": "内容起点",
+        "review": "草稿与审阅",
+        "access": "准入",
+        "ai": "AI 协作"
+      },
+      "creationScope": {
+        "auxiliary": "🧩 同级辅圈",
+        "nextLevel": "🪜 下一级圈层"
+      },
+      "mode": {
+        "social": "🌐 社交模式",
+        "knowledge": "📚 知识模式"
+      },
+      "genesis": {
+        "seeded": "🌱 SEEDED · 带种子材料",
+        "blank": "📝 BLANK · 空白起草"
+      },
+      "seededFilesAttached": "已挂载 {count} 个 Seeded 源文件",
+      "reviewEntry": {
+        "autoOnly": "自动结束进入审阅",
+        "manualOnly": "手动结束进入审阅",
+        "autoOrManual": "自动或手动进入审阅"
+      },
+      "reviewSummary": {
+        "withAuto": " · {draftingWindowMinutes} 分钟后自动进入审阅 · 审阅 {reviewWindowMinutes} 分钟 · 最多 {maxRevisionRounds} 轮",
+        "manualOnly": " · 审阅 {reviewWindowMinutes} 分钟 · 最多 {maxRevisionRounds} 轮"
+      },
+      "access": {
+        "free": "🌍 开放",
+        "crystal": "💎 需 ≥ {minCrystals} 晶体",
+        "invite": "🔒 邀请制"
+      },
+      "ai": {
+        "summary": "讨论摘要：{mode}",
+        "draftTrigger": "草稿触发：{mode}",
+        "triggerSummary": "触发摘要：{mode}",
+        "llm": "LLM",
+        "rule": "规则",
+        "autoDraft": "自动草稿",
+        "notifyOnly": "仅提醒"
+      }
+    },
+    "common": {
+      "minutes": "分钟"
+    },
+    "actions": {
+      "cancel": "取消",
+      "back": "上一步",
+      "next": "下一步",
+      "create": "✨ 创建圈层",
+      "creating": "创建中..."
+    },
+    "errors": {
+      "seededRequired": "请选择至少一个 Seeded 源文件。"
+    }
+  },
+  "FeedTab": {
+    "states": {
+      "empty": "这个圈层暂时还没有新动态"
+    },
+    "repost": {
+      "fromAuthor": "转发自 @{author}",
+      "emptyBody": "原帖没有正文",
+      "fromOriginal": "转发自原始帖子",
+      "unavailable": "这里暂时看不到原帖内容"
+    },
+    "actions": {
+      "like": "点赞",
+      "liked": "已点赞",
+      "comment": "评论",
+      "openReplies": "查看回复",
+      "commentUnavailable": "暂不可查看回复",
+      "repost": "转发",
+      "repostReasons": {
+        "connect_wallet": "请先连接钱包",
+        "join_circle": "加入圈层后才可转发",
+        "pending_membership": "你的入圈申请正在等待审核",
+        "pending": "正在转发…",
+        "already_reposted": "已转发过一次"
+      }
+    },
+    "composer": {
+      "placeholder": "在「{circleName}」里说说你的下一步",
+      "aria": "在「{circleName}」里发布一条动态",
+      "unavailable": "当前不可发布"
+    }
+  },
+  "SanctuaryTab": {
+    "meta": {
+      "citedCount": "被引用 {count} 次"
+    },
+    "patina": {
+      "ancient": "🏛 经典",
+      "weathering": "📜 沉淀中"
+    }
+  },
+  "ForkReadiness": {
+    "defaults": {
+      "sourceCircleFallback": "圈层 #{sourceCircleId}",
+      "sourceLevelPending": "层级待确认",
+      "sourceLevel": "第 {level} 层",
+      "identityFloor": "保护线：{roleLabel}",
+      "contributionProgress": "{current} / {required} 份贡献",
+      "prefillSourceLabel": "创建时会带入默认配置（当前第 {configVersion} 版）。",
+      "slogan": "当分歧已指向不同的未来，分叉比彼此裹挟更诚实。",
+      "declarationPlaceholder": "写下这次分叉想守住的方向差异，以及为什么需要从当前圈层独立开始。",
+      "hintTitle": "继续分支条件",
+      "hintBody": "这里会同时说明贡献门槛、身份保护线、继承方式和知识延续范围，真正的创建入口仍保留在圈层页。"
+    },
+    "threshold": {
+      "disabled": "当前圈层还没有开放继续分支。",
+      "base": "至少累计 {minimumContributions} 份贡献，成员身份不低于 {roleLabel}",
+      "withGovernance": "{base}，并通过一次治理表决。",
+      "ready": "{base}，即可继续分支。"
+    },
+    "inheritance": {
+      "locked": "会先带入上游配置，创建后保持锁定。",
+      "editable": "会先带入上游配置，创建后仍可继续调整。",
+      "independent": "会从独立配置开始，不继续继承上游设置。"
+    },
+    "knowledgeLineage": {
+      "upstreamUntilForkNode": "会沿用上游知识脉络，直到新的分支节点出现。"
+    },
+    "roles": {
+      "Owner": "圈主",
+      "Admin": "高级管理员",
+      "Moderator": "管理员",
+      "Member": "成员",
+      "Elder": "长老",
+      "Initiate": "见习成员"
+    },
+    "qualification": {
+      "qualified": "当前资格已满足，可继续 Fork。",
+      "forkDisabled": "当前圈层暂未开放 Fork。",
+      "identityShortfall": "当前角色或身份仍低于 {roleLabel} 的保护线。",
+      "contributionShortfall": "还差 {missing} 份贡献，达到门槛后即可提交。",
+      "fallback": "当前还未满足提交条件。"
+    },
+    "statusBadge": {
+      "qualified": "可继续 Fork",
+      "forkDisabled": "暂未开放",
+      "identityShortfall": "身份仍不足",
+      "contributionShortfall": "贡献仍不足"
+    }
+  },
+  "ForkReadinessPanel": {
+    "eyebrow": "继续分支条件",
+    "labels": {
+      "sourceCircle": "来源圈层",
+      "currentQualification": "当前资格",
+      "contributionThreshold": "贡献门槛",
+      "identityFloor": "身份保护线",
+      "level": "层级",
+      "entryThreshold": "进入门槛",
+      "inheritance": "继承方式",
+      "knowledgeLineage": "知识延续",
+      "originMarker": "来源标记",
+      "retentionRhythm": "保留节奏",
+      "prefill": "默认带入"
+    },
+    "values": {
+      "originMarker": "延迟显示，仅在总览或 lineage 面板出现，不进入主结构。",
+      "retentionRhythm": "第 2 / 7 / 30 / 90 / 180 天检查，连续两次不活跃后隐藏。"
+    }
+  },
+  "ForkCreateSheet": {
+    "header": {
+      "eyebrow": "Fork 设置",
+      "title": "Fork · {sourceCircleName}"
+    },
+    "defaults": {
+      "name": "{sourceCircleName} Fork"
+    },
+    "roles": {
+      "Initiate": "见习成员",
+      "Member": "成员",
+      "Elder": "长老",
+      "Moderator": "管理员",
+      "Admin": "高级管理员",
+      "Owner": "圈主"
+    },
+    "eligibility": {
+      "title": "为什么现在可以 Fork",
+      "hint": "来源圈层、资格快照和分歧依据会一起写进这次备案。",
+      "fallbackSlogan": "当分歧已指向不同的未来，分叉比彼此裹挟更诚实。",
+      "loading": "正在整理当前的 Fork 条件…",
+      "pendingTarget": "Fork 圈层 #{targetCircleId} 已经存在，继续补齐备案不会再次创建圈层。"
+    },
+    "setup": {
+      "title": "新圈怎么开始",
+      "hint": "下面这些字段会成为新圈的起始配置，除了 fork policy，其他都沿用当前写入链。"
+    },
+    "fields": {
+      "declaration": "分歧说明",
+      "declarationPlaceholder": "写下这次分叉在方向上到底哪里不同。",
+      "name": "名称",
+      "description": "简介",
+      "joinRequirement": "加入方式",
+      "minCrystals": "最低晶体数",
+      "draftLifecycleTemplate": "草稿生命周期",
+      "draftWorkflowPolicy": "草稿工作流",
+      "ghostPolicy": "Ghost 策略",
+      "forkPolicy": "Fork 策略"
+    },
+    "access": {
+      "free": "自由加入",
+      "crystal": "晶体门槛",
+      "invite": "邀请制",
+      "approval": "审批制"
+    },
+    "reviewEntryMode": {
+      "auto_or_manual": "自动或手动",
+      "auto_only": "仅自动",
+      "manual_only": "仅手动"
+    },
+    "ghostPolicy": {
+      "notify_only": "仅提醒",
+      "auto_draft": "自动草稿"
+    },
+    "forkPolicy": {
+      "minimumContributions": "最低贡献数：{count}",
+      "minimumRole": "最低角色：{role}",
+      "requiresGovernanceVote": "需要治理表决：{value}"
+    },
+    "common": {
+      "true": "是",
+      "false": "否"
+    },
+    "actions": {
+      "closeAria": "关闭 Fork 创建",
+      "close": "稍后再说",
+      "resumeSubmit": "继续补齐备案",
+      "disabled": "暂不可提交",
+      "create": "创建 Fork 圈层"
+    }
+  },
+  "CircleDetailPage": {
+    "defaults": {
+      "unknownCircle": "未知圈层",
+      "publicCircle": "公共圈",
+      "circleWithId": "圈层 #{circleId}",
+      "unknownMember": "未知成员"
+    },
+    "tabs": {
+      "plaza": "讨论",
+      "feed": "动态",
+      "crucible": "草稿",
+      "sanctuary": "知识库"
+    },
+    "header": {
+      "backToCirclesAria": "返回圈层列表",
+      "meta": "{memberCount} 位成员 · {crystalCount} 枚晶体",
+      "notificationsAria": "打开通知",
+      "settingsAria": "打开圈层设置"
+    },
+    "join": {
+      "processing": "处理中…",
+      "banner": {
+        "connectWallet": "连接钱包",
+        "connectWalletHint": "先连接钱包，再加入当前圈层。",
+        "registerIdentity": "创建身份",
+        "registerIdentityHint": "先创建身份，再加入当前圈层。",
+        "retrySession": "重试",
+        "retrySessionHint": "身份状态确认失败，请重试。"
+      },
+      "button": {
+        "join": "加入圈层",
+        "createIdentity": "创建身份",
+        "joined": "已加入",
+        "pending": "审核中",
+        "approvalRequired": "申请加入",
+        "inviteRequired": "需邀请",
+        "crystalRequirement": "还差 {missingCrystals} 枚晶体",
+        "restricted": "受限",
+        "rejoin": "重新加入"
+      },
+      "hint": {
+        "visitorDefault": "游客可以发送烟尘消息，但只有成员会进入正式档案。",
+        "createIdentity": "先创建身份，再加入当前圈层。",
+        "pending": "你的加入申请已提交，正在等待审核。",
+        "approvalRequired": "当前圈层采用审核加入机制，提交申请后等待处理。",
+        "inviteRequired": "当前圈层采用邀请制，请联系管理员获取邀请。",
+        "insufficientCrystals": "你需要 {required} 枚晶体，目前已有 {current} 枚。",
+        "banned": "你当前被限制进入这个圈层。"
+      },
+      "errors": {
+        "walletRequired": "请先连接身份后再加入圈层。",
+        "inviteRequired": "当前圈层采用邀请制，请联系管理员获取邀请。",
+        "insufficientCrystals": "你现在的晶体数还不够加入。",
+        "banned": "你当前被限制进入这个圈层。",
+        "requestStateChanged": "请求状态已经变化，请刷新后重试。",
+        "membershipBridgeUnavailable": "身份已经创建成功，但加入圈层的最终确认暂时不可用。请直接重试加入。",
+        "fallback": "加入圈层失败，请稍后重试。"
+      }
+    },
+    "levels": {
+      "Visitor": "游客",
+      "Initiate": "入局者",
+      "Member": "成员",
+      "Elder": "长老"
+    },
+    "states": {
+      "visitor": "游客",
+      "initiate": "入局者",
+      "member": "成员",
+      "curator": "策展人",
+      "owner": "创建者"
+    },
+    "identityProgress": {
+      "label": "圈内身份",
+      "labelInline": "身份",
+      "nextLevel": "下一阶：{levelLabel}",
+      "summaryLink": "查看总结"
+    },
+    "identityTransition": {
+      "badge": "身份变化",
+      "dismissAria": "关闭身份变化提示"
+    },
+    "memberDirectory": {
+      "notice": {
+        "connectAndJoin": "连接身份并加入当前圈层后可查看成员列表与角色。",
+        "joinRequired": "成员列表仅对当前圈层成员可见；加入后可查看角色与成员详情。"
+      },
+      "errors": {
+        "profileUnavailable": "成员资料暂不可用。",
+        "loadFailed": "加载成员资料失败，请稍后重试。"
+      },
+      "actionErrors": {
+        "forbidden": "你当前的角色还不能执行这个操作。",
+        "memberGone": "该成员已不在当前圈层，或状态已经变化，请刷新后重试。",
+        "activeInviteExists": "该成员已经有一条仍在生效的邀请。",
+        "alreadyMember": "该成员已经在当前圈层内。",
+        "protectedRole": "该成员的角色当前不能在这里修改。",
+        "selfRemovalUnsupported": "这里暂不支持移除自己，请改用离开圈层。",
+        "selfRoleChangeUnsupported": "这里暂不支持修改你自己的角色。"
+      },
+      "followSyncing": "已上链，索引同步中。"
+    },
+    "boundary": {
+      "back": "返回",
+      "backToMain": "返回主圈",
+      "next": "继续",
+      "nextLevel": "下一层",
+      "previousLevel": "上一层"
+    },
+    "settings": {
+      "forwardPolicyNotice": "转发策略目前仍由圈层统一管理，暂时不能在这里单独修改。",
+      "deleteNotice": "解散圈层尚未接入更安全的审核闭环，当前暂不开放。",
+      "errors": {
+        "invalidCircleForAi": "当前圈层 ID 无效，无法保存 AI 配置。",
+        "invalidCircleForDraftLifecycle": "当前圈层 ID 无效，无法保存草稿流程设置。",
+        "invalidCircleForWorkflow": "当前圈层 ID 无效，无法保存问题单与阶段权限。",
+        "invalidCircleForAgents": "当前圈层 ID 无效，无法保存 Agent 策略。",
+        "loadAiFallback": "加载 AI 配置失败，已使用默认配置。",
+        "loadDraftPolicyFallback": "加载草稿流程设置失败，已使用默认值。",
+        "loadAgentPolicyFallback": "加载 Agent 治理配置失败，已使用默认值。",
+        "saveAiFailed": "保存 AI 配置失败，请稍后重试。",
+        "saveDraftLifecycleFailed": "保存草稿流程设置失败，请稍后重试。",
+        "saveWorkflowFailed": "保存问题单与阶段权限失败，请稍后重试。",
+        "saveAgentsFailed": "保存 Agent 策略失败，请稍后重试。",
+        "invalidCircleForRoleChange": "当前圈层 ID 无效，无法修改成员角色。",
+        "memberWalletMissingForRoleChange": "目标成员缺少钱包地址，无法完成链上角色变更。",
+        "roleChangeFailed": "角色变更失败，请稍后重试。",
+        "invalidCircleForRemoveMember": "当前圈层 ID 无效，无法移除成员。",
+        "memberWalletMissingForRemoveMember": "目标成员缺少钱包地址，无法完成链上移除。",
+        "removeMemberFailed": "移除成员失败，请稍后重试。",
+        "invalidCircleForLeave": "当前圈层 ID 无效，暂时无法离开该圈层。",
+        "leaveFailed": "离开圈层失败，请稍后重试。"
+      }
+    },
+    "createCircle": {
+      "title": "创建圈层 · {name} (Lv.{level})",
+      "parentCircleName": "{name}（第 {level} 层）",
+      "errors": {
+        "invalidParentCircle": "当前圈层 ID 无效，无法创建。",
+        "noNextLevelPermission": "当前账号没有创建下一级圈层的权限。"
+      }
+    },
+    "invite": {
+      "errors": {
+        "selectMember": "请选择要邀请的成员。",
+        "sendFailed": "邀请发送失败，请稍后重试。"
+      }
+    },
+    "fork": {
+      "nextLevelPermission": {
+        "connectWallet": "请先连接钱包，再创建下一级圈层。",
+        "insufficientRole": "只有创建者、圈层管理员，或当前晶体贡献最高的成员才能创建下一级圈层。"
+      },
+      "errors": {
+        "invalidSourceCircle": "当前圈层无效，暂时无法发起 Fork。",
+        "loadRequirementsFailed": "加载 Fork 条件失败，请稍后重试。",
+        "pendingFinalizationDetected": "Fork 圈层 #{targetCircleId} 已经存在，只剩最后一步备案，补完也不会重复创建。",
+        "notQualified": "当前资格仍不足，暂不可提交 Fork。",
+        "pendingFinalizationStillReconciling": "Fork 圈层 #{targetCircleId} 已创建，最终备案仍在补齐，请稍后重试最后一步。",
+        "pendingFinalizationRetryLastStep": "Fork 圈层 #{targetCircleId} 已创建，现在只差最后一步备案，请重试最后一步。",
+        "prepareFilingFailed": "提交 Fork 附属备案失败，暂未开始创建新圈层。",
+        "finalizationStillReconciling": "Fork 圈层 #{targetCircleId} 已创建，最终备案仍在补齐，请稍后重试最后一步。",
+        "finalizationRetryLastStep": "Fork 圈层 #{targetCircleId} 已创建，现在只差最后一步备案，请重试最后一步。"
+      }
+    },
+    "forkLineage": {
+      "eyebrow": "Fork 备案",
+      "title": "来源与分叉备案",
+      "syncing": "同步中…",
+      "errors": {
+        "loadFailed": "分叉备案正式读出口暂不可用，请稍后重试。"
+      },
+      "badges": {
+        "currentFrom": "当前圈层来自",
+        "sourceFork": "来源圈层 Fork"
+      },
+      "meta": {
+        "originAnchor": "来源锚点 {anchor}",
+        "executionDigest": "执行摘要 {digest}"
+      },
+      "status": {
+        "completed": "已完成",
+        "reconciliationPending": "补齐中",
+        "prepared": "已准备"
+      },
+      "marker": {
+        "permanentWithDate": "{date} 起永久展示",
+        "permanent": "永久展示",
+        "hiddenWithDate": "{date} 起隐藏标记",
+        "hidden": "已隐藏标记",
+        "visibleWithCheckpoint": "保持展示 · 检查点第 {day} 天",
+        "visible": "保持展示",
+        "pendingInit": "标记状态待初始化"
+      },
+      "schedule": {
+        "inactiveWithNextCheck": "已连续静默 {count} 次 · 下次检查 {date}",
+        "inactiveOnly": "已连续静默 {count} 次",
+        "nextCheck": "下次检查 {date}",
+        "waitingNextCheck": "等待下一次 lineage 检查"
+      }
+    }
+  },
+  "CircleSummaryPage": {
+    "errors": {
+      "fetchSnapshot": "读取总结快照失败。",
+      "fetchOutputs": "读取沉淀结论失败。",
+      "fetchDraft": "读取草稿基线失败。",
+      "fetchDraftCandidates": "读取圈层草稿列表失败。"
+    },
+    "warnings": {
+      "formalOutputReadFailed": "知识 {knowledgeId} 的正式 CrystalOutput 暂不可读。",
+      "partialOutputs": "有 {count} 条正式 CrystalOutput 暂不可读，当前先只显示其余可读结果。{firstWarning}"
+    }
+  },
+  "CircleSummaryReadinessPanel": {
+    "eyebrow": "总结页面",
+    "title": "当前页面怎样取材",
+    "status": {
+      "snapshotVersion": "正式快照 v{version}",
+      "waiting": "等待正式快照"
+    },
+    "cards": {
+      "truthSource": {
+        "title": "当前真相来源",
+        "snapshotNote": "当前页面优先消费 CircleSummarySnapshot v{version}，由 {generatedBy} 生成。",
+        "pendingSnapshotOnly": "当前页面只接受正式 CircleSummarySnapshot 作为总结真相；在快照可读之前，这里只保留边界说明，不再回退为 scaffold truth。",
+        "snapshotTruthLive": "当前页面已经接入正式 summary truth。"
+      },
+      "knowledgePath": {
+        "title": "直接使用现有知识链路",
+        "items": {
+          "identityAndVersion": "已沉淀结论的身份与版本",
+          "snapshotLineage": "贡献快照带来的来源脉络",
+          "citations": "引用与被引关系",
+          "versionHeat": "版本轨迹与热度变化"
+        }
+      },
+      "draftBaseline": {
+        "title": "需要草稿基线时再补读",
+        "items": {
+          "draftIdentity": "草稿身份与当前状态",
+          "stableVersion": "稳定版本与来源指纹",
+          "workingCopy": "正在编辑的正文版本与更新时间"
+        },
+        "noteWithDraft": "当前已经能读取草稿 #{draftPostId} 的稳定字段，用来补全这页的草稿基线。",
+        "noteWithoutDraft": "当前还没有唯一草稿基线，因此页面先停留在知识脉络视角。",
+        "degradationLead": "以下属于当前保留的降级表达，不会被误解成页面出错。"
+      },
+      "references": {
+        "title": "引用线索准备",
+        "note": "这里列出当前引用展示依赖的稳定字段；引用页通过独立的 DraftReferenceLink 正式读出口消费它们。"
+      }
+    },
+    "chips": {
+      "version": "版本 v{version}",
+      "model": "来源模型：{model}",
+      "providerMode": "来源方式：{providerMode}",
+      "promptVersion": "提示词版本：{promptAsset}@{promptVersion}",
+      "contextFingerprint": "上下文指纹：{digest}"
+    },
+    "degradation": {
+      "prefix": "当前降级：{label}"
+    }
+  },
+  "CircleSummaryScaffold": {
+    "common": {
+      "backToCircle": "返回圈层"
+    },
+    "pending": {
+      "heroLead": "正式总结只由 CircleSummarySnapshot 提供；在快照可读之前，这页只保留边界说明，不会假装自己已经是正式总结。",
+      "snapshotLoading": "正在读取正式 CircleSummarySnapshot…",
+      "snapshotEmpty": "当前还没有可消费的正式 CircleSummarySnapshot；这页不会再用 scaffold 路线图冒充正式总结真相。"
+    },
+    "appendix": {
+      "title": "辅助说明",
+      "meta": "不抢主舞台，只在需要时解释当前边界。",
+      "loadingSnapshot": "正在读取正式总结快照…",
+      "loadingDraft": "正在定位这页是否存在唯一的稳定正文基线…",
+      "loadingOutputs": "正在读取当前圈层已经沉淀出的结论清单…",
+      "sourceDraftReady": "当前页面已经能回到草稿 #{draftPostId} 的稳定字段来补足认知基线。",
+      "forkLineageNote": "Fork 来源标记会延迟显示，不进入主结构；它只在总览 / lineage 里按第 2 / 7 / 30 / 90 / 180 天检查，连续两次不活跃后隐藏，存活到最后一次则永久保留。",
+      "degradationPrefix": "当前降级：{label}",
+      "snapshotPriorityLead": "当前页面优先消费正式快照 v{version}，生成来源为",
+      "snapshotPriorityWithMode": "，实际取材方式为 {providerMode}。",
+      "snapshotPriorityWithoutMode": "。"
+    },
+    "sections": {
+      "primaryRoutes": {
+        "title": "从这里进入主要路线",
+        "meta": "沿着一条主轴往下看，再决定要不要切去别的分支。",
+        "loading": "正在整理这个圈层已经沉淀出来的主线…",
+        "degradationPrefix": "仍待补：{label}",
+        "facts": {
+          "source": "它从哪来",
+          "impact": "它影响多大",
+          "stabilizedAt": "它何时站稳"
+        },
+        "empty": {
+          "routeLabel": "主线还在形成",
+          "title": "这个圈层还没有出现稳定沉淀",
+          "hint": "先围绕当前主议题继续补事实、解释和可验证的分歧点。",
+          "currentStartingPoint": "当前起点",
+          "cardTitle": "先把第一条站稳的线长出来",
+          "cardHint": "等第一条沉淀结果出现后，这里才会真正展开成路线图。",
+          "status": "目前仍在聚焦中",
+          "bodyFallback": "当前还没有形成稳定的沉淀结果，因此先继续从讨论和草稿里聚焦主题。",
+          "facts": {
+            "missingLabel": "现在最缺什么",
+            "missingValue": "一条能稳定沉淀下来的结论",
+            "draftBaselineLabel": "正文基线",
+            "draftBaselineValueWithDraft": "已能回看草稿 #{draftPostId}",
+            "draftBaselineValueWithoutDraft": "还没有唯一草稿基线",
+            "nextStepLabel": "现在怎么做",
+            "nextStepValue": "先补事实、解释与可验证分歧"
+          }
+        }
+      },
+      "issueMap": {
+        "title": "先看什么",
+        "meta": "先看站稳的结论，再决定要不要往下钻。"
+      },
+      "situation": {
+        "title": "当前局势",
+        "meta": "先用一眼能扫完的方式看当前进展。"
+      },
+      "coverage": {
+        "title": "这些线站得稳不稳",
+        "meta": "不是都一样可靠，先把证据强弱看清。"
+      },
+      "timeline": {
+        "title": "它是怎么沉淀出来的",
+        "meta": "把正文基线和结晶结果按时间串起来。",
+        "empty": "当前还没有足够稳定的沉淀节点可供串成时间线。"
+      },
+      "questions": {
+        "title": "现在还没说清的事",
+        "meta": "把目前仍然模糊的点直接摊开。",
+        "empty": "当前至少已经能看清主要沉淀线索；后续再补充完整的认知图、冲突语境和开放问题快照。"
+      },
+      "entry": {
+        "title": "你现在怎么进入",
+        "meta": "不同角色，适合的进入方式不同。",
+        "newcomer": {
+          "role": "新进入者",
+          "body": "先从“当前主议题”和最成熟的沉淀分支进入，再回看是否存在唯一草稿基线。"
+        },
+        "participant": {
+          "role": "参与者",
+          "body": "优先补“仍待解决的问题”里提到的证据空缺，尤其是稳定快照和来源草稿绑定。"
+        }
+      }
+    }
+  },
+  "CircleSummaryAdapter": {
+    "common": {
+      "timeTbd": "时间待补",
+      "unresolvedSource": "来源待确认"
+    },
+    "hero": {
+      "eyebrow": "认知地图入口",
+      "title": "圈层 {circleId} 的认知地图",
+      "lead": "先看这件事目前聚焦在哪里、已经沉淀出哪些分支、哪些地方还需要继续补足。"
+    },
+    "issueMap": {
+      "stableConclusionTitle": "先看这条已经站稳的结论",
+      "stableConclusionBodyWithOutput": "当前最清晰的沉淀焦点是“{title}”，它已经成为这个圈层目前最适合先进入的认知入口。",
+      "stableConclusionBodyWithoutOutput": "当前还没有形成稳定的沉淀结果，因此这页先帮助你看清：哪些内容已开始聚焦，哪些仍在形成中。",
+      "draftBaselineTitle": "再回看它基于哪份正文",
+      "draftBaselineBodyWithDraft": "现在可以回到草稿 #{draftPostId} 的 v{draftVersion} 稳定版本，继续理解这轮沉淀是怎么形成的。",
+      "draftBaselineBodyWithoutDraft": "当前还没有唯一的正文基线，因此先从已经沉淀出来的结论进入，不伪造草稿真相。"
+    },
+    "route": {
+      "primaryLabel": "主线入口",
+      "parallelLabel": "并行分支 {index}",
+      "primaryHint": "如果你第一次进入这个圈层，先从这里开始。",
+      "parallelHint": "当你想比较不同理解方向时，再继续看这条线。"
+    },
+    "branch": {
+      "statusPrimary": "当前最成熟",
+      "statusParallel": "并行分支 {index}",
+      "bindingWithDraft": "已回到草稿 #{draftPostId}",
+      "bindingMissing": "还没有稳定回到来源草稿",
+      "evidenceSnapshot": "快照支撑",
+      "evidenceSettlementFallback": "结算回放",
+      "evidenceUnknown": "来源待确认",
+      "evidenceSummarySnapshot": "当前已有稳定快照证据，可以作为总结入口继续追溯。",
+      "evidenceSummarySettlementFallback": "当前能确认这条沉淀已经成立，但来源链仍停留在回放级证据。",
+      "evidenceSummaryUnknown": "当前还不能把这条沉淀稳定绑定到快照证据上。",
+      "citationSummary": "总被引 {citationCount} · 预览引用 {outboundReferenceCount} / 预览被引 {inboundReferenceCount}",
+      "versionPending": "版本待补"
+    },
+    "situation": {
+      "formedConclusionsLabel": "已经形成的结论",
+      "formedConclusionsDescription": "先看已经稳定沉淀下来的内容。",
+      "visibleEntriesLabel": "当前可见入口",
+      "visibleEntriesDescription": "这里只统计当前能直接进入的路线入口，不代表完整分支图。",
+      "draftBaselineLabel": "可回看的正文",
+      "draftBaselinePending": "待定位",
+      "draftBaselineDescription": "如果能定位到唯一草稿，就能回看它是怎么长出来的。"
+    },
+    "coverage": {
+      "snapshotLabel": "稳定快照支撑",
+      "snapshotDescription": "已经能回到稳定快照与来源线索的沉淀结果。",
+      "settlementLabel": "结算回放",
+      "settlementDescription": "结果已成立，但当前还没有完整快照链可以回看。",
+      "unresolvedLabel": "来源待确认",
+      "unresolvedDescription": "还不能稳定确认来源，需要继续补足来源证据。"
+    },
+    "timeline": {
+      "outputSummarySnapshot": "已沉淀为知识结果，并可回到稳定快照来源。",
+      "outputSummaryFallback": "已沉淀为知识结果，但来源链仍有待继续补齐。",
+      "draftTitle": "稳定草稿基线 v{draftVersion}",
+      "draftSummary": "草稿 #{draftPostId} 当前提供了这页认知地图的正文基线。"
+    },
+    "questions": {
+      "noStableOutputTitle": "这个圈层的第一条稳定沉淀还没有出现",
+      "noStableOutputBody": "当前更适合继续补事实、解释和分歧，而不是假装这里已经形成了清晰结论。",
+      "noDraftBaselineTitle": "还没有唯一的正文基线",
+      "noDraftBaselineBody": "当前仍无法把整页内容稳定地回到同一个草稿版本，因此要先从结论脉络进入。",
+      "missingSnapshotTitle": "部分沉淀仍缺稳定快照",
+      "missingSnapshotBody": "这些结果已经能被看到，但还没有足够稳定的快照证据来支持深入追溯。",
+      "missingDraftBindingTitle": "部分结果还没有稳定回到来源草稿",
+      "missingDraftBindingBody": "当前只能确认它们已经沉淀下来，暂时还不能把它们稳当地绑定回某个草稿入口。"
+    },
+    "generatedBy": {
+      "systemLlm": "系统 LLM",
+      "userRequested": "手动请求",
+      "systemProjection": "系统投影"
+    },
+    "providerMode": {
+      "builtin": "内置 LLM",
+      "projection": "系统投影",
+      "rule": "规则摘要",
+      "fallback": "来源待补"
+    },
+    "reference": {
+      "note": "引用页通过独立的 DraftReferenceLink 公共读出口消费这些稳定字段，不再依赖临时 Team 00 窗口。",
+      "fields": {
+        "referenceId": "引用标识",
+        "draftPostId": "来源草稿",
+        "draftVersion": "草稿版本",
+        "sourceBlockId": "来源段落",
+        "crystalName": "结晶名称",
+        "crystalBlockAnchor": "结晶片段",
+        "status": "解析状态"
+      }
+    },
+    "degradation": {
+      "selectedDraft": "尚未定位唯一的草稿基线",
+      "snapshotEvidence": "当前结论还没有稳定快照来源",
+      "draftBinding": "当前结论还没有稳定草稿绑定"
+    }
+  },
+  "CrystalOutputEvidencePanel": {
+    "binding": {
+      "snapshot": "快照来源",
+      "settlementFallback": "结算回放",
+      "unresolved": "来源待确认"
+    },
+    "compact": {
+      "citations": "总被引 {count}",
+      "draft": "草稿 #{draftPostId}"
+    },
+    "eyebrow": "结晶结果",
+    "title": "来源与证据",
+    "metrics": {
+      "version": {
+        "label": "版本"
+      },
+      "contributors": {
+        "label": "贡献者"
+      },
+      "citations": {
+        "label": "总被引"
+      },
+      "preview": {
+        "label": "引用预览（当前页）",
+        "value": "引用 {outboundReferenceCount} / 被引 {inboundReferenceCount}"
+      }
+    },
+    "rows": {
+      "common": {
+        "missing": "未提供"
+      },
+      "sourceDraft": {
+        "label": "来源草稿",
+        "empty": "当前还没有稳定草稿绑定"
+      },
+      "anchor": {
+        "label": "讨论锚点"
+      },
+      "summaryHash": {
+        "label": "摘要指纹"
+      },
+      "messageDigest": {
+        "label": "消息指纹"
+      }
+    },
+    "degradationPrefix": "当前降级：{label}"
+  },
+  "NotificationsPage": {
+    "title": "通知",
+    "actions": {
+      "markAllRead": "全部已读"
+    },
+    "states": {
+      "loading": "加载中…",
+      "error": "加载通知失败，请稍后重试",
+      "empty": "暂无通知"
+    }
+  },
+  "MemberCard": {
+    "roles": {
+      "owner": "创建者",
+      "curator": "策展人",
+      "member": "成员"
+    },
+    "meta": {
+      "handle": "@{handle} · 加入 {joinedAgo}"
+    },
+    "followHint": {
+      "profileUnavailable": "资料暂未就绪，暂时无法关注。"
+    },
+    "states": {
+      "loading": "成员资料加载中…"
+    },
+    "stats": {
+      "citations": "引用",
+      "crystals": "晶体",
+      "circles": "圈层"
+    },
+    "sections": {
+      "sharedCircles": "共同圈层",
+      "recentActivity": "近期动态"
+    },
+    "actions": {
+      "followPending": "处理中",
+      "following": "已关注",
+      "follow": "关注",
+      "message": "私信",
+      "invite": "邀请"
+    }
+  },
+  "InviteMemberSheet": {
+    "title": "邀请成员",
+    "target": {
+      "label": "邀请加入"
+    },
+    "search": {
+      "placeholder": "搜索成员…"
+    },
+    "states": {
+      "empty": "未找到匹配成员",
+      "alreadyIn": "已在圈内"
+    },
+    "roles": {
+      "curator": "策展人",
+      "member": "成员"
+    },
+    "actions": {
+      "cancel": "取消",
+      "sending": "发送中…",
+      "send": "发送邀请{count, plural, =0 {} other {（{count}）}}"
+    },
+    "toast": {
+      "success": "已发送 {count} 条邀请",
+      "partialSuccess": "已发送 {successCount} 条邀请，失败 {failureCount} 条"
+    },
+    "errors": {
+      "sendFailed": "邀请发送失败，请稍后重试。"
+    }
+  },
+  "MessageActionSheet": {
+    "actions": {
+      "reply": "回复",
+      "highlight": "高亮",
+      "forward": "转发",
+      "copy": "复制",
+      "delete": "删除",
+      "cancel": "取消"
+    }
+  },
+  "ProfilePage": {
+    "fallbacks": {
+      "anonymous": "匿名成员",
+      "unknownHandle": "unknown",
+      "unknownCircle": "未知圈层"
+    },
+    "common": {
+      "loading": "加载中…"
+    },
+    "errors": {
+      "walletIdentityNotReady": "当前钱包身份未就绪，暂时无法提交链上资料更新。",
+      "indexerLagging": "资料已上链，但索引暂未追平，请稍后重试。",
+      "missingEditableIdentity": "当前钱包还没有可编辑的链上身份，请先创建身份或刷新登录态后再试。",
+      "invalidUpdatePayload": "资料保存参数未被链上程序接受，请刷新页面后重试。",
+      "saveFailed": "资料保存失败，请稍后重试。"
+    },
+    "identityStates": {
+      "sessionError": {
+        "displayName": "身份待确认",
+        "bio": "身份状态确认失败，请重试。"
+      },
+      "connecting": {
+        "displayName": "身份确认中…",
+        "bio": "正在确认当前钱包的链上身份，请稍候。",
+        "headerHandle": "正在确认链上身份"
+      },
+      "unregistered": {
+        "displayName": "未创建身份",
+        "bio": "创建链上身份后，你可以加入圈层；加入后才能正式发言并进入沉淀链路。",
+        "headerHandle": "等待创建链上身份"
+      }
+    },
+    "identityEntry": {
+      "sessionError": {
+        "title": "身份状态确认失败",
+        "description": "当前钱包身份暂时无法确认，请重试。",
+        "primaryLabel": "重试确认"
+      },
+      "unregistered": {
+        "title": "你已连接钱包，但还没有链上身份",
+        "description": "当前钱包 {wallet} 仍处于游客态。未加入圈层前，你的发言仍是烟尘消息。",
+        "primaryLabel": "创建身份"
+      }
+    },
+    "empty": {
+      "totem": {
+        "sessionError": "身份确认完成后，这里会展示你的图腾演化状态。",
+        "connecting": "正在确认身份，确认完成后这里会展示你的图腾演化状态。",
+        "unregistered": "创建身份后，这里会展示你的图腾演化状态。"
+      },
+      "crystals": {
+        "sessionError": "身份确认完成并加入圈层后，这里会展示你的晶体沉淀。",
+        "connecting": "正在确认身份，确认完成并加入圈层后，这里会展示你的晶体沉淀。",
+        "unregistered": "加入圈层并贡献内容后，这里会展示你的晶体沉淀。"
+      },
+      "noCrystals": "你还没有晶体，在圈层中贡献知识后会从这里开始沉淀。"
+    },
+    "actions": {
+      "connectWallet": "连接钱包",
+      "editProfile": "编辑资料",
+      "disconnect": "断开",
+      "openSettings": "打开设置"
+    },
+    "stats": {
+      "posts": "帖子",
+      "circles": "圈层",
+      "followers": "关注者",
+      "reputation": "声誉"
+    },
+    "sections": {
+      "totem": "图腾",
+      "myCrystals": "我的晶体"
+    },
+    "crystals": {
+      "citationCount": "被引用 {count} 次"
+    }
+  },
+  "ProfileSettingsSheet": {
+    "eyebrow": "设置",
+    "title": "偏好设置",
+    "actions": {
+      "closeAria": "关闭设置抽屉"
+    },
+    "language": {
+      "label": "语言",
+      "title": "选择语言",
+      "hint": "默认会根据你的设备与浏览器语言自动选择；你也可以在这里手动切换。",
+      "openAria": "打开语言设置",
+      "backAria": "返回设置首页",
+      "backLabel": "返回",
+      "currentLabel": "当前语言",
+      "tapToSwitch": "点击切换到此语言",
+      "pending": "正在切换语言…",
+      "options": {
+        "zh": "中文",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français"
+      }
+    }
+  },
+  "EditProfileModal": {
+    "title": "编辑资料",
+    "errors": {
+      "saveFailed": "资料保存失败，请稍后重试。"
+    },
+    "fields": {
+      "displayName": {
+        "label": "昵称",
+        "placeholder": "输入昵称"
+      },
+      "bio": {
+        "label": "简介",
+        "placeholder": "一句话介绍自己",
+        "charCount": "{count}/120"
+      }
+    },
+    "actions": {
+      "cancel": "取消",
+      "save": "保存",
+      "saving": "保存中…",
+      "closeAria": "关闭资料编辑弹窗"
+    }
+  },
+  "TotemDisplay": {
+    "stages": {
+      "seed": {
+        "name": "Seed",
+        "description": "种子：沉睡的矿石，守望最初的秩序。"
+      },
+      "sprout": {
+        "name": "Sprout",
+        "description": "萌芽：思维破土，琥珀内核中跳动着光脉。"
+      },
+      "bloom": {
+        "name": "Bloom",
+        "description": "绽放：稳态晶簇，几何逻辑在折射中沉淀。"
+      },
+      "radiant": {
+        "name": "Radiant",
+        "description": "璀璨：多维真理交织，散发出神圣的洞察。"
+      },
+      "legendary": {
+        "name": "Legendary",
+        "description": "传世：时间的重量，外壳冰冷如晶，内心温润如流。"
+      }
+    }
+  },
+  "KnowledgeDetailPage": {
+    "header": {
+      "title": "知识晶体"
+    },
+    "fallbacks": {
+      "unknownMember": "未知成员"
+    },
+    "states": {
+      "notFound": {
+        "title": "知识晶体未找到",
+        "description": "该晶体可能尚未结晶，或已经被移除。"
+      }
+    },
+    "meta": {
+      "citationCount": "被引用 {count} 次",
+      "heat": "热度 {label} {score}°",
+      "crystallizedDaysAgo": "{count} 天前结晶"
+    },
+    "sections": {
+      "timeline": "版本轨迹",
+      "sourceCircle": "来源圈层",
+      "citationLineage": "引用链路"
+    },
+    "heat": {
+      "active": "活跃",
+      "cooling": "冷却中",
+      "frozen": "已冻结"
+    },
+    "timeline": {
+      "systemActor": "系统",
+      "eventTitle": {
+        "contributorsUpdated": "贡献账本更新 · {actor}",
+        "initialCrystal": "提交结晶 · {actor}"
+      },
+      "detail": {
+        "contributors": "贡献者 {count} 人",
+        "initialPublish": "初始发布"
+      },
+      "fallback": {
+        "initialTitle": "初始结晶",
+        "currentTitle": "当前版本",
+        "currentDetail": "当前可读版本"
+      },
+      "hint": {
+        "recorded": "时间线根据已经记录的版本事件整理而来。",
+        "partial": "当前先展示起始结晶和最新版本，中间变化还没有单独展开。",
+        "initialOnly": "当前仍是初始版本。"
+      },
+      "currentBadge": "当前"
+    },
+    "errors": {
+      "fetchDraftReferenceLinks": "读取草稿引用入口失败。",
+      "fetchFormalOutput": "读取正式 CrystalOutput 失败。"
+    },
+    "formalOutput": {
+      "label": "正式结晶结果",
+      "status": {
+        "loading": "读取中",
+        "error": "暂不可读",
+        "unavailable": "尚未可读"
+      },
+      "loadingMessage": "正在读取正式 CrystalOutput…",
+      "emptyMessage": "当前还没有可消费的正式 CrystalOutput；这里先不把贡献账本推断当成结果合同。"
+    },
+    "contributors": {
+      "title": "贡献者 ({count})",
+      "roles": {
+        "author": "作者",
+        "discussant": "讨论者",
+        "reviewer": "审阅者",
+        "cited": "被引者",
+        "unknown": "贡献者"
+      }
+    },
+    "lineage": {
+      "sourceTypeLabel": "来源类型",
+      "sourceTypes": {
+        "snapshot": "讨论锚点快照",
+        "settlementFallback": "结算回放（回退）",
+        "unlabeled": "未标注"
+      },
+      "rows": {
+        "sourceDraft": "来源草稿",
+        "discussionAnchor": "讨论锚点",
+        "summaryHash": "摘要哈希",
+        "messageDigest": "消息摘要"
+      }
+    },
+    "summaryLink": {
+      "title": "查看圈层总结",
+      "withDraft": "带着草稿 #{draftPostId} 查看这条结论的总结视角 →",
+      "default": "先从圈层已有结论进入总结页 →",
+      "referencesLoading": "正在通过正式引用出口读取草稿引用入口…",
+      "referencesReady": "已读取 {totalCount} 条正式引用入口，覆盖 {sourceBlockCount} 个段落。",
+      "referencesEmpty": "当前还没有正式 DraftReferenceLink 入口。"
+    },
+    "sourceCircle": {
+      "open": "查看圈层 →"
+    },
+    "citations": {
+      "referencesTitle": "本晶体引用",
+      "referencesEmpty": "尚未引用其他晶体。",
+      "citedByTitle": "引用本晶体",
+      "citedByEmpty": "暂无上游晶体引用。",
+      "entryMeta": "{circleName} · 热度 {heatLabel} {heatScore}° · 被引 {citationCount}"
+    }
+  },
+  "KnowledgeDiscussionPanel": {
+    "fallbackSummary": "这枚晶体已经完成结晶，后续讨论应围绕其命题、推导与影响继续展开。",
+    "errors": {
+      "loadThread": "主题讨论暂时无法加载，请稍后重试。",
+      "connectWalletFirst": "请先连接钱包。",
+      "permissionDenied": "当前会话没有权限在此留言，请重新连接钱包或重新加入圈层后再试。",
+      "postFailed": "发布留言失败，请稍后再试。"
+    },
+    "title": "主题讨论",
+    "lead": "此晶体作为主题帖，以下留言只记录围绕知识本身的延展、质疑与补注。",
+    "topic": {
+      "kicker": "主题帖",
+      "rule": "不同于 Plaza 的即时聊天，这里应当留下可回看的推导、质疑与补注。"
+    },
+    "states": {
+      "membershipLoading": {
+        "title": "正在确认访问权限",
+        "description": "只有来源圈层的活跃成员可以查看这枚晶体的主题讨论。"
+      },
+      "locked": {
+        "title": "主题讨论已上锁",
+        "description": "加入来源圈层后，可查看围绕该晶体的讨论与留言。"
+      },
+      "threadLoading": {
+        "title": "正在展开楼层",
+        "description": "把围绕这枚晶体的讨论按主题串整理出来。"
+      },
+      "unavailable": {
+        "title": "讨论暂时不可用"
+      },
+      "empty": {
+        "description": "还没有楼层留言。第一层应当补充推导、提出质疑，或记录这枚晶体后续被使用时出现的新判断。"
+      }
+    },
+    "message": {
+      "floorLabel": "楼",
+      "unknownAuthor": "unknown"
+    },
+    "composer": {
+      "title": "留下新的一层",
+      "hint": "补注、质疑、推导或引用路径，避免即时闲聊。",
+      "placeholder": "例如：这枚晶体在新的圈层中被如何理解？哪些前提还需要补充？",
+      "walletRequired": "连接钱包后才可留下楼层。",
+      "boundHint": "留言会绑定到当前晶体，并进入独立热度。"
+    },
+    "actions": {
+      "connectWallet": "连接钱包",
+      "posting": "落层中…",
+      "submit": "留下这一层"
+    }
+  },
+  "KnowledgeCitationPanel": {
+    "title": "引用这枚晶体",
+    "lead": "为这条已结晶知识管理或补充引用关系。选择你自己的另一枚晶体，建立明确的引用链。",
+    "target": {
+      "label": "当前目标"
+    },
+    "errors": {
+      "sourceNotFound": "未找到可用的引用源，请刷新后重试。",
+      "engineUnavailable": "当前环境未启用引用引擎，无法提交链上引用。",
+      "submitFailed": "引用提交失败，请稍后重试。"
+    },
+    "status": {
+      "submitted": "引用交易已提交，索引后会更新被引次数与通知。tx: {signature}..."
+    },
+    "states": {
+      "loading": {
+        "title": "正在载入你的晶体列表",
+        "description": "引用源会从你已结晶的知识中选择，用来补充当前结果的正式引用链。"
+      },
+      "error": {
+        "title": "暂时无法读取你的晶体列表",
+        "description": "请确认当前会话已登录，再尝试发起引用。"
+      },
+      "empty": {
+        "title": "还没有可用的引用源",
+        "description": "至少需要拥有另一枚晶体，才能对当前知识建立引用关系。"
+      }
+    },
+    "sourceList": {
+      "ariaLabel": "可用引用源",
+      "unassignedCircle": "未归属圈层",
+      "heat": "热度 {label} {score}°",
+      "citations": "被引 {count}"
+    },
+    "footer": {
+      "connectHint": "连接钱包后可提交链上引用。",
+      "defaultHint": "这里管理的是已结晶结果的正式引用关系。引用会走真实链上交易，成功后由 indexer 回写。"
+    },
+    "actions": {
+      "connectWallet": "连接钱包",
+      "submitting": "提交中…",
+      "submit": "提交引用"
+    },
+    "heat": {
+      "active": "活跃",
+      "cooling": "冷却中",
+      "frozen": "已冻结"
+    }
+  },
+  "KnowledgeVersionDiffPanel": {
+    "title": "版本对比",
+    "subtitle": "当前先提供基于版本事件的结构化 compare，不伪造历史正文快照。",
+    "controls": {
+      "fromVersion": "起始版本",
+      "toVersion": "对比版本"
+    },
+    "states": {
+      "notEnoughVersions": "当前还没有足够的版本点可供 compare。",
+      "loading": "正在读取版本差异…",
+      "error": "版本差异暂时不可读：{message}",
+      "noDiff": "当前选中的版本暂时没有可读 diff。",
+      "noFieldChanges": "两个版本在当前可读范围内没有差异。"
+    },
+    "notes": {
+      "metadataOnly": "历史正文快照尚未入库，所以这里优先展示版本事件元数据差异；当某一侧正好是当前版本时，会附带当前可读的标题、描述和 content hash。"
+    },
+    "snapshot": {
+      "eventType": "事件类型：{value}",
+      "actor": "执行者：{value}",
+      "eventAt": "事件时间：{value}",
+      "contentSnapshot": "正文快照：{value}",
+      "system": "系统",
+      "readable": "可读",
+      "unreadable": "不可读"
+    },
+    "labels": {
+      "from": "From",
+      "to": "To"
+    }
+  },
+  "DiscussionDiagnosticsPage": {
+    "title": "Discussion Diagnostics",
+    "subtitle": "这里展示的是 discussion AI 的完整调试视图：不仅看结果，也看 Input、Runtime、Output、Decision 和 Failure。",
+    "errors": {
+      "authentication_required": "请先登录拥有该圈层管理权限的账号，然后再读取分析快照。",
+      "private_sidecar_required": "当前诊断接口只能在 private sidecar 节点访问，请确认你连的是私有诊断节点。",
+      "discussion_message_not_found": "没有找到这条消息，或者你不是该圈层的管理员/主持人。",
+      "discussion_trigger_not_found": "当前圈层还没有 trigger 运行记录。",
+      "discussion_analysis_diagnostics_failed": "读取消息分析快照失败，请检查 query-api 日志和当前登录态。",
+      "discussion_summary_diagnostics_failed": "读取讨论总结快照失败，请检查 summary 路由、缓存和当前登录态。",
+      "discussion_trigger_diagnostics_failed": "读取 trigger 快照失败，请检查 ghost_runs 和相关 worker 日志。",
+      "discussion_analysis_reanalyze_failed": "重新入队分析失败，请检查权限、节点类型和 worker 状态。",
+      "invalidCircleId": "请输入有效的 circle id。"
+    },
+    "controls": {
+      "circleId": "Circle ID",
+      "circlePlaceholder": "输入 circle id 读取最近消息",
+      "envelopeId": "Envelope ID",
+      "envelopePlaceholder": "输入 discussion envelope id"
+    },
+    "actions": {
+      "loadingMessages": "读取中…",
+      "loadRecentMessages": "读取最近消息",
+      "loadingAnalysis": "加载中…",
+      "loadAnalysis": "读取分析快照",
+      "reanalyzing": "重跑中…",
+      "reanalyze": "重新入队分析"
+    },
+    "status": {
+      "reanalyzeQueued": "已重新入队：job #{jobId} ({status})"
+    },
+    "sample": {
+      "title": "当前样本",
+      "emptyMessage": "[空消息]",
+      "currentBadge": "当前样本"
+    },
+    "recentMessages": {
+      "title": "最近消息",
+      "deleted": "已删除"
+    },
+    "keyDiagnosticsTitle": "关键诊断",
+    "blocks": {
+      "input": "Input",
+      "runtime": "Runtime",
+      "output": "Output",
+      "decision": "Decision",
+      "failure": "Failure"
+    },
+    "metrics": {
+      "status": "运行状态",
+      "actualMode": "实际模式",
+      "focusLabel": "聚焦标签",
+      "semanticScore": "语义分数",
+      "embedding": "Embedding",
+      "featured": "精选"
+    },
+    "sections": {
+      "analysis": {
+        "title": "Message Analysis",
+        "scope": "message-scoped"
+      },
+      "summary": {
+        "title": "Discussion Summary",
+        "scope": "circle-scoped"
+      },
+      "trigger": {
+        "title": "Trigger",
+        "scope": "circle-scoped"
+      },
+      "ghostDraft": {
+        "title": "Ghost Draft",
+        "scope": "draft-scoped"
+      },
+      "humanOverrides": {
+        "title": "Human Overrides",
+        "scope": "message-scoped"
+      }
+    },
+    "analysis": {
+      "topicProfileLabel": "Topic Profile",
+      "decision": {
+        "offTopic": "被判为 off_topic，因为 semanticScore 低于 focused 阈值。",
+        "focused": "被判为 focused，因为 semantic 与 focus 两个信号都越过了 focused 阈值。",
+        "contextual": "被判为 contextual，因为它仍在主题语境内，但没有越过 focused 阈值。"
+      },
+      "errorLabel": "错误信息",
+      "rawJsonTitle": "查看原始 analysis JSON"
+    },
+    "summary": {
+      "metrics": {
+        "method": "方法",
+        "cache": "缓存",
+        "inputFidelity": "输入保真度",
+        "model": "模型"
+      },
+      "cacheHit": "cache hit",
+      "cacheMiss": "cache miss",
+      "ruleBased": "rule-based",
+      "notLoaded": "summary diagnostics not loaded yet",
+      "decision": {
+        "cacheHit": "当前 summary 来自缓存。",
+        "cacheMiss": "当前 summary 由当前窗口生成。",
+        "currentConfig": "当前 summary 就是在现行配置（{source}）下生成的。",
+        "cachedVsCurrentConfig": "缓存 summary 生成于 {cachedSource}，而当前配置已经变成 {currentSource}。",
+        "exactFidelity": "source window 与缓存 summary 的原始输入完全一致。",
+        "metadataOnlyFidelity": "现在只能看到当前窗口；缓存 summary 来自更早的 payload，当时没有保留精确 source messages。"
+      },
+      "rawJsonTitle": "查看原始 summary JSON"
+    },
+    "trigger": {
+      "metrics": {
+        "status": "运行状态",
+        "reason": "触发原因",
+        "summaryMethod": "摘要方法",
+        "messageCount": "窗口消息数"
+      },
+      "notLoaded": "trigger diagnostics not loaded yet",
+      "decision": {
+        "scopeNotice": "Circle Trigger Diagnostics 是 circle-scoped；当前选中的消息只用来对照它是否出现在 windowEnvelopeIds 中。"
+      },
+      "rawJsonTitle": "查看原始 trigger JSON"
+    },
+    "ghostDraft": {
+      "notConnected": "ghost draft diagnostics route 会在 Task 4 接上。",
+      "failure": "这批还没有接上 ghost draft generation diagnostics。"
+    },
+    "humanOverrides": {
+      "notConnected": "admin-only override surface 会在 Task 6 落地。",
+      "currentRule": "historical authorAnnotations 目前仍只是 legacy display-only；admin overrides 还没接上。",
+      "failure": "这批还没有可用的人类 override 治理面。"
+    }
+  },
+  "CrystalDemoPage": {
+    "title": "晶体视觉原型",
+    "subtitle": "每枚晶体都由八个知识参数驱动，而且每次渲染都保持确定性。",
+    "loading": "正在加载 3D…",
+    "parameters": {
+      "title": "视觉参数",
+      "hue": "色相",
+      "clarity": "通透度",
+      "facets": "切面",
+      "texture": "纹理",
+      "radiance": "辉光",
+      "patina": "包浆",
+      "warmth": "温度"
+    },
+    "variants": {
+      "title": "全部变体"
+    },
+    "presets": {
+      "gold": {
+        "label": "🥇 Gold · 新生晶体",
+        "circleName": "区块链哲学"
+      },
+      "sapphire": {
+        "label": "💎 Sapphire · 成熟晶体",
+        "circleName": "DeFi 研究"
+      },
+      "amethyst": {
+        "label": "🔮 Amethyst · 古老经典",
+        "circleName": "密码学原理"
+      },
+      "jade": {
+        "label": "🌿 Jade · 仍在讨论",
+        "circleName": "Solana 生态系统"
+      }
+    }
+  },
+  "FeedThreadSheet": {
+    "header": {
+      "eyebrow": "动态讨论",
+      "title": "围绕这条动态的回复",
+      "closeAria": "关闭动态讨论"
+    },
+    "states": {
+      "noBody": "（无正文）",
+      "empty": "先留下第一条回复，让这条动态继续展开。"
+    },
+    "thread": {
+      "replyCount": "{count} 条回复",
+      "noReplies": "还没有回复"
+    },
+    "composer": {
+      "placeholder": "写下你的回复…",
+      "disabledPlaceholder": "连接钱包后可回复",
+      "helper": "回复会作为该动态的线程内容写入。",
+      "readOnly": "当前仅可浏览回复。"
+    },
+    "actions": {
+      "sending": "发送中",
+      "sendReply": "发送回复"
+    }
+  },
+  "AccessProgressBar": {
+    "states": {
+      "topTier": "已到达最高层级"
+    },
+    "progress": {
+      "crystals": "{currentCrystals}/{nextTierCrystals} 晶体",
+      "remaining": "还需 {remaining} 枚进入「{nextTierName}」"
+    }
+  },
+  "IdentityBadge": {
+    "labels": {
+      "visitor": "游客",
+      "initiate": "参与者",
+      "member": "成员",
+      "curator": "策展人",
+      "owner": "创建者"
+    }
+  },
+  "DraftCandidateInlineCard": {
+    "states": {
+      "open": {
+        "label": "候选中",
+        "title": "这段讨论已被识别为候选草稿",
+        "hint": "候选已经识别，圈层管理员可以先查看来源，再手动生成正式草稿。"
+      },
+      "proposal_active": {
+        "label": "提案中",
+        "title": "草稿生成提案进行中",
+        "hint": "候选正在进入治理流程，草稿生成完成后才会出现可打开入口。"
+      },
+      "accepted": {
+        "label": "已生成",
+        "title": "候选草稿已生成正式草稿"
+      },
+      "generation_failed": {
+        "label": "生成失败",
+        "title": "草稿生成未完成"
+      },
+      "rejected": {
+        "label": "未通过",
+        "title": "草稿生成提案未通过"
+      },
+      "expired": {
+        "label": "已过期",
+        "title": "草稿生成提案已过期"
+      },
+      "cancelled": {
+        "label": "已取消",
+        "title": "草稿生成流程已取消"
+      },
+      "default": {
+        "label": "候选状态",
+        "title": "候选草稿状态更新"
+      }
+    },
+    "semanticFacets": {
+      "fact": "事实",
+      "explanation": "解释",
+      "emotion": "情绪",
+      "question": "问题",
+      "problem": "卡点",
+      "criteria": "条件",
+      "proposal": "提案",
+      "summary": "总结"
+    },
+    "meta": {
+      "sourceMessages": "来源消息 {count} 条",
+      "authorAnnotation": "作者标注 · {label}"
+    },
+    "errors": {
+      "failureReason": "失败原因：{error}"
+    },
+    "recovery": {
+      "summary": "治理恢复：{action}。",
+      "reusePassedProposal": "可复用已通过提案重试",
+      "reproposalRequired": "需重新提案重试"
+    },
+    "actions": {
+      "viewSource": "查看来源",
+      "createDraft": "生成草稿",
+      "createDraftBusy": "生成中…",
+      "expandDetails": "展开详情",
+      "collapseDetails": "收起详情",
+      "openDraft": "前往草稿",
+      "retry": "重试",
+      "cancel": "取消",
+      "retryTitle": "重试本次生成",
+      "retryDisabledTitle": "重试权限由治理规则决定",
+      "cancelTitle": "取消当前候选治理流程",
+      "cancelDisabledTitle": "取消权限由治理规则决定"
+    }
+  },
+  "PlazaTab": {
+    "actions": {
+      "forward": "转发"
+    },
+    "levels": {
+      "Visitor": "游客",
+      "Initiate": "参与者",
+      "Member": "成员",
+      "Elder": "长老"
+    },
+    "semanticFacets": {
+      "fact": "事实",
+      "explanation": "解释",
+      "emotion": "情绪",
+      "question": "问题",
+      "problem": "卡点",
+      "criteria": "条件",
+      "proposal": "提案",
+      "summary": "总结"
+    },
+    "time": {
+      "justNow": "刚刚"
+    },
+    "filters": {
+      "title": "筛选",
+      "scopeLabel": "范围",
+      "contentLabel": "内容",
+      "scope": {
+        "all": "全部",
+        "focused": "聚焦",
+        "mine": "仅我"
+      }
+    },
+    "states": {
+      "visitor": "游客",
+      "initiate": "参与者",
+      "member": "成员",
+      "curator": "策展人",
+      "owner": "创建者",
+      "syncing": "同步讨论数据中…",
+      "hiddenNoiseCount": "已折叠 {count} 条噪音消息",
+      "sending": "发送中…"
+    },
+    "messages": {
+      "deleted": "[消息已删除]",
+      "deletedVisibleToSender": "该消息已删除（发件人可见）",
+      "ephemeral": "烟尘消息 · 24h 后消散",
+      "offTopicReveal": "偏离主题 · 点击查看",
+      "authorAnnotations": "作者标注：{labels}"
+    },
+    "reply": {
+      "emptyBody": "消息内容为空",
+      "quoted": "↪ 回复 @{author}：{preview}\n{body}",
+      "banner": "回复 @{author}",
+      "cancelAria": "取消回复"
+    },
+    "composer": {
+      "identityHint": "当前为{stateLabel} · {hint}",
+      "identityHintOpenAria": "查看发言身份提示",
+      "replyPlaceholder": "回复 @{author}…",
+      "placeholderJoined": "在广场中发言…",
+      "placeholderEphemeral": "发送烟尘消息（不进入正式沉淀链路）…",
+      "placeholderDisconnected": "连接钱包后可发送消息",
+      "sendAria": "发送",
+      "moreAria": "更多",
+      "actions": {
+        "emoji": "表情",
+        "attachments": "文件待开放",
+        "attachmentsUnavailable": "讨论文件上传暂未开放",
+        "mention": "提及"
+      },
+      "authorAnnotations": {
+        "title": "作者标注",
+        "clear": "清空",
+        "hint": "这些标注只代表作者意图，系统语义筛选以后端分析结果为准。"
+      }
+    },
+    "errors": {
+      "walletRequired": "请先连接钱包后再发送消息",
+      "syncFailed": "同步讨论消息失败",
+      "loadFailed": "加载讨论消息失败",
+      "sendFailed": "发送失败",
+      "forwardFailed": "转发失败",
+      "deleteFailed": "删除失败"
+    },
+    "status": {
+      "forwardedToCircle": "已转发到 {circleName}，等待目标圈层同步显示",
+      "localDeleteOnly": "未连接钱包，仅本地标记删除"
+    },
+    "candidate": {
+      "avatar": "候",
+      "retryDenied": "候选 {candidateId} 当前策略下不能重试。",
+      "proposalId": "提案 {proposalId}。",
+      "currentProposal": "当前提案。",
+      "retryReusePassedProposal": "重试会复用{proposalHint}",
+      "retryNeedsNewProposal": "重试不能复用{proposalHint}，需要重新发起新提案。",
+      "createDenied": "候选 {candidateId} 需要圈层管理员来生成正式草稿。",
+      "createSucceeded": "候选 {candidateId} 已生成正式草稿。",
+      "createExistingDraft": "候选 {candidateId} 已经有正式草稿了。",
+      "createNotReady": "候选 {candidateId} 当前状态还不能生成正式草稿。",
+      "createMissingSources": "候选 {candidateId} 缺少来源消息，暂时不能生成草稿。",
+      "cancelDenied": "候选 {candidateId} 当前策略下不能取消。",
+      "relatedProposal": "关联提案 {proposalId}。",
+      "cancelAvailable": "候选 {candidateId} 现在可以取消。{proposalHint}",
+      "sourceUnavailable": "这个候选暂时没有可定位的来源消息。",
+      "sourceFocused": "已定位到候选 {candidateId} 的来源讨论。",
+      "systemTag": "系统",
+      "persistedNotice": "已保存通知"
+    },
+    "forward": {
+      "cardLabel": "转发卡",
+      "sourceCircleFallback": "来源圈层",
+      "sourceLevel": "第 {level} 层",
+      "unknownSourceAuthor": "未知成员",
+      "forwardedBy": "由 @{handle} 转发",
+      "viewSource": "查看来源",
+      "sourceDeleted": "原消息已删除",
+      "reason": {
+        "viewerNotJoined": "加入圈层后可转发消息。",
+        "missingEnvelopeId": "该消息暂不具备可转发的稳定标识。",
+        "deleted": "已删除消息不可转发。",
+        "ephemeral": "烟尘消息不进入正式沉淀链路，不可转发。",
+        "forwardCard": "转发卡片不可再次转发，请回到原始消息发起。",
+        "noTargets": "当前没有符合规则的目标圈层。"
+      }
+    },
+    "auxShortcut": {
+      "crystals": " · {count}晶体"
+    }
+  },
+  "AccessGate": {
+    "description": "至少需要 <strong>{required}</strong> 枚晶体才能进入这个层级。",
+    "actions": {
+      "dismiss": "我知道了"
+    }
+  },
+  "CirclePicker": {
+    "title": "转发到",
+    "hint": "已选 {count} 条消息 · 这里只显示符合条件的目标圈层",
+    "meta": {
+      "level": "第 {level} 层"
+    },
+    "actions": {
+      "cancel": "取消"
+    }
+  },
+  "ChatRecordBubble": {
+    "source": "来自 {circle} 的聊天记录",
+    "more": "还有 {count} 条消息…",
+    "count": "共 {count} 条消息",
+    "actions": {
+      "viewAll": "点击查看全部 →"
+    }
+  },
+  "NotificationPanel": {
+    "title": "通知",
+    "empty": "暂无通知",
+    "actions": {
+      "markAllRead": "全部已读"
+    }
+  },
+  "TierPill": {
+    "hint": "← 滑动切换 →",
+    "meta": {
+      "level": "第 {level} 层",
+      "childLevel": "第 {parentLevel}.{childLevel} 层"
+    },
+    "actions": {
+      "createCircle": "创建圈层"
+    }
+  },
+  "CollaborativeEditor": {
+    "placeholder": "开始编写草稿…",
+    "toolbar": {
+      "bold": "粗体",
+      "italic": "斜体",
+      "strike": "删除线",
+      "heading": "标题",
+      "subheading": "小标题",
+      "bulletList": "无序列表",
+      "orderedList": "有序列表",
+      "blockquote": "引用",
+      "codeBlock": "代码块",
+      "highlight": "高亮"
+    }
+  },
+  "CrucibleEditor": {
+    "fallback": {
+      "untitledDraft": "未命名草稿",
+      "emptyParagraph": "这段当前还没有正文。"
+    },
+    "anchorStatus": {
+      "anchored": "已锚定",
+      "failed": "锚定失败",
+      "skipped": "锚定跳过",
+      "syncing": "锚定中",
+      "idle": "待连接"
+    },
+    "errors": {
+      "applyAcceptedIssues": "应用已通过问题单失败。",
+      "requestTemporaryGrant": "请求临时编辑授权失败。",
+      "issueTemporaryGrant": "批准临时授权失败。",
+      "revokeTemporaryGrant": "撤销临时授权失败。"
+    },
+    "blocks": {
+      "title": "段落 {index}",
+      "typeLabel": "段落块",
+      "statusLabel": "可继续完善",
+      "editabilityEditable": "正文可编辑",
+      "editabilityReadOnly": "只读查看",
+      "editabilityLocked": "正文已锁定",
+      "sourceVersion": "V{version}",
+      "statusLocked": "已锁定",
+      "statusResolved": "已解决",
+      "statusAcceptedPending": "已通过待应用",
+      "statusInReview": "审议中",
+      "statusSubmitted": "已提交",
+      "statusReadyForMoreEdits": "可继续编辑",
+      "editabilitySelected": "当前选中"
+    },
+    "heat": {
+      "active": "活跃",
+      "cooling": "降温中",
+      "frozen": "冻结"
+    },
+    "meta": {
+      "onlineCount": "{count} 在线",
+      "editCount": "{count} 次编辑",
+      "contributorCount": "{count} 位贡献者",
+      "commentCount": "{count} 条留言",
+      "issueCount": "{count} 个问题单"
+    },
+    "actions": {
+      "completeEditingResolve": "完成编辑并解决 {count} 条问题单",
+      "completeEditing": "完成编辑",
+      "editing": "编辑中",
+      "editParagraph": "编辑这段",
+      "viewDiscussion": "查看讨论",
+      "submitting": "提交中…",
+      "requestTemporaryGrant": "请求临时编辑授权",
+      "processing": "处理中…",
+      "issueTemporaryGrant": "批准临时授权",
+      "revokeTemporaryGrant": "撤销临时授权",
+      "completing": "正在完成…",
+      "send": "发送"
+    },
+    "temporaryGrant": {
+      "title": "临时编辑授权",
+      "hint": "当前段落未直接开放编辑，可以通过临时编辑授权进入这一段的修订。",
+      "requested": "你已经请求了这段的临时编辑授权，正在等待批准。",
+      "managerRequested": "这段的临时访问请求正在等待批准。",
+      "managerActive": "这段当前存在有效的临时访问授权。"
+    },
+    "issueCarry": {
+      "title": "这段有已通过的问题单，可选择随本次编辑一起解决",
+      "hint": "完成编辑后，勾选的问题单会自动写入本段的应用记录，形成可追溯的解决链。若这段刚应用过问题线程修订建议，对应的问题单会默认勾选，你仍可手动取消。"
+    },
+    "placeholders": {
+      "continueParagraph": "继续完善{title}…"
+    },
+    "readOnly": {
+      "editorDisconnected": "当前协作编辑器未连接，暂时无法进入段落编辑。",
+      "commentLocked": "🔒 需要参与者以上身份才能留言。",
+      "contentLocked": "🔒 当前身份只能查看正文，不能直接修改段落。"
+    },
+    "comments": {
+      "title": "段落 {index} 的留言",
+      "empty": "这一段还没有留言。",
+      "placeholder": "对这一段落留言…"
+    }
+  },
+  "IdentityOnboardingProvider": {
+    "errors": {
+      "sessionConfirmation": "身份状态确认失败，请重试。",
+      "invalidSignature": "钱包签名验证失败，请重试。"
+    }
+  },
+  "AgentAdminPanel": {
+    "title": "Agent 管理与审计",
+    "subtitle": "查看当前 Agent 目录，并为自动触发、折扣和审核门槛设定治理边界。",
+    "ownerOnly": "仅圈主可修改",
+    "sections": {
+      "registeredAgents": "已登记 Agent",
+      "policy": "Agent 策略"
+    },
+    "states": {
+      "loading": "正在读取 Agent 目录…",
+      "empty": "当前圈层还没有登记 Agent。"
+    },
+    "fields": {
+      "triggerScope": {
+        "label": "Agent 触发范围",
+        "options": {
+          "disabled": "disabled",
+          "draftOnly": "draft_only",
+          "circleWide": "circle_wide"
+        }
+      },
+      "costDiscount": {
+        "label": "成本折扣 (bps)",
+        "aria": "Agent 折扣"
+      },
+      "reviewMode": {
+        "label": "审核门槛",
+        "aria": "Agent 审核门槛",
+        "options": {
+          "ownerReview": "owner_review",
+          "adminReview": "admin_review",
+          "selfServe": "self_serve"
+        }
+      }
+    },
+    "auditNote": "触发范围决定 Agent 能否参与圈层级自动化；折扣用于成本治理；审核门槛决定是否需要 Owner/Admin 复核。",
+    "actions": {
+      "saving": "保存中…",
+      "save": "保存 Agent 策略"
+    }
+  },
+  "CircleSettingsSheet": {
+    "header": {
+      "title": "{circleName} · 设置"
+    },
+    "sections": {
+      "basicInfo": "基本信息",
+      "permissions": "权限",
+      "aiCollab": "AI 协作",
+      "dangerZone": "危险操作"
+    },
+    "basic": {
+      "modeLabel": "模式",
+      "modeSocial": "🌐 社交模式",
+      "modeKnowledge": "📚 知识模式",
+      "accessLabel": "准入",
+      "accessFree": "🌍 开放",
+      "accessCrystal": "💎 ≥{count} 晶体",
+      "accessInvite": "🔒 邀请制"
+    },
+    "permissions": {
+      "forwardTitle": "允许消息转出",
+      "forwardDescription": "成员可将消息转发到其他圈层。"
+    },
+    "common": {
+      "collapse": "收起",
+      "expand": "点击查看"
+    },
+    "identityRules": {
+      "title": "圈层身份规则",
+      "lead": "正式发言需先创建身份并加入圈层。",
+      "initiateStep": "游客 → 参与者",
+      "initiateText": "发送 {count} 条消息后晋升为参与者。",
+      "memberStep": "参与者 → 成员",
+      "memberText": "获得 {count} 次引用后晋升为成员。",
+      "elderStep": "成员 → 长老",
+      "elderText": "进入本圈信誉前 {percentile}% 可晋升为长老。",
+      "footnote": "连续 {count} 天不活跃时，身份层级可能回落。"
+    },
+    "draftLifecycle": {
+      "title": "草稿流程设置",
+      "reviewEntryLabel": "进入审阅方式",
+      "reviewEntry": {
+        "autoOnly": "自动结束",
+        "manualOnly": "手动结束",
+        "autoOrManual": "两者都可"
+      },
+      "help": {
+        "autoOnly": "到时间后会自动结束正文编辑，进入问题单审阅。",
+        "manualOnly": "只有具备权限的人可以手动结束正文编辑，进入问题单审阅。",
+        "autoOrManual": "到时间会自动进入审阅，也可以提前手动结束编辑。"
+      },
+      "autoReviewTimeLabel": "自动进入审阅时间",
+      "autoReviewTimeHint": "到时间后会从正文编辑切到问题单审阅",
+      "reviewWindowLabel": "审阅阶段时长",
+      "reviewWindowHint": "到时间后会提示本轮审阅已结束，等待决定下一轮或发起结晶",
+      "maxRoundsLabel": "最多修订轮次",
+      "save": "保存草稿流程设置"
+    },
+    "draftWorkflow": {
+      "title": "问题单与阶段权限",
+      "createIssue": "谁可提交问题单",
+      "followupIssue": "谁可追加补充",
+      "reviewIssue": "谁可审议问题单",
+      "retagIssue": "谁可改问题类型",
+      "applyIssue": "谁可确认已解决",
+      "manualEndDrafting": "谁可结束编辑",
+      "advanceFromReview": "谁可结束本轮审阅",
+      "enterCrystallization": "谁可发起结晶",
+      "allowAuthorWithdraw": "提交者在审议前可撤回",
+      "allowModeratorRetag": "审议者可改问题类型",
+      "save": "保存问题单与阶段权限"
+    },
+    "ghost": {
+      "source": {
+        "circle": "当前：圈层自定义配置",
+        "pending": "当前：待索引临时配置（圈层入库后自动生效）",
+        "globalDefault": "当前：继承全局默认配置"
+      },
+      "loading": "配置加载中...",
+      "summaryUseLlmTitle": "用 AI 生成讨论总结",
+      "summaryUseLlmDescription": "开启后，系统会自动整理最近讨论，生成一段讨论总结。",
+      "summaryUseLlmWarning": "关闭后会改用规则整理讨论，结果可能不够准确。",
+      "triggerModeLabel": "触发后怎么处理",
+      "triggerModeHint": "当系统判断这段讨论已经值得进入草稿流程后，是只提醒，还是直接生成草稿。",
+      "triggerModeNotifyOnly": "仅提醒",
+      "triggerModeAutoDraft": "直接生成草稿",
+      "triggerSummaryUseLlmTitle": "用 AI 辅助判断是否触发草稿",
+      "triggerSummaryUseLlmDescription": "开启后，系统会先自动整理最近讨论，再用 AI 辅助判断这段讨论是否该进入草稿流程。",
+      "triggerSummaryUseLlmWarning": "关闭后会改用规则判断是否触发草稿，结果可能不够准确。",
+      "save": "保存 AI 配置"
+    },
+    "roleOptions": {
+      "initiate": "见习成员",
+      "member": "成员",
+      "elder": "长老",
+      "moderator": "管理员",
+      "admin": "高级管理员",
+      "owner": "圈主"
+    },
+    "memberRoles": {
+      "owner": "创建者",
+      "curator": "策展人",
+      "member": "成员"
+    },
+    "members": {
+      "directoryTitle": "成员目录",
+      "title": "成员 ({count})",
+        "actions": {
+          "setCurator": "设为策展人",
+          "unsetCurator": "取消策展人",
+          "remove": "移除成员",
+          "invite": "邀请成员",
+          "leave": "离开圈层"
+        }
+      },
+    "danger": {
+      "deleteCircle": "解散此圈层"
+    },
+    "errors": {
+      "roleChange": "角色变更失败，请稍后重试。",
+      "removeMember": "移除成员失败，请稍后重试。",
+      "leaveCircle": "离开圈层失败，请稍后重试。"
+    },
+    "actions": {
+      "saving": "保存中..."
+    },
+    "units": {
+      "minutes": "分钟"
+    },
+    "reviewEntry": {
+      "help": {
+        "autoOnly": "正文编辑会在计时结束后自动结束，并进入问题评审。",
+        "manualOnly": "只有被授权的成员可以手动结束正文编辑并进入问题评审。",
+        "autoOrManual": "评审会在超时后自动开始，也可以由有权限的成员提前结束。"
+      }
+    }
+  },
+  "CrystalDetailSheet": {
+    "errors": {
+      "loadFormalOutput": "读取正式 CrystalOutput 失败。"
+    },
+    "roles": {
+      "author": "作者",
+      "discussant": "讨论者",
+      "reviewer": "审阅者",
+      "cited": "被引者",
+      "unknown": "贡献者"
+    },
+    "lineage": {
+      "sourceDraft": "来源草稿",
+      "discussionAnchor": "讨论锚点",
+      "summaryHash": "摘要哈希",
+      "messagesDigest": "消息摘要",
+      "sourceType": "来源类型",
+      "snapshotSource": "讨论锚点快照",
+      "settlementFallback": "结算回放（回退）",
+      "unlabeled": "未标注"
+    },
+    "patina": {
+      "ancient": "🏛 经典",
+      "settling": "📜 沉淀中",
+      "fresh": "✨ 新结晶"
+    },
+    "meta": {
+      "citedBy": "被引用 {count} 次",
+      "ageDays": "{count} 天前结晶"
+    },
+    "formalOutput": {
+      "label": "正式结晶结果",
+      "loading": "读取中",
+      "unavailable": "暂不可读",
+      "pending": "尚未可读",
+      "loadingBody": "正在读取正式 CrystalOutput…",
+      "pendingBody": "当前还没有可消费的正式 CrystalOutput；这里先不把贡献账本推断当成结果合同。"
+    },
+    "sections": {
+      "provenance": "溯源",
+      "contributionLedger": "贡献账本"
+    },
+    "actions": {
+      "copy": "复制",
+      "cite": "引用",
+      "citePending": "晶体引用待开放"
+    }
+  },
+  "DraftCard": {
+    "meta": {
+      "editors": "{count} 位编辑",
+      "comments": "{count} 条评论"
+    }
+  },
+  "DraftDiscussionPanel": {
+    "fallback": {
+      "pendingTime": "时间待定"
+    },
+    "messages": {
+      "create": "已创建问题",
+      "followup": "已补充跟进",
+      "propose": "已提出方案",
+      "accept": "已接受方案",
+      "reject": "已拒绝方案",
+      "apply": "已应用方案",
+      "withdraw": "已撤回线程",
+      "retag": "已重新标注问题类型",
+      "update": "已更新",
+      "meta": "{authorId} · {time}",
+      "content": {
+        "retag": "问题类型已变更。",
+        "withdraw": "该线程已被撤回。",
+        "accept": "该提案已被接受。",
+        "reject": "该提案已被拒绝。",
+        "apply": "已把接受的变更落实到草稿中。",
+        "empty": "没有补充更多细节。",
+        "retagWithType": "问题类型已改为 {issueType}。"
+      }
+    },
+    "issueTypes": {
+      "fact_correction": "事实修正",
+      "expression_improvement": "表达优化",
+      "knowledge_supplement": "知识补充",
+      "question_and_supplement": "问题与补充",
+      "fallback": "问题"
+    },
+    "states": {
+      "open": "已提交",
+      "proposed": "评审中",
+      "accepted": "已接受",
+      "rejected": "已拒绝",
+      "withdrawn": "已撤回",
+      "applied": "已应用"
+    },
+    "targetTypes": {
+      "paragraph": "段落",
+      "structure": "结构",
+      "document": "全文"
+    },
+    "targetLabels": {
+      "paragraphNumber": "第 {index} 段",
+      "paragraphRaw": "段落 · {value}",
+      "structureParagraphs": "结构 · 段落 {values}",
+      "generic": "{type} · {value}"
+    },
+    "errors": {
+      "loadRevisionDirections": "无法加载已接受的方向。",
+      "revisionSummaryRequired": "请先填写已接受方向摘要。",
+      "createRevisionDirection": "无法保存已接受方向。",
+      "acceptRevisionDirection": "无法将该方向标记为已接受。",
+      "rejectRevisionDirection": "无法拒绝该方向。",
+      "selectParagraph": "请先选择目标段落。",
+      "selectStructureRange": "结构类问题至少需要选择一个段落。",
+      "createDescriptionRequired": "提交前请先描述这个问题。",
+      "createThread": "无法创建问题线程。",
+      "followupRequired": "请先填写跟进内容。",
+      "reply": "无法发送跟进回复。",
+      "propose": "无法提交解决方案。",
+      "resolve": "无法记录解决结论。",
+      "withdraw": "无法撤回该线程。",
+      "apply": "无法记录已应用的结论。"
+    },
+    "aria": {
+      "panel": "草稿讨论面板"
+    },
+    "header": {
+      "eyebrow": "修订讨论",
+      "title": "问题与处理"
+    },
+    "governance": {
+      "eyebrow": "治理",
+      "labels": {
+        "target": "目标",
+        "actor": "操作人",
+        "audit": "审计线索"
+      },
+      "actions": {
+        "drafting": "修订推进中",
+        "review": "审阅进行中",
+        "crystallizationActive": "结晶投票进行中",
+        "crystallizationFailed": "从结晶失败中恢复",
+        "crystallized": "结晶完成",
+        "archived": "已归档",
+        "default": "草稿流程进行中"
+      },
+      "values": {
+        "targetVersion": "稳定版本 v{version}"
+      },
+      "capabilities": {
+        "create": "可提交问题单",
+        "resolve": "可审议问题单",
+        "apply": "可应用已通过问题单",
+        "crystallize": "可发起结晶"
+      },
+      "viewOnly": "仅查看",
+      "progress": {
+        "submitted": "已提交",
+        "inReview": "审议中",
+        "accepted": "已通过",
+        "resolved": "已解决"
+      }
+    },
+    "revisionDirections": {
+      "title": "已接受方向",
+      "hint": "当治理提案通过后，先在这里记录被接受的方向，再把变更应用到草稿。",
+      "summaryLabel": "已接受方向",
+      "summaryPlaceholder": "概括这个已通过提案要求落实的内容。",
+      "acceptanceMode": {
+        "label": "接受方式",
+        "managerConfirm": "管理员确认",
+        "roleConfirm": "角色确认",
+        "governanceVote": "治理投票"
+      },
+      "status": {
+        "accepted": "已接受",
+        "rejected": "已拒绝",
+        "expired": "已过期",
+        "open": "待处理"
+      },
+      "scope": {
+        "paragraph": "第 {index} 段",
+        "document": "全文"
+      },
+      "submit": "保存已接受方向",
+      "acceptedTitle": "可应用的已接受方向",
+      "scopeMeta": "{scope} · {status} · {mode}",
+      "listTitle": "全部已接受方向",
+      "governanceMeta": "治理提案 {id}",
+      "actions": {
+        "accept": "接受",
+        "reject": "拒绝"
+      },
+      "governanceHint": "治理提案通过本身不会直接修改正文，必须先在这里记录被接受的方向。"
+    },
+    "create": {
+      "title": "创建新问题",
+      "bindingHint": "这个问题会绑定到稳定版本 v{version}。",
+      "targetTypeLabel": "目标类型",
+      "issueTypeLabel": "问题类型",
+      "paragraphTargetLabel": "目标段落",
+      "selectParagraph": "选择段落",
+      "paragraphOption": "第 {index} 段 · {preview}",
+      "paragraphSelectedHint": "该问题会绑定到第 {index} 段。",
+      "paragraphSelectHint": "选择这个问题对应的段落。",
+      "structureLabel": "目标结构",
+      "structureHint": "选择定义这次结构调整的段落。",
+      "paragraphShort": "段 {index}",
+      "selectedStructure": "已选段落：{values}",
+      "documentLabel": "全文",
+      "documentHint": "当问题影响整篇草稿时使用这个选项。",
+      "boundVersionLabel": "绑定的稳定版本",
+      "boundVersionHint": "这里新开的所有问题都会指向 v{version}。",
+      "descriptionLabel": "问题描述",
+      "descriptionPlaceholder": "说明需要修正的事实、表达、知识缺口或开放问题。",
+      "insertCurrentReference": "插入当前文件引用",
+      "submit": "提交问题"
+    },
+    "threads": {
+      "title": "问题线程",
+      "loading": "正在加载问题线程…",
+      "empty": "还没有问题线程。",
+      "targetVersion": "v{version} · 线程 {id}",
+      "noMessages": "这个线程里还没有消息。",
+      "evidence": {
+        "title": "应用证据",
+        "editAnchor": "编辑锚点：{id}",
+        "snapshotHash": "快照哈希：{hash}",
+        "draftVersion": "草稿版本：v{version}"
+      },
+      "issueTypeLabel": "问题类型",
+      "replyPlaceholder": "补充一条跟进回复…",
+      "proposePlaceholder": "描述这次解决方案…",
+      "resolvePlaceholder": "说明为什么应接受或拒绝这个问题…",
+      "applyPlaceholder": "描述已接受的方案是如何落实到草稿里的…",
+      "actions": {
+        "reply": "回复",
+        "withdraw": "撤回",
+        "propose": "提出方案",
+        "accept": "接受",
+        "reject": "拒绝",
+        "apply": "记录应用"
+      },
+      "emptySummary": "这个问题还没有补充上下文。"
+    }
+  },
+  "SeededFileTree": {
+    "aria": {
+      "section": "预置参考文件"
+    },
+    "title": "预置参考文件",
+    "hint": "浏览已索引文件，选择一行引用插入到草稿讨论中。",
+    "currentRef": "当前引用：{reference}",
+    "loading": "正在加载预置文件…",
+    "empty": "还没有预置文件。",
+    "preview": {
+      "unselected": "先选择文件和行号"
+    }
+  },
+  "ReferencesPanel": {
+    "aria": {
+      "section": "参考资料"
+    },
+    "eyebrow": "参考资料",
+    "title": "参考资料",
+    "hint": "把当前草稿可追溯的引用集中收在一起。",
+    "formal": {
+      "title": "正式引用",
+      "hint": "当前可见的正式知识引用来自草稿正文里已经存在的 @crystal(...) 标记。",
+      "insertAction": "插入引用",
+      "loading": "正在加载正式引用…",
+      "empty": "当前还没有正式草稿引用。",
+      "summary": "当前可见 {count} 条正式引用，覆盖 {sourceBlockCount} 个来源段落。",
+      "note": "这些入口来自草稿正文中已有的 @crystal(...) 标记。更完整的草稿期引用选择器会在后续单独打磨。"
+    },
+    "seeded": {
+      "title": "预置文件证据",
+      "hint": "Seeded 圈层仍可在这里选择文件行证据，并把当前 @file:path:line 引用插入到草稿讨论中。"
+    }
+  },
+  "KnowledgeReferencePicker": {
+    "title": "插入引用",
+    "hint": "从当前圈层已预加载的结晶知识里选择（最多 50 条）。",
+    "searchPlaceholder": "搜索当前圈层已预加载知识",
+    "searchAriaLabel": "搜索当前圈层已预加载知识",
+    "empty": "当前圈层里没有标题匹配的知识。",
+    "close": "关闭",
+    "version": "v{version}"
+  },
+  "CrucibleLifecycleHeader": {
+    "fallback": {
+      "notProvided": "未提供"
+    },
+    "facets": {
+      "none": "未识别",
+      "fact": "事实",
+      "explanation": "解释",
+      "emotion": "情绪",
+      "question": "问题",
+      "problem": "卡点",
+      "criteria": "条件",
+      "proposal": "提案",
+      "summary": "总结"
+    },
+    "annotations": {
+      "none": "无",
+      "fact": "事实",
+      "explanation": "解释",
+      "emotion": "情绪"
+    },
+    "sourceKind": {
+      "unavailable": "来源不可用",
+      "acceptedCandidate": "已接受候选的起始版本",
+      "reviewBoundSnapshot": "评审绑定快照",
+      "pending": "来源仍待确认"
+    },
+    "warnings": {
+      "missingDraftSource": "原始来源交接记录缺失，所以暂时无法显示草稿来源。",
+      "missingAnchorEvidence": "当前稳定快照缺少草稿锚定证据，因此来源细节暂时依赖已记录的交接元数据。",
+      "legacyApplicationEvidence": "部分历史问题应用记录仍在归一化，目前沿用旧证据链。",
+      "boundVersionOnly": "当前稳定快照的应用证据还不完整，因此暂时只显示绑定版本。",
+      "fallback": "这个草稿仍有一处生命周期细节待补齐。"
+    },
+    "status": {
+      "drafting": "起草中",
+      "review": "评审中",
+      "crystallizationActive": "结晶进行中",
+      "crystallizationFailed": "结晶未完成",
+      "crystallized": "已结晶",
+      "archived": "已归档",
+      "inProgress": "进行中"
+    },
+    "meta": {
+      "pendingTime": "时间待定",
+      "latestUpdatePending": "最新更新时间待定",
+      "updated": "更新于 {date}"
+    },
+    "reviewLead": "当前有 {count} 个问题绑定在 v{version}",
+    "summary": {
+      "drafting": {
+        "manualWithIssues": "当前处于第 {round} 轮修订。围绕 v{version} 正在处理 {count} 个问题，团队准备好后可手动进入评审。",
+        "manualNoIssues": "当前处于第 {round} 轮修订，团队准备好后可手动进入评审。",
+        "autoWithIssues": "当前处于第 {round} 轮修订。围绕 v{version} 正在处理 {count} 个问题，预计会在 {window} 左右进入评审。",
+        "autoNoIssues": "当前处于第 {round} 轮修订，预计会在 {window} 左右进入评审。"
+      },
+      "review": {
+        "expiredWithIssues": "正文已锁定。绑定到 v{version} 的 {count} 个问题已结束评审，现在需要决定进入下一轮修订还是进入结晶。",
+        "expiredNoIssues": "正文已锁定。v{version} 的评审已结束，现在需要决定进入下一轮修订还是进入结晶。",
+        "activeWithIssues": "正文已锁定。绑定到 v{version} 的 {count} 个问题正在评审，预计会在 {window} 左右结束。",
+        "activeNoIssues": "正文已锁定。v{version} 的评审轮正在等待问题进入，预计会在 {window} 左右结束。"
+      },
+      "archived": {
+        "withStableVersion": "这份已归档草稿保留了稳定版本 v{version} 及其讨论历史。恢复后可以继续下一轮修订。",
+        "withoutStableVersion": "这份已归档草稿保留了当前正文与讨论历史。恢复后可以继续下一轮修订。"
+      },
+      "crystallizationActive": "正文已锁定，v{version} 正在结晶阶段。",
+      "crystallizationFailed": "v{version} 的结晶没有完成。你可以继续处理问题，稍后再尝试。",
+      "crystallized": "这份草稿已成功结晶，当前稳定结果是 v{version}。",
+      "default": "这份草稿仍在围绕 v{version} 继续推进。"
+    },
+    "headline": "{status} · v{version}",
+    "header": {
+      "eyebrow": "草稿生命周期"
+    },
+    "actions": {
+      "enterReview": {
+        "pending": "正在进入评审…",
+        "idle": "进入评审"
+      },
+      "advanceReview": {
+        "pending": "正在开启下一轮…",
+        "idle": "开始下一轮"
+      },
+      "enterCrystallization": {
+        "pending": "正在进入结晶…",
+        "idle": "进入结晶"
+      },
+      "executeCrystallization": {
+        "pending": "正在结晶…",
+        "idle": "执行结晶"
+      },
+      "retryCrystallization": {
+        "pending": "正在重试结晶…",
+        "idle": "重试结晶"
+      },
+      "rollbackCrystallization": {
+        "pending": "正在回退…",
+        "idle": "回到评审"
+      },
+      "archive": {
+        "pending": "正在归档…",
+        "idle": "归档草稿"
+      },
+      "restore": {
+        "pending": "正在恢复…",
+        "idle": "恢复草稿"
+      }
+    },
+    "details": {
+      "collapse": "收起细节",
+      "expand": "展开细节"
+    },
+    "cards": {
+      "source": {
+        "title": "来源交接",
+        "lead": "这份草稿来自 {count} 条源消息",
+        "candidateId": "候选 {id}",
+        "messageCount": "{count} 条源消息",
+        "semanticFacets": "系统标签：{labels}",
+        "authorAnnotations": "作者标注：{labels}",
+        "lastProposal": "最近提案：{id}",
+        "missingTitle": "来源交接缺失",
+        "missingHint": "草稿仍可继续推进，但原始来源记录暂时不可用。"
+      },
+      "baseline": {
+        "title": "稳定基线",
+        "lead": "稳定快照 v{version} 是当前评审基线。",
+        "source": "来源：{label}",
+        "createdAt": "创建于 {date}",
+        "anchorId": "锚点 {id}"
+      },
+      "workingCopy": {
+        "title": "工作副本",
+        "draftingLead": "当前工作副本可编辑，并且仍基于稳定快照 v{version}。",
+        "lockedLead": "正文已锁定，因此工作副本继续固定在 v{version}。",
+        "basedOnVersion": "基于稳定快照 v{version}",
+        "updatedAt": "最近编辑于 {date}"
+      },
+      "reviewProgress": {
+        "title": "评审进度",
+        "submittedInReview": "评审中已提交 {submitted} 项",
+        "acceptedResolved": "已接受或已解决 {accepted} 项"
+      }
+    }
+  },
+  "CrucibleTab": {
+    "errors": {
+      "loadTemporaryEditGrants": "无法加载临时编辑权限。",
+      "fetchDraftReferenceLinks": "无法加载草稿引用入口。",
+      "loadSourceMaterials": "无法加载来源材料。",
+      "loadSeededReferences": "无法加载预置参考文件。",
+      "missingDraftContextForUpload": "请先打开草稿，再上传来源材料。",
+      "uploadWithoutEditPermission": "需要编辑权限后才能上传来源材料。",
+      "unsupportedSourceMaterial": "这种来源材料文件类型暂不支持。",
+      "uploadSourceMaterial": "无法上传来源材料。",
+      "loadDraftLifecycle": "无法加载草稿生命周期。",
+      "loadDiscussionThreads": "无法加载问题线程。",
+      "saveDraft": "无法保存草稿正文。",
+      "reviewRequiresBody": "进入评审前请先补充正文。",
+      "enterReview": "无法进入评审。",
+      "advanceReview": "无法开启下一轮修订。",
+      "enterCrystallization": "无法进入结晶阶段。",
+      "retryCrystallization": "无法重试结晶。",
+      "rollbackCrystallization": "无法把草稿退回评审。",
+      "archiveRequiresBody": "归档前请先补充正文。",
+      "archiveDraft": "无法归档草稿。",
+      "restoreDraft": "无法恢复草稿。",
+      "refreshDiscussionThreads": "无法刷新问题线程。",
+      "discussionOperation": "无法完成这次讨论操作。",
+      "missingDraftContextForCreateThread": "请先打开草稿，再创建问题线程。",
+      "missingDraftContextForPropose": "请先打开草稿，再提出解决方案。",
+      "missingDraftContextForResolve": "请先打开草稿，再记录解决结论。",
+      "missingDraftContextForReply": "请先打开草稿，再发送回复。",
+      "missingDraftContextForWithdraw": "请先打开草稿，再撤回线程。",
+      "missingDraftContextForApply": "请先打开草稿，再记录应用结果。",
+      "missingDraftContextForApplyAcceptedIssues": "请先打开草稿，再应用已接受的问题。",
+      "applyAcceptedIssuesRequiresBody": "应用已接受问题前请先补充正文。",
+      "applyAcceptedIssues": "无法应用已接受的问题。",
+      "sendComment": "无法发送段落评论。",
+      "requestTemporaryEditGrant": "无法申请临时编辑权限。",
+      "issueTemporaryEditGrant": "无法批准临时编辑权限。",
+      "revokeTemporaryEditGrant": "无法撤销临时编辑权限。",
+      "crystallizeRequiresBody": "结晶前请先补充正文。",
+      "executeCrystallization": "无法执行结晶。"
+    },
+    "confirm": {
+      "applyAcceptedGhostThreads": "这次状态切换会把已写入正文的 {count} 条 AI 已接受问题一并记为“已应用”。是否继续？"
+    },
+    "notices": {
+      "enterReviewSuccess": "已进入评审阶段。",
+      "advanceReviewSuccess": "已开启下一轮修订。",
+      "enterCrystallizationSuccess": "已进入结晶阶段。",
+      "retryCrystallizationSuccess": "已开始重试结晶。",
+      "rollbackCrystallizationSuccess": "草稿已回到评审阶段。",
+      "archiveSuccess": "草稿已归档。",
+      "restoreSuccess": "草稿已恢复。",
+      "requestTemporaryEditGrantSuccess": "已提交临时编辑权限申请。",
+      "issueTemporaryEditGrantSuccess": "已授予临时编辑权限。",
+      "revokeTemporaryEditGrantSuccess": "已撤销临时编辑权限。"
+    },
+    "fallback": {
+      "unknownMember": "未知成员",
+      "untitledDraft": "未命名草稿"
+    },
+    "disabled": {
+      "maxRevisionRounds": "已达到最大修订轮次（{count}）。",
+      "walletRequiredForCrystallization": "进入结晶前请先连接钱包。",
+      "policyProfileRequiredForCrystallization": "进入结晶前需要先配置治理策略。",
+      "editAnchorRequiredForCrystallization": "进入结晶前，请先对草稿做一次协同编辑，并等待编辑锚点生成。",
+      "editAnchorPendingForCrystallization": "最新协同编辑锚点还未完成链上确认，请稍后再试。",
+      "policyProfileRequiredForRetryCrystallization": "重试结晶前需要先配置治理策略。",
+      "walletRequiredForArchive": "归档草稿前请先连接钱包。",
+      "policyProfileRequiredForArchive": "归档草稿前需要先配置治理策略。",
+      "walletRequiredForRestore": "恢复草稿前请先连接钱包。",
+      "policyProfileRequiredForRestore": "恢复草稿前需要先配置治理策略。"
+    },
+    "loading": {
+      "draftContent": "正在加载草稿…",
+      "draftLifecycle": "正在加载生命周期…"
+    },
+    "actions": {
+      "backToDraftList": "返回草稿列表"
+    },
+    "editor": {
+      "bodyEyebrow": "草稿正文",
+      "bodyTitle": "工作副本",
+      "bodyHint": "在这里继续修正文稿，并把已接受的问题直接落实到正文中。",
+      "discussionEyebrow": "讨论链路",
+      "discussionTitle": "问题线程",
+      "discussionHint": "跟踪和这份草稿相关的问题、提案以及已应用的解决结果。"
+    },
+    "ghostReveal": {
+      "title": "问题线程修订方案"
+    },
+    "permissions": {
+      "inactiveReason": "只有活跃圈层成员才能执行这个动作。",
+      "roles": {
+        "owner": "圈主",
+        "admin": "管理员",
+        "moderator": "主持人",
+        "elder": "长老",
+        "member": "成员",
+        "initiate": "初始成员",
+        "higher": "更高角色"
+      },
+      "reasons": {
+        "createIssue": "当前圈层策略要求至少 {role} 才能提交问题单。",
+        "followupIssue": "当前圈层策略要求至少 {role} 才能补充问题单上下文。",
+        "withdrawOwnIssue": "当前圈层策略不允许在进入审议前撤回自己的问题单。",
+        "reviewIssue": "当前圈层策略要求至少 {role} 才能发起或处理问题单审议。",
+        "retagIssue": "当前圈层策略要求至少 {role} 才能调整问题类型。",
+        "applyAcceptedIssue": "当前圈层策略要求至少 {role} 才能把已通过问题标记为已应用到正文。",
+        "endDraftingEarly": "当前圈层策略要求至少 {role} 才能提前结束正文修订并进入审阅。",
+        "advanceFromReview": "当前圈层策略要求至少 {role} 才能结束当前审阅轮并进入下一轮修订。",
+        "enterCrystallization": "当前圈层策略要求至少 {role} 才能进入结晶。",
+        "retagIssueDisabled": "当前圈层策略暂不允许在审议过程中调整问题类型。"
+      }
+    }
+  },
+  "GhostReveal": {
+    "metadata": {
+      "model": "模型：{model}",
+      "promptVersion": "{asset} · v{version}",
+      "sourceDigest": "来源摘要 {digest}"
+    },
+    "errors": {
+      "missingDraftContext": "缺少草稿上下文，暂时无法生成修订建议。",
+      "missingArtifact": "AI 没有返回可读取的修订产物。",
+      "missingContent": "AI 没有返回可展示的修订内容。",
+      "generateFailed": "生成修订建议失败，请稍后重试。",
+      "acceptFailed": "接受修订方案失败，请稍后重试。"
+    },
+    "states": {
+      "pending": {
+        "title": "正在整理问题线程修订建议",
+        "hint": "系统正在读取 {count} 条待处理问题线程，并生成一版结构化修订稿。"
+      },
+      "error": {
+        "title": "问题线程修订建议生成失败",
+        "fallback": "生成失败，请稍后重试。"
+      },
+      "applied": {
+        "title": "修订建议已写入正文",
+        "hint": "这版基于问题线程的修订稿已经写入当前正文。后续段落编辑会默认带上对应的已接受问题单，你仍可取消。"
+      },
+      "accepted": {
+        "title": "修订方案已接受",
+        "hint": "这条修订方案已被接受，但当前草稿在写入前发生了变化。请刷新草稿后再试。"
+      },
+      "candidate": {
+        "title": "问题线程整合修订稿",
+        "emptyDraftHint": "系统根据 {count} 条待处理问题线程生成了逐段修订建议。",
+        "existingDraftHint": "这些修订建议基于 {count} 条待处理问题线程生成。应用某条方案后，会立即更新当前草稿中的目标段落。",
+        "carryHint": "应用方案后，关联问题线程的上下文也会被记录下来，方便后续编辑继续保持一致。"
+      },
+      "idle": {
+        "title": "问题线程整合助手",
+        "hint": "仅在审议阶段出现，用来把 {count} 条待处理问题线程整理成下一轮修订可直接采用的段落方案。"
+      }
+    },
+    "actions": {
+      "retry": "重试",
+      "accept": "应用到草稿",
+      "ignore": "忽略",
+      "generate": "生成修订建议"
+    },
+    "candidate": {
+      "targetLabel": "{targetRef} · 关联 {count} 条问题线程"
+    },
+    "defaultTitle": "问题线程修订方案"
+  },
+  "SourceMaterialsPanel": {
+    "status": {
+      "aiReadable": "AI 可读",
+      "extracting": "正在抽取",
+      "processing": "处理中"
+    },
+    "aria": {
+      "section": "来源材料",
+      "fileInput": "上传来源材料文件"
+    },
+    "title": "来源材料",
+    "hint": "上传 AI 在起草和评审时可以读取的依据文件。",
+    "actions": {
+      "uploadAndExtract": "上传并抽取"
+    },
+    "notices": {
+      "uploadDisabled": "需要编辑权限后才能上传来源材料。"
+    },
+    "loading": "正在加载来源材料…",
+    "empty": "还没有来源材料。",
+    "meta": {
+      "chunkDigest": "{chunkCount} 个分块 · 摘要 {digest}"
+    }
+  },
+  "CreateCircleFlow": {
+    "errors": {
+      "metadataSyncFailed": "圈层已创建，但圈层描述保存失败，可在圈层设置页重试。",
+      "metadataSyncFailedSuffix": "圈层描述保存失败，可在圈层设置页重试。"
+    }
+  }
+}

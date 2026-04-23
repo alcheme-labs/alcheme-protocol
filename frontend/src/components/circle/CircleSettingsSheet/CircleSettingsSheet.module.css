@@ -1,0 +1,639 @@
+.settingsOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay);
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.settingsSheet {
+    width: 100%;
+    max-width: 500px;
+    max-height: 75vh;
+    display: flex;
+    flex-direction: column;
+    background: rgba(31, 36, 33, 0.97);
+    backdrop-filter: blur(var(--blur-sheet));
+    -webkit-backdrop-filter: blur(var(--blur-sheet));
+    border-top: 1px solid rgba(199, 168, 107, 0.15);
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.handle {
+    width: 36px;
+    height: 4px;
+    margin: var(--space-2) auto var(--space-1);
+    border-radius: 2px;
+    background: rgba(231, 228, 221, 0.2);
+    flex-shrink: 0;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-4) var(--space-3);
+    border-bottom: 1px solid rgba(231, 228, 221, 0.06);
+    flex-shrink: 0;
+}
+
+.title {
+    flex: 1;
+    font-size: 15px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.closeBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    border-radius: var(--radius-button);
+}
+
+.closeBtn:active {
+    background: rgba(231, 228, 221, 0.06);
+}
+
+.body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: var(--space-3) var(--space-4);
+}
+
+/* ── Section ── */
+.section {
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid rgba(231, 228, 221, 0.04);
+}
+
+.section:last-child {
+    border-bottom: none;
+}
+
+.sectionLabel {
+    font-size: 11px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: var(--space-2);
+}
+
+/* ── Role Row ── */
+.memberRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+    position: relative;
+}
+
+.memberRowTappable {
+    cursor: pointer;
+}
+
+.memberRowTappable:active {
+    background: rgba(231, 228, 221, 0.02);
+}
+
+.memberAvatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(231, 228, 221, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+}
+
+.memberName {
+    flex: 1;
+    font-size: 14px;
+    color: var(--color-text-primary);
+}
+
+.roleBadge {
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: var(--font-weight-medium);
+}
+
+.roleBadgeOwner {
+    background: rgba(199, 168, 107, 0.12);
+    color: var(--color-accent-gold);
+    border: 1px solid rgba(199, 168, 107, 0.2);
+}
+
+.roleBadgeCurator {
+    background: rgba(100, 180, 130, 0.1);
+    color: var(--color-state-success);
+    border: 1px solid rgba(100, 180, 130, 0.2);
+}
+
+.roleBadgeMember {
+    background: rgba(231, 228, 221, 0.05);
+    color: var(--color-text-muted);
+    border: 1px solid rgba(231, 228, 221, 0.1);
+}
+
+/* ── Role Popover ── */
+.rolePopover {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: 10;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    min-width: 120px;
+}
+
+.roleOption {
+    display: block;
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-caption);
+    color: var(--color-text-primary);
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background var(--motion-fast) var(--easing-standard);
+}
+
+.roleOption:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.roleOption:active {
+    background: rgba(231, 228, 221, 0.06);
+}
+
+.roleOptionDanger {
+    color: var(--color-state-error);
+}
+
+/* ── Invite Button ── */
+.inviteBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    width: 100%;
+    padding: var(--space-2);
+    margin-top: var(--space-2);
+    border-radius: var(--radius-button);
+    background: transparent;
+    border: 1px solid var(--color-border-medium);
+    color: var(--color-accent-gold);
+    font-size: var(--font-size-caption);
+    cursor: pointer;
+    transition: border-color var(--motion-fast) var(--easing-standard);
+}
+
+.inviteBtn:active {
+    border-color: var(--color-accent-gold);
+}
+
+.leaveBtn {
+    color: var(--color-text-secondary);
+    border-color: rgba(231, 228, 221, 0.14);
+}
+
+.leaveBtn:active {
+    border-color: rgba(231, 228, 221, 0.32);
+}
+
+.memberActionError {
+    margin-top: var(--space-2);
+    border: 1px solid rgba(220, 80, 80, 0.25);
+    background: rgba(220, 80, 80, 0.08);
+    color: #dc5050;
+    border-radius: var(--radius-button);
+    padding: var(--space-2);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.memberDirectoryNotice {
+    border: 1px solid rgba(199, 168, 107, 0.18);
+    background: rgba(199, 168, 107, 0.06);
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-button);
+    padding: var(--space-2) var(--space-3);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.sectionNotice {
+    margin-top: var(--space-2);
+    color: var(--color-text-tertiary);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.identityRulesToggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+
+.identityRulesToggleTitle {
+    font-size: 13px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.identityRulesToggleAction {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+}
+
+.identityRulesToggleChevron {
+    transition: transform var(--motion-fast) var(--easing-standard);
+}
+
+.identityRulesToggleChevronExpanded {
+    transform: rotate(180deg);
+}
+
+.identityRulesCard {
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    padding: var(--space-3);
+    border-radius: 16px;
+    border: 1px solid rgba(199, 168, 107, 0.14);
+    background:
+        linear-gradient(180deg, rgba(199, 168, 107, 0.08), rgba(199, 168, 107, 0.03)),
+        rgba(18, 22, 20, 0.78);
+}
+
+.identityRulesLead,
+.identityRulesFootnote,
+.identityRuleText {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.identityRulesLead {
+    color: var(--color-text-secondary);
+}
+
+.identityRulesFootnote {
+    color: var(--color-text-tertiary);
+}
+
+.identityRuleItem {
+    display: grid;
+    gap: 4px;
+}
+
+.identityRuleStep {
+    font-size: 11px;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.04em;
+    color: var(--color-accent-gold);
+}
+
+.identityRuleText {
+    color: var(--color-text-primary);
+}
+
+/* ── Toggle Row ── */
+.toggleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2) 0;
+}
+
+.toggleLabel {
+    font-size: 14px;
+    color: var(--color-text-primary);
+}
+
+.toggleDesc {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+.toggleSwitch {
+    width: 44px;
+    height: 24px;
+    border-radius: 12px;
+    background: rgba(231, 228, 221, 0.1);
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    transition: background var(--motion-fast) var(--easing-standard);
+    flex-shrink: 0;
+}
+
+.toggleSwitchOn {
+    background: rgba(199, 168, 107, 0.35);
+}
+
+.toggleSwitch:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.toggleKnob {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--color-text-secondary);
+    transition: all var(--motion-fast) var(--easing-standard);
+}
+
+.toggleKnobOn {
+    transform: translateX(20px);
+    background: var(--color-accent-gold);
+}
+
+/* ── Ghost Settings ── */
+.ghostSourceHint {
+    margin-bottom: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.ghostLoading {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    margin-bottom: var(--space-2);
+}
+
+.ghostWarning {
+    margin: -2px 0 var(--space-1);
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(199, 168, 107, 0.24);
+    background: rgba(199, 168, 107, 0.08);
+    color: var(--color-accent-gold);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.workflowModeField {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-2) 0;
+}
+
+.workflowModeHeader {
+    display: grid;
+    gap: 4px;
+}
+
+.workflowModeHelp {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-text-tertiary);
+}
+
+.ghostChoiceGroup {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.ghostChoiceBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(231, 228, 221, 0.16);
+    background: rgba(231, 228, 221, 0.04);
+    color: var(--color-text-secondary);
+    border-radius: 999px;
+    min-height: 44px;
+    padding: 8px 10px;
+    font-size: 12px;
+    line-height: 1.35;
+    text-align: center;
+    white-space: normal;
+    cursor: pointer;
+}
+
+.ghostChoiceBtnActive {
+    border-color: rgba(199, 168, 107, 0.4);
+    color: var(--color-accent-gold);
+    background: rgba(199, 168, 107, 0.12);
+}
+
+.ghostError {
+    margin-top: var(--space-2);
+    border: 1px solid rgba(220, 80, 80, 0.25);
+    background: rgba(220, 80, 80, 0.08);
+    color: #dc5050;
+    border-radius: var(--radius-button);
+    padding: var(--space-2);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.ghostSaveBtn {
+    width: 100%;
+    margin-top: var(--space-2);
+    border: 1px solid rgba(199, 168, 107, 0.28);
+    background: rgba(199, 168, 107, 0.14);
+    color: var(--color-accent-gold);
+    border-radius: var(--radius-button);
+    padding: var(--space-2);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.ghostSaveBtn:disabled {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+/* ── Info Row ── */
+.infoRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2) 0;
+}
+
+.infoField {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+}
+
+.infoFieldHeader {
+    display: grid;
+    gap: 4px;
+    flex: 1;
+}
+
+.infoLabel {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+
+.infoHint {
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-text-tertiary);
+}
+
+.infoValue {
+    font-size: 14px;
+    color: var(--color-text-primary);
+}
+
+.inlineNumberInput {
+    width: 84px;
+    padding: 8px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(231, 228, 221, 0.16);
+    background: rgba(231, 228, 221, 0.04);
+    color: var(--color-text-primary);
+    font-size: 12px;
+    text-align: right;
+}
+
+.inlineNumberWrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.inlineUnit {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    white-space: nowrap;
+}
+
+.inlineNumberInput:focus {
+    outline: none;
+    border-color: rgba(199, 168, 107, 0.4);
+}
+
+.workflowPolicyField {
+    display: grid;
+    gap: 10px;
+    padding: var(--space-2) 0;
+}
+
+.workflowPolicyCopy {
+    display: grid;
+    gap: 4px;
+}
+
+.workflowSelectWrap {
+    position: relative;
+}
+
+.workflowSelect {
+    width: 100%;
+    padding: 10px 40px 10px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(231, 228, 221, 0.16);
+    background: rgba(231, 228, 221, 0.04);
+    color: var(--color-text-primary);
+    font-size: 13px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.workflowSelect:focus {
+    outline: none;
+    border-color: rgba(199, 168, 107, 0.4);
+}
+
+.workflowSelectIcon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--color-text-tertiary);
+}
+
+@media (max-width: 520px) {
+    .ghostChoiceGroup {
+        grid-template-columns: 1fr;
+    }
+
+    .infoField {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .inlineNumberInput {
+        width: 100%;
+        text-align: left;
+    }
+
+    .inlineNumberWrap {
+        width: 100%;
+    }
+
+    .toggleRow {
+        align-items: flex-start;
+    }
+}
+
+/* ── Danger Zone ── */
+.dangerBtn {
+    width: 100%;
+    padding: var(--space-3);
+    background: rgba(220, 80, 80, 0.06);
+    border: 1px solid rgba(220, 80, 80, 0.15);
+    border-radius: var(--radius-button);
+    color: #dc5050;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all var(--motion-fast) var(--easing-standard);
+}
+
+.dangerBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.dangerBtn:active {
+    background: rgba(220, 80, 80, 0.12);
+}

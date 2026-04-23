@@ -1,0 +1,152 @@
+.circlePickerOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.circlePickerSheet {
+    width: 100%;
+    max-width: 500px;
+    max-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    background: rgba(38, 45, 41, 0.95);
+    backdrop-filter: blur(var(--blur-sheet));
+    -webkit-backdrop-filter: blur(var(--blur-sheet));
+    border-top: 1px solid rgba(199, 168, 107, 0.18);
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.circlePickerHandle {
+    width: 36px;
+    height: 4px;
+    margin: var(--space-2) auto var(--space-1);
+    border-radius: 2px;
+    background: rgba(231, 228, 221, 0.2);
+    flex-shrink: 0;
+}
+
+.circlePickerHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4) var(--space-3);
+    border-bottom: 1px solid rgba(231, 228, 221, 0.06);
+    flex-shrink: 0;
+}
+
+.circlePickerTitle {
+    font-size: 15px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.circlePickerHint {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-left: auto;
+}
+
+.circlePickerList {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: var(--space-2) 0;
+}
+
+.circlePickerGroup {
+    padding: var(--space-1) var(--space-4);
+}
+
+.circlePickerGroupName {
+    font-size: 11px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: var(--space-2) 0 var(--space-1);
+}
+
+.circlePickerItem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-3) var(--space-2);
+    background: none;
+    border: none;
+    border-radius: var(--radius-button);
+    color: var(--color-text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color var(--motion-fast) var(--easing-standard);
+}
+
+.circlePickerItem:active {
+    background: rgba(199, 168, 107, 0.1);
+}
+
+.circlePickerItemDisabled {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+.circlePickerItemCurrent {
+    opacity: 0.5;
+}
+
+.circlePickerItemDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.circlePickerItemDotFree {
+    background: var(--color-state-success);
+}
+
+.circlePickerItemDotLocked {
+    background: var(--color-accent-amber);
+}
+
+.circlePickerItemName {
+    flex: 1;
+    text-align: left;
+}
+
+.circlePickerItemMeta {
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.circlePickerItemBadge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    background: rgba(199, 168, 107, 0.12);
+    color: var(--color-accent-gold);
+    border: 1px solid rgba(199, 168, 107, 0.2);
+}
+
+.circlePickerCancel {
+    flex-shrink: 0;
+    width: 100%;
+    padding: var(--space-3);
+    background: none;
+    border: none;
+    border-top: 1px solid rgba(231, 228, 221, 0.06);
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.circlePickerCancel:active {
+    background: rgba(231, 228, 221, 0.04);
+}

@@ -1,0 +1,631 @@
+.createCircleOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 110;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.createCircleSheet {
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    background: rgba(31, 36, 33, 0.97);
+    backdrop-filter: blur(var(--blur-sheet));
+    -webkit-backdrop-filter: blur(var(--blur-sheet));
+    border-top: 1px solid rgba(199, 168, 107, 0.15);
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    overflow: hidden;
+}
+
+.sheetHandle {
+    width: 36px;
+    height: 4px;
+    margin: var(--space-2) auto var(--space-1);
+    border-radius: 2px;
+    background: rgba(231, 228, 221, 0.2);
+    flex-shrink: 0;
+}
+
+/* ── Header ── */
+.sheetHeader {
+    display: flex;
+    align-items: center;
+    padding: var(--space-2) var(--space-4) var(--space-3);
+    border-bottom: 1px solid rgba(231, 228, 221, 0.06);
+    flex-shrink: 0;
+    gap: var(--space-3);
+}
+
+.sheetBackBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    border-radius: var(--radius-button);
+    transition: background var(--motion-fast) var(--easing-standard);
+}
+
+.sheetBackBtn:active {
+    background: rgba(231, 228, 221, 0.06);
+}
+
+.sheetBackBtn:disabled {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+.sheetTitle {
+    flex: 1;
+    font-size: 15px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.sheetCloseBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    border-radius: var(--radius-button);
+    transition: background var(--motion-fast) var(--easing-standard);
+}
+
+/* ── Progress Steps ── */
+.progressBar {
+    display: flex;
+    gap: 4px;
+    padding: var(--space-2) var(--space-4);
+    flex-shrink: 0;
+}
+
+.progressDot {
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(231, 228, 221, 0.08);
+    transition: background var(--motion-normal) var(--easing-standard);
+}
+
+.progressDotActive {
+    background: var(--color-accent-gold);
+}
+
+.progressDotDone {
+    background: rgba(199, 168, 107, 0.35);
+}
+
+/* ── Body ── */
+.sheetBody {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: var(--space-4);
+}
+
+/* ── Step shared ── */
+.stepLabel {
+    display: block;
+    font-size: 12px;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: var(--space-1);
+}
+
+.stepTitle {
+    font-size: 18px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-4);
+}
+
+.inputField {
+    width: 100%;
+    min-height: 44px;
+    padding: var(--space-3);
+    background: rgba(231, 228, 221, 0.04);
+    border: 1px solid rgba(231, 228, 221, 0.1);
+    border-radius: var(--radius-button);
+    color: var(--color-text-primary);
+    /* Keep iOS from auto-zooming the sheet when a field receives focus. */
+    font-size: 16px;
+    outline: none;
+    transition: border-color var(--motion-fast) var(--easing-standard);
+}
+
+.inputField:focus {
+    border-color: rgba(199, 168, 107, 0.4);
+}
+
+.inputField::placeholder {
+    color: var(--color-text-muted);
+}
+
+.textareaField {
+    width: 100%;
+    padding: var(--space-3);
+    background: rgba(231, 228, 221, 0.04);
+    border: 1px solid rgba(231, 228, 221, 0.1);
+    border-radius: var(--radius-button);
+    color: var(--color-text-primary);
+    font-size: 16px;
+    outline: none;
+    transition: border-color var(--motion-fast) var(--easing-standard);
+    min-height: 80px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+/* ── Mode Picker ── */
+.modeGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+}
+
+.modeGridThree {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.modeCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-3);
+    background: rgba(231, 228, 221, 0.03);
+    border: 1.5px solid rgba(231, 228, 221, 0.08);
+    border-radius: var(--radius-card);
+    cursor: pointer;
+    transition: all var(--motion-fast) var(--easing-standard);
+}
+
+.modeCard:active {
+    transform: scale(0.97);
+}
+
+.modeCard:disabled {
+    cursor: not-allowed;
+}
+
+.modeCardSelected {
+    border-color: var(--color-accent-gold);
+    background: rgba(199, 168, 107, 0.06);
+}
+
+.modeCardDisabled {
+    opacity: 0.45;
+    filter: grayscale(0.2);
+}
+
+.modeCardIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(231, 228, 221, 0.05);
+}
+
+.modeCardSelectedIcon {
+    background: rgba(199, 168, 107, 0.12);
+    color: var(--color-accent-gold);
+}
+
+.modeCardName {
+    font-size: 14px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.modeCardDesc {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    text-align: center;
+    line-height: 1.4;
+}
+
+.creationHint {
+    margin-bottom: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-button);
+    border: 1px solid rgba(199, 168, 107, 0.25);
+    background: rgba(199, 168, 107, 0.08);
+    color: var(--color-accent-gold);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* ── AI Settings ── */
+.aiSettingsBlock {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    border-radius: var(--radius-card);
+    border: 1px solid rgba(231, 228, 221, 0.08);
+    background: rgba(231, 228, 221, 0.02);
+}
+
+.aiSettingCopy {
+    display: grid;
+    gap: 4px;
+    flex: 1;
+}
+
+.aiSettingTitle {
+    font-size: 13px;
+    color: var(--color-text-primary);
+}
+
+.aiSettingHint {
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-text-tertiary);
+}
+
+.aiSettingWarning {
+    margin-top: -2px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(199, 168, 107, 0.24);
+    background: rgba(199, 168, 107, 0.08);
+    color: var(--color-accent-gold);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.workflowModeField {
+    display: grid;
+    gap: var(--space-2);
+}
+
+.workflowModeHeader {
+    display: grid;
+    gap: 4px;
+}
+
+.workflowModeHelp {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-text-tertiary);
+}
+
+.aiChoiceGroup {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.aiChoiceBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 8px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(231, 228, 221, 0.16);
+    background: rgba(231, 228, 221, 0.04);
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 1.35;
+    text-align: center;
+    white-space: normal;
+    cursor: pointer;
+}
+
+.aiChoiceBtnActive {
+    border-color: rgba(199, 168, 107, 0.45);
+    background: rgba(199, 168, 107, 0.12);
+    color: var(--color-accent-gold);
+}
+
+.workflowPolicyField {
+    display: grid;
+    gap: 10px;
+}
+
+.workflowPolicyCopy {
+    display: grid;
+    gap: 4px;
+}
+
+.workflowSelectWrap {
+    position: relative;
+}
+
+.workflowSelect {
+    width: 100%;
+    padding: 10px 40px 10px 14px;
+    background: rgba(231, 228, 221, 0.04);
+    border: 1px solid rgba(231, 228, 221, 0.12);
+    border-radius: 999px;
+    color: var(--color-text-primary);
+    font-size: 13px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.workflowSelect:focus {
+    outline: none;
+    border-color: rgba(199, 168, 107, 0.4);
+}
+
+.workflowSelectIcon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--color-text-tertiary);
+}
+
+.workflowToggleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: 6px 0;
+}
+
+.workflowSwitch {
+    width: 44px;
+    height: 24px;
+    padding: 2px;
+    border-radius: 999px;
+    border: none;
+    background: rgba(231, 228, 221, 0.1);
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: background var(--motion-fast) var(--easing-standard);
+}
+
+.workflowSwitchOn {
+    background: rgba(199, 168, 107, 0.35);
+}
+
+.workflowSwitch:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.workflowKnob {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--color-text-secondary);
+    transition: transform var(--motion-fast) var(--easing-standard), background var(--motion-fast) var(--easing-standard);
+}
+
+.workflowKnobOn {
+    transform: translateX(20px);
+    background: var(--color-accent-gold);
+}
+
+/* ── Access Options ── */
+.accessOptions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.accessOption {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: rgba(231, 228, 221, 0.03);
+    border: 1.5px solid rgba(231, 228, 221, 0.08);
+    border-radius: var(--radius-button);
+    cursor: pointer;
+    transition: all var(--motion-fast) var(--easing-standard);
+}
+
+.accessOptionSelected {
+    border-color: var(--color-accent-gold);
+    background: rgba(199, 168, 107, 0.06);
+}
+
+.accessRadio {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(231, 228, 221, 0.2);
+    transition: all var(--motion-fast) var(--easing-standard);
+    flex-shrink: 0;
+}
+
+.accessRadioSelected {
+    border-color: var(--color-accent-gold);
+    background: var(--color-accent-gold);
+    box-shadow: inset 0 0 0 3px rgba(31, 36, 33, 0.97);
+}
+
+.accessLabel {
+    flex: 1;
+}
+
+.accessName {
+    font-size: 14px;
+    color: var(--color-text-primary);
+}
+
+.accessDesc {
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.crystalInput {
+    width: 60px;
+    padding: var(--space-1) var(--space-2);
+    background: rgba(231, 228, 221, 0.04);
+    border: 1px solid rgba(231, 228, 221, 0.12);
+    border-radius: 6px;
+    color: var(--color-accent-gold);
+    font-size: 14px;
+    font-weight: var(--font-weight-semibold);
+    text-align: center;
+    outline: none;
+}
+
+.numberWithUnit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.numberUnit {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    white-space: nowrap;
+}
+
+.crystalInput:focus {
+    border-color: rgba(199, 168, 107, 0.4);
+}
+
+@media (max-width: 520px) {
+    .modeGridThree {
+        grid-template-columns: 1fr;
+    }
+
+    .aiChoiceGroup {
+        grid-template-columns: 1fr;
+    }
+
+    .crystalInput {
+        width: 100%;
+    }
+
+    .numberWithUnit {
+        width: 100%;
+    }
+
+    .workflowToggleRow {
+        align-items: flex-start;
+    }
+}
+
+/* ── Confirm Step ── */
+.confirmSection {
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid rgba(231, 228, 221, 0.04);
+}
+
+.confirmSection:last-child {
+    border-bottom: none;
+}
+
+.confirmLabel {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: var(--space-1);
+}
+
+.confirmValue {
+    font-size: 14px;
+    color: var(--color-text-primary);
+}
+
+.confirmTabs {
+    display: flex;
+    gap: var(--space-1);
+    flex-wrap: wrap;
+}
+
+.confirmTabPill {
+    padding: 2px 8px;
+    border-radius: 8px;
+    background: rgba(199, 168, 107, 0.08);
+    border: 1px solid rgba(199, 168, 107, 0.15);
+    color: var(--color-accent-gold);
+    font-size: 11px;
+}
+
+.submitError {
+    margin: 0 var(--space-4);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid rgba(196, 102, 90, 0.45);
+    border-radius: var(--radius-button);
+    background: rgba(196, 102, 90, 0.12);
+    color: var(--color-state-error);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* ── Footer ── */
+.sheetFooter {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid rgba(231, 228, 221, 0.06);
+    flex-shrink: 0;
+}
+
+.footerBtnSecondary {
+    flex: 1;
+    padding: var(--space-3);
+    background: none;
+    border: 1px solid rgba(231, 228, 221, 0.1);
+    border-radius: var(--radius-button);
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all var(--motion-fast) var(--easing-standard);
+}
+
+.footerBtnSecondary:active {
+    background: rgba(231, 228, 221, 0.04);
+}
+
+.footerBtnSecondary:disabled {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+.footerBtnPrimary {
+    flex: 1;
+    padding: var(--space-3);
+    background: rgba(199, 168, 107, 0.15);
+    border: 1px solid rgba(199, 168, 107, 0.25);
+    border-radius: var(--radius-button);
+    color: var(--color-accent-gold);
+    font-size: 14px;
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: all var(--motion-fast) var(--easing-standard);
+}
+
+.footerBtnPrimary:active {
+    background: rgba(199, 168, 107, 0.25);
+}
+
+.footerBtnPrimary:disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}

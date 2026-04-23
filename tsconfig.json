@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "types": ["node", "mocha", "chai"],
+    "typeRoots": ["./node_modules/@types"],
+    "lib": ["es2020"],
+    "module": "commonjs",
+    "target": "es2020",
+    "noEmit": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@/*": ["frontend/src/*"]
+    }
+  },
+  "include": [
+    "tests/**/*.ts",
+    "scripts/**/*.ts",
+    "extensions/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "frontend/.next/**",
+    "frontend/.next-playwright-*/**",
+    "services/query-api/dist/**",
+    "sdk/dist/**",
+    "extensions/contribution-engine/tracker/dist/**"
+  ]
+}

@@ -1,0 +1,503 @@
+.editor {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    border: 1px solid rgba(199, 168, 107, 0.08);
+    border-radius: 18px;
+    background:
+        linear-gradient(165deg, rgba(199, 168, 107, 0.06), rgba(199, 168, 107, 0.015) 36%),
+        rgba(21, 28, 25, 0.82);
+    backdrop-filter: blur(6px);
+    box-shadow:
+        0 14px 32px rgba(0, 0, 0, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.014);
+}
+
+.header {
+    border-bottom: 1px solid var(--color-border-soft);
+    padding-bottom: var(--space-3);
+}
+
+.headerTop {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+}
+
+.titleBlock {
+    flex: 1;
+    min-width: 0;
+}
+
+.headerRight {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+.title {
+    margin: 0;
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    line-height: 1.28;
+    overflow-wrap: anywhere;
+}
+
+.titleSub {
+    margin: var(--space-1) 0 0;
+    font-size: var(--font-size-caption);
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.heatBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-button);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
+}
+
+.heatBadge.active {
+    background-color: rgba(199, 168, 107, 0.15);
+    color: var(--color-accent-gold);
+    border: 1px solid rgba(199, 168, 107, 0.3);
+}
+
+.heatBadge.cooling {
+    background-color: rgba(180, 195, 210, 0.1);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border-soft);
+}
+
+.heatBadge.frozen {
+    background-color: rgba(100, 120, 140, 0.1);
+    color: var(--color-text-tertiary);
+    border: 1px solid var(--color-border-soft);
+    opacity: 0.7;
+}
+
+.collabStatus {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--font-size-small);
+    color: var(--color-text-tertiary);
+    white-space: nowrap;
+}
+
+.connDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--color-text-tertiary);
+    transition: background-color var(--motion-fast) ease;
+}
+
+.connDotOnline {
+    background-color: #4ade80;
+    box-shadow: 0 0 6px rgba(74, 222, 128, 0.4);
+}
+
+.connCount {
+    font-variant-numeric: tabular-nums;
+}
+
+.meta {
+    display: flex;
+    gap: var(--space-2);
+    font-size: var(--font-size-caption);
+    color: var(--color-text-tertiary);
+}
+
+.document {
+    flex: 1;
+}
+
+.paragraphStage {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.paragraphBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(199, 168, 107, 0.1);
+}
+
+.paragraphBlock:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.paragraphBlockActive {
+    border-bottom-color: rgba(199, 168, 107, 0.22);
+}
+
+.paragraphHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.paragraphMetaRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    flex-wrap: wrap;
+}
+
+.paragraphMetaItem {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--color-text-tertiary);
+}
+
+.paragraphMetaButton {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-accent-gold);
+    font-size: 12px;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+.paragraphMetaButton:hover {
+    color: var(--color-accent-ivory-glow);
+}
+
+.paragraphEditor {
+    width: 100%;
+    min-height: 88px;
+    padding: 10px 12px;
+    border: 1px solid rgba(199, 168, 107, 0.16);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.018);
+    resize: vertical;
+    font-size: 24px;
+    line-height: 1.7;
+    color: var(--color-text-primary);
+    font-family: inherit;
+}
+
+.paragraphEditor:focus {
+    outline: none;
+    border-color: rgba(199, 168, 107, 0.28);
+}
+
+.paragraphReadOnly {
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    font-size: 24px;
+    line-height: 1.7;
+    color: var(--color-text-primary);
+    font-family: inherit;
+}
+
+.paragraphAction {
+    flex-shrink: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-accent-gold);
+    font-size: 12px;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+.paragraphAction:hover {
+    color: var(--color-accent-ivory-glow);
+}
+
+.paragraphAction:disabled {
+    opacity: 0.45;
+    cursor: wait;
+}
+
+.paragraphEditorActions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.paragraphCompleteButton {
+    min-height: 40px;
+    padding: 0 16px;
+    border: 1px solid rgba(199, 168, 107, 0.28);
+    border-radius: 999px;
+    background: rgba(199, 168, 107, 0.12);
+    color: var(--color-accent-gold);
+    font-size: 13px;
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--motion-fast) ease;
+}
+
+.paragraphCompleteButton:hover {
+    background: rgba(199, 168, 107, 0.18);
+    color: var(--color-accent-ivory-glow);
+}
+
+.paragraphCompleteButton:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
+.issueCarryPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(199, 168, 107, 0.12);
+    background: rgba(199, 168, 107, 0.04);
+}
+
+.issueCarryTitle {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--color-text-secondary);
+}
+
+.issueCarryList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.issueCarryItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--color-text-primary);
+    cursor: pointer;
+}
+
+.issueCarryItem input {
+    margin-top: 2px;
+    accent-color: var(--color-accent-gold);
+}
+
+.issueCarryText {
+    flex: 1;
+    min-width: 0;
+}
+
+.issueCarryHint {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-text-tertiary);
+}
+
+.issueCarryError {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #f1cf86;
+}
+
+.readOnlyHint {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-caption);
+    color: var(--color-text-tertiary);
+    border: 1px dashed var(--color-border-soft);
+    border-radius: var(--radius-button);
+    opacity: 0.75;
+}
+
+.commentPanel {
+    background: rgba(255, 255, 255, 0.025);
+    border-radius: var(--radius-card);
+    border: 1px solid rgba(199, 168, 107, 0.08);
+    padding: var(--space-3);
+}
+
+.commentPanelHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+}
+
+.commentPanelTitle {
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-accent-gold);
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    font-size: var(--font-size-body);
+    padding: var(--space-1);
+}
+
+.commentList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.commentItem {
+    padding: var(--space-2);
+    border-left: 2px solid var(--color-border-soft);
+    padding-left: var(--space-3);
+}
+
+.commentAuthor {
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-accent-gold);
+    display: block;
+    margin-bottom: var(--space-1);
+}
+
+.commentText {
+    font-size: var(--font-size-caption);
+    color: var(--color-text-primary);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.commentTime {
+    font-size: 10px;
+    color: var(--color-text-tertiary);
+    margin-top: var(--space-1);
+    display: block;
+}
+
+.commentInput {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.commentInput input {
+    flex: 1;
+    background-color: var(--color-bg-base);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-button);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-caption);
+    color: var(--color-text-primary);
+}
+
+.commentInput input:focus {
+    outline: none;
+    border-color: var(--color-accent-gold);
+}
+
+.commentInput button {
+    background-color: var(--color-accent-gold);
+    border: none;
+    border-radius: var(--radius-button);
+    padding: var(--space-2) var(--space-3);
+    min-height: 44px;
+    font-size: var(--font-size-caption);
+    color: var(--color-bg-base);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--motion-fast) ease;
+}
+
+.commentInput button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.noComments {
+    margin: 0;
+    font-size: var(--font-size-small);
+    color: var(--color-text-tertiary);
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .editor {
+        padding: var(--space-3);
+        border-radius: 16px;
+    }
+
+    .headerTop {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-2);
+    }
+
+    .headerRight {
+        width: 100%;
+        justify-content: space-between;
+        gap: var(--space-2);
+    }
+
+    .title {
+        font-size: clamp(28px, 7.5vw, 36px);
+        text-align: center;
+    }
+
+    .titleSub {
+        -webkit-line-clamp: 3;
+        text-align: center;
+    }
+
+    .meta {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .paragraphHeader {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .paragraphEditor,
+    .paragraphReadOnly {
+        font-size: 20px;
+    }
+
+    .commentInput {
+        flex-direction: column;
+    }
+
+    .paragraphEditorActions {
+        justify-content: stretch;
+    }
+
+    .paragraphCompleteButton {
+        width: 100%;
+    }
+}

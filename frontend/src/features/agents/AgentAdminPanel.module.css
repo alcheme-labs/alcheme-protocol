@@ -1,0 +1,154 @@
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 14px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.subtitle {
+    margin: 4px 0 0;
+    font-size: 12px;
+    line-height: 1.5;
+    opacity: 0.76;
+}
+
+.ownerOnlyBadge {
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    background: rgba(216, 160, 78, 0.16);
+    color: #f3d08a;
+    white-space: nowrap;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sectionLabel {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.78;
+}
+
+.helper {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.agentList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.agentCard {
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.agentHead {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+}
+
+.agentHandle {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.agentStatus {
+    font-size: 11px;
+    opacity: 0.7;
+    text-transform: uppercase;
+}
+
+.agentDisplay {
+    margin-top: 6px;
+    font-size: 12px;
+    opacity: 0.88;
+}
+
+.agentDescription {
+    margin: 6px 0 0;
+    font-size: 12px;
+    line-height: 1.5;
+    opacity: 0.72;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.fieldLabel {
+    font-size: 12px;
+    opacity: 0.82;
+}
+
+.select,
+.input {
+    min-height: 38px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(17, 24, 39, 0.4);
+    color: inherit;
+}
+
+.auditNote {
+    font-size: 12px;
+    line-height: 1.5;
+    opacity: 0.72;
+}
+
+.error {
+    font-size: 12px;
+    color: #f5b5b5;
+}
+
+.saveButton {
+    align-self: flex-start;
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(216, 160, 78, 0.35);
+    background: rgba(216, 160, 78, 0.14);
+    color: #f6d89c;
+}
+
+.saveButton:disabled {
+    opacity: 0.55;
+}

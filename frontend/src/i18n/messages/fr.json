@@ -1,0 +1,2968 @@
+{
+  "Metadata": {
+    "title": "Alcheme — Transformez le bruit en or",
+    "description": "Un protocole décentralisé pour l'ordre et les actifs de connaissance. Transformez des discussions fragmentées en cristaux numériques traçables et précieux."
+  },
+  "LanguageSwitcher": {
+    "label": "Langue",
+    "ariaLabel": "Changer de langue",
+    "statusPending": "Mise à jour…",
+    "options": {
+      "zh": "中文",
+      "en": "English",
+      "es": "Español",
+      "fr": "Français"
+    }
+  },
+  "BottomNav": {
+    "ariaLabel": "Navigation principale",
+    "items": {
+      "home": "Accueil",
+      "circles": "Cercles",
+      "compose": "Publier",
+      "notifications": "Alertes",
+      "profile": "Moi"
+    }
+  },
+  "IdentityRegistrationEntry": {
+    "eyebrow": "Identité on-chain",
+    "primaryLabel": "Créer une identité"
+  },
+  "LandingPage": {
+    "tagline": "Transformez le bruit en or"
+  },
+  "HeatGauge": {
+    "meterLabel": "Chaleur {state} {value} degrés",
+    "displayLabel": "{state} · {value}°",
+    "states": {
+      "active": "Active",
+      "cooling": "En refroidissement",
+      "frozen": "Gelée"
+    }
+  },
+  "ConnectPage": {
+    "title": "Retrouve ta place",
+    "walletHint": "Fonctionne avec des portefeuilles Solana comme Phantom et Solflare",
+    "common": {
+      "skip": "Juste regarder →"
+    },
+    "states": {
+      "connectingSession": {
+        "subtitle": "Vérification de l'existence d'une identité on-chain pour ce portefeuille.",
+        "primaryLabel": "Vérification…"
+      },
+      "unregistered": {
+        "subtitle": "Votre portefeuille est connecté, mais vous n'avez pas encore d'identité on-chain. Créez-en une pour rejoindre des cercles et entrer dans le vrai flux de contribution.",
+        "primaryLabel": "Créer une identité",
+        "skipLabel": "Plus tard, emmène-moi à l'accueil →"
+      },
+      "sessionError": {
+        "subtitle": "Impossible de confirmer votre identité. Réessayez.",
+        "primaryLabel": "Réessayer",
+        "skipLabel": "Aller à l'accueil pour l'instant →"
+      },
+      "registered": {
+        "subtitle": "Identité confirmée. Retour à l'accueil en cours.",
+        "primaryLabel": "Retour à l'accueil"
+      },
+      "default": {
+        "subtitle": "Connectez votre portefeuille et commencez votre parcours Alcheme.",
+        "primaryLabel": "Connecter le portefeuille"
+      }
+    }
+  },
+  "RegisterIdentitySheet": {
+    "helper": {
+      "default": "Le handle doit contenir entre 3 et 32 caractères, utiliser lettres, chiffres ou underscores, et ne peut pas commencer par un chiffre.",
+      "syncing": {
+        "joinCircle": "Votre identité est déjà on-chain. Nous attendons l'indexation pour poursuivre l'entrée dans ce cercle.",
+        "onboarding": "Votre identité est déjà on-chain. Nous attendons l'indexation pour finaliser la connexion."
+      }
+    },
+    "title": {
+      "joinCircle": "Créer une identité et rejoindre le cercle",
+      "onboarding": "Créer une identité on-chain"
+    },
+    "lead": {
+      "joinCircle": "Ce portefeuille est connecté, mais il n'a pas encore d'identité on-chain prête pour la connexion. Terminez cette étape et nous poursuivrons automatiquement l'entrée dans le cercle actuel.",
+      "onboarding": "Ce portefeuille est connecté, mais il n'a pas encore d'identité on-chain prête pour la connexion. Une fois cette étape terminée, vous pourrez rejoindre des cercles et contribuer pleinement."
+    },
+    "actions": {
+      "cancel": "Annuler",
+      "notNow": "Plus tard",
+      "submittingJoin": "Rejoindre…",
+      "submittingCreate": "Création…",
+      "registeringJoin": "Enregistrement…",
+      "registeringCreate": "Création…",
+      "createAndJoin": "Créer et rejoindre",
+      "create": "Créer une identité",
+      "close": "Fermer"
+    },
+    "handle": {
+      "label": "Handle d'identité",
+      "placeholder": "Par exemple alice_01"
+    }
+  },
+  "HomePage": {
+    "reminder": {
+      "sessionError": {
+        "title": "Impossible de confirmer votre identité",
+        "description": "La vérification d'identité a échoué. Réessayez.",
+        "primaryLabel": "Réessayer"
+      },
+      "unregistered": {
+        "title": "Portefeuille connecté, identité manquante",
+        "description": "Créez une identité pour rejoindre des cercles, parler à l'intérieur et entrer dans le vrai flux de contribution.",
+        "primaryLabel": "Créer une identité",
+        "secondaryLabel": "Plus tard"
+      }
+    },
+    "header": {
+      "title": "Reprenez le fil",
+      "subtitle": "La connaissance se dépose à l'intérieur des cercles. Le flux public n'affiche que les signaux Lv0 mis en avant.",
+      "flow": {
+        "public": "Public",
+        "following": "Abonnements"
+      },
+      "walletConnected": "● Portefeuille connecté"
+    },
+    "public": {
+      "discussions": {
+        "title": "Discussions Lv0 mises en avant",
+        "empty": "Aucune discussion mise en avant pour l'instant"
+      },
+      "crystals": {
+        "title": "Derniers cristaux Lv0",
+        "empty": "Aucun cristal pour l'instant",
+        "openAria": "Ouvrir le cristal {title}"
+      },
+      "meta": "{circleName} · @{authorHandle}"
+    },
+    "following": {
+      "title": "Flux des abonnements",
+      "empty": {
+        "following": "Les personnes que vous suivez n'ont encore rien publié de visible. Revenez un peu plus tard.",
+        "none": "Vous ne suivez encore aucun créateur. Trouvez-en quelques-uns pour commencer."
+      },
+      "untitled": "Publication sans titre",
+      "postMeta": "@{authorHandle} · {circleName} · Chaleur {heatLabel} {heat}°"
+    },
+    "heat": {
+      "states": {
+        "active": "Active",
+        "cooling": "En refroidissement",
+        "frozen": "Gelée"
+      }
+    },
+    "discover": {
+      "title": "Découvrir des cercles",
+      "empty": "Aucun cercle pour l'instant",
+      "noDescription": "Aucune description pour l'instant",
+      "meta": "{members} membres · {posts} publications"
+    },
+    "common": {
+      "circleFallback": "Cercle"
+    }
+  },
+  "ComposePage": {
+    "title": "Publier une idée",
+    "validation": {
+      "feedNotAllowed": "Les cercles en mode connaissance n'acceptent que les brouillons.",
+      "draftNotAllowed": "Les cercles en mode social n'acceptent que les publications dans le flux."
+    },
+    "status": {
+      "joinedCircles": "Membre de {count} cercles",
+      "guest": "Mode visiteur (sans cercle)",
+      "label": "État actuel"
+    },
+    "success": {
+      "title": "Publication envoyée",
+      "text": "Envoyé vers {circleName} · {target}"
+    },
+    "common": {
+      "circleFallback": "Cercle"
+    },
+    "actions": {
+      "backHomeAria": "Retour à l'accueil",
+      "publish": "Publier"
+    },
+    "composer": {
+      "placeholder": "Écrivez votre idée, question ou insight…",
+      "charCount": "{count} caractères"
+    },
+    "empty": {
+      "title": "Aucun cercle disponible pour publier",
+      "description": "Vous naviguez actuellement en visiteur. Les publications rapides doivent appartenir à un cercle, créez-en un ou rejoignez-en un d'abord.",
+      "createCircle": "Créer un cercle",
+      "joinCircle": "Rejoindre un cercle"
+    },
+    "selectors": {
+      "chooseRequired": "Choisir le cercle de publication (obligatoire)",
+      "createOrJoinFirst": "Créez ou rejoignez d'abord un cercle",
+      "auxiliaryPrefix": "Aux",
+      "levelLabel": "Niveau {level}"
+    },
+    "intent": {
+      "feed": "Flux",
+      "draft": "Brouillon",
+      "feedArea": "flux",
+      "draftArea": "zone de brouillons",
+      "feedTitleEnabled": "Publier dans le flux",
+      "feedTitleDisabled": "Seuls les cercles sociaux acceptent le flux",
+      "draftTitleEnabled": "Publier dans les brouillons",
+      "draftTitleDisabled": "Seuls les cercles de connaissance acceptent les brouillons"
+    },
+    "hint": "💡 La publication rapide prend en charge deux intentions : flux et brouillon. Les cercles sociaux publient dans le flux par défaut ; les cercles de connaissance peuvent transformer directement une idée en brouillon pour l'affiner ensuite ensemble."
+  },
+  "CirclesPage": {
+    "title": "Cercles",
+    "subtitle": "Trouvez l'endroit où votre connaissance peut vraiment s'ancrer",
+    "empty": "Aucun cercle correspondant",
+    "actions": {
+      "createAria": "Créer un cercle"
+    },
+    "search": {
+      "placeholder": "Rechercher des cercles…",
+      "relatedResults": "{count} résultats liés ont aussi été trouvés dans le contenu"
+    },
+    "circle": {
+      "noDescription": "Aucune description pour l'instant",
+      "meta": "{members} membres · {posts} publications",
+      "type": {
+        "closed": "🔒 Accès contrôlé",
+        "secret": "🔒 Secret",
+        "open": "Ouvert"
+      }
+    }
+  },
+  "CreateCircleSheet": {
+    "header": {
+      "defaultTitle": "Créer un cercle",
+      "createAuxiliaryWithParent": "Créer un cercle latéral · {parentCircleName}"
+    },
+    "steps": {
+      "basicInfo": "Informations de base",
+      "circleMode": "Mode du cercle",
+      "accessSettings": "Accès",
+      "confirmCreate": "Vérifier et créer"
+    },
+    "stepIndicator": "Étape {current} / {total}",
+    "fields": {
+      "creationScope": "Type de création",
+      "name": "Nom du cercle",
+      "namePlaceholder": "Par exemple : Groupe sur la programmation asynchrone",
+      "description": "Description (optionnelle)",
+      "descriptionPlaceholder": "Décrivez le thème et l'objectif de ce cercle…",
+      "genesis": "Point de départ",
+      "seededFiles": "Fichiers sources SEEDED",
+      "seededFilesHint": "À ce stade, ces fichiers servent uniquement de sources de référence et de contexte pour l'IA. Ils ne transforment pas le brouillon en espace de travail multifichier.",
+      "seededFilesSelected": "{count} fichiers sélectionnés :",
+      "aiCollaboration": "Collaboration IA",
+      "draftAndReview": "Brouillon et revue",
+      "workflowPermissions": "Permissions du flux des tickets"
+    },
+    "creationScope": {
+      "auxiliary": {
+        "name": "Cercle latéral",
+        "line1": "Lv.x.y",
+        "line2": "Groupe de discussion / cellule thématique"
+      },
+      "nextLevel": {
+        "name": "Cercle de niveau suivant",
+        "line1": "Lv.x+1",
+        "line2": "Extension du cercle principal"
+      },
+      "fork": {
+        "name": "Fork",
+        "line1": "Branche au niveau du cercle",
+        "line2": "Avenir indépendant et lineage moins couplé"
+      },
+      "nextLevelDisabledReason": "Vous ne remplissez pas encore les conditions pour créer le niveau suivant.",
+      "nextLevelUnavailable": "Ce compte ne peut pas créer le niveau suivant pour le moment."
+    },
+    "mode": {
+      "social": {
+        "name": "Mode social",
+        "line1": "Discussion + flux",
+        "line2": "Idéal pour les groupes d'intérêt et les échanges du quotidien"
+      },
+      "knowledge": {
+        "name": "Mode connaissance",
+        "line1": "Discussion + brouillons + bibliothèque",
+        "line2": "Idéal pour les documents structurés et les sous-projets"
+      }
+    },
+    "genesis": {
+      "blank": {
+        "line1": "Partir d'un brouillon vide",
+        "line2": "Idéal pour un sujet entièrement nouveau"
+      },
+      "seeded": {
+        "line1": "Importer d'abord du matériau de départ",
+        "line2": "Mieux adapté lorsqu'un sujet a déjà des sources"
+      },
+      "seededHint": "SEEDED produit toujours un brouillon monodocument ; il permet simplement de réutiliser plus tard des fichiers sources et des matériaux importés."
+    },
+    "tabs": {
+      "plaza": "Discussion",
+      "feed": "Flux",
+      "crucible": "Brouillons",
+      "sanctuary": "Bibliothèque"
+    },
+    "roles": {
+      "Initiate": "Initié",
+      "Member": "Membre",
+      "Elder": "Ancien",
+      "Moderator": "Modérateur",
+      "Admin": "Admin senior",
+      "Owner": "Propriétaire"
+    },
+    "reviewEntryModeHelp": {
+      "auto_only": "Quand le temps est écoulé, l'édition se termine automatiquement et passe directement en revue des tickets.",
+      "manual_only": "Seules les personnes autorisées peuvent clore l'édition manuellement et lancer la revue.",
+      "auto_or_manual": "La revue peut commencer automatiquement à la fin du temps imparti, ou être lancée plus tôt manuellement."
+    },
+    "ai": {
+      "summaryUseLlm": {
+        "title": "Utiliser l’IA pour générer un résumé de discussion",
+        "hint": "Une fois activé, le système organise la discussion récente et génère un court résumé.",
+        "warning": "Une fois désactivé, le système revient à des règles pour résumer la discussion, ce qui peut être moins précis."
+      },
+      "draftTriggerMode": {
+        "title": "Que faire après le déclenchement",
+        "hint": "Une fois que le système juge que la discussion est prête à entrer dans le flux de brouillon, faut-il seulement notifier ou créer immédiatement un brouillon ?",
+        "notifyOnly": "Notifier seulement",
+        "autoDraft": "Créer un brouillon automatiquement"
+      },
+      "triggerSummaryUseLlm": {
+        "title": "Utiliser l’IA pour décider s’il faut déclencher un brouillon",
+        "hint": "Une fois activé, le système organise d’abord la discussion récente, puis utilise l’IA pour aider à décider si elle doit entrer dans le flux de brouillon.",
+        "warning": "Une fois désactivé, le système revient à des règles pour décider s’il faut déclencher un brouillon, ce qui peut être moins précis."
+      }
+    },
+    "review": {
+      "entryMode": {
+        "title": "Comment la revue commence",
+        "autoOnly": "Fin automatique",
+        "manualOnly": "Fin manuelle",
+        "autoOrManual": "Les deux"
+      },
+      "autoEntryWindow": {
+        "title": "Minuteur d'entrée automatique",
+        "hint": "À la fin de ce délai, l'éditeur passe du brouillon à la revue des tickets."
+      },
+      "reviewWindow": {
+        "title": "Durée de la revue",
+        "hint": "Quand le temps est écoulé, la revue en cours s'arrête et l'équipe décide de réviser encore ou de cristalliser."
+      },
+      "maxRevisionRounds": {
+        "title": "Nombre maximal de cycles de révision"
+      }
+    },
+    "workflow": {
+      "createIssueMinRole": "Qui peut créer des tickets",
+      "followupIssueMinRole": "Qui peut ajouter un suivi",
+      "reviewIssueMinRole": "Qui peut réviser les tickets",
+      "retagIssueMinRole": "Qui peut changer leur type",
+      "applyIssueMinRole": "Qui peut les marquer comme résolus",
+      "manualEndDraftingMinRole": "Qui peut clore l'édition",
+      "advanceFromReviewMinRole": "Qui peut clore la revue en cours",
+      "enterCrystallizationMinRole": "Qui peut lancer la cristallisation",
+      "allowAuthorWithdrawBeforeReview": "L'auteur peut retirer avant la revue",
+      "allowModeratorRetagIssue": "Les relecteurs peuvent changer le type"
+    },
+    "access": {
+      "free": {
+        "name": "Ouvert",
+        "description": "Tout membre du cercle principal peut rejoindre librement"
+      },
+      "crystal": {
+        "name": "Seuil de cristaux",
+        "description": "Demande un minimum de cristaux détenus"
+      },
+      "invite": {
+        "name": "Sur invitation",
+        "description": "Seules les personnes invitées peuvent rejoindre"
+      }
+    },
+    "confirm": {
+      "labels": {
+        "creationScope": "Type de création",
+        "name": "Nom",
+        "description": "Description",
+        "mode": "Mode",
+        "genesis": "Point de départ",
+        "review": "Brouillon et revue",
+        "access": "Accès",
+        "ai": "Collaboration IA"
+      },
+      "creationScope": {
+        "auxiliary": "🧩 Cercle latéral",
+        "nextLevel": "🪜 Cercle de niveau suivant"
+      },
+      "mode": {
+        "social": "🌐 Mode social",
+        "knowledge": "📚 Mode connaissance"
+      },
+      "genesis": {
+        "seeded": "🌱 SEEDED · Avec matériau de départ",
+        "blank": "📝 BLANK · À partir de zéro"
+      },
+      "seededFilesAttached": "{count} fichiers sources SEEDED attachés",
+      "reviewEntry": {
+        "autoOnly": "Entrée automatique en revue",
+        "manualOnly": "Entrée manuelle en revue",
+        "autoOrManual": "Entrée automatique ou manuelle en revue"
+      },
+      "reviewSummary": {
+        "withAuto": " · entrée automatique dans {draftingWindowMinutes} min · revue de {reviewWindowMinutes} min · jusqu'à {maxRevisionRounds} cycles",
+        "manualOnly": " · revue de {reviewWindowMinutes} min · jusqu'à {maxRevisionRounds} cycles"
+      },
+      "access": {
+        "free": "🌍 Ouvert",
+        "crystal": "💎 Nécessite ≥ {minCrystals} cristaux",
+        "invite": "🔒 Sur invitation"
+      },
+      "ai": {
+        "summary": "Résumé de discussion : {mode}",
+        "draftTrigger": "Déclenchement du brouillon : {mode}",
+        "triggerSummary": "Résumé de déclenchement : {mode}",
+        "llm": "LLM",
+        "rule": "Règles",
+        "autoDraft": "Brouillon automatique",
+        "notifyOnly": "Notifier seulement"
+      }
+    },
+    "common": {
+      "minutes": "min"
+    },
+    "actions": {
+      "cancel": "Annuler",
+      "back": "Retour",
+      "next": "Suivant",
+      "create": "✨ Créer le cercle",
+      "creating": "Création…"
+    },
+    "errors": {
+      "seededRequired": "Sélectionnez au moins un fichier source SEEDED."
+    }
+  },
+  "FeedTab": {
+    "states": {
+      "empty": "Rien de nouveau dans ce cercle pour l’instant"
+    },
+    "repost": {
+      "fromAuthor": "Republié depuis @{author}",
+      "emptyBody": "Le post d’origine n’avait pas de texte",
+      "fromOriginal": "Republié depuis un post d’origine",
+      "unavailable": "Le post d’origine n’est pas disponible ici"
+    },
+    "actions": {
+      "like": "J’aime",
+      "liked": "Déjà aimé",
+      "comment": "Commenter",
+      "openReplies": "Ouvrir les réponses",
+      "commentUnavailable": "Réponses indisponibles",
+      "repost": "Reposter",
+      "repostReasons": {
+        "connect_wallet": "Connectez d’abord votre wallet",
+        "join_circle": "Rejoignez ce cercle pour reposter",
+        "pending_membership": "Votre demande d’accès est en attente de validation",
+        "pending": "Repost en cours…",
+        "already_reposted": "Déjà reposté une fois"
+      }
+    },
+    "composer": {
+      "placeholder": "Partagez la suite dans {circleName}",
+      "aria": "Publier dans {circleName}",
+      "unavailable": "Composer indisponible"
+    }
+  },
+  "SanctuaryTab": {
+    "meta": {
+      "citedCount": "Cité {count} fois"
+    },
+    "patina": {
+      "ancient": "🏛 Classique",
+      "weathering": "📜 En maturation"
+    }
+  },
+  "ForkReadiness": {
+    "defaults": {
+      "sourceCircleFallback": "Cercle #{sourceCircleId}",
+      "sourceLevelPending": "Niveau en attente",
+      "sourceLevel": "Niveau {level}",
+      "identityFloor": "Seuil : {roleLabel}",
+      "contributionProgress": "{current} / {required} contributions",
+      "prefillSourceLabel": "Le nouveau cercle démarre avec le profil par défaut (v{configVersion}).",
+      "slogan": "Quand le désaccord pointe vers un autre futur, bifurquer est plus honnête que forcer l’alignement.",
+      "declarationPlaceholder": "Expliquez ce que ce fork doit préserver et pourquoi il doit repartir séparément du cercle actuel.",
+      "hintTitle": "Conditions du fork",
+      "hintBody": "Cette vue montre la barre de contribution, le seuil d’identité, le mode d’héritage et la portée de la lignée de connaissance. L’entrée de création reste sur la page du cercle."
+    },
+    "threshold": {
+      "disabled": "Le fork n’est pas encore ouvert dans ce cercle.",
+      "base": "Au moins {minimumContributions} contributions, avec un statut au moins égal à {roleLabel}",
+      "withGovernance": "{base}, plus une validation de gouvernance.",
+      "ready": "{base}, et le fork devient possible."
+    },
+    "inheritance": {
+      "locked": "Le nouveau cercle démarre avec la configuration amont et la garde verrouillée.",
+      "editable": "Le nouveau cercle démarre avec la configuration amont, puis reste modifiable.",
+      "independent": "Le nouveau cercle démarre de manière indépendante au lieu d’hériter de l’amont."
+    },
+    "knowledgeLineage": {
+      "upstreamUntilForkNode": "La lignée de connaissance suit l’amont jusqu’à l’apparition du nouveau nœud de fork."
+    },
+    "roles": {
+      "Owner": "Propriétaire",
+      "Admin": "Admin",
+      "Moderator": "Modérateur",
+      "Member": "Membre",
+      "Elder": "Ancien",
+      "Initiate": "Initié"
+    },
+    "qualification": {
+      "qualified": "Vous remplissez les conditions actuelles et pouvez forker.",
+      "forkDisabled": "Le fork n’est pas encore ouvert dans ce cercle.",
+      "identityShortfall": "Votre rôle ou identité actuelle reste sous le seuil {roleLabel}.",
+      "contributionShortfall": "Il manque encore {missing} contributions avant l’envoi.",
+      "fallback": "Les conditions d’envoi ne sont pas encore réunies."
+    },
+    "statusBadge": {
+      "qualified": "Prêt à forker",
+      "forkDisabled": "Fermé",
+      "identityShortfall": "Identité insuffisante",
+      "contributionShortfall": "Contributions manquantes"
+    }
+  },
+  "ForkReadinessPanel": {
+    "eyebrow": "Conditions du fork",
+    "labels": {
+      "sourceCircle": "Cercle source",
+      "currentQualification": "État actuel",
+      "contributionThreshold": "Seuil de contribution",
+      "identityFloor": "Seuil d’identité",
+      "level": "Niveau",
+      "entryThreshold": "Condition d’entrée",
+      "inheritance": "Héritage",
+      "knowledgeLineage": "Lignée de connaissance",
+      "originMarker": "Marque d’origine",
+      "retentionRhythm": "Rythme de rétention",
+      "prefill": "Préremplissage"
+    },
+    "values": {
+      "originMarker": "Affiché plus tard dans la vue d’ensemble ou le panneau lineage, pas dans la structure principale.",
+      "retentionRhythm": "Vérifié aux jours 2 / 7 / 30 / 90 / 180, puis masqué après deux contrôles inactifs."
+    }
+  },
+  "ForkCreateSheet": {
+    "header": {
+      "eyebrow": "Configuration du fork",
+      "title": "Fork · {sourceCircleName}"
+    },
+    "defaults": {
+      "name": "{sourceCircleName} Fork"
+    },
+    "roles": {
+      "Initiate": "Initié",
+      "Member": "Membre",
+      "Elder": "Ancien",
+      "Moderator": "Modérateur",
+      "Admin": "Admin senior",
+      "Owner": "Propriétaire"
+    },
+    "eligibility": {
+      "title": "Pourquoi ce fork peut avancer maintenant",
+      "hint": "Le cercle source, l’état des prérequis et la raison de la séparation seront tous inscrits dans ce dépôt.",
+      "fallbackSlogan": "Quand le désaccord pointe vers un autre futur, bifurquer est plus honnête que forcer l’alignement.",
+      "loading": "Vérification des conditions actuelles du fork…",
+      "pendingTarget": "Le cercle fork #{targetCircleId} existe déjà. Finaliser ce dossier ne le recréera pas."
+    },
+    "setup": {
+      "title": "Comment démarre le nouveau cercle",
+      "hint": "Ces champs deviennent la configuration de départ du nouveau cercle. Tout sauf la fork policy suit encore la chaîne d’écriture actuelle."
+    },
+    "fields": {
+      "declaration": "Raison de la bifurcation",
+      "declarationPlaceholder": "Expliquez clairement quel changement de cap justifie ce fork.",
+      "name": "Nom",
+      "description": "Description",
+      "joinRequirement": "Condition d’accès",
+      "minCrystals": "Minimum de cristaux",
+      "draftLifecycleTemplate": "Cycle du brouillon",
+      "draftWorkflowPolicy": "Workflow du brouillon",
+      "ghostPolicy": "Politique Ghost",
+      "forkPolicy": "Fork policy"
+    },
+    "access": {
+      "free": "Accès libre",
+      "crystal": "Seuil de cristaux",
+      "invite": "Sur invitation",
+      "approval": "Validation requise"
+    },
+    "reviewEntryMode": {
+      "auto_or_manual": "Automatique ou manuel",
+      "auto_only": "Automatique uniquement",
+      "manual_only": "Manuel uniquement"
+    },
+    "ghostPolicy": {
+      "notify_only": "Notifier seulement",
+      "auto_draft": "Brouillon auto"
+    },
+    "forkPolicy": {
+      "minimumContributions": "Contributions minimales : {count}",
+      "minimumRole": "Rôle minimal : {role}",
+      "requiresGovernanceVote": "Vote de gouvernance requis : {value}"
+    },
+    "common": {
+      "true": "Oui",
+      "false": "Non"
+    },
+    "actions": {
+      "closeAria": "Fermer la configuration du fork",
+      "close": "Plus tard",
+      "resumeSubmit": "Terminer le dossier",
+      "disabled": "Pas encore disponible",
+      "create": "Créer le cercle fork"
+    }
+  },
+  "CircleDetailPage": {
+    "defaults": {
+      "unknownCircle": "Cercle inconnu",
+      "publicCircle": "Cercle public",
+      "circleWithId": "Cercle #{circleId}",
+      "unknownMember": "membre inconnu"
+    },
+    "tabs": {
+      "plaza": "Discussion",
+      "feed": "Flux",
+      "crucible": "Brouillons",
+      "sanctuary": "Connaissance"
+    },
+    "header": {
+      "backToCirclesAria": "Retour aux cercles",
+      "meta": "{memberCount} membres · {crystalCount} cristaux",
+      "notificationsAria": "Ouvrir les notifications",
+      "settingsAria": "Ouvrir les réglages du cercle"
+    },
+    "join": {
+      "processing": "Traitement…",
+      "banner": {
+        "connectWallet": "Connecter le wallet",
+        "connectWalletHint": "Connectez votre wallet avant de rejoindre ce cercle.",
+        "registerIdentity": "Créer une identité",
+        "registerIdentityHint": "Créez une identité avant de rejoindre ce cercle.",
+        "retrySession": "Réessayer",
+        "retrySessionHint": "Impossible de confirmer votre identité. Réessayez."
+      },
+      "button": {
+        "join": "Rejoindre le cercle",
+        "createIdentity": "Créer une identité",
+        "joined": "Déjà membre",
+        "pending": "En attente",
+        "approvalRequired": "Demander l’accès",
+        "inviteRequired": "Invitation requise",
+        "crystalRequirement": "{missingCrystals} cristaux requis",
+        "restricted": "Restreint",
+        "rejoin": "Rejoindre à nouveau"
+      },
+      "hint": {
+        "visitorDefault": "Les visiteurs peuvent publier des messages éphémères, mais seuls les membres entrent dans l’archive formelle.",
+        "createIdentity": "Créez une identité avant de rejoindre ce cercle.",
+        "pending": "Votre demande a bien été envoyée et reste en attente de validation.",
+        "approvalRequired": "Ce cercle valide les demandes d’accès avant approbation.",
+        "inviteRequired": "Ce cercle fonctionne uniquement sur invitation. Demandez l’accès à un administrateur.",
+        "insufficientCrystals": "Il faut {required} cristaux, et vous en avez actuellement {current}.",
+        "banned": "Votre accès à ce cercle est actuellement restreint."
+      },
+      "errors": {
+        "walletRequired": "Connectez votre identité avant de rejoindre le cercle.",
+        "inviteRequired": "Ce cercle fonctionne uniquement sur invitation. Demandez l’accès à un administrateur.",
+        "insufficientCrystals": "Vous n’avez pas encore assez de cristaux pour rejoindre ce cercle.",
+        "banned": "Votre accès à ce cercle est actuellement restreint.",
+        "requestStateChanged": "L’état de cette demande a changé. Actualisez puis réessayez.",
+        "membershipBridgeUnavailable": "Votre identité a bien été créée, mais la finalisation de l’adhésion au cercle est temporairement indisponible. Réessayez simplement de rejoindre le cercle.",
+        "fallback": "Impossible de rejoindre le cercle pour le moment. Réessayez."
+      }
+    },
+    "levels": {
+      "Visitor": "Visiteur",
+      "Initiate": "Initié",
+      "Member": "Membre",
+      "Elder": "Ancien"
+    },
+    "states": {
+      "visitor": "Visiteur",
+      "initiate": "Initié",
+      "member": "Membre",
+      "curator": "Curateur",
+      "owner": "Propriétaire"
+    },
+    "identityProgress": {
+      "label": "Identité du cercle",
+      "labelInline": "Identité",
+      "nextLevel": "Suivant : {levelLabel}",
+      "summaryLink": "Voir le résumé"
+    },
+    "identityTransition": {
+      "badge": "Évolution d’identité",
+      "dismissAria": "Fermer l’avis d’évolution d’identité"
+    },
+    "memberDirectory": {
+      "notice": {
+        "connectAndJoin": "Connectez-vous et rejoignez ce cercle pour voir les membres et leurs rôles.",
+        "joinRequired": "Les détails des membres deviennent visibles après avoir rejoint ce cercle."
+      },
+      "errors": {
+        "profileUnavailable": "Le profil de ce membre n’est pas disponible pour le moment.",
+        "loadFailed": "Impossible de charger le profil du membre. Réessayez."
+      },
+      "actionErrors": {
+        "forbidden": "Votre rôle actuel ne permet pas cette action.",
+        "memberGone": "Ce membre n’est plus ici ou son état a déjà changé. Actualisez puis réessayez.",
+        "activeInviteExists": "Ce membre a déjà une invitation active.",
+        "alreadyMember": "Ce membre est déjà dans ce cercle.",
+        "protectedRole": "Le rôle de ce membre ne peut pas être modifié ici pour le moment.",
+        "selfRemovalUnsupported": "Vous ne pouvez pas vous retirer depuis ici. Utilisez plutôt l’option pour quitter le cercle.",
+        "selfRoleChangeUnsupported": "La modification de votre propre rôle n’est pas disponible ici pour le moment."
+      },
+      "followSyncing": "La mise à jour on-chain est confirmée, mais l’index est encore en cours de synchronisation."
+    },
+    "boundary": {
+      "back": "Retour",
+      "backToMain": "Retour au cercle principal",
+      "next": "Continuer",
+      "nextLevel": "Niveau suivant",
+      "previousLevel": "Niveau précédent"
+    },
+    "settings": {
+      "forwardPolicyNotice": "La politique de transfert reste gérée au niveau du cercle et ne peut pas encore être modifiée ici.",
+      "deleteNotice": "La suppression d’un cercle reste bloquée derrière un flux de validation plus sûr et n’est pas encore disponible.",
+      "errors": {
+        "invalidCircleForAi": "Ce cercle est invalide, donc les réglages IA ne peuvent pas encore être enregistrés.",
+        "invalidCircleForDraftLifecycle": "Ce cercle est invalide, donc les réglages du cycle de brouillon ne peuvent pas encore être enregistrés.",
+        "invalidCircleForWorkflow": "Ce cercle est invalide, donc les permissions de workflow ne peuvent pas encore être enregistrées.",
+        "invalidCircleForAgents": "Ce cercle est invalide, donc la gouvernance des agents ne peut pas encore être enregistrée.",
+        "loadAiFallback": "Impossible de charger les réglages IA ; les valeurs par défaut sont utilisées pour le moment.",
+        "loadDraftPolicyFallback": "Impossible de charger les réglages du flux de brouillon ; les valeurs par défaut sont utilisées pour le moment.",
+        "loadAgentPolicyFallback": "Impossible de charger les réglages de gouvernance des agents ; les valeurs par défaut sont utilisées pour le moment.",
+        "saveAiFailed": "Impossible d’enregistrer les réglages IA. Réessayez.",
+        "saveDraftLifecycleFailed": "Impossible d’enregistrer les réglages du cycle de brouillon. Réessayez.",
+        "saveWorkflowFailed": "Impossible d’enregistrer les permissions du workflow. Réessayez.",
+        "saveAgentsFailed": "Impossible d’enregistrer les réglages de gouvernance des agents. Réessayez.",
+        "invalidCircleForRoleChange": "Ce cercle est invalide, donc le rôle du membre ne peut pas être modifié.",
+        "memberWalletMissingForRoleChange": "L’adresse wallet de ce membre est manquante, donc la mise à jour on-chain du rôle ne peut pas aboutir.",
+        "roleChangeFailed": "Impossible de modifier le rôle du membre. Réessayez.",
+        "invalidCircleForRemoveMember": "Ce cercle est invalide, donc ce membre ne peut pas être retiré.",
+        "memberWalletMissingForRemoveMember": "L’adresse wallet de ce membre est manquante, donc le retrait on-chain ne peut pas aboutir.",
+        "removeMemberFailed": "Impossible de retirer ce membre. Réessayez.",
+        "invalidCircleForLeave": "Ce cercle est invalide, vous ne pouvez donc pas encore le quitter.",
+        "leaveFailed": "Impossible de quitter le cercle. Réessayez."
+      }
+    },
+    "createCircle": {
+      "title": "Créer un cercle · {name} (Nv.{level})",
+      "parentCircleName": "{name} (Niveau {level})",
+      "errors": {
+        "invalidParentCircle": "Ce cercle est invalide, donc la création ne peut pas encore démarrer.",
+        "noNextLevelPermission": "Ce compte ne peut pas encore créer le niveau suivant depuis ici."
+      }
+    },
+    "invite": {
+      "errors": {
+        "selectMember": "Sélectionnez au moins un membre à inviter.",
+        "sendFailed": "Impossible d’envoyer l’invitation. Réessayez."
+      }
+    },
+    "fork": {
+      "nextLevelPermission": {
+        "connectWallet": "Connectez votre wallet avant de créer le cercle du niveau suivant.",
+        "insufficientRole": "Seul le créateur, les administrateurs du cercle ou le meilleur contributeur actuel en cristaux peut créer le niveau suivant."
+      },
+      "errors": {
+        "invalidSourceCircle": "Ce cercle est invalide, donc le fork ne peut pas encore commencer.",
+        "loadRequirementsFailed": "Impossible de charger les prérequis du fork. Réessayez.",
+        "pendingFinalizationDetected": "Le cercle fork #{targetCircleId} existe déjà. Il ne manque plus que le dépôt final, et le terminer ne recréera pas le cercle.",
+        "notQualified": "Vous ne remplissez pas encore les conditions actuelles pour lancer ce fork.",
+        "pendingFinalizationStillReconciling": "Le cercle fork #{targetCircleId} existe déjà. Le dépôt final est encore en cours de rapprochement ; réessayez la dernière étape dans un instant.",
+        "pendingFinalizationRetryLastStep": "Le cercle fork #{targetCircleId} existe déjà. Il ne manque plus que la dernière étape du dépôt ; relancez-la.",
+        "prepareFilingFailed": "Impossible d’enregistrer le lien de fork, donc le nouveau cercle n’a pas encore démarré.",
+        "finalizationStillReconciling": "Le cercle fork #{targetCircleId} existe déjà. Le dépôt final est encore en cours de rapprochement ; réessayez la dernière étape dans un instant.",
+        "finalizationRetryLastStep": "Le cercle fork #{targetCircleId} existe déjà. Il ne manque plus que la dernière étape du dépôt ; relancez-la."
+      }
+    },
+    "forkLineage": {
+      "eyebrow": "Filiation du fork",
+      "title": "Origine et filiation du fork",
+      "syncing": "Synchronisation…",
+      "errors": {
+        "loadFailed": "La vue de filiation du fork n’est pas disponible pour le moment. Réessayez plus tard."
+      },
+      "badges": {
+        "currentFrom": "Le cercle actuel vient de",
+        "sourceFork": "Fork issu d’ici"
+      },
+      "meta": {
+        "originAnchor": "Ancre d’origine {anchor}",
+        "executionDigest": "Résumé d’exécution {digest}"
+      },
+      "status": {
+        "completed": "Terminé",
+        "reconciliationPending": "Rapprochement en cours",
+        "prepared": "Préparé"
+      },
+      "marker": {
+        "permanentWithDate": "Marqueur permanent depuis {date}",
+        "permanent": "Marqueur permanent",
+        "hiddenWithDate": "Marqueur masqué depuis {date}",
+        "hidden": "Marqueur masqué",
+        "visibleWithCheckpoint": "Marqueur visible · checkpoint jour {day}",
+        "visible": "Marqueur visible",
+        "pendingInit": "État du marqueur en attente"
+      },
+      "schedule": {
+        "inactiveWithNextCheck": "{count} checkpoints inactifs · prochain contrôle {date}",
+        "inactiveOnly": "{count} checkpoints inactifs",
+        "nextCheck": "Prochain contrôle {date}",
+        "waitingNextCheck": "En attente du prochain contrôle de filiation"
+      }
+    }
+  },
+  "CircleSummaryPage": {
+    "errors": {
+      "fetchSnapshot": "Impossible de charger le snapshot du résumé.",
+      "fetchOutputs": "Impossible de charger les sorties déjà stabilisées.",
+      "fetchDraft": "Impossible de charger la base du brouillon.",
+      "fetchDraftCandidates": "Impossible de charger les brouillons candidats du cercle."
+    },
+    "warnings": {
+      "formalOutputReadFailed": "La sortie formelle de CrystalOutput pour la connaissance {knowledgeId} n’est pas disponible pour le moment.",
+      "partialOutputs": "{count} sorties formelles de CrystalOutput sont indisponibles pour le moment ; seules celles qui restent lisibles sont affichées. {firstWarning}"
+    }
+  },
+  "CircleSummaryReadinessPanel": {
+    "eyebrow": "Surface de résumé",
+    "title": "De quoi cette page se nourrit",
+    "status": {
+      "snapshotVersion": "Snapshot v{version}",
+      "waiting": "En attente du snapshot formel"
+    },
+    "cards": {
+      "truthSource": {
+        "title": "Source de vérité actuelle",
+        "snapshotNote": "Cette page s'appuie en priorité sur CircleSummarySnapshot v{version}, généré par {generatedBy}.",
+        "pendingSnapshotOnly": "Cette page n'accepte que le CircleSummarySnapshot formel comme vérité du résumé. Tant que ce snapshot n'est pas lisible, elle n'affiche que les limites et ne revient pas à la vérité du scaffold.",
+        "snapshotTruthLive": "Cette page lit déjà la vérité formelle du résumé."
+      },
+      "knowledgePath": {
+        "title": "Lit directement la voie de connaissance stabilisée",
+        "items": {
+          "identityAndVersion": "Identité et version de chaque conclusion stabilisée",
+          "snapshotLineage": "Le fil d'origine laissé par les snapshots de contribution",
+          "citations": "Relations de citations et de rétroliens",
+          "versionHeat": "Historique des versions et variations de chaleur"
+        }
+      },
+      "draftBaseline": {
+        "title": "N'ajoute la base du brouillon qu'en cas de besoin",
+        "items": {
+          "draftIdentity": "Identité du brouillon et état actuel",
+          "stableVersion": "Version stable et empreinte d'origine",
+          "workingCopy": "Version éditable du texte et heure de mise à jour"
+        },
+        "noteWithDraft": "Les champs stables du brouillon #{draftPostId} sont déjà disponibles et peuvent servir de base à cette page.",
+        "noteWithoutDraft": "Il n'y a pas encore de base de brouillon unique, donc la page reste d'abord ancrée dans la ligne de connaissance stabilisée.",
+        "degradationLead": "Ces libellés de dégradation sont volontaires ; ils ne signalent pas une panne de page."
+      },
+      "references": {
+        "title": "Préparation des références",
+        "note": "Ici sont listés les champs stables dont dépend l'UI de références. La page de références les lit via le chemin dédié DraftReferenceLink."
+      }
+    },
+    "chips": {
+      "version": "Version v{version}",
+      "model": "Modèle : {model}",
+      "providerMode": "Mode : {providerMode}",
+      "promptVersion": "Prompt : {promptAsset}@{promptVersion}",
+      "contextFingerprint": "Empreinte de contexte : {digest}"
+    },
+    "degradation": {
+      "prefix": "Dégradation actuelle : {label}"
+    }
+  },
+  "CircleSummaryScaffold": {
+    "common": {
+      "backToCircle": "Retour au cercle"
+    },
+    "pending": {
+      "heroLead": "Les résumés formels ne viennent que de CircleSummarySnapshot. Tant que ce snapshot n'est pas lisible, cette page garde les limites claires au lieu de se faire passer pour le résumé final.",
+      "snapshotLoading": "Chargement du CircleSummarySnapshot formel…",
+      "snapshotEmpty": "Aucun CircleSummarySnapshot lisible n'est encore disponible ; cette page n'utilisera plus la carte scaffold comme si c'était la vérité formelle du résumé."
+    },
+    "appendix": {
+      "title": "Notes d'appui",
+      "meta": "Cela reste en retrait et n'explique la frontière actuelle qu'au moment utile.",
+      "loadingSnapshot": "Chargement du snapshot formel du résumé…",
+      "loadingDraft": "Vérification de l'existence d'une base de brouillon stable et unique pour cette page…",
+      "loadingOutputs": "Chargement de la liste des sorties déjà stabilisées pour ce cercle…",
+      "sourceDraftReady": "Cette page peut déjà revenir aux champs stables du brouillon #{draftPostId} pour compléter la base de connaissance.",
+      "forkLineageNote": "Les badges d'origine de fork apparaissent plus tard et restent hors de la structure principale. Ils ne sont vérifiés dans la vue d'ensemble ou la vue lineage qu'aux jours 2, 7, 30, 90 et 180 ; ils sont masqués après deux contrôles inactifs et conservés définitivement s'ils sont encore vivants au dernier passage.",
+      "degradationPrefix": "Dégradation actuelle : {label}",
+      "snapshotPriorityLead": "Cette page privilégie le snapshot formel v{version}, généré par",
+      "snapshotPriorityWithMode": ", et le mode réel de collecte était {providerMode}.",
+      "snapshotPriorityWithoutMode": "."
+    },
+    "sections": {
+      "primaryRoutes": {
+        "title": "Entrer par la route principale",
+        "meta": "Suivez d'abord une ligne principale, puis décidez si vous devez ouvrir d'autres branches.",
+        "loading": "Organisation des lignes déjà stabilisées de ce cercle…",
+        "degradationPrefix": "Encore à compléter : {label}",
+        "facts": {
+          "source": "D'où cela vient",
+          "impact": "Quelle ampleur cela a",
+          "stabilizedAt": "Quand cela s'est stabilisé"
+        },
+        "empty": {
+          "routeLabel": "La ligne principale est encore en formation",
+          "title": "Ce cercle n'a pas encore de sédimentation stable",
+          "hint": "Continuez d'abord à accumuler faits, explications et désaccords vérifiables autour du sujet actuel.",
+          "currentStartingPoint": "Point de départ actuel",
+          "cardTitle": "Faire émerger la première ligne qui tienne vraiment",
+          "cardHint": "Quand le premier résultat stabilisé apparaîtra, cette page pourra enfin devenir une vraie carte de routes.",
+          "status": "Toujours en convergence",
+          "bodyFallback": "Il n'existe pas encore de sédimentation stable ; il vaut donc mieux continuer à resserrer le sujet via la discussion et les brouillons.",
+          "facts": {
+            "missingLabel": "Ce qui manque le plus",
+            "missingValue": "Une conclusion capable de tenir seule",
+            "draftBaselineLabel": "Base du brouillon",
+            "draftBaselineValueWithDraft": "Le brouillon #{draftPostId} est déjà retraçable",
+            "draftBaselineValueWithoutDraft": "Pas encore de base de brouillon unique",
+            "nextStepLabel": "Que faire maintenant",
+            "nextStepValue": "Ajouter des faits, des explications et des désaccords vérifiables"
+          }
+        }
+      },
+      "issueMap": {
+        "title": "Que lire d'abord",
+        "meta": "Commencez par les conclusions qui tiennent déjà, puis décidez si cela vaut la peine d'aller plus loin."
+      },
+      "situation": {
+        "title": "État actuel",
+        "meta": "Lisez l'avancement actuel en un seul coup d'œil."
+      },
+      "coverage": {
+        "title": "À quel point ces lignes sont solides",
+        "meta": "Elles n'ont pas toutes la même fiabilité, donc il faut d'abord regarder la force des preuves."
+      },
+      "timeline": {
+        "title": "Comment cela s'est stabilisé",
+        "meta": "Reliez la base du brouillon et les résultats cristallisés dans l'ordre du temps.",
+        "empty": "Il n'y a pas encore assez de nœuds de sédimentation stables pour former une frise."
+      },
+      "questions": {
+        "title": "Ce qui reste encore flou",
+        "meta": "Exposez clairement ce qui demeure ambigu.",
+        "empty": "Les principales lignes de sédimentation sont déjà visibles. La carte complète, le contexte de conflit et le snapshot des questions ouvertes pourront venir ensuite."
+      },
+      "entry": {
+        "title": "Comment entrer maintenant",
+        "meta": "Chaque type de personne bénéficie d'un point d'entrée différent.",
+        "newcomer": {
+          "role": "Nouvel arrivant",
+          "body": "Commencez par le sujet principal actuel et par la branche stabilisée la plus mûre, puis vérifiez s'il existe déjà une base de brouillon unique."
+        },
+        "participant": {
+          "role": "Participant",
+          "body": "Donnez la priorité aux manques de preuve signalés dans les questions ouvertes, surtout les snapshots stables et les liens vers les brouillons d'origine."
+        }
+      }
+    }
+  },
+  "CircleSummaryAdapter": {
+    "common": {
+      "timeTbd": "Date en attente",
+      "unresolvedSource": "Source encore incertaine"
+    },
+    "hero": {
+      "eyebrow": "Carte cognitive",
+      "title": "Carte de connaissance du cercle {circleId}",
+      "lead": "Commencez par voir où le sujet converge, quelles branches se sont déjà stabilisées et quelles zones demandent encore des preuves."
+    },
+    "issueMap": {
+      "stableConclusionTitle": "Commencez par la conclusion qui tient déjà",
+      "stableConclusionBodyWithOutput": "La ligne stabilisée la plus lisible pour l'instant est « {title} » ; c'est donc le meilleur point d'entrée dans la carte du cercle.",
+      "stableConclusionBodyWithoutOutput": "Il n'existe pas encore de sortie stabilisée, donc cette page vous aide d'abord à voir ce qui converge et ce qui reste en formation.",
+      "draftBaselineTitle": "Puis revenez à la base du brouillon",
+      "draftBaselineBodyWithDraft": "Vous pouvez maintenant revenir au brouillon #{draftPostId} et à son snapshot stable v{draftVersion} pour comprendre comment cette sédimentation s'est formée.",
+      "draftBaselineBodyWithoutDraft": "Il n'existe pas encore de base de brouillon unique et stable ; mieux vaut donc entrer par les sorties stabilisées plutôt que d'inventer une vérité de brouillon encore absente."
+    },
+    "route": {
+      "primaryLabel": "Route principale",
+      "parallelLabel": "Branche parallèle {index}",
+      "primaryHint": "Si c'est votre première visite dans ce cercle, commencez ici.",
+      "parallelHint": "Ouvrez cette branche quand vous voulez comparer une autre lecture."
+    },
+    "branch": {
+      "statusPrimary": "La plus mûre pour l'instant",
+      "statusParallel": "Branche parallèle {index}",
+      "bindingWithDraft": "Revient au brouillon #{draftPostId}",
+      "bindingMissing": "Pas encore de brouillon source stable",
+      "evidenceSnapshot": "Adossée à un snapshot",
+      "evidenceSettlementFallback": "Rejeu de sédimentation",
+      "evidenceUnknown": "Source en attente",
+      "evidenceSummarySnapshot": "Cette branche dispose déjà d'une preuve snapshot stable et peut servir de point d'entrée fiable au résumé.",
+      "evidenceSummarySettlementFallback": "La branche est clairement stabilisée, mais sa chaîne d'origine reste à un niveau de preuve de replay.",
+      "evidenceSummaryUnknown": "La branche est déjà visible, mais sa preuve d'origine au niveau snapshot reste incomplète.",
+      "citationSummary": "Citée {citationCount} fois · refs d'aperçu {outboundReferenceCount} / citée par {inboundReferenceCount}",
+      "versionPending": "Version en attente"
+    },
+    "situation": {
+      "formedConclusionsLabel": "Conclusions stabilisées",
+      "formedConclusionsDescription": "Commencez par ce qui s'est déjà stabilisé.",
+      "visibleEntriesLabel": "Entrées visibles",
+      "visibleEntriesDescription": "Ici, on compte les routes que vous pouvez emprunter maintenant, pas le graphe complet des branches.",
+      "draftBaselineLabel": "Base du brouillon",
+      "draftBaselinePending": "En attente",
+      "draftBaselineDescription": "Quand un brouillon unique sera résolu, vous pourrez retracer comment la ligne a vraiment grandi."
+    },
+    "coverage": {
+      "snapshotLabel": "Adossées à un snapshot",
+      "snapshotDescription": "Sorties stabilisées qui remontent déjà à une preuve snapshot stable.",
+      "settlementLabel": "Rejeu de sédimentation",
+      "settlementDescription": "Le résultat est stabilisé, mais la chaîne complète de snapshots reste incomplète.",
+      "unresolvedLabel": "Source en attente",
+      "unresolvedDescription": "Le résultat est visible, mais sa preuve d'origine doit encore être consolidée."
+    },
+    "timeline": {
+      "outputSummarySnapshot": "S'est stabilisé comme sortie de connaissance et remonte déjà à une preuve snapshot stable.",
+      "outputSummaryFallback": "S'est stabilisé comme sortie de connaissance, mais la chaîne d'origine demande encore davantage de preuves.",
+      "draftTitle": "Base stable du brouillon v{draftVersion}",
+      "draftSummary": "Le brouillon #{draftPostId} fournit actuellement la base du texte pour cette carte de connaissance."
+    },
+    "questions": {
+      "noStableOutputTitle": "La première sortie stable n'est pas encore apparue",
+      "noStableOutputBody": "Pour l'instant, il est plus honnête de continuer à ajouter faits, explications et désaccords que de faire comme s'il existait déjà une conclusion claire.",
+      "noDraftBaselineTitle": "Il n'y a toujours pas de base de brouillon unique",
+      "noDraftBaselineBody": "La page ne peut pas encore tout rattacher de manière fiable à une seule version du brouillon ; mieux vaut donc entrer d'abord par les sorties stabilisées.",
+      "missingSnapshotTitle": "Certaines sorties stabilisées n'ont pas encore de snapshots stables",
+      "missingSnapshotBody": "Ces résultats sont déjà visibles, mais leur preuve snapshot traçable reste incomplète.",
+      "missingDraftBindingTitle": "Certaines sorties ne reviennent pas encore à un brouillon source",
+      "missingDraftBindingBody": "Elles sont clairement stabilisées, mais pas encore ancrées de façon fiable à un point d'entrée du brouillon."
+    },
+    "generatedBy": {
+      "systemLlm": "LLM système",
+      "userRequested": "Demande manuelle",
+      "systemProjection": "Projection système"
+    },
+    "providerMode": {
+      "builtin": "LLM intégré",
+      "projection": "Projection système",
+      "rule": "Résumé par règles",
+      "fallback": "Source en attente"
+    },
+    "reference": {
+      "note": "La page de références consomme ces champs stables via la surface publique dédiée DraftReferenceLink et non via une fenêtre temporaire Team 00.",
+      "fields": {
+        "referenceId": "ID de référence",
+        "draftPostId": "Brouillon source",
+        "draftVersion": "Version du brouillon",
+        "sourceBlockId": "Bloc source",
+        "crystalName": "Nom du cristal",
+        "crystalBlockAnchor": "Fragment du cristal",
+        "status": "État d'analyse"
+      }
+    },
+    "degradation": {
+      "selectedDraft": "Aucune base de brouillon unique n'a encore été résolue",
+      "snapshotEvidence": "Cette conclusion ne dispose pas encore d'une preuve snapshot stable",
+      "draftBinding": "Cette conclusion n'a pas encore de lien stable vers un brouillon"
+    }
+  },
+  "CrystalOutputEvidencePanel": {
+    "binding": {
+      "snapshot": "Origine snapshot",
+      "settlementFallback": "Rejeu de sédimentation",
+      "unresolved": "Source en attente"
+    },
+    "compact": {
+      "citations": "Cité {count} fois",
+      "draft": "Brouillon #{draftPostId}"
+    },
+    "eyebrow": "Résultat cristallisé",
+    "title": "Origine et preuves",
+    "metrics": {
+      "version": {
+        "label": "Version"
+      },
+      "contributors": {
+        "label": "Contributeurs"
+      },
+      "citations": {
+        "label": "Citations totales"
+      },
+      "preview": {
+        "label": "Aperçu des références (cette page)",
+        "value": "Refs {outboundReferenceCount} / cité par {inboundReferenceCount}"
+      }
+    },
+    "rows": {
+      "common": {
+        "missing": "Non fourni"
+      },
+      "sourceDraft": {
+        "label": "Brouillon source",
+        "empty": "Pas encore de lien stable vers le brouillon"
+      },
+      "anchor": {
+        "label": "Ancre de discussion"
+      },
+      "summaryHash": {
+        "label": "Empreinte du résumé"
+      },
+      "messageDigest": {
+        "label": "Empreinte des messages"
+      }
+    },
+    "degradationPrefix": "Dégradation actuelle : {label}"
+  },
+  "NotificationsPage": {
+    "title": "Notifications",
+    "actions": {
+      "markAllRead": "Tout marquer comme lu"
+    },
+    "states": {
+      "loading": "Chargement…",
+      "error": "Impossible de charger les notifications pour le moment. Réessayez dans un instant.",
+      "empty": "Aucune notification pour l'instant"
+    }
+  },
+  "ProfilePage": {
+    "fallbacks": {
+      "anonymous": "Anonyme",
+      "unknownHandle": "inconnu",
+      "unknownCircle": "Cercle inconnu"
+    },
+    "common": {
+      "loading": "Chargement…"
+    },
+    "errors": {
+      "walletIdentityNotReady": "L'identité de ce portefeuille n'est pas encore prête pour une mise à jour on-chain du profil.",
+      "indexerLagging": "Ton profil a bien été mis à jour on-chain, mais l'indexeur est encore en retard. Réessaie dans un instant.",
+      "missingEditableIdentity": "Ce portefeuille n'a pas encore d'identité on-chain modifiable. Crée-en une ou rafraîchis ta session puis réessaie.",
+      "invalidUpdatePayload": "Le programme on-chain a rejeté cette mise à jour du profil. Recharge la page puis réessaie.",
+      "saveFailed": "Nous n'avons pas pu enregistrer ton profil pour l'instant. Réessaie plus tard."
+    },
+    "identityStates": {
+      "sessionError": {
+        "displayName": "Identité indisponible",
+        "bio": "Nous n'avons pas pu confirmer l'état de ton identité. Réessaie."
+      },
+      "connecting": {
+        "displayName": "Vérification de l'identité…",
+        "bio": "Nous vérifions l'identité on-chain de ce portefeuille.",
+        "headerHandle": "Vérification de l'identité on-chain"
+      },
+      "unregistered": {
+        "displayName": "Pas encore d'identité",
+        "bio": "Crée d'abord une identité on-chain. Ensuite tu pourras rejoindre des cercles, y prendre la parole et entrer dans le cycle complet de settlement.",
+        "headerHandle": "En attente d'une identité on-chain"
+      }
+    },
+    "identityEntry": {
+      "sessionError": {
+        "title": "Nous n'avons pas pu confirmer ton identité",
+        "description": "L'identité de ce portefeuille est temporairement indisponible. Réessaie.",
+        "primaryLabel": "Réessayer"
+      },
+      "unregistered": {
+        "title": "Le portefeuille est connecté, mais l'identité manque encore",
+        "description": "Le portefeuille {wallet} est encore en mode invité. Tant que tu n'as pas rejoint un cercle, tes publications restent des messages de poussière.",
+        "primaryLabel": "Créer une identité"
+      }
+    },
+    "empty": {
+      "totem": {
+        "sessionError": "Une fois l'identité confirmée, l'évolution de ton totem apparaîtra ici.",
+        "connecting": "Nous vérifions ton identité. Dès que c'est terminé, l'évolution de ton totem apparaîtra ici.",
+        "unregistered": "Crée une identité et l'évolution de ton totem apparaîtra ici."
+      },
+      "crystals": {
+        "sessionError": "Une fois ton identité confirmée et un cercle rejoint, ton historique de cristaux apparaîtra ici.",
+        "connecting": "Nous vérifions ton identité. Dès que c'est terminé et que tu as rejoint un cercle, ton historique de cristaux apparaîtra ici.",
+        "unregistered": "Rejoins un cercle et apporte quelque chose d'utile pour commencer à faire naître des cristaux ici."
+      },
+      "noCrystals": "Tu n'as pas encore de cristaux. Contribue à la connaissance dans les cercles pour commencer à en faire pousser."
+    },
+    "actions": {
+      "connectWallet": "Connecter le portefeuille",
+      "editProfile": "Modifier le profil",
+      "disconnect": "Déconnecter",
+      "openSettings": "Ouvrir les réglages"
+    },
+    "stats": {
+      "posts": "Publications",
+      "circles": "Cercles",
+      "followers": "Abonnés",
+      "reputation": "Réputation"
+    },
+    "sections": {
+      "totem": "Totem",
+      "myCrystals": "Mes cristaux"
+    },
+    "crystals": {
+      "citationCount": "Cité {count} fois"
+    }
+  },
+  "ProfileSettingsSheet": {
+    "eyebrow": "Réglages",
+    "title": "Préférences",
+    "actions": {
+      "closeAria": "Fermer le tiroir des réglages"
+    },
+    "language": {
+      "label": "Langue",
+      "title": "Choisir la langue",
+      "hint": "Par défaut, nous suivons la langue de ton appareil et de ton navigateur. Tu peux aussi la changer manuellement ici.",
+      "openAria": "Ouvrir les réglages de langue",
+      "backAria": "Retour aux réglages",
+      "backLabel": "Retour",
+      "currentLabel": "Langue actuelle",
+      "tapToSwitch": "Touchez pour passer à cette langue",
+      "pending": "Changement de langue…",
+      "options": {
+        "zh": "中文",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français"
+      }
+    }
+  },
+  "EditProfileModal": {
+    "title": "Modifier le profil",
+    "errors": {
+      "saveFailed": "Nous n'avons pas pu enregistrer ton profil pour l'instant. Réessaie plus tard."
+    },
+    "fields": {
+      "displayName": {
+        "label": "Nom affiché",
+        "placeholder": "Saisis un nom affiché"
+      },
+      "bio": {
+        "label": "Bio",
+        "placeholder": "Présente-toi en une ligne",
+        "charCount": "{count}/120"
+      }
+    },
+    "actions": {
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "closeAria": "Fermer la fenêtre de modification du profil"
+    }
+  },
+  "TotemDisplay": {
+    "stages": {
+      "seed": {
+        "name": "Seed",
+        "description": "Seed : un minerai en sommeil qui veille sur la première couche d'ordre."
+      },
+      "sprout": {
+        "name": "Sprout",
+        "description": "Sprout : la pensée perce la surface et les veines d'ambre commencent à pulser."
+      },
+      "bloom": {
+        "name": "Bloom",
+        "description": "Bloom : un cristal stable où la logique géométrique commence à se déposer."
+      },
+      "radiant": {
+        "name": "Radiant",
+        "description": "Radiant : plusieurs vérités s'entrelacent jusqu'à devenir limpides."
+      },
+      "legendary": {
+        "name": "Legendary",
+        "description": "Legendary : le temps a désormais du poids — froid comme le cristal dehors, vivant comme un courant dedans."
+      }
+    }
+  },
+  "KnowledgeDetailPage": {
+    "header": {
+      "title": "Cristal de connaissance"
+    },
+    "fallbacks": {
+      "unknownMember": "membre inconnu"
+    },
+    "states": {
+      "notFound": {
+        "title": "Cristal de connaissance introuvable",
+        "description": "Ce cristal n'est peut-être pas encore stabilisé, ou il a été supprimé."
+      }
+    },
+    "meta": {
+      "citationCount": "Cité {count} fois",
+      "heat": "Heat {label} {score}°",
+      "crystallizedDaysAgo": "Cristallisé il y a {count} jours"
+    },
+    "sections": {
+      "timeline": "Chronologie des versions",
+      "sourceCircle": "Cercle source",
+      "citationLineage": "Lignée des citations"
+    },
+    "heat": {
+      "active": "Actif",
+      "cooling": "En refroidissement",
+      "frozen": "Gelé"
+    },
+    "timeline": {
+      "systemActor": "Système",
+      "eventTitle": {
+        "contributorsUpdated": "Grand livre des contributions mis à jour · {actor}",
+        "initialCrystal": "Cristal soumis · {actor}"
+      },
+      "detail": {
+        "contributors": "{count} contributeurs",
+        "initialPublish": "Publication initiale"
+      },
+      "fallback": {
+        "initialTitle": "Cristallisation initiale",
+        "currentTitle": "Version actuelle",
+        "currentDetail": "Version lisible actuelle"
+      },
+      "hint": {
+        "recorded": "Cette chronologie est reconstruite à partir des événements de version enregistrés.",
+        "partial": "Pour l'instant, nous montrons la cristallisation initiale et la dernière version. Les changements intermédiaires ne sont pas encore détaillés.",
+        "initialOnly": "Il s'agit toujours de la version initiale."
+      },
+      "currentBadge": "Actuelle"
+    },
+    "errors": {
+      "fetchDraftReferenceLinks": "Impossible de charger les références au brouillon.",
+      "fetchFormalOutput": "Impossible de charger le CrystalOutput formel."
+    },
+    "formalOutput": {
+      "label": "Sortie formelle de cristallisation",
+      "status": {
+        "loading": "Chargement",
+        "error": "Temporairement indisponible",
+        "unavailable": "Pas encore lisible"
+      },
+      "loadingMessage": "Chargement du CrystalOutput formel…",
+      "emptyMessage": "Il n'existe pas encore de CrystalOutput formel exploitable, donc cette page ne prétend pas que le registre des contributions constitue déjà le contrat final."
+    },
+    "contributors": {
+      "title": "Contributeurs ({count})",
+      "roles": {
+        "author": "Auteur",
+        "discussant": "Participant",
+        "reviewer": "Relecteur",
+        "cited": "Contributeur cité",
+        "unknown": "Contributeur"
+      }
+    },
+    "lineage": {
+      "sourceTypeLabel": "Type de source",
+      "sourceTypes": {
+        "snapshot": "Instantané de l'ancre de discussion",
+        "settlementFallback": "Fallback de replay du settlement",
+        "unlabeled": "Sans libellé"
+      },
+      "rows": {
+        "sourceDraft": "Brouillon source",
+        "discussionAnchor": "Ancre de discussion",
+        "summaryHash": "Empreinte du résumé",
+        "messageDigest": "Empreinte du message"
+      }
+    },
+    "summaryLink": {
+      "title": "Ouvrir le résumé du cercle",
+      "withDraft": "Ouvrir la vue de résumé de cette conclusion avec le brouillon #{draftPostId} →",
+      "default": "Ouvrir la vue de résumé stabilisée du cercle →",
+      "referencesLoading": "Chargement des références au brouillon depuis la surface formelle de citation…",
+      "referencesReady": "{totalCount} références formelles chargées sur {sourceBlockCount} blocs source.",
+      "referencesEmpty": "Il n'y a pas encore d'entrée DraftReferenceLink formelle."
+    },
+    "sourceCircle": {
+      "open": "Ouvrir le cercle →"
+    },
+    "citations": {
+      "referencesTitle": "Ce cristal cite",
+      "referencesEmpty": "Ce cristal ne cite encore aucun autre.",
+      "citedByTitle": "Cité par ce cristal",
+      "citedByEmpty": "Rien en amont ne cite encore ce cristal.",
+      "entryMeta": "{circleName} · Heat {heatLabel} {heatScore}° · Cité {citationCount}"
+    }
+  },
+  "KnowledgeDiscussionPanel": {
+    "fallbackSummary": "Ce cristal est déjà stabilisé. Le fil ci-dessous doit rester centré sur ses affirmations, sa dérivation et son impact.",
+    "errors": {
+      "loadThread": "Le fil thématique est temporairement indisponible. Réessaie plus tard.",
+      "connectWalletFirst": "Connecte d'abord ton portefeuille.",
+      "permissionDenied": "Cette session ne peut pas publier ici pour le moment. Reconnecte ton portefeuille ou rejoins de nouveau le cercle source puis réessaie.",
+      "postFailed": "Impossible de publier cet étage pour le moment. Réessaie plus tard."
+    },
+    "title": "Fil thématique",
+    "lead": "Ce cristal sert de publication racine. Les réponses ci-dessous doivent seulement prolonger, contester ou annoter la connaissance elle-même.",
+    "topic": {
+      "kicker": "Publication racine",
+      "rule": "Contrairement au chat rapide de Plaza, cet espace doit conserver des arguments, objections et annotations qu'il vaut la peine de revisiter."
+    },
+    "states": {
+      "membershipLoading": {
+        "title": "Vérification de l'accès",
+        "description": "Seuls les membres actifs du cercle source peuvent voir le fil thématique de ce cristal."
+      },
+      "locked": {
+        "title": "Fil thématique verrouillé",
+        "description": "Rejoins le cercle source pour lire ou contribuer au fil de ce cristal."
+      },
+      "threadLoading": {
+        "title": "Ouverture des étages",
+        "description": "Nous déroulons la discussion autour de ce cristal sous la forme d'un fil lisible."
+      },
+      "unavailable": {
+        "title": "Fil indisponible"
+      },
+      "empty": {
+        "description": "Personne n'a encore laissé d'étage. La première réponse devrait apporter une dérivation, formuler une objection ou noter un nouveau jugement apparu lors d'un réemploi de ce cristal."
+      }
+    },
+    "message": {
+      "floorLabel": "étage",
+      "unknownAuthor": "inconnu"
+    },
+    "composer": {
+      "title": "Ajouter l'étage suivant",
+      "hint": "Ajoute ici une annotation, une objection, une dérivation ou un chemin de citation, plutôt qu'une discussion légère.",
+      "placeholder": "Par exemple : comment ce cristal est-il interprété dans un nouveau cercle, et quelles hypothèses demandent encore à être étayées ?",
+      "walletRequired": "Connecte ton portefeuille avant de laisser un étage.",
+      "boundHint": "Cette réponse est liée au cristal actuel et porte son propre heat."
+    },
+    "actions": {
+      "connectWallet": "Connecter le portefeuille",
+      "posting": "Publication…",
+      "submit": "Ajouter cet étage"
+    }
+  },
+  "KnowledgeCitationPanel": {
+    "title": "Citer ce cristal",
+    "lead": "Gère ou complète les citations de cet élément déjà cristallisé en choisissant un autre de tes cristaux.",
+    "target": {
+      "label": "Cible actuelle"
+    },
+    "errors": {
+      "sourceNotFound": "Aucune source de citation exploitable n'a été trouvée. Rafraîchis la page puis réessaie.",
+      "engineUnavailable": "Le moteur de citation n'est pas disponible dans cet environnement, nous ne pouvons donc pas soumettre de citation on-chain.",
+      "submitFailed": "Impossible de soumettre la citation. Réessaie plus tard."
+    },
+    "status": {
+      "submitted": "Citation soumise. L'indexeur mettra bientôt à jour les compteurs et les notifications. tx: {signature}..."
+    },
+    "states": {
+      "loading": {
+        "title": "Chargement de tes cristaux",
+        "description": "Les sources de citation sont choisies parmi les cristaux que tu as déjà cristallisés afin de compléter ce résultat."
+      },
+      "error": {
+        "title": "Nous n'avons pas pu charger tes cristaux pour l'instant",
+        "description": "Assure-toi que la session actuelle est bien connectée, puis réessaie."
+      },
+      "empty": {
+        "title": "Pas encore de source de citation",
+        "description": "Il te faut au moins un autre cristal avant de pouvoir citer celui-ci."
+      }
+    },
+    "sourceList": {
+      "ariaLabel": "Sources de citation disponibles",
+      "unassignedCircle": "Aucun cercle attribué",
+      "heat": "Heat {label} {score}°",
+      "citations": "Cité {count}"
+    },
+    "footer": {
+      "connectHint": "Connecte ton portefeuille pour soumettre une citation on-chain.",
+      "defaultHint": "Ce panneau gère les citations formelles d'un résultat déjà cristallisé. Les citations utilisent une vraie transaction on-chain, puis l'indexeur réécrit le résultat."
+    },
+    "actions": {
+      "connectWallet": "Connecter le portefeuille",
+      "submitting": "Soumission…",
+      "submit": "Soumettre la citation"
+    },
+    "heat": {
+      "active": "Actif",
+      "cooling": "En refroidissement",
+      "frozen": "Gelé"
+    }
+  },
+  "KnowledgeVersionDiffPanel": {
+    "title": "Comparer les versions",
+    "subtitle": "Pour l'instant, ce panneau affiche une comparaison structurée à partir des événements de version, sans inventer d'instantanés historiques du corps.",
+    "controls": {
+      "fromVersion": "Version de départ",
+      "toVersion": "Version d'arrivée"
+    },
+    "states": {
+      "notEnoughVersions": "Il n'y a pas encore assez de points de version à comparer.",
+      "loading": "Chargement du diff de version…",
+      "error": "Le diff de version est temporairement indisponible : {message}",
+      "noDiff": "Les versions sélectionnées n'ont pas encore de diff lisible.",
+      "noFieldChanges": "Aucune différence lisible entre ces deux versions."
+    },
+    "notes": {
+      "metadataOnly": "Les instantanés historiques du corps ne sont pas encore stockés, donc ce panneau privilégie les différences de métadonnées d'événements. Si l'un des deux côtés correspond à la version actuelle, le titre lisible, la description et le hash de contenu actuels sont inclus."
+    },
+    "snapshot": {
+      "eventType": "Type d'événement : {value}",
+      "actor": "Acteur : {value}",
+      "eventAt": "Heure de l'événement : {value}",
+      "contentSnapshot": "Instantané du corps : {value}",
+      "system": "Système",
+      "readable": "Lisible",
+      "unreadable": "Illisible"
+    },
+    "labels": {
+      "from": "De",
+      "to": "À"
+    }
+  },
+  "DiscussionDiagnosticsPage": {
+    "title": "Discussion diagnostics",
+    "subtitle": "Voici la vue complète de debug pour discussion AI : pas seulement le résultat, mais aussi l'entrée, le runtime, la sortie, le chemin de décision et l'état d'échec.",
+    "errors": {
+      "authentication_required": "Connecte-toi avec un compte disposant d'un accès de gestion à ce cercle avant de charger le diagnostic.",
+      "private_sidecar_required": "Cette route de diagnostic ne fonctionne que sur un nœud private sidecar. Assure-toi d'être connecté au nœud privé de diagnostic.",
+      "discussion_message_not_found": "Impossible de trouver ce message, ou tu ne gères pas ce cercle.",
+      "discussion_trigger_not_found": "Ce cercle n'a encore aucun run de trigger.",
+      "discussion_analysis_diagnostics_failed": "Impossible de charger l'instantané d'analyse du message. Vérifie les logs de query-api et ta session actuelle.",
+      "discussion_summary_diagnostics_failed": "Impossible de charger l'instantané du résumé de discussion. Vérifie la route de summary, le cache et ta session actuelle.",
+      "discussion_trigger_diagnostics_failed": "Impossible de charger l'instantané du trigger. Vérifie ghost_runs et les logs du worker concerné.",
+      "discussion_analysis_reanalyze_failed": "Impossible de remettre cette analyse en file d'attente. Vérifie les permissions, le type de nœud et l'état du worker.",
+      "invalidCircleId": "Saisis un circle id valide."
+    },
+    "controls": {
+      "circleId": "Circle ID",
+      "circlePlaceholder": "Saisis un circle id pour charger les messages récents",
+      "envelopeId": "Envelope ID",
+      "envelopePlaceholder": "Saisis un discussion envelope id"
+    },
+    "actions": {
+      "loadingMessages": "Chargement…",
+      "loadRecentMessages": "Charger les messages récents",
+      "loadingAnalysis": "Chargement…",
+      "loadAnalysis": "Charger l'instantané d'analyse",
+      "reanalyzing": "Remise en file…",
+      "reanalyze": "Remettre l'analyse en file"
+    },
+    "status": {
+      "reanalyzeQueued": "Remis en file : job #{jobId} ({status})"
+    },
+    "sample": {
+      "title": "Échantillon actuel",
+      "emptyMessage": "[message vide]",
+      "currentBadge": "Échantillon actuel"
+    },
+    "recentMessages": {
+      "title": "Messages récents",
+      "deleted": "supprimé"
+    },
+    "keyDiagnosticsTitle": "Diagnostic clé",
+    "blocks": {
+      "input": "Entrée",
+      "runtime": "Runtime",
+      "output": "Sortie",
+      "decision": "Décision",
+      "failure": "Échec"
+    },
+    "metrics": {
+      "status": "Statut",
+      "actualMode": "Mode réel",
+      "focusLabel": "Étiquette de focus",
+      "semanticScore": "Score sémantique",
+      "embedding": "Embedding",
+      "featured": "Mis en avant"
+    },
+    "sections": {
+      "analysis": {
+        "title": "Analyse du message",
+        "scope": "message-scoped"
+      },
+      "summary": {
+        "title": "Résumé de discussion",
+        "scope": "circle-scoped"
+      },
+      "trigger": {
+        "title": "Trigger",
+        "scope": "circle-scoped"
+      },
+      "ghostDraft": {
+        "title": "Ghost draft",
+        "scope": "draft-scoped"
+      },
+      "humanOverrides": {
+        "title": "Overrides humains",
+        "scope": "message-scoped"
+      }
+    },
+    "analysis": {
+      "topicProfileLabel": "Profil thématique",
+      "decision": {
+        "offTopic": "Marqué off-topic parce que le score sémantique est resté sous le seuil de focus.",
+        "focused": "Marqué focused parce que les signaux sémantique et de focus ont tous deux dépassé le seuil focused.",
+        "contextual": "Marqué contextual parce que le message est resté dans le contexte du sujet sans dépasser le seuil focused."
+      },
+      "errorLabel": "Détails de l'erreur",
+      "rawJsonTitle": "Voir le JSON brut de l'analyse"
+    },
+    "summary": {
+      "metrics": {
+        "method": "Méthode",
+        "cache": "Cache",
+        "inputFidelity": "Fidélité d'entrée",
+        "model": "Modèle"
+      },
+      "cacheHit": "cache hit",
+      "cacheMiss": "cache miss",
+      "ruleBased": "rule-based",
+      "notLoaded": "le diagnostic du résumé n'est pas encore chargé",
+      "decision": {
+        "cacheHit": "Le résumé vient du cache.",
+        "cacheMiss": "Le résumé a été généré à partir de la fenêtre actuelle.",
+        "currentConfig": "Le résumé a été généré avec la configuration actuelle ({source}).",
+        "cachedVsCurrentConfig": "Le résumé en cache a été généré sous {cachedSource}, alors que la configuration actuelle est {currentSource}.",
+        "exactFidelity": "La fenêtre source correspond exactement à l'entrée originale du résumé en cache.",
+        "metadataOnlyFidelity": "Seule la fenêtre actuelle est disponible. Le résumé en cache provient d'un ancien payload sans les messages source exacts."
+      },
+      "rawJsonTitle": "Voir le JSON brut du résumé"
+    },
+    "trigger": {
+      "metrics": {
+        "status": "Statut",
+        "reason": "Raison",
+        "summaryMethod": "Méthode du résumé",
+        "messageCount": "Messages dans la fenêtre"
+      },
+      "notLoaded": "le diagnostic du trigger n'est pas encore chargé",
+      "decision": {
+        "scopeNotice": "Le diagnostic du trigger est circle-scoped. Le message sélectionné sert seulement à vérifier s'il apparaît dans windowEnvelopeIds."
+      },
+      "rawJsonTitle": "Voir le JSON brut du trigger"
+    },
+    "ghostDraft": {
+      "notConnected": "La route de diagnostic du ghost draft sera branchée à la Task 4.",
+      "failure": "Le diagnostic de génération du ghost draft n'est pas encore câblé dans cette vague."
+    },
+    "humanOverrides": {
+      "notConnected": "La surface admin-only des overrides arrivera à la Task 6.",
+      "currentRule": "Les authorAnnotations historiques restent pour l'instant un affichage legacy ; les admin overrides ne sont pas encore branchés.",
+      "failure": "La surface de gouvernance des overrides humains n'est pas encore disponible dans cette vague."
+    }
+  },
+  "CrystalDemoPage": {
+    "title": "Prototype visuel des cristaux",
+    "subtitle": "Chaque cristal est piloté par huit paramètres de connaissance, et chaque rendu reste déterministe.",
+    "loading": "Chargement de la 3D…",
+    "parameters": {
+      "title": "Paramètres visuels",
+      "hue": "teinte",
+      "clarity": "clarté",
+      "facets": "facettes",
+      "texture": "texture",
+      "radiance": "radiance",
+      "patina": "patine",
+      "warmth": "chaleur"
+    },
+    "variants": {
+      "title": "Toutes les variantes"
+    },
+    "presets": {
+      "gold": {
+        "label": "🥇 Gold · jeune cristal",
+        "circleName": "Philosophie blockchain"
+      },
+      "sapphire": {
+        "label": "💎 Sapphire · cristal mature",
+        "circleName": "Recherche DeFi"
+      },
+      "amethyst": {
+        "label": "🔮 Amethyst · classique durable",
+        "circleName": "Fondamentaux de la cryptographie"
+      },
+      "jade": {
+        "label": "🌿 Jade · encore en discussion",
+        "circleName": "Écosystème Solana"
+      }
+    }
+  },
+  "MemberCard": {
+    "roles": {
+      "owner": "Fondateur",
+      "curator": "Curateur",
+      "member": "Membre"
+    },
+    "meta": {
+      "handle": "@{handle} · Rejoint {joinedAgo}"
+    },
+    "followHint": {
+      "profileUnavailable": "Ce profil n'est pas encore prêt, donc le suivi est temporairement indisponible."
+    },
+    "states": {
+      "loading": "Chargement du profil…"
+    },
+    "stats": {
+      "citations": "Citations",
+      "crystals": "Cristaux",
+      "circles": "Cercles"
+    },
+    "sections": {
+      "sharedCircles": "Cercles en commun",
+      "recentActivity": "Activité récente"
+    },
+    "actions": {
+      "followPending": "Traitement…",
+      "following": "Suivi",
+      "follow": "Suivre",
+      "message": "Message",
+      "invite": "Inviter"
+    }
+  },
+  "InviteMemberSheet": {
+    "title": "Inviter des membres",
+    "target": {
+      "label": "Inviter dans"
+    },
+    "search": {
+      "placeholder": "Rechercher un membre…"
+    },
+    "states": {
+      "empty": "Aucun membre correspondant",
+      "alreadyIn": "Déjà dans le cercle"
+    },
+    "roles": {
+      "curator": "Curateur",
+      "member": "Membre"
+    },
+    "actions": {
+      "cancel": "Annuler",
+      "sending": "Envoi…",
+      "send": "Envoyer l'invitation{count, plural, =0 {} other { ({count})}}"
+    },
+    "toast": {
+      "success": "{count} invitations envoyées",
+      "partialSuccess": "{successCount} invitations envoyées, {failureCount} en échec"
+    },
+    "errors": {
+      "sendFailed": "Impossible d'envoyer les invitations pour l'instant. Réessaie."
+    }
+  },
+  "MessageActionSheet": {
+    "actions": {
+      "reply": "Répondre",
+      "highlight": "Mettre en avant",
+      "forward": "Transférer",
+      "copy": "Copier",
+      "delete": "Supprimer",
+      "cancel": "Annuler"
+    }
+  },
+  "FeedThreadSheet": {
+    "header": {
+      "eyebrow": "Fil de publication",
+      "title": "Réponses autour de cette publication",
+      "closeAria": "Fermer le fil"
+    },
+    "states": {
+      "noBody": "(Pas de contenu)",
+      "empty": "Laisse la première réponse pour faire avancer cette publication."
+    },
+    "thread": {
+      "replyCount": "{count} réponses",
+      "noReplies": "Aucune réponse pour l’instant"
+    },
+    "composer": {
+      "placeholder": "Écris ta réponse…",
+      "disabledPlaceholder": "Connecte ton portefeuille pour répondre",
+      "helper": "La réponse sera ajoutée au fil de cette publication.",
+      "readOnly": "Tu peux seulement consulter les réponses pour le moment."
+    },
+    "actions": {
+      "sending": "Envoi…",
+      "sendReply": "Envoyer la réponse"
+    }
+  },
+  "AccessProgressBar": {
+    "states": {
+      "topTier": "Tu as déjà atteint le niveau le plus élevé"
+    },
+    "progress": {
+      "crystals": "{currentCrystals}/{nextTierCrystals} cristaux",
+      "remaining": "Encore {remaining} pour entrer dans «{nextTierName}»"
+    }
+  },
+  "IdentityBadge": {
+    "labels": {
+      "visitor": "Visiteur",
+      "initiate": "Participant",
+      "member": "Membre",
+      "curator": "Curateur",
+      "owner": "Fondateur"
+    }
+  },
+  "DraftCandidateInlineCard": {
+    "states": {
+      "open": {
+        "label": "Candidat",
+        "title": "Cette discussion a été reconnue comme un brouillon candidat",
+        "hint": "Le candidat est prêt. Les responsables du cercle peuvent relire la discussion source puis créer un brouillon formel."
+      },
+      "proposal_active": {
+        "label": "Proposition active",
+        "title": "La proposition de génération du brouillon est en cours",
+        "hint": "Le candidat suit le flux de gouvernance. Un lien vers le brouillon apparaîtra seulement une fois la génération terminée."
+      },
+      "accepted": {
+        "label": "Généré",
+        "title": "Le brouillon candidat est devenu un vrai brouillon"
+      },
+      "generation_failed": {
+        "label": "Génération échouée",
+        "title": "La génération du brouillon ne s'est pas terminée"
+      },
+      "rejected": {
+        "label": "Rejeté",
+        "title": "La proposition de génération du brouillon a été rejetée"
+      },
+      "expired": {
+        "label": "Expiré",
+        "title": "La proposition de génération du brouillon a expiré"
+      },
+      "cancelled": {
+        "label": "Annulé",
+        "title": "Le flux de génération du brouillon a été annulé"
+      },
+      "default": {
+        "label": "État du candidat",
+        "title": "Mise à jour de l'état du brouillon candidat"
+      }
+    },
+    "semanticFacets": {
+      "fact": "Fait",
+      "explanation": "Explication",
+      "emotion": "Émotion",
+      "question": "Question",
+      "problem": "Problème",
+      "criteria": "Critères",
+      "proposal": "Proposition",
+      "summary": "Résumé"
+    },
+    "meta": {
+      "sourceMessages": "{count} messages source",
+      "authorAnnotation": "Intention de l'auteur · {label}"
+    },
+    "errors": {
+      "failureReason": "Cause de l'échec : {error}"
+    },
+    "recovery": {
+      "summary": "Récupération de gouvernance : {action}.",
+      "reusePassedProposal": "il est possible de relancer avec une proposition déjà approuvée",
+      "reproposalRequired": "il faut créer une nouvelle proposition avant de relancer"
+    },
+    "actions": {
+      "viewSource": "Voir la source",
+      "createDraft": "Créer le brouillon",
+      "createDraftBusy": "Création…",
+      "expandDetails": "Afficher les détails",
+      "collapseDetails": "Masquer les détails",
+      "openDraft": "Ouvrir le brouillon",
+      "retry": "Relancer",
+      "cancel": "Annuler",
+      "retryTitle": "Relancer cette génération",
+      "retryDisabledTitle": "Le droit de relancer dépend de la gouvernance",
+      "cancelTitle": "Annuler ce flux candidat",
+      "cancelDisabledTitle": "Le droit d'annuler dépend de la gouvernance"
+    }
+  },
+  "PlazaTab": {
+    "actions": {
+      "forward": "Transférer"
+    },
+    "levels": {
+      "Visitor": "Visiteur",
+      "Initiate": "Initié",
+      "Member": "Membre",
+      "Elder": "Ancien"
+    },
+    "semanticFacets": {
+      "fact": "Fait",
+      "explanation": "Explication",
+      "emotion": "Émotion",
+      "question": "Question",
+      "problem": "Problème",
+      "criteria": "Critères",
+      "proposal": "Proposition",
+      "summary": "Résumé"
+    },
+    "time": {
+      "justNow": "à l’instant"
+    },
+    "filters": {
+      "title": "Filtres",
+      "scopeLabel": "Portée",
+      "contentLabel": "Contenu",
+      "scope": {
+        "all": "Tout",
+        "focused": "Ciblé",
+        "mine": "Seulement moi"
+      }
+    },
+    "states": {
+      "visitor": "Visiteur",
+      "initiate": "Initié",
+      "member": "Membre",
+      "curator": "Curateur",
+      "owner": "Propriétaire",
+      "syncing": "Synchronisation de la discussion…",
+      "hiddenNoiseCount": "{count} messages à faible signal masqués",
+      "sending": "Envoi…"
+    },
+    "messages": {
+      "deleted": "[message supprimé]",
+      "deletedVisibleToSender": "Ce message a été supprimé (visible pour son auteur).",
+      "ephemeral": "Message éphémère · disparaît après 24 h",
+      "offTopicReveal": "Hors sujet · appuyez pour voir",
+      "authorAnnotations": "Annotation de l’auteur : {labels}"
+    },
+    "reply": {
+      "emptyBody": "Le message est vide",
+      "quoted": "↪ Réponse à @{author} : {preview}\n{body}",
+      "banner": "Répondre à @{author}",
+      "cancelAria": "Annuler la réponse"
+    },
+    "composer": {
+      "identityHint": "Publication en tant que {stateLabel} · {hint}",
+      "identityHintOpenAria": "Afficher l’indication d’identité de publication",
+      "replyPlaceholder": "Répondre à @{author}…",
+      "placeholderJoined": "Partager quelque chose sur la plaza…",
+      "placeholderEphemeral": "Envoyer un message éphémère (il n’entrera pas dans l’archive officielle)…",
+      "placeholderDisconnected": "Connectez votre wallet pour envoyer des messages",
+      "sendAria": "Envoyer",
+      "moreAria": "Plus d’actions",
+      "actions": {
+        "emoji": "Emoji",
+        "attachments": "Fichiers bientôt",
+        "attachmentsUnavailable": "L’envoi de fichiers de discussion n’est pas encore disponible",
+        "mention": "Mentionner"
+      },
+      "authorAnnotations": {
+        "title": "Annotations de l’auteur",
+        "clear": "Effacer",
+        "hint": "Ces annotations reflètent uniquement l’intention de l’auteur. Le filtrage du système suit l’analyse sémantique du backend."
+      }
+    },
+    "errors": {
+      "walletRequired": "Connectez votre wallet avant d’envoyer un message.",
+      "syncFailed": "Impossible de synchroniser les messages de la discussion.",
+      "loadFailed": "Impossible de charger les messages de la discussion.",
+      "sendFailed": "L’envoi du message a échoué.",
+      "forwardFailed": "Le transfert a échoué.",
+      "deleteFailed": "Impossible de supprimer le message."
+    },
+    "status": {
+      "forwardedToCircle": "Transféré vers {circleName}. En attente de la synchronisation du cercle cible.",
+      "localDeleteOnly": "Le wallet n’est pas connecté, donc cette suppression n’a été marquée qu’en local."
+    },
+    "candidate": {
+      "avatar": "✦",
+      "retryDenied": "Le candidat {candidateId} ne peut pas être relancé avec la politique actuelle.",
+      "proposalId": " la proposition {proposalId}.",
+      "currentProposal": " la proposition en cours.",
+      "retryReusePassedProposal": "La relance réutilisera{proposalHint}",
+      "retryNeedsNewProposal": "La relance exige une nouvelle proposition au lieu de{proposalHint}",
+      "createDenied": "Le candidat {candidateId} doit être transformé en brouillon formel par un responsable du cercle.",
+      "createSucceeded": "Le candidat {candidateId} est maintenant un brouillon formel.",
+      "createExistingDraft": "Le candidat {candidateId} possède déjà un brouillon formel.",
+      "createNotReady": "Le candidat {candidateId} n'est pas encore prêt à générer un brouillon formel.",
+      "createMissingSources": "Le candidat {candidateId} n'a pas de messages source, le brouillon ne peut pas encore être créé.",
+      "cancelDenied": "Le candidat {candidateId} ne peut pas être annulé avec la politique actuelle.",
+      "relatedProposal": " Proposition liée {proposalId}.",
+      "cancelAvailable": "Le candidat {candidateId} peut être annulé maintenant.{proposalHint}",
+      "sourceUnavailable": "Ce candidat n'a pas encore de messages source vers lesquels naviguer.",
+      "sourceFocused": "Retour à la discussion source du candidat {candidateId}.",
+      "systemTag": "Système",
+      "persistedNotice": "Avis enregistré"
+    },
+    "forward": {
+      "cardLabel": "Carte transférée",
+      "sourceCircleFallback": "Cercle source",
+      "sourceLevel": "Niveau {level}",
+      "unknownSourceAuthor": "membre inconnu",
+      "forwardedBy": "Transféré par @{handle}",
+      "viewSource": "Voir la source",
+      "sourceDeleted": "Message d’origine supprimé",
+      "reason": {
+        "viewerNotJoined": "Rejoignez le cercle avant de transférer des messages.",
+        "missingEnvelopeId": "Ce message n’a pas encore d’identifiant stable pour être transféré.",
+        "deleted": "Les messages supprimés ne peuvent pas être transférés.",
+        "ephemeral": "Les messages éphémères n’entrent pas dans l’archive officielle et ne peuvent donc pas être transférés.",
+        "forwardCard": "Une carte transférée ne peut pas être retransférée. Revenez au message d’origine pour le faire.",
+        "noTargets": "Aucun cercle de destination éligible n’est disponible pour le moment."
+      }
+    },
+    "auxShortcut": {
+      "crystals": " · {count} cristaux"
+    }
+  },
+  "AccessGate": {
+    "description": "Il faut au moins <strong>{required}</strong> cristaux pour entrer dans ce niveau.",
+    "actions": {
+      "dismiss": "Compris"
+    }
+  },
+  "CirclePicker": {
+    "title": "Transférer vers",
+    "hint": "{count} messages sélectionnés · seuls les cercles cibles éligibles sont affichés",
+    "meta": {
+      "level": "Niveau {level}"
+    },
+    "actions": {
+      "cancel": "Annuler"
+    }
+  },
+  "ChatRecordBubble": {
+    "source": "Historique de discussion de {circle}",
+    "more": "Encore {count} messages…",
+    "count": "{count} messages au total",
+    "actions": {
+      "viewAll": "Voir tout →"
+    }
+  },
+  "NotificationPanel": {
+    "title": "Notifications",
+    "empty": "Aucune notification pour le moment",
+    "actions": {
+      "markAllRead": "Tout marquer comme lu"
+    }
+  },
+  "TierPill": {
+    "hint": "← Glissez pour changer →",
+    "meta": {
+      "level": "Niveau {level}",
+      "childLevel": "Niveau {parentLevel}.{childLevel}"
+    },
+    "actions": {
+      "createCircle": "Créer un cercle"
+    }
+  },
+  "CollaborativeEditor": {
+    "placeholder": "Commence à rédiger le brouillon…",
+    "toolbar": {
+      "bold": "Gras",
+      "italic": "Italique",
+      "strike": "Barré",
+      "heading": "Titre",
+      "subheading": "Sous-titre",
+      "bulletList": "Liste à puces",
+      "orderedList": "Liste numérotée",
+      "blockquote": "Citation",
+      "codeBlock": "Bloc de code",
+      "highlight": "Surligner"
+    }
+  },
+  "CrucibleEditor": {
+    "fallback": {
+      "untitledDraft": "Brouillon sans titre",
+      "emptyParagraph": "Ce paragraphe n’a pas encore de contenu."
+    },
+    "anchorStatus": {
+      "anchored": "Ancré",
+      "failed": "Échec de l’ancrage",
+      "skipped": "Ancrage ignoré",
+      "syncing": "Ancrage…",
+      "idle": "En attente de connexion"
+    },
+    "errors": {
+      "applyAcceptedIssues": "Impossible d’appliquer les issues acceptées.",
+      "requestTemporaryGrant": "Impossible de demander l’accès d’édition temporaire.",
+      "issueTemporaryGrant": "Impossible d’approuver l’accès temporaire.",
+      "revokeTemporaryGrant": "Impossible de révoquer l’accès temporaire."
+    },
+    "blocks": {
+      "title": "Paragraphe {index}",
+      "typeLabel": "Bloc de paragraphe",
+      "statusLabel": "Prêt à être affiné",
+      "editabilityEditable": "Corps modifiable",
+      "editabilityReadOnly": "Lecture seule",
+      "editabilityLocked": "Corps verrouillé",
+      "sourceVersion": "V{version}",
+      "statusLocked": "Verrouillé",
+      "statusResolved": "Résolu",
+      "statusAcceptedPending": "Accepté, en attente d’application",
+      "statusInReview": "En révision",
+      "statusSubmitted": "Soumis",
+      "statusReadyForMoreEdits": "Prêt pour d’autres retouches",
+      "editabilitySelected": "Sélectionné"
+    },
+    "heat": {
+      "active": "Actif",
+      "cooling": "En refroidissement",
+      "frozen": "Gelé"
+    },
+    "meta": {
+      "onlineCount": "{count} en ligne",
+      "editCount": "{count} modifications",
+      "contributorCount": "{count} contributeurs",
+      "commentCount": "{count} commentaires",
+      "issueCount": "{count} issues"
+    },
+    "actions": {
+      "completeEditingResolve": "Terminer la modification et résoudre {count} issues",
+      "completeEditing": "Terminer la modification",
+      "editing": "Modification en cours…",
+      "editParagraph": "Modifier le paragraphe",
+      "viewDiscussion": "Voir la discussion",
+      "submitting": "Envoi…",
+      "requestTemporaryGrant": "Demander un accès temporaire",
+      "processing": "Traitement…",
+      "issueTemporaryGrant": "Approuver l’accès temporaire",
+      "revokeTemporaryGrant": "Révoquer l’accès temporaire",
+      "completing": "Finalisation…",
+      "send": "Envoyer"
+    },
+    "temporaryGrant": {
+      "title": "Accès d’édition temporaire",
+      "hint": "Ce paragraphe n’est pas modifiable directement pour le moment. Utilisez une autorisation temporaire pour entrer dans son flux de révision.",
+      "requested": "Vous avez déjà demandé un accès temporaire pour ce paragraphe et la demande attend une approbation.",
+      "managerRequested": "Une demande d’accès temporaire attend une approbation pour ce paragraphe.",
+      "managerActive": "Un accès temporaire est actif pour ce paragraphe."
+    },
+    "issueCarry": {
+      "title": "Ce paragraphe contient des issues acceptées que vous pouvez résoudre pendant cette modification",
+      "hint": "Quand vous terminez la modification, chaque issue cochée est écrite dans l’historique d’application du paragraphe afin de conserver une résolution traçable. Si ce paragraphe vient d’utiliser une révision issue des fils, les issues liées seront présélectionnées et vous pourrez toujours les décocher."
+    },
+    "placeholders": {
+      "continueParagraph": "Continuez à affiner {title}…"
+    },
+    "readOnly": {
+      "editorDisconnected": "L’éditeur collaboratif est actuellement hors ligne, donc la modification du paragraphe est temporairement indisponible.",
+      "commentLocked": "🔒 Vous devez avoir le niveau participant ou plus pour laisser un commentaire.",
+      "contentLocked": "🔒 Votre rôle actuel peut uniquement consulter le corps et ne peut pas modifier directement les paragraphes."
+    },
+    "comments": {
+      "title": "Commentaires du paragraphe {index}",
+      "empty": "Il n’y a pas encore de commentaire sur ce paragraphe.",
+      "placeholder": "Laisser un commentaire sur ce paragraphe…"
+    }
+  },
+  "IdentityOnboardingProvider": {
+    "errors": {
+      "sessionConfirmation": "Impossible de confirmer l’état de votre identité. Réessayez.",
+      "invalidSignature": "La vérification de la signature du portefeuille a échoué. Réessayez."
+    }
+  },
+  "AgentAdminPanel": {
+    "title": "Gouvernance et audit des agents",
+    "subtitle": "Consultez le registre actuel des agents et définissez les garde-fous de gouvernance pour les déclenchements automatiques, les remises et les seuils de relecture.",
+    "ownerOnly": "Seule la personne propriétaire du cercle peut modifier ceci",
+    "sections": {
+      "registeredAgents": "Agents enregistrés",
+      "policy": "Politique des agents"
+    },
+    "states": {
+      "loading": "Chargement du registre des agents…",
+      "empty": "Aucun agent n’est encore enregistré dans ce cercle."
+    },
+    "fields": {
+      "triggerScope": {
+        "label": "Portée de déclenchement de l’agent",
+        "options": {
+          "disabled": "Désactivé",
+          "draftOnly": "Brouillons seulement",
+          "circleWide": "Tout le cercle"
+        }
+      },
+      "costDiscount": {
+        "label": "Remise de coût (bps)",
+        "aria": "Remise agent"
+      },
+      "reviewMode": {
+        "label": "Seuil de relecture",
+        "aria": "Seuil de relecture de l’agent",
+        "options": {
+          "ownerReview": "Relecture owner",
+          "adminReview": "Relecture admin",
+          "selfServe": "Libre-service"
+        }
+      }
+    },
+    "auditNote": "La portée de déclenchement détermine si les agents peuvent participer à l’automatisation du cercle, la remise encadre le coût, et le seuil de relecture décide si une validation Owner/Admin est nécessaire.",
+    "actions": {
+      "saving": "Enregistrement…",
+      "save": "Enregistrer la politique des agents"
+    }
+  },
+  "CircleSettingsSheet": {
+    "header": {
+      "title": "{circleName} · Réglages"
+    },
+    "sections": {
+      "basicInfo": "Informations de base",
+      "permissions": "Permissions",
+      "aiCollab": "Collaboration IA",
+      "dangerZone": "Zone sensible"
+    },
+    "basic": {
+      "modeLabel": "Mode",
+      "modeSocial": "🌐 Mode social",
+      "modeKnowledge": "📚 Mode connaissance",
+      "accessLabel": "Accès",
+      "accessFree": "🌍 Ouvert",
+      "accessCrystal": "💎 ≥{count} cristaux",
+      "accessInvite": "🔒 Sur invitation"
+    },
+    "permissions": {
+      "forwardTitle": "Autoriser le transfert sortant",
+      "forwardDescription": "Les membres peuvent transférer des messages vers d’autres cercles."
+    },
+    "common": {
+      "collapse": "Réduire",
+      "expand": "Afficher"
+    },
+    "identityRules": {
+      "title": "Règles d’identité du cercle",
+      "lead": "Pour parler officiellement, il faut d’abord créer une identité et rejoindre le cercle.",
+      "initiateStep": "Invité → Initié",
+      "initiateText": "Vous devenez initié après avoir envoyé {count} messages.",
+      "memberStep": "Initié → Membre",
+      "memberText": "Vous devenez membre après avoir reçu {count} citations.",
+      "elderStep": "Membre → Ancien",
+      "elderText": "Entrer dans les {percentile}% supérieurs de réputation du cercle permet de devenir ancien.",
+      "footnote": "Le niveau d’identité peut redescendre après {count} jours d’inactivité continue."
+    },
+    "draftLifecycle": {
+      "title": "Réglages du flux de brouillon",
+      "reviewEntryLabel": "Entrée en relecture",
+      "reviewEntry": {
+        "autoOnly": "Fin automatique",
+        "manualOnly": "Fin manuelle",
+        "autoOrManual": "Les deux"
+      },
+      "help": {
+        "autoOnly": "Quand le délai expire, l’édition du corps se termine automatiquement et passe en relecture des issues.",
+        "manualOnly": "Seules les personnes autorisées peuvent arrêter manuellement l’édition du corps et entrer en relecture.",
+        "autoOrManual": "La relecture démarre automatiquement à l’expiration, mais on peut aussi l’arrêter plus tôt à la main."
+      },
+      "autoReviewTimeLabel": "Entrer automatiquement en relecture après",
+      "autoReviewTimeHint": "À l’expiration, l’édition du corps bascule vers la relecture des issues.",
+      "reviewWindowLabel": "Durée de la phase de relecture",
+      "reviewWindowHint": "À la fin du délai, le tour est considéré comme terminé et attend la révision suivante ou la cristallisation.",
+      "maxRoundsLabel": "Nombre maximal de tours de révision",
+      "save": "Enregistrer les réglages du flux de brouillon"
+    },
+    "draftWorkflow": {
+      "title": "Permissions des issues et des étapes",
+      "createIssue": "Qui peut soumettre des issues",
+      "followupIssue": "Qui peut ajouter des compléments",
+      "reviewIssue": "Qui peut relire les issues",
+      "retagIssue": "Qui peut changer le type d’issue",
+      "applyIssue": "Qui peut confirmer la résolution",
+      "manualEndDrafting": "Qui peut terminer l’édition",
+      "advanceFromReview": "Qui peut terminer ce tour de relecture",
+      "enterCrystallization": "Qui peut lancer la cristallisation",
+      "allowAuthorWithdraw": "L’auteur ou l’autrice peut retirer avant relecture",
+      "allowModeratorRetag": "La personne qui relit peut changer le type d’issue",
+      "save": "Enregistrer les permissions des issues et des étapes"
+    },
+    "ghost": {
+      "source": {
+        "circle": "Actuel : surcharge propre au cercle",
+        "pending": "Actuel : surcharge temporaire en attente (active une fois le cercle indexé)",
+        "globalDefault": "Actuel : hérite du défaut global"
+      },
+      "loading": "Chargement de la configuration…",
+      "summaryUseLlmTitle": "Utiliser l’IA pour générer un résumé de discussion",
+      "summaryUseLlmDescription": "Une fois activé, le système organise la discussion récente et génère un court résumé.",
+      "summaryUseLlmWarning": "Une fois désactivé, le système revient à des règles pour résumer la discussion, ce qui peut être moins précis.",
+      "triggerModeLabel": "Que faire après le déclenchement",
+      "triggerModeHint": "Une fois que le système juge que la discussion est prête à entrer dans le flux de brouillon, faut-il seulement notifier ou créer immédiatement un brouillon ?",
+      "triggerModeNotifyOnly": "Notification seulement",
+      "triggerModeAutoDraft": "Créer un brouillon automatiquement",
+      "triggerSummaryUseLlmTitle": "Utiliser l’IA pour décider s’il faut déclencher un brouillon",
+      "triggerSummaryUseLlmDescription": "Une fois activé, le système organise d’abord la discussion récente, puis utilise l’IA pour aider à décider si elle doit entrer dans le flux de brouillon.",
+      "triggerSummaryUseLlmWarning": "Une fois désactivé, le système revient à des règles pour décider s’il faut déclencher un brouillon, ce qui peut être moins précis.",
+      "save": "Enregistrer la configuration IA"
+    },
+    "roleOptions": {
+      "initiate": "Initié",
+      "member": "Membre",
+      "elder": "Ancien",
+      "moderator": "Modérateur",
+      "admin": "Admin",
+      "owner": "Owner"
+    },
+    "memberRoles": {
+      "owner": "Owner",
+      "curator": "Curateur",
+      "member": "Membre"
+    },
+    "members": {
+      "directoryTitle": "Annuaire des membres",
+      "title": "Membres ({count})",
+        "actions": {
+          "setCurator": "Nommer curateur",
+          "unsetCurator": "Retirer le rôle de curateur",
+          "remove": "Retirer le membre",
+          "invite": "Inviter des membres",
+          "leave": "Quitter le cercle"
+        }
+      },
+    "danger": {
+      "deleteCircle": "Dissoudre ce cercle"
+    },
+    "errors": {
+      "roleChange": "La mise à jour du rôle a échoué. Réessayez.",
+      "removeMember": "La suppression du membre a échoué. Réessayez.",
+      "leaveCircle": "Impossible de quitter le cercle. Réessayez."
+    },
+    "actions": {
+      "saving": "Enregistrement…"
+    },
+    "units": {
+      "minutes": "minutes"
+    },
+    "reviewEntry": {
+      "help": {
+        "autoOnly": "L’édition du corps se termine automatiquement à l’expiration du minuteur et passe en revue des problèmes.",
+        "manualOnly": "Seuls les membres autorisés peuvent terminer manuellement l’édition du corps et entrer en revue des problèmes.",
+        "autoOrManual": "La revue démarre automatiquement à l’expiration du temps, mais elle peut aussi être terminée manuellement plus tôt."
+      }
+    }
+  },
+  "CrystalDetailSheet": {
+    "errors": {
+      "loadFormalOutput": "Impossible de lire le CrystalOutput formel."
+    },
+    "roles": {
+      "author": "Auteur",
+      "discussant": "Personne ayant discuté",
+      "reviewer": "Relecteur",
+      "cited": "Contributeur cité",
+      "unknown": "Contributeur"
+    },
+    "lineage": {
+      "sourceDraft": "Brouillon source",
+      "discussionAnchor": "Ancre de discussion",
+      "summaryHash": "Hash du résumé",
+      "messagesDigest": "Résumé des messages",
+      "sourceType": "Type de source",
+      "snapshotSource": "Instantané de l’ancre de discussion",
+      "settlementFallback": "Rejeu de settlement (secours)",
+      "unlabeled": "Non étiqueté"
+    },
+    "patina": {
+      "ancient": "🏛 Classique",
+      "settling": "📜 En décantation",
+      "fresh": "✨ Cristal neuf"
+    },
+    "meta": {
+      "citedBy": "Cité {count} fois",
+      "ageDays": "Cristallisé il y a {count} jours"
+    },
+    "formalOutput": {
+      "label": "Résultat formel de cristallisation",
+      "loading": "Chargement",
+      "unavailable": "Indisponible",
+      "pending": "Pas encore prêt",
+      "loadingBody": "Chargement du CrystalOutput formel…",
+      "pendingBody": "Il n’existe pas encore de CrystalOutput formel exploitable ; ce panneau ne traite donc pas encore le grand livre de contribution inféré comme contrat final du résultat."
+    },
+    "sections": {
+      "provenance": "Provenance",
+      "contributionLedger": "Grand livre des contributions"
+    },
+    "actions": {
+      "copy": "Copier",
+      "cite": "Citer",
+      "citePending": "La citation du cristal n’est pas encore disponible"
+    }
+  },
+  "DraftCard": {
+    "meta": {
+      "editors": "{count} éditeurs",
+      "comments": "{count} commentaires"
+    }
+  },
+  "DraftDiscussionPanel": {
+    "fallback": {
+      "pendingTime": "Heure en attente"
+    },
+    "messages": {
+      "create": "Problème créé",
+      "followup": "Suivi ajouté",
+      "propose": "Résolution proposée",
+      "accept": "Résolution acceptée",
+      "reject": "Résolution rejetée",
+      "apply": "Résolution appliquée",
+      "withdraw": "Fil retiré",
+      "retag": "Type de problème modifié",
+      "update": "Mis à jour",
+      "meta": "{authorId} · {time}",
+      "content": {
+        "retag": "Le type de problème a changé.",
+        "withdraw": "Ce fil a été retiré.",
+        "accept": "La proposition a été acceptée.",
+        "reject": "La proposition a été rejetée.",
+        "apply": "Le changement accepté a été appliqué au brouillon.",
+        "empty": "Aucun détail supplémentaire n’a été ajouté.",
+        "retagWithType": "Le type de problème est devenu {issueType}."
+      }
+    },
+    "issueTypes": {
+      "fact_correction": "Correction factuelle",
+      "expression_improvement": "Amélioration de formulation",
+      "knowledge_supplement": "Complément de connaissance",
+      "question_and_supplement": "Question et complément",
+      "fallback": "Problème"
+    },
+    "states": {
+      "open": "Soumis",
+      "proposed": "En revue",
+      "accepted": "Accepté",
+      "rejected": "Rejeté",
+      "withdrawn": "Retiré",
+      "applied": "Appliqué"
+    },
+    "targetTypes": {
+      "paragraph": "Paragraphe",
+      "structure": "Structure",
+      "document": "Document"
+    },
+    "targetLabels": {
+      "paragraphNumber": "Paragraphe {index}",
+      "paragraphRaw": "Paragraphe · {value}",
+      "structureParagraphs": "Structure · paragraphes {values}",
+      "generic": "{type} · {value}"
+    },
+    "errors": {
+      "loadRevisionDirections": "Impossible de charger les orientations acceptées.",
+      "revisionSummaryRequired": "Un résumé de l’orientation acceptée est requis.",
+      "createRevisionDirection": "Impossible d’enregistrer l’orientation acceptée.",
+      "acceptRevisionDirection": "Impossible de marquer cette orientation comme acceptée.",
+      "rejectRevisionDirection": "Impossible de rejeter cette orientation acceptée.",
+      "selectParagraph": "Choisissez un paragraphe avant d’ouvrir ce problème.",
+      "selectStructureRange": "Choisissez au moins un paragraphe pour ce problème structurel.",
+      "createDescriptionRequired": "Décrivez le problème avant de l’envoyer.",
+      "createThread": "Impossible de créer le fil de problème.",
+      "followupRequired": "Ajoutez le suivi avant de l’envoyer.",
+      "reply": "Impossible d’envoyer la réponse de suivi.",
+      "propose": "Impossible d’envoyer la résolution proposée.",
+      "resolve": "Impossible d’enregistrer la décision de résolution.",
+      "withdraw": "Impossible de retirer ce fil.",
+      "apply": "Impossible d’enregistrer la résolution appliquée."
+    },
+    "aria": {
+      "panel": "Panneau de discussion du brouillon"
+    },
+    "header": {
+      "eyebrow": "Discussion de révision",
+      "title": "Problèmes et résolutions"
+    },
+    "governance": {
+      "eyebrow": "Gouvernance",
+      "labels": {
+        "target": "Cible",
+        "actor": "Acteur",
+        "audit": "Piste d’audit"
+      },
+      "actions": {
+        "drafting": "Révision en cours",
+        "review": "Relecture en cours",
+        "crystallizationActive": "Vote de cristallisation en cours",
+        "crystallizationFailed": "Reprise après un échec de cristallisation",
+        "crystallized": "Cristallisation terminée",
+        "archived": "Archivé",
+        "default": "Flux du brouillon en cours"
+      },
+      "values": {
+        "targetVersion": "Version stable v{version}"
+      },
+      "capabilities": {
+        "create": "Peut soumettre des points",
+        "resolve": "Peut examiner des points",
+        "apply": "Peut appliquer les points acceptés",
+        "crystallize": "Peut lancer la cristallisation"
+      },
+      "viewOnly": "Lecture seule",
+      "progress": {
+        "submitted": "Soumis",
+        "inReview": "En révision",
+        "accepted": "Acceptés",
+        "resolved": "Résolus"
+      }
+    },
+    "revisionDirections": {
+      "title": "Orientations acceptées",
+      "hint": "Quand une proposition de gouvernance est adoptée, enregistrez ici l’orientation acceptée avant d’appliquer les changements au brouillon.",
+      "summaryLabel": "Orientation acceptée",
+      "summaryPlaceholder": "Résumez ce que la proposition adoptée demande de mettre en œuvre.",
+      "acceptanceMode": {
+        "label": "Mode d’acceptation",
+        "managerConfirm": "Confirmation du gestionnaire",
+        "roleConfirm": "Confirmation par rôle",
+        "governanceVote": "Vote de gouvernance"
+      },
+      "status": {
+        "accepted": "Acceptée",
+        "rejected": "Rejetée",
+        "expired": "Expirée",
+        "open": "Ouverte"
+      },
+      "scope": {
+        "paragraph": "Paragraphe {index}",
+        "document": "Document entier"
+      },
+      "submit": "Enregistrer l’orientation acceptée",
+      "acceptedTitle": "Orientations acceptées prêtes à être appliquées",
+      "scopeMeta": "{scope} · {status} · {mode}",
+      "listTitle": "Toutes les orientations acceptées",
+      "governanceMeta": "Proposition de gouvernance {id}",
+      "actions": {
+        "accept": "Accepter",
+        "reject": "Rejeter"
+      },
+      "governanceHint": "L’adoption de la proposition n’édite pas le brouillon à elle seule. Enregistrez d’abord l’orientation acceptée ici."
+    },
+    "create": {
+      "title": "Ouvrir un nouveau problème",
+      "bindingHint": "Ce problème sera lié à la version stable v{version}.",
+      "targetTypeLabel": "Type de cible",
+      "issueTypeLabel": "Type de problème",
+      "paragraphTargetLabel": "Paragraphe cible",
+      "selectParagraph": "Choisir un paragraphe",
+      "paragraphOption": "Paragraphe {index} · {preview}",
+      "paragraphSelectedHint": "Le problème sera rattaché au paragraphe {index}.",
+      "paragraphSelectHint": "Choisissez le paragraphe concerné par ce problème.",
+      "structureLabel": "Structure cible",
+      "structureHint": "Choisissez les paragraphes qui définissent ce changement de structure.",
+      "paragraphShort": "P{index}",
+      "selectedStructure": "Paragraphes sélectionnés : {values}",
+      "documentLabel": "Document entier",
+      "documentHint": "Utilisez cette option quand le problème touche le brouillon dans son ensemble.",
+      "boundVersionLabel": "Version stable liée",
+      "boundVersionHint": "Les nouveaux problèmes ouverts ici viseront la v{version}.",
+      "descriptionLabel": "Description du problème",
+      "descriptionPlaceholder": "Décrivez la correction factuelle, le changement de formulation, le manque de connaissance ou la question ouverte.",
+      "insertCurrentReference": "Insérer la référence de fichier actuelle",
+      "submit": "Envoyer le problème"
+    },
+    "threads": {
+      "title": "Fils de problème",
+      "loading": "Chargement des fils de problème…",
+      "empty": "Aucun fil de problème pour le moment.",
+      "targetVersion": "v{version} · fil {id}",
+      "noMessages": "Aucun message dans ce fil pour le moment.",
+      "evidence": {
+        "title": "Preuve appliquée",
+        "editAnchor": "Ancre d’édition : {id}",
+        "snapshotHash": "Hash du snapshot : {hash}",
+        "draftVersion": "Version du brouillon : v{version}"
+      },
+      "issueTypeLabel": "Type de problème",
+      "replyPlaceholder": "Ajouter une réponse de suivi…",
+      "proposePlaceholder": "Décrire la résolution proposée…",
+      "resolvePlaceholder": "Expliquez pourquoi ce problème doit être accepté ou rejeté…",
+      "applyPlaceholder": "Décrivez comment la résolution acceptée a été appliquée…",
+      "actions": {
+        "reply": "Répondre",
+        "withdraw": "Retirer",
+        "propose": "Proposer une résolution",
+        "accept": "Accepter",
+        "reject": "Rejeter",
+        "apply": "Appliquer la résolution"
+      },
+      "emptySummary": "Aucun contexte supplémentaire n’a encore été ajouté à ce point."
+    }
+  },
+  "SeededFileTree": {
+    "aria": {
+      "section": "Références amorcées"
+    },
+    "title": "Références amorcées",
+    "hint": "Parcourez les fichiers indexés et choisissez une référence de ligne à insérer dans la discussion du brouillon.",
+    "currentRef": "Référence actuelle : {reference}",
+    "loading": "Chargement des fichiers amorcés…",
+    "empty": "Aucun fichier amorcé pour le moment.",
+    "preview": {
+      "unselected": "Sélectionnez un fichier et une ligne"
+    }
+  },
+  "ReferencesPanel": {
+    "aria": {
+      "section": "Références"
+    },
+    "eyebrow": "Références",
+    "title": "Références",
+    "hint": "Regroupez ici les références traçables de ce brouillon.",
+    "formal": {
+      "title": "Références formelles",
+      "hint": "Les références formelles visibles viennent des marqueurs @crystal(...) déjà présents dans le corps du brouillon.",
+      "insertAction": "Insérer une référence",
+      "loading": "Chargement des références formelles…",
+      "empty": "Aucune référence formelle pour ce brouillon pour le moment.",
+      "summary": "{count} références formelles sont actuellement visibles sur {sourceBlockCount} blocs source.",
+      "note": "Ces entrées proviennent des marqueurs @crystal(...) déjà présents dans le corps du brouillon. Un sélecteur plus riche pour la phase brouillon sera travaillé séparément plus tard."
+    },
+    "seeded": {
+      "title": "Preuve par fichiers amorcés",
+      "hint": "Les cercles seeded peuvent encore choisir ici une preuve fichier-ligne et insérer la référence courante @file:path:line dans la discussion du brouillon."
+    }
+  },
+  "KnowledgeReferencePicker": {
+    "title": "Insérer une référence",
+    "hint": "Choisissez parmi jusqu’à 50 connaissances cristallisées déjà chargées pour ce cercle.",
+    "searchPlaceholder": "Rechercher dans les connaissances déjà chargées du cercle",
+    "searchAriaLabel": "Rechercher dans les connaissances déjà chargées du cercle",
+    "empty": "Aucune connaissance du cercle ne correspond à ce filtre.",
+    "close": "Fermer",
+    "version": "v{version}"
+  },
+  "CrucibleLifecycleHeader": {
+    "fallback": {
+      "notProvided": "Non renseigné"
+    },
+    "facets": {
+      "none": "Aucun détecté",
+      "fact": "Fait",
+      "explanation": "Explication",
+      "emotion": "Émotion",
+      "question": "Question",
+      "problem": "Problème",
+      "criteria": "Critères",
+      "proposal": "Proposition",
+      "summary": "Résumé"
+    },
+    "annotations": {
+      "none": "Aucune",
+      "fact": "Fait",
+      "explanation": "Explication",
+      "emotion": "Émotion"
+    },
+    "sourceKind": {
+      "unavailable": "Source indisponible",
+      "acceptedCandidate": "Graine de candidature acceptée",
+      "reviewBoundSnapshot": "Snapshot lié à la revue",
+      "pending": "Source encore en attente de confirmation"
+    },
+    "warnings": {
+      "missingDraftSource": "Le relais de source d’origine est manquant, donc la source du brouillon reste indisponible pour l’instant.",
+      "missingAnchorEvidence": "Le snapshot stable actuel n’a pas encore la preuve d’ancrage du brouillon ; les détails de source s’appuient donc sur les métadonnées enregistrées.",
+      "legacyApplicationEvidence": "Certaines applications historiques de problèmes utilisent encore une preuve héritée et sont en cours de normalisation.",
+      "boundVersionOnly": "La preuve d’application du snapshot stable actuel n’est pas encore complète, donc seule la version liée est affichée pour le moment.",
+      "fallback": "Ce brouillon conserve encore un détail de cycle de vie non résolu."
+    },
+    "status": {
+      "drafting": "Rédaction",
+      "review": "En revue",
+      "crystallizationActive": "Cristallisation active",
+      "crystallizationFailed": "Cristallisation incomplète",
+      "crystallized": "Cristallisé",
+      "archived": "Archivé",
+      "inProgress": "En cours"
+    },
+    "meta": {
+      "pendingTime": "Heure en attente",
+      "latestUpdatePending": "Dernière mise à jour en attente",
+      "updated": "Mis à jour {date}"
+    },
+    "reviewLead": "{count} problèmes sont actuellement liés à v{version}",
+    "summary": {
+      "drafting": {
+        "manualWithIssues": "Le cycle de révision {round} est en cours. {count} problèmes avancent autour de v{version}, et la revue peut être lancée manuellement quand l’équipe est prête.",
+        "manualNoIssues": "Le cycle de révision {round} est en cours, et la revue peut être lancée manuellement quand l’équipe est prête.",
+        "autoWithIssues": "Le cycle de révision {round} est en cours. {count} problèmes avancent autour de v{version}, et la revue devrait commencer vers {window}.",
+        "autoNoIssues": "Le cycle de révision {round} est en cours, et la revue devrait commencer vers {window}."
+      },
+      "review": {
+        "expiredWithIssues": "Le corps est verrouillé. La revue est terminée pour {count} problèmes liés à v{version} ; il faut maintenant décider de lancer un nouveau cycle ou d’entrer en cristallisation.",
+        "expiredNoIssues": "Le corps est verrouillé. La revue de v{version} est terminée ; il faut maintenant décider de lancer un nouveau cycle ou d’entrer en cristallisation.",
+        "activeWithIssues": "Le corps est verrouillé. {count} problèmes liés à v{version} sont en revue, et ce cycle devrait se terminer vers {window}.",
+        "activeNoIssues": "Le corps est verrouillé. Le cycle de revue de v{version} attend encore des problèmes et devrait se terminer vers {window}."
+      },
+      "archived": {
+        "withStableVersion": "Ce brouillon archivé conserve la version stable v{version} et son historique de discussion. Restaurez-le pour lancer un nouveau cycle de révision.",
+        "withoutStableVersion": "Ce brouillon archivé conserve le corps actuel et l’historique de discussion. Restaurez-le pour lancer un nouveau cycle de révision."
+      },
+      "crystallizationActive": "Le corps est verrouillé et v{version} est en cristallisation.",
+      "crystallizationFailed": "La cristallisation ne s’est pas terminée pour v{version}. Vous pouvez continuer à résoudre les problèmes puis réessayer plus tard.",
+      "crystallized": "Ce brouillon a été cristallisé avec succès, et le résultat stable est v{version}.",
+      "default": "Ce brouillon continue d’avancer autour de v{version}."
+    },
+    "headline": "{status} · v{version}",
+    "header": {
+      "eyebrow": "Cycle de vie du brouillon"
+    },
+    "actions": {
+      "enterReview": {
+        "pending": "Entrée en revue…",
+        "idle": "Entrer en revue"
+      },
+      "advanceReview": {
+        "pending": "Ouverture du cycle suivant…",
+        "idle": "Lancer le cycle suivant"
+      },
+      "enterCrystallization": {
+        "pending": "Entrée en cristallisation…",
+        "idle": "Entrer en cristallisation"
+      },
+      "executeCrystallization": {
+        "pending": "Cristallisation en cours…",
+        "idle": "Exécuter la cristallisation"
+      },
+      "retryCrystallization": {
+        "pending": "Nouvelle tentative de cristallisation…",
+        "idle": "Réessayer la cristallisation"
+      },
+      "rollbackCrystallization": {
+        "pending": "Retour en arrière…",
+        "idle": "Revenir en revue"
+      },
+      "archive": {
+        "pending": "Archivage…",
+        "idle": "Archiver le brouillon"
+      },
+      "restore": {
+        "pending": "Restauration…",
+        "idle": "Restaurer le brouillon"
+      }
+    },
+    "details": {
+      "collapse": "Masquer les détails",
+      "expand": "Afficher les détails"
+    },
+    "cards": {
+      "source": {
+        "title": "Relais de source",
+        "lead": "Relais de source depuis {count} messages",
+        "candidateId": "Candidat {id}",
+        "messageCount": "{count} messages source",
+        "semanticFacets": "Facettes système : {labels}",
+        "authorAnnotations": "Annotations auteur : {labels}",
+        "lastProposal": "Dernière proposition : {id}",
+        "missingTitle": "Relais de source manquant",
+        "missingHint": "Le brouillon peut continuer d’avancer, mais l’enregistrement de source d’origine est indisponible pour l’instant."
+      },
+      "baseline": {
+        "title": "Base stable",
+        "lead": "Le snapshot stable v{version} est la base actuelle de revue.",
+        "source": "Source : {label}",
+        "createdAt": "Créé {date}",
+        "anchorId": "Ancre {id}"
+      },
+      "workingCopy": {
+        "title": "Copie de travail",
+        "draftingLead": "La copie de travail est éditable et repose actuellement sur le snapshot stable v{version}.",
+        "lockedLead": "Le corps est verrouillé ; la copie de travail reste donc épinglée à v{version}.",
+        "basedOnVersion": "Basée sur le snapshot stable v{version}",
+        "updatedAt": "Dernière édition {date}"
+      },
+      "reviewProgress": {
+        "title": "Avancement de la revue",
+        "submittedInReview": "{submitted} soumis en revue",
+        "acceptedResolved": "{accepted} acceptés ou résolus"
+      }
+    }
+  },
+  "CrucibleTab": {
+    "errors": {
+      "loadTemporaryEditGrants": "Impossible de charger les accès temporaires d’édition.",
+      "fetchDraftReferenceLinks": "Impossible de charger les références du brouillon.",
+      "loadSourceMaterials": "Impossible de charger les matériaux source.",
+      "loadSeededReferences": "Impossible de charger les références amorcées.",
+      "missingDraftContextForUpload": "Ouvrez d’abord un brouillon avant de téléverser des matériaux source.",
+      "uploadWithoutEditPermission": "Un droit d’édition est nécessaire avant de téléverser des matériaux source.",
+      "unsupportedSourceMaterial": "Ce type de fichier n’est pas pris en charge comme matériau source.",
+      "uploadSourceMaterial": "Impossible de téléverser le matériau source.",
+      "loadDraftLifecycle": "Impossible de charger le cycle de vie du brouillon.",
+      "loadDiscussionThreads": "Impossible de charger les fils de problème.",
+      "saveDraft": "Impossible d’enregistrer le corps du brouillon.",
+      "reviewRequiresBody": "Ajoutez du contenu avant d’entrer en revue.",
+      "enterReview": "Impossible d’entrer en revue.",
+      "advanceReview": "Impossible de lancer le cycle suivant.",
+      "enterCrystallization": "Impossible d’entrer en cristallisation.",
+      "retryCrystallization": "Impossible de relancer la cristallisation.",
+      "rollbackCrystallization": "Impossible de ramener ce brouillon en revue.",
+      "archiveRequiresBody": "Ajoutez du contenu avant d’archiver ce brouillon.",
+      "archiveDraft": "Impossible d’archiver le brouillon.",
+      "restoreDraft": "Impossible de restaurer le brouillon.",
+      "refreshDiscussionThreads": "Impossible d’actualiser les fils de problème.",
+      "discussionOperation": "Impossible de terminer cette action de discussion.",
+      "missingDraftContextForCreateThread": "Ouvrez d’abord un brouillon avant de créer un fil de problème.",
+      "missingDraftContextForPropose": "Ouvrez d’abord un brouillon avant de proposer une résolution.",
+      "missingDraftContextForResolve": "Ouvrez d’abord un brouillon avant d’enregistrer la résolution.",
+      "missingDraftContextForReply": "Ouvrez d’abord un brouillon avant de répondre.",
+      "missingDraftContextForWithdraw": "Ouvrez d’abord un brouillon avant de retirer un fil.",
+      "missingDraftContextForApply": "Ouvrez d’abord un brouillon avant d’enregistrer une application.",
+      "missingDraftContextForApplyAcceptedIssues": "Ouvrez d’abord un brouillon avant d’appliquer des problèmes acceptés.",
+      "applyAcceptedIssuesRequiresBody": "Ajoutez du contenu avant d’appliquer des problèmes acceptés.",
+      "applyAcceptedIssues": "Impossible d’appliquer les problèmes acceptés.",
+      "sendComment": "Impossible d’envoyer le commentaire de paragraphe.",
+      "requestTemporaryEditGrant": "Impossible de demander un accès temporaire d’édition.",
+      "issueTemporaryEditGrant": "Impossible d’accorder un accès temporaire d’édition.",
+      "revokeTemporaryEditGrant": "Impossible de révoquer l’accès temporaire d’édition.",
+      "crystallizeRequiresBody": "Ajoutez du contenu avant la cristallisation.",
+      "executeCrystallization": "Impossible d’exécuter la cristallisation."
+    },
+    "confirm": {
+      "applyAcceptedGhostThreads": "Ce changement d’étape marquera aussi {count} fils acceptés par l’IA comme appliqués, car leurs changements sont déjà dans le brouillon. Continuer ?"
+    },
+    "notices": {
+      "enterReviewSuccess": "Le brouillon est entré en revue.",
+      "advanceReviewSuccess": "Le cycle suivant a démarré.",
+      "enterCrystallizationSuccess": "Le brouillon est entré en cristallisation.",
+      "retryCrystallizationSuccess": "La nouvelle tentative de cristallisation a commencé.",
+      "rollbackCrystallizationSuccess": "Le brouillon est revenu en revue.",
+      "archiveSuccess": "Brouillon archivé.",
+      "restoreSuccess": "Brouillon restauré.",
+      "requestTemporaryEditGrantSuccess": "Demande d’accès temporaire envoyée.",
+      "issueTemporaryEditGrantSuccess": "Accès temporaire accordé.",
+      "revokeTemporaryEditGrantSuccess": "Accès temporaire révoqué."
+    },
+    "fallback": {
+      "unknownMember": "Membre inconnu",
+      "untitledDraft": "Brouillon sans titre"
+    },
+    "disabled": {
+      "maxRevisionRounds": "Le nombre maximal de cycles de révision est atteint ({count}).",
+      "walletRequiredForCrystallization": "Connectez votre wallet avant d’entrer en cristallisation.",
+      "policyProfileRequiredForCrystallization": "Un profil de politique est requis avant que ce brouillon puisse entrer en cristallisation.",
+      "editAnchorRequiredForCrystallization": "Faites d’abord une modification collaborative et attendez la création de l’ancre d’édition avant de cristalliser.",
+      "editAnchorPendingForCrystallization": "La dernière ancre d’édition collaborative n’a pas encore fini sa confirmation on-chain. Réessayez dans un instant.",
+      "policyProfileRequiredForRetryCrystallization": "Un profil de politique est requis avant de réessayer la cristallisation.",
+      "walletRequiredForArchive": "Connectez votre wallet avant d’archiver ce brouillon.",
+      "policyProfileRequiredForArchive": "Un profil de politique est requis avant d’archiver ce brouillon.",
+      "walletRequiredForRestore": "Connectez votre wallet avant de restaurer ce brouillon.",
+      "policyProfileRequiredForRestore": "Un profil de politique est requis avant de restaurer ce brouillon."
+    },
+    "loading": {
+      "draftContent": "Chargement du brouillon…",
+      "draftLifecycle": "Chargement du cycle de vie…"
+    },
+    "actions": {
+      "backToDraftList": "Retour aux brouillons"
+    },
+    "editor": {
+      "bodyEyebrow": "Corps du brouillon",
+      "bodyTitle": "Copie de travail",
+      "bodyHint": "Modifiez le corps actuel et appliquez directement dans le texte les problèmes acceptés.",
+      "discussionEyebrow": "Discussion",
+      "discussionTitle": "Fils de problème",
+      "discussionHint": "Suivez les problèmes, propositions et résolutions appliquées liés à ce brouillon."
+    },
+    "ghostReveal": {
+      "title": "Plan de révision issu des fils"
+    },
+    "permissions": {
+      "inactiveReason": "Seuls les membres actifs du cercle peuvent effectuer cette action.",
+      "roles": {
+        "owner": "propriétaire",
+        "admin": "administrateur",
+        "moderator": "modérateur",
+        "elder": "ancien",
+        "member": "membre",
+        "initiate": "initié",
+        "higher": "un rôle supérieur"
+      },
+      "reasons": {
+        "createIssue": "Ce cercle exige au moins le rôle de {role} pour soumettre un point.",
+        "followupIssue": "Ce cercle exige au moins le rôle de {role} pour ajouter un complément à un point.",
+        "withdrawOwnIssue": "Ce cercle ne permet pas de retirer votre propre point avant le début de la relecture.",
+        "reviewIssue": "Ce cercle exige au moins le rôle de {role} pour lancer ou gérer la relecture des points.",
+        "retagIssue": "Ce cercle exige au moins le rôle de {role} pour changer le type d’un point.",
+        "applyAcceptedIssue": "Ce cercle exige au moins le rôle de {role} pour marquer un point accepté comme appliqué au brouillon.",
+        "endDraftingEarly": "Ce cercle exige au moins le rôle de {role} pour arrêter la rédaction plus tôt et passer en relecture.",
+        "advanceFromReview": "Ce cercle exige au moins le rôle de {role} pour clôturer la relecture en cours et passer à l’itération suivante.",
+        "enterCrystallization": "Ce cercle exige au moins le rôle de {role} pour entrer en cristallisation.",
+        "retagIssueDisabled": "Ce cercle ne permet pas actuellement de changer le type d’un point pendant la relecture."
+      }
+    }
+  },
+  "GhostReveal": {
+    "metadata": {
+      "model": "Modèle : {model}",
+      "promptVersion": "{asset} · v{version}",
+      "sourceDigest": "Empreinte source {digest}"
+    },
+    "errors": {
+      "missingDraftContext": "Le contexte du brouillon manque encore, la suggestion de révision ne peut donc pas être générée pour l’instant.",
+      "missingArtifact": "L’IA n’a pas renvoyé d’artefact de révision lisible.",
+      "missingContent": "L’IA n’a pas renvoyé de contenu de révision exploitable.",
+      "generateFailed": "Impossible de générer la suggestion de révision. Réessayez.",
+      "acceptFailed": "Impossible d’accepter le plan de révision. Réessayez."
+    },
+    "states": {
+      "pending": {
+        "title": "Génération d’une révision issue des fils",
+        "hint": "Le système lit {count} fils de problème en attente et prépare une révision structurée."
+      },
+      "error": {
+        "title": "Échec de la révision issue des fils",
+        "fallback": "La génération a échoué. Réessayez."
+      },
+      "applied": {
+        "title": "Révision écrite dans le brouillon",
+        "hint": "Cette révision fondée sur les fils de problème a déjà été écrite dans le corps actuel. Les problèmes de paragraphe acceptés liés seront présélectionnés lors des prochaines modifications, et vous pourrez toujours les décocher."
+      },
+      "accepted": {
+        "title": "Plan de révision accepté",
+        "hint": "Ce plan de révision a été accepté, mais le brouillon a changé avant son écriture. Actualisez le brouillon puis réessayez."
+      },
+      "candidate": {
+        "title": "Brouillon de révision issu des fils",
+        "emptyDraftHint": "Le système a généré des suggestions de révision par paragraphe à partir de {count} fils de problème en attente.",
+        "existingDraftHint": "Ces suggestions de révision ont été générées à partir de {count} fils de problème en attente. En en appliquant une, vous mettez immédiatement à jour le paragraphe cible dans le brouillon actuel.",
+        "carryHint": "L’application d’un plan enregistre aussi le contexte des fils liés afin de garder les modifications suivantes alignées."
+      },
+      "idle": {
+        "title": "Assistant de révision issu des fils",
+        "hint": "Ce module n’apparaît qu’en relecture et transforme {count} fils de problème en attente en plans de révision par paragraphe pour le prochain cycle."
+      }
+    },
+    "actions": {
+      "retry": "Réessayer",
+      "accept": "Appliquer au brouillon",
+      "ignore": "Ignorer",
+      "generate": "Générer une révision"
+    },
+    "candidate": {
+      "targetLabel": "{targetRef} · {count} fils de problème liés"
+    },
+    "defaultTitle": "Plan de révision issu des fils"
+  },
+  "SourceMaterialsPanel": {
+    "status": {
+      "aiReadable": "Lisible par l’IA",
+      "extracting": "Extraction en cours",
+      "processing": "Traitement en cours"
+    },
+    "aria": {
+      "section": "Matériaux source",
+      "fileInput": "Téléverser un fichier de matériau source"
+    },
+    "title": "Matériaux source",
+    "hint": "Téléversez les fichiers d’appui que l’IA peut lire pendant la rédaction et la revue.",
+    "actions": {
+      "uploadAndExtract": "Téléverser et extraire"
+    },
+    "notices": {
+      "uploadDisabled": "Un droit d’édition est nécessaire avant de téléverser des matériaux source."
+    },
+    "loading": "Chargement des matériaux source…",
+    "empty": "Aucun matériau source pour le moment.",
+    "meta": {
+      "chunkDigest": "{chunkCount} fragments · empreinte {digest}"
+    }
+  },
+  "CreateCircleFlow": {
+    "errors": {
+      "metadataSyncFailed": "Le cercle a bien été créé, mais la description n’a pas pu être enregistrée. Vous pouvez réessayer depuis la page des réglages du cercle.",
+      "metadataSyncFailedSuffix": "La description du cercle n’a pas pu être enregistrée. Vous pouvez réessayer depuis la page des réglages du cercle."
+    }
+  }
+}

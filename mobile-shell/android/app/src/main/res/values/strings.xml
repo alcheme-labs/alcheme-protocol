@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Alcheme Demo</string>
+    <string name="title_activity_main">Alcheme Demo</string>
+    <string name="package_name">xyz.alcheme.mobile</string>
+    <string name="custom_url_scheme">xyz.alcheme.mobile</string>
+</resources>

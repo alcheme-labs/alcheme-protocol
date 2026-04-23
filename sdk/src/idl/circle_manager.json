@@ -1,0 +1,2429 @@
+{
+  "address": "GZswb1rGbZfoiapkvatDuMZrptVAX2p1pEVDSrMuyLqQ",
+  "metadata": {
+    "name": "circle_manager",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Circle-based knowledge governance for SocialHub Protocol"
+  },
+  "instructions": [
+    {
+      "name": "add_circle_member",
+      "discriminator": [
+        45,
+        44,
+        80,
+        103,
+        143,
+        177,
+        246,
+        150
+      ],
+      "accounts": [
+        {
+          "name": "circle",
+          "writable": true
+        },
+        {
+          "name": "circle_member",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  105,
+                  114,
+                  99,
+                  108,
+                  101,
+                  95,
+                  109,
+                  101,
+                  109,
+                  98,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "circle"
+              },
+              {
+                "kind": "account",
+                "path": "member"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "member"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "role",
+          "type": {
+            "defined": {
+              "name": "CircleMemberRole"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "add_curator",
+      "docs": [
+        "添加策展人（通过AccessController验证）"
+      ],
+      "discriminator": [
+        242,
+        179,
+        115,
+        214,
+        215,
+        130,
+        73,
+        120
+      ],
+      "accounts": [
+        {
+          "name": "circle",
+          "writable": true
+        },
+        {
+          "name": "access_controller"
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "curator",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "bind_and_update_contributors",
+      "docs": [
+        "严格主路径：原子执行 proof 绑定与 contributors 更新"
+      ],
+      "discriminator": [
+        151,
+        243,
+        137,
+        252,
+        181,
+        48,
+        164,
+        210
+      ],
+      "accounts": [
+        {
+          "name": "knowledge",
+          "writable": true
+        },
+        {
+          "name": "circle"
+        },
+        {
+          "name": "knowledge_binding",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  107,
+                  110,
+                  111,
+                  119,
+                  108,
+                  101,
+                  100,
+                  103,
+                  101,
+                  95,
+                  98,
+                  105,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "knowledge"
+              }
+            ]
+          }
+        },
+        {
+          "name": "proof_attestor_registry",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  111,
+                  102,
+                  95,
+                  97,
+                  116,
+                  116,
+                  101,
+                  115,
+                  116,
+                  111,
+                  114,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "instructions_sysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "source_anchor_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "proof_package_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "contributors_root",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "contributors_count",
+          "type": "u16"
+        },
+        {
+          "name": "binding_version",
+          "type": "u16"
+        },
+        {
+          "name": "generated_at",
+          "type": "i64"
+        },
+        {
+          "name": "issuer_key_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "issued_signature",
+          "type": {
+            "array": [
+              "u8",
+              64
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "bind_contributor_proof",
+      "docs": [
+        "绑定贡献证明（创建 KnowledgeBinding PDA）"
+      ],
+      "discriminator": [
+        237,
+        90,
+        173,
+        177,
+        170,
+        188,
+        42,
+        247
+      ],
+      "accounts": [
+        {
+          "name": "knowledge",
+          "writable": true
+        },
+        {
+          "name": "circle"
+        },
+        {
+          "name": "knowledge_binding",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  107,
+                  110,
+                  111,
+                  119,
+                  108,
+                  101,
+                  100,
+                  103,
+                  101,
+                  95,
+                  98,
+                  105,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "knowledge"
+              }
+            ]
+          }
+        },
+        {
+          "name": "proof_attestor_registry",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  111,
+                  102,
+                  95,
+                  97,
+                  116,
+                  116,
+                  101,
+                  115,
+                  116,
+                  111,
+                  114,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "instructions_sysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "source_anchor_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "proof_package_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "contributors_root",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "contributors_count",
+          "type": "u16"
+        },
+        {
+          "name": "binding_version",
+          "type": "u16"
+        },
+        {
+          "name": "generated_at",
+          "type": "i64"
+        },
+        {
+          "name": "issuer_key_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "issued_signature",
+          "type": {
+            "array": [
+              "u8",
+              64
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "cpi_promote_knowledge",
+      "docs": [
+        "通过扩展程序提升知识评分（需要 CircleExtend 权限 + circle/knowledge 关系一致）"
+      ],
+      "discriminator": [
+        30,
+        102,
+        29,
+        232,
+        170,
+        131,
+        68,
+        116
+      ],
+      "accounts": [
+        {
+          "name": "knowledge",
+          "writable": true
+        },
+        {
+          "name": "circle"
+        },
+        {
+          "name": "caller_program"
+        },
+        {
+          "name": "extension_registry"
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "quality_delta",
+          "type": "f64"
+        },
+        {
+          "name": "reason",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "create_circle",
+      "docs": [
+        "创建圈层"
+      ],
+      "discriminator": [
+        186,
+        99,
+        49,
+        131,
+        31,
+        51,
+        13,
+        198
+      ],
+      "accounts": [
+        {
+          "name": "circle",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  105,
+                  114,
+                  99,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "circle_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "circle_manager",
+          "writable": true
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "circle_id",
+          "type": "u8"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "level",
+          "type": "u8"
+        },
+        {
+          "name": "parent_circle",
+          "type": {
+            "option": "u8"
+          }
+        },
+        {
+          "name": "knowledge_governance",
+          "type": {
+            "defined": {
+              "name": "KnowledgeGovernance"
+            }
+          }
+        },
+        {
+          "name": "decision_engine",
+          "type": {
+            "defined": {
+              "name": "DecisionEngine"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "execute_transfer",
+      "docs": [
+        "执行已批准的传递"
+      ],
+      "discriminator": [
+        233,
+        126,
+        160,
+        184,
+        235,
+        206,
+        31,
+        119
+      ],
+      "accounts": [
+        {
+          "name": "proposal",
+          "writable": true
+        },
+        {
+          "name": "from_circle"
+        },
+        {
+          "name": "transferred_knowledge",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  107,
+                  110,
+                  111,
+                  119,
+                  108,
+                  101,
+                  100,
+                  103,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "to_circle"
+              },
+              {
+                "kind": "account",
+                "path": "to_circle.knowledge_count",
+                "account": "Circle"
+              }
+            ]
+          }
+        },
+        {
+          "name": "to_circle",
+          "writable": true
+        },
+        {
+          "name": "original_knowledge"
+        },
+        {
+          "name": "circle_manager",
+          "writable": true
+        },
+        {
+          "name": "executor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize",
+      "docs": [
+        "初始化圈层管理器"
+      ],
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "circle_manager",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  105,
+                  114,
+                  99,
+                  108,
+                  101,
+                  95,
+                  109,
+                  97,
+                  110,
+                  97,
+                  103,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_proof_attestor_registry",
+      "docs": [
+        "初始化贡献证明签发者注册表"
+      ],
+      "discriminator": [
+        113,
+        127,
+        215,
+        254,
+        37,
+        87,
+        140,
+        156
+      ],
+      "accounts": [
+        {
+          "name": "proof_attestor_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  111,
+                  102,
+                  95,
+                  97,
+                  116,
+                  116,
+                  101,
+                  115,
+                  116,
+                  111,
+                  114,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "circle_manager",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  105,
+                  114,
+                  99,
+                  108,
+                  101,
+                  95,
+                  109,
+                  97,
+                  110,
+                  97,
+                  103,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "join_circle",
+      "discriminator": [
+        231,
+        168,
+        235,
+        18,
+        99,
+        12,
+        22,
+        7
+      ],
+      "accounts": [
+        {
+          "name": "circle"
+        },
+        {
+          "name": "circle_member",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  105,
+                  114,
+                  99,
+                  108,
+                  101,
+                  95,
+                  109,
+                  101,
+                  109,
+                  98,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "circle"
+              },
+              {
+                "kind": "account",
+                "path": "member"
+              }
+            ]
+          }
+        },
+        {
+          "name": "member",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "leave_circle",
+      "discriminator": [
+        90,
+        250,
+        45,
+        116,
+        132,
+        126,
+        209,
+        126
+      ],
+      "accounts": [
+        {
+          "name": "circle"
+        },
+        {
+          "name": "circle_member",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  105,
+                  114,
+                  99,
+                  108,
+                  101,
+                  95,
+                  109,
+                  101,
+                  109,
+                  98,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "circle"
+              },
+              {
+                "kind": "account",
+                "path": "member"
+              }
+            ]
+          }
+        },
+        {
+          "name": "member",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "propose_transfer",
+      "docs": [
+        "提议知识传递"
+      ],
+      "discriminator": [
+        140,
+        86,
+        133,
+        124,
+        253,
+        226,
+        251,
+        195
+      ],
+      "accounts": [
+        {
+          "name": "proposal",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  112,
+                  111,
+                  115,
+                  97,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "circle"
+              },
+              {
+                "kind": "account",
+                "path": "circle.knowledge_count",
+                "account": "Circle"
+              }
+            ]
+          }
+        },
+        {
+          "name": "knowledge"
+        },
+        {
+          "name": "circle",
+          "writable": true
+        },
+        {
+          "name": "proposer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "knowledge_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "to_circles",
+          "type": "bytes"
+        },
+        {
+          "name": "transfer_type",
+          "type": {
+            "defined": {
+              "name": "TransferType"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "register_proof_attestor",
+      "docs": [
+        "注册贡献证明签发者（admin-only）"
+      ],
+      "discriminator": [
+        32,
+        143,
+        225,
+        188,
+        238,
+        58,
+        11,
+        124
+      ],
+      "accounts": [
+        {
+          "name": "proof_attestor_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  111,
+                  102,
+                  95,
+                  97,
+                  116,
+                  116,
+                  101,
+                  115,
+                  116,
+                  111,
+                  114,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "attestor",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "remove_circle_member",
+      "discriminator": [
+        212,
+        211,
+        79,
+        226,
+        19,
+        7,
+        112,
+        20
+      ],
+      "accounts": [
+        {
+          "name": "circle"
+        },
+        {
+          "name": "circle_member",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  105,
+                  114,
+                  99,
+                  108,
+                  101,
+                  95,
+                  109,
+                  101,
+                  109,
+                  98,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "circle"
+              },
+              {
+                "kind": "account",
+                "path": "member"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "member"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "submit_ai_evaluation",
+      "docs": [
+        "AI提交评估"
+      ],
+      "discriminator": [
+        242,
+        121,
+        90,
+        207,
+        225,
+        39,
+        188,
+        214
+      ],
+      "accounts": [
+        {
+          "name": "proposal",
+          "writable": true
+        },
+        {
+          "name": "circle"
+        },
+        {
+          "name": "ai_oracle",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "evaluation",
+          "type": {
+            "defined": {
+              "name": "AIEvaluation"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "submit_knowledge",
+      "docs": [
+        "提交知识到圈层（curator-only）"
+      ],
+      "discriminator": [
+        196,
+        132,
+        54,
+        65,
+        156,
+        116,
+        199,
+        0
+      ],
+      "accounts": [
+        {
+          "name": "knowledge",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  107,
+                  110,
+                  111,
+                  119,
+                  108,
+                  101,
+                  100,
+                  103,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "circle"
+              },
+              {
+                "kind": "account",
+                "path": "circle.knowledge_count",
+                "account": "Circle"
+              }
+            ]
+          }
+        },
+        {
+          "name": "circle",
+          "writable": true
+        },
+        {
+          "name": "circle_manager",
+          "writable": true
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "ipfs_cid",
+          "type": "string"
+        },
+        {
+          "name": "content_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "title",
+          "type": "string"
+        },
+        {
+          "name": "description",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "update_circle_flags",
+      "docs": [
+        "更新圈层 flags 位字段（kind/mode/min_crystals 等）"
+      ],
+      "discriminator": [
+        203,
+        46,
+        29,
+        249,
+        8,
+        134,
+        248,
+        97
+      ],
+      "accounts": [
+        {
+          "name": "circle",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "flags",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "update_contributors",
+      "docs": [
+        "兼容路径：在已绑定前提下更新 contributors"
+      ],
+      "discriminator": [
+        30,
+        207,
+        188,
+        85,
+        216,
+        99,
+        4,
+        101
+      ],
+      "accounts": [
+        {
+          "name": "knowledge",
+          "writable": true
+        },
+        {
+          "name": "circle"
+        },
+        {
+          "name": "knowledge_binding",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  107,
+                  110,
+                  111,
+                  119,
+                  108,
+                  101,
+                  100,
+                  103,
+                  101,
+                  95,
+                  98,
+                  105,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "knowledge"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "proof_package_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "contributors_root",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "contributors_count",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "update_decision_engine",
+      "docs": [
+        "更新决策引擎"
+      ],
+      "discriminator": [
+        63,
+        250,
+        184,
+        46,
+        164,
+        76,
+        200,
+        179
+      ],
+      "accounts": [
+        {
+          "name": "circle",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_engine",
+          "type": {
+            "defined": {
+              "name": "DecisionEngine"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "vote",
+      "docs": [
+        "投票"
+      ],
+      "discriminator": [
+        227,
+        110,
+        155,
+        23,
+        136,
+        126,
+        172,
+        25
+      ],
+      "accounts": [
+        {
+          "name": "proposal",
+          "writable": true
+        },
+        {
+          "name": "circle"
+        },
+        {
+          "name": "voter",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "vote_for",
+          "type": "bool"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Circle",
+      "discriminator": [
+        27,
+        59,
+        8,
+        117,
+        62,
+        199,
+        222,
+        252
+      ]
+    },
+    {
+      "name": "CircleManager",
+      "discriminator": [
+        232,
+        36,
+        246,
+        127,
+        225,
+        236,
+        21,
+        237
+      ]
+    },
+    {
+      "name": "CircleMemberAccount",
+      "discriminator": [
+        31,
+        9,
+        237,
+        222,
+        220,
+        6,
+        92,
+        154
+      ]
+    },
+    {
+      "name": "Knowledge",
+      "discriminator": [
+        96,
+        22,
+        187,
+        69,
+        64,
+        144,
+        240,
+        191
+      ]
+    },
+    {
+      "name": "KnowledgeBinding",
+      "discriminator": [
+        135,
+        40,
+        70,
+        75,
+        142,
+        66,
+        106,
+        231
+      ]
+    },
+    {
+      "name": "ProofAttestorRegistry",
+      "discriminator": [
+        20,
+        216,
+        110,
+        200,
+        56,
+        128,
+        173,
+        244
+      ]
+    },
+    {
+      "name": "TransferProposal",
+      "discriminator": [
+        4,
+        63,
+        123,
+        17,
+        197,
+        223,
+        149,
+        175
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "AIEvaluation",
+      "docs": [
+        "AI评估"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "quality_score",
+            "type": "f64"
+          },
+          {
+            "name": "relevance_score",
+            "type": "f64"
+          },
+          {
+            "name": "novelty_score",
+            "type": "f64"
+          },
+          {
+            "name": "recommendation",
+            "type": {
+              "defined": {
+                "name": "AIRecommendation"
+              }
+            }
+          },
+          {
+            "name": "confidence",
+            "type": "f64"
+          },
+          {
+            "name": "reasoning",
+            "type": "string"
+          },
+          {
+            "name": "model_version",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AIRecommendation",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ApproveUpward"
+          },
+          {
+            "name": "ApproveDownward"
+          },
+          {
+            "name": "Reject"
+          },
+          {
+            "name": "NeedHumanReview"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Circle",
+      "docs": [
+        "圈层（专注知识治理）"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "circle_id",
+            "type": "u8"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "level",
+            "type": "u8"
+          },
+          {
+            "name": "parent_circle",
+            "type": {
+              "option": "u8"
+            }
+          },
+          {
+            "name": "child_circles",
+            "type": "bytes"
+          },
+          {
+            "name": "curators",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "knowledge_count",
+            "type": "u64"
+          },
+          {
+            "name": "knowledge_governance",
+            "type": {
+              "defined": {
+                "name": "KnowledgeGovernance"
+              }
+            }
+          },
+          {
+            "name": "decision_engine",
+            "type": {
+              "defined": {
+                "name": "DecisionEngine"
+              }
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "flags",
+            "docs": [
+              "通用位标志字段，用于存储可扩展的圈层属性",
+              "┌─────────┬─────────┬──────────────┬──────────────────┐",
+              "│ bit 0   │ bit 1   │ bit 2-17     │ bit 18-63        │",
+              "│ kind    │ mode    │ min_crystals │ reserved         │",
+              "│ 0=main  │ 0=know  │ u16 (0-65535)│                  │",
+              "│ 1=aux   │ 1=social│              │                  │",
+              "└─────────┴─────────┴──────────────┴──────────────────┘"
+            ],
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CircleManager",
+      "docs": [
+        "圈层管理器"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "total_circles",
+            "type": "u64"
+          },
+          {
+            "name": "total_knowledge",
+            "type": "u64"
+          },
+          {
+            "name": "total_transfers",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CircleMemberAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "circle_id",
+            "type": "u8"
+          },
+          {
+            "name": "member",
+            "type": "pubkey"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "CircleMemberStatus"
+              }
+            }
+          },
+          {
+            "name": "role",
+            "type": {
+              "defined": {
+                "name": "CircleMemberRole"
+              }
+            }
+          },
+          {
+            "name": "joined_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CircleMemberRole",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Owner"
+          },
+          {
+            "name": "Admin"
+          },
+          {
+            "name": "Moderator"
+          },
+          {
+            "name": "Member"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CircleMemberStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Inactive"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DecisionEngine",
+      "docs": [
+        "决策引擎"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AdminOnly",
+            "fields": [
+              {
+                "name": "admin",
+                "type": "pubkey"
+              }
+            ]
+          },
+          {
+            "name": "VotingGovernance",
+            "fields": [
+              {
+                "name": "min_votes",
+                "type": "u64"
+              },
+              {
+                "name": "vote_duration",
+                "type": "i64"
+              },
+              {
+                "name": "quorum_percentage",
+                "type": "u8"
+              }
+            ]
+          },
+          {
+            "name": "DaoGovernance",
+            "fields": [
+              {
+                "name": "dao_program",
+                "type": "pubkey"
+              },
+              {
+                "name": "proposal_threshold",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "AIAssisted",
+            "fields": [
+              {
+                "name": "ai_oracle",
+                "type": "pubkey"
+              },
+              {
+                "name": "human_veto_threshold",
+                "type": "u64"
+              },
+              {
+                "name": "confidence_required",
+                "type": "f64"
+              }
+            ]
+          },
+          {
+            "name": "FullyAutonomous",
+            "fields": [
+              {
+                "name": "ai_model_hash",
+                "type": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              },
+              {
+                "name": "mcp_endpoint",
+                "type": "string"
+              },
+              {
+                "name": "fallback_to_dao",
+                "type": "bool"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Knowledge",
+      "docs": [
+        "知识条目"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "knowledge_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "circle_id",
+            "type": "u8"
+          },
+          {
+            "name": "ipfs_cid",
+            "type": "string"
+          },
+          {
+            "name": "content_hash",
+            "docs": [
+              "SHA-256 hash of the crystallized IPFS content, for integrity verification.",
+              "Computed client-side as sha256(ipfs_content) before submission."
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "author",
+            "type": "pubkey"
+          },
+          {
+            "name": "quality_score",
+            "type": "f64"
+          },
+          {
+            "name": "source_circle",
+            "type": {
+              "option": "u8"
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "view_count",
+            "type": "u64"
+          },
+          {
+            "name": "citation_count",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "flags",
+            "docs": [
+              "通用位标志字段",
+              "┌──────────────┬──────────────────────────────────────┐",
+              "│ bit 0-15     │ bit 16-63                            │",
+              "│ version (u16)│ reserved                             │",
+              "└──────────────┴──────────────────────────────────────┘"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "contributors_root",
+            "docs": [
+              "Merkle root of contributors tree.",
+              "Each leaf = hash(user_pubkey | role_u8 | weight_u16)"
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "contributors_count",
+            "docs": [
+              "Total number of contributors (informational, not enforced by Merkle)"
+            ],
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "KnowledgeBinding",
+      "docs": [
+        "知识贡献证明绑定（Knowledge 1:1 sidecar）"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "knowledge",
+            "type": "pubkey"
+          },
+          {
+            "name": "source_anchor_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "proof_package_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "contributors_root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "contributors_count",
+            "type": "u16"
+          },
+          {
+            "name": "binding_version",
+            "type": "u16"
+          },
+          {
+            "name": "generated_at",
+            "type": "i64"
+          },
+          {
+            "name": "bound_at",
+            "type": "i64"
+          },
+          {
+            "name": "bound_by",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "KnowledgeGovernance",
+      "docs": [
+        "知识治理配置（专注知识管理）"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "min_quality_score",
+            "type": "f64"
+          },
+          {
+            "name": "min_curator_reputation",
+            "type": "u64"
+          },
+          {
+            "name": "transfer_cooldown",
+            "type": "i64"
+          },
+          {
+            "name": "max_transfers_per_day",
+            "type": "u32"
+          },
+          {
+            "name": "require_peer_review",
+            "type": "bool"
+          },
+          {
+            "name": "peer_review_count",
+            "type": "u8"
+          },
+          {
+            "name": "auto_quality_check",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProofAttestorRegistry",
+      "docs": [
+        "贡献证明签发者注册表（admin 管理）"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "attestors",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProposalStatus",
+      "docs": [
+        "提案状态"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Pending"
+          },
+          {
+            "name": "Approved"
+          },
+          {
+            "name": "Rejected"
+          },
+          {
+            "name": "AIProcessing"
+          },
+          {
+            "name": "HumanReview"
+          },
+          {
+            "name": "Executed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TransferProposal",
+      "docs": [
+        "传递提案"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "proposal_id",
+            "type": "u64"
+          },
+          {
+            "name": "knowledge_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "from_circle",
+            "type": "u8"
+          },
+          {
+            "name": "to_circles",
+            "type": "bytes"
+          },
+          {
+            "name": "transfer_type",
+            "type": {
+              "defined": {
+                "name": "TransferType"
+              }
+            }
+          },
+          {
+            "name": "proposer",
+            "type": "pubkey"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "ProposalStatus"
+              }
+            }
+          },
+          {
+            "name": "decision_engine",
+            "type": {
+              "defined": {
+                "name": "DecisionEngine"
+              }
+            }
+          },
+          {
+            "name": "votes_for",
+            "type": "u64"
+          },
+          {
+            "name": "votes_against",
+            "type": "u64"
+          },
+          {
+            "name": "voters",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "ai_evaluation",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "AIEvaluation"
+                }
+              }
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "deadline",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TransferType",
+      "docs": [
+        "传递类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Upward"
+          },
+          {
+            "name": "Downward"
+          },
+          {
+            "name": "Horizontal"
+          }
+        ]
+      }
+    }
+  ]
+}

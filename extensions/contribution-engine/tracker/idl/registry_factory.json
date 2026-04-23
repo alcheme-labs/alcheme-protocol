@@ -1,0 +1,2778 @@
+{
+  "address": "AYrzTqFdxpiH3VhCBzLsJQtzFqjoSRKYUvk29d797AQC",
+  "metadata": {
+    "name": "registry_factory",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Registry Factory Program for SocialHub Protocol"
+  },
+  "docs": [
+    "Registry Factory Program - 注册表工厂程序"
+  ],
+  "instructions": [
+    {
+      "name": "check_upgrade_availability",
+      "docs": [
+        "检查升级可用性"
+      ],
+      "discriminator": [
+        98,
+        190,
+        198,
+        33,
+        229,
+        89,
+        28,
+        231
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory"
+        },
+        {
+          "name": "deployed_registry"
+        }
+      ],
+      "args": [
+        {
+          "name": "registry_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "current_version",
+          "type": "string"
+        }
+      ],
+      "returns": {
+        "vec": {
+          "defined": {
+            "name": "UpgradePath"
+          }
+        }
+      }
+    },
+    {
+      "name": "create_deployment_template",
+      "docs": [
+        "创建部署模板"
+      ],
+      "discriminator": [
+        56,
+        13,
+        115,
+        131,
+        255,
+        104,
+        163,
+        129
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "template",
+          "type": {
+            "defined": {
+              "name": "DeploymentTemplate"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "delete_deployment_template",
+      "docs": [
+        "删除部署模板"
+      ],
+      "discriminator": [
+        134,
+        254,
+        184,
+        175,
+        180,
+        21,
+        41,
+        37
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "template_id",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "deploy_access_controller",
+      "docs": [
+        "部署访问控制器"
+      ],
+      "discriminator": [
+        177,
+        97,
+        82,
+        143,
+        119,
+        230,
+        153,
+        188
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory",
+          "writable": true
+        },
+        {
+          "name": "deployed_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  112,
+                  108,
+                  111,
+                  121,
+                  101,
+                  100,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "controller_name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deployer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "access_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "controller_name",
+          "type": "string"
+        },
+        {
+          "name": "config",
+          "type": {
+            "defined": {
+              "name": "RegistryConfig"
+            }
+          }
+        },
+        {
+          "name": "template_id",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deploy_circle_manager",
+      "docs": [
+        "部署圈层管理器"
+      ],
+      "discriminator": [
+        178,
+        169,
+        3,
+        177,
+        132,
+        144,
+        18,
+        123
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory",
+          "writable": true
+        },
+        {
+          "name": "deployed_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  112,
+                  108,
+                  111,
+                  121,
+                  101,
+                  100,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "manager_name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deployer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "circle_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "manager_name",
+          "type": "string"
+        },
+        {
+          "name": "config",
+          "type": {
+            "defined": {
+              "name": "RegistryConfig"
+            }
+          }
+        },
+        {
+          "name": "template_id",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deploy_content_manager",
+      "docs": [
+        "部署内容管理器"
+      ],
+      "discriminator": [
+        187,
+        251,
+        186,
+        88,
+        204,
+        176,
+        217,
+        119
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory",
+          "writable": true
+        },
+        {
+          "name": "deployed_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  112,
+                  108,
+                  111,
+                  121,
+                  101,
+                  100,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "manager_name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deployer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "content_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "manager_name",
+          "type": "string"
+        },
+        {
+          "name": "config",
+          "type": {
+            "defined": {
+              "name": "RegistryConfig"
+            }
+          }
+        },
+        {
+          "name": "template_id",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deploy_event_emitter",
+      "docs": [
+        "部署事件发射器"
+      ],
+      "discriminator": [
+        88,
+        60,
+        98,
+        92,
+        122,
+        7,
+        92,
+        95
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory",
+          "writable": true
+        },
+        {
+          "name": "deployed_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  112,
+                  108,
+                  111,
+                  121,
+                  101,
+                  100,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "emitter_name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deployer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "emitter_name",
+          "type": "string"
+        },
+        {
+          "name": "config",
+          "type": {
+            "defined": {
+              "name": "RegistryConfig"
+            }
+          }
+        },
+        {
+          "name": "template_id",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deploy_identity_registry",
+      "docs": [
+        "部署身份注册表"
+      ],
+      "discriminator": [
+        234,
+        35,
+        5,
+        208,
+        101,
+        253,
+        147,
+        214
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory",
+          "writable": true
+        },
+        {
+          "name": "deployed_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  112,
+                  108,
+                  111,
+                  121,
+                  101,
+                  100,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "registry_name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deployer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "identity_program"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "registry_name",
+          "type": "string"
+        },
+        {
+          "name": "config",
+          "type": {
+            "defined": {
+              "name": "RegistryConfig"
+            }
+          }
+        },
+        {
+          "name": "template_id",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deploy_messaging_manager",
+      "docs": [
+        "部署消息管理器"
+      ],
+      "discriminator": [
+        151,
+        136,
+        48,
+        62,
+        4,
+        59,
+        155,
+        216
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory",
+          "writable": true
+        },
+        {
+          "name": "deployed_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  112,
+                  108,
+                  111,
+                  121,
+                  101,
+                  100,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "manager_name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deployer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "messaging_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "manager_name",
+          "type": "string"
+        },
+        {
+          "name": "config",
+          "type": {
+            "defined": {
+              "name": "RegistryConfig"
+            }
+          }
+        },
+        {
+          "name": "template_id",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deprecate_registry",
+      "docs": [
+        "弃用注册表"
+      ],
+      "discriminator": [
+        47,
+        114,
+        13,
+        217,
+        94,
+        23,
+        233,
+        241
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory",
+          "writable": true
+        },
+        {
+          "name": "deployed_registry",
+          "writable": true
+        },
+        {
+          "name": "deployer",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "registry_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "deprecation_reason",
+          "type": "string"
+        },
+        {
+          "name": "migration_path",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "get_deployment_stats",
+      "docs": [
+        "获取部署统计"
+      ],
+      "discriminator": [
+        232,
+        46,
+        177,
+        164,
+        207,
+        15,
+        58,
+        29
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory"
+        }
+      ],
+      "args": [
+        {
+          "name": "time_range",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "TimeRange"
+              }
+            }
+          }
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "DeploymentStats"
+        }
+      }
+    },
+    {
+      "name": "get_registry_info",
+      "docs": [
+        "获取注册表信息 (CPI)"
+      ],
+      "discriminator": [
+        186,
+        160,
+        31,
+        19,
+        203,
+        59,
+        108,
+        34
+      ],
+      "accounts": [
+        {
+          "name": "deployed_registry"
+        },
+        {
+          "name": "caller_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "registry_id",
+          "type": "pubkey"
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "DeployedRegistry"
+        }
+      }
+    },
+    {
+      "name": "get_version_info",
+      "docs": [
+        "获取版本信息"
+      ],
+      "discriminator": [
+        237,
+        124,
+        53,
+        51,
+        163,
+        2,
+        216,
+        170
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory"
+        }
+      ],
+      "args": [],
+      "returns": {
+        "defined": {
+          "name": "VersionManager"
+        }
+      }
+    },
+    {
+      "name": "initialize_extension_registry",
+      "docs": [
+        "初始化扩展注册表"
+      ],
+      "discriminator": [
+        242,
+        238,
+        93,
+        81,
+        213,
+        191,
+        0,
+        90
+      ],
+      "accounts": [
+        {
+          "name": "extension_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  110,
+                  115,
+                  105,
+                  111,
+                  110,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "registry_factory"
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "max_extensions",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initialize_registry_factory",
+      "docs": [
+        "初始化注册表工厂"
+      ],
+      "discriminator": [
+        203,
+        146,
+        80,
+        54,
+        115,
+        121,
+        156,
+        252
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121,
+                  95,
+                  102,
+                  97,
+                  99,
+                  116,
+                  111,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "factory_config",
+          "type": {
+            "defined": {
+              "name": "FactoryConfig"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "list_deployed_registries",
+      "docs": [
+        "列出已部署的注册表 (CPI)"
+      ],
+      "discriminator": [
+        172,
+        148,
+        46,
+        116,
+        195,
+        97,
+        137,
+        21
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory"
+        },
+        {
+          "name": "caller_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "deployer",
+          "type": {
+            "option": "pubkey"
+          }
+        },
+        {
+          "name": "registry_type",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "RegistryType"
+              }
+            }
+          }
+        },
+        {
+          "name": "status_filter",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "RegistryStatus"
+              }
+            }
+          }
+        }
+      ],
+      "returns": {
+        "vec": {
+          "defined": {
+            "name": "DeployedRegistry"
+          }
+        }
+      }
+    },
+    {
+      "name": "pause_registry",
+      "docs": [
+        "暂停注册表"
+      ],
+      "discriminator": [
+        106,
+        147,
+        106,
+        131,
+        69,
+        218,
+        76,
+        249
+      ],
+      "accounts": [
+        {
+          "name": "deployed_registry",
+          "writable": true
+        },
+        {
+          "name": "registry_factory"
+        },
+        {
+          "name": "deployer",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "registry_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "reason",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "register_extension",
+      "docs": [
+        "注册扩展程序"
+      ],
+      "discriminator": [
+        158,
+        205,
+        4,
+        17,
+        6,
+        106,
+        172,
+        148
+      ],
+      "accounts": [
+        {
+          "name": "extension_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  110,
+                  115,
+                  105,
+                  111,
+                  110,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "program_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "permissions",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "CpiPermission"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "remove_extension",
+      "docs": [
+        "移除扩展程序"
+      ],
+      "discriminator": [
+        9,
+        147,
+        5,
+        33,
+        159,
+        34,
+        9,
+        43
+      ],
+      "accounts": [
+        {
+          "name": "extension_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  110,
+                  115,
+                  105,
+                  111,
+                  110,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "program_id",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "resume_registry",
+      "docs": [
+        "恢复注册表"
+      ],
+      "discriminator": [
+        214,
+        222,
+        128,
+        181,
+        158,
+        27,
+        118,
+        208
+      ],
+      "accounts": [
+        {
+          "name": "deployed_registry",
+          "writable": true
+        },
+        {
+          "name": "registry_factory"
+        },
+        {
+          "name": "deployer",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "registry_id",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "update_deployment_template",
+      "docs": [
+        "更新部署模板"
+      ],
+      "discriminator": [
+        88,
+        71,
+        237,
+        14,
+        217,
+        237,
+        73,
+        222
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "template_id",
+          "type": "string"
+        },
+        {
+          "name": "template",
+          "type": {
+            "defined": {
+              "name": "DeploymentTemplate"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_extension_permissions",
+      "docs": [
+        "更新扩展程序权限"
+      ],
+      "discriminator": [
+        203,
+        144,
+        223,
+        153,
+        187,
+        20,
+        141,
+        122
+      ],
+      "accounts": [
+        {
+          "name": "extension_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  110,
+                  115,
+                  105,
+                  111,
+                  110,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "program_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "new_permissions",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "CpiPermission"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_factory_config",
+      "docs": [
+        "更新工厂配置"
+      ],
+      "discriminator": [
+        219,
+        46,
+        19,
+        240,
+        1,
+        37,
+        160,
+        26
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_config",
+          "type": {
+            "defined": {
+              "name": "FactoryConfig"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "upgrade_registry",
+      "docs": [
+        "升级注册表"
+      ],
+      "discriminator": [
+        242,
+        169,
+        242,
+        104,
+        237,
+        228,
+        210,
+        101
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory",
+          "writable": true
+        },
+        {
+          "name": "deployed_registry",
+          "writable": true
+        },
+        {
+          "name": "deployer",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "registry_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "new_version",
+          "type": "string"
+        },
+        {
+          "name": "upgrade_data",
+          "type": "bytes"
+        }
+      ]
+    },
+    {
+      "name": "validate_registry_config",
+      "docs": [
+        "验证注册表配置 (CPI)"
+      ],
+      "discriminator": [
+        92,
+        143,
+        47,
+        145,
+        158,
+        153,
+        92,
+        28
+      ],
+      "accounts": [
+        {
+          "name": "registry_factory"
+        },
+        {
+          "name": "caller_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "config",
+          "type": {
+            "defined": {
+              "name": "RegistryConfig"
+            }
+          }
+        },
+        {
+          "name": "registry_type",
+          "type": {
+            "defined": {
+              "name": "RegistryType"
+            }
+          }
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "ValidationResult"
+        }
+      }
+    }
+  ],
+  "accounts": [
+    {
+      "name": "DeployedRegistryAccount",
+      "discriminator": [
+        107,
+        46,
+        1,
+        102,
+        124,
+        92,
+        202,
+        124
+      ]
+    },
+    {
+      "name": "ExtensionRegistryAccount",
+      "discriminator": [
+        31,
+        80,
+        216,
+        122,
+        49,
+        145,
+        216,
+        198
+      ]
+    },
+    {
+      "name": "RegistryFactoryAccount",
+      "discriminator": [
+        189,
+        32,
+        106,
+        114,
+        174,
+        52,
+        26,
+        23
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "AuthorizedCaller",
+      "docs": [
+        "授权调用者"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "program_id",
+            "type": "pubkey"
+          },
+          {
+            "name": "permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "CpiPermission"
+                }
+              }
+            }
+          },
+          {
+            "name": "enabled",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CpiPermission",
+      "docs": [
+        "CPI 权限类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "IdentityRead"
+          },
+          {
+            "name": "IdentityVerify"
+          },
+          {
+            "name": "IdentityUpdate"
+          },
+          {
+            "name": "ContentRead"
+          },
+          {
+            "name": "ContentValidate"
+          },
+          {
+            "name": "ContentCreate"
+          },
+          {
+            "name": "ContentStatusUpdate"
+          },
+          {
+            "name": "AccessCheck"
+          },
+          {
+            "name": "AccessRuleRead"
+          },
+          {
+            "name": "EventEmit"
+          },
+          {
+            "name": "EventQuery"
+          },
+          {
+            "name": "RegistryDeploy"
+          },
+          {
+            "name": "RegistryUpgrade"
+          },
+          {
+            "name": "ReputationWrite"
+          },
+          {
+            "name": "ContributionRead"
+          },
+          {
+            "name": "CircleExtend"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeployedRegistry",
+      "docs": [
+        "已部署的注册表账户"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "registry_id",
+            "type": "pubkey"
+          },
+          {
+            "name": "registry_type",
+            "type": {
+              "defined": {
+                "name": "RegistryType"
+              }
+            }
+          },
+          {
+            "name": "deployer",
+            "type": "pubkey"
+          },
+          {
+            "name": "deployed_at",
+            "type": "i64"
+          },
+          {
+            "name": "current_version",
+            "type": "string"
+          },
+          {
+            "name": "config",
+            "type": {
+              "defined": {
+                "name": "RegistryConfig"
+              }
+            }
+          },
+          {
+            "name": "deployment_info",
+            "type": {
+              "defined": {
+                "name": "DeploymentInfo"
+              }
+            }
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "RegistryStatus"
+              }
+            }
+          },
+          {
+            "name": "upgrade_history",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "UpgradeRecord"
+                }
+              }
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeployedRegistryAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inner",
+            "type": {
+              "defined": {
+                "name": "DeployedRegistry"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeploymentInfo",
+      "docs": [
+        "部署信息"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "deployment_method",
+            "type": {
+              "defined": {
+                "name": "DeploymentMethod"
+              }
+            }
+          },
+          {
+            "name": "template_used",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "deployment_cost",
+            "type": "u64"
+          },
+          {
+            "name": "estimated_users",
+            "type": "u32"
+          },
+          {
+            "name": "geographic_regions",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "compliance_certifications",
+            "type": {
+              "vec": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeploymentMethod",
+      "docs": [
+        "部署方法"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Standard"
+          },
+          {
+            "name": "Template"
+          },
+          {
+            "name": "Clone"
+          },
+          {
+            "name": "Migration"
+          },
+          {
+            "name": "Custom"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeploymentRequirements",
+      "docs": [
+        "部署要求"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "minimum_sol_balance",
+            "type": "u64"
+          },
+          {
+            "name": "required_permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Permission"
+                }
+              }
+            }
+          },
+          {
+            "name": "technical_requirements",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "compliance_requirements",
+            "type": {
+              "vec": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeploymentStats",
+      "docs": [
+        "部署统计"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "total_deployments",
+            "type": "u64"
+          },
+          {
+            "name": "successful_deployments",
+            "type": "u64"
+          },
+          {
+            "name": "failed_deployments",
+            "type": "u64"
+          },
+          {
+            "name": "deployments_by_type",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "TypeCount"
+                }
+              }
+            }
+          },
+          {
+            "name": "average_deployment_time",
+            "type": "f64"
+          },
+          {
+            "name": "total_users_served",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeploymentTemplate",
+      "docs": [
+        "部署模板"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "template_id",
+            "type": "string"
+          },
+          {
+            "name": "template_name",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "registry_type",
+            "type": {
+              "defined": {
+                "name": "RegistryType"
+              }
+            }
+          },
+          {
+            "name": "default_config",
+            "type": {
+              "defined": {
+                "name": "RegistryConfig"
+              }
+            }
+          },
+          {
+            "name": "recommended_settings",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "KeyValue"
+                }
+              }
+            }
+          },
+          {
+            "name": "minimum_requirements",
+            "type": {
+              "defined": {
+                "name": "DeploymentRequirements"
+              }
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "created_by",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeprecationNotice",
+      "docs": [
+        "弃用通知"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "version",
+            "type": "string"
+          },
+          {
+            "name": "deprecation_date",
+            "type": "i64"
+          },
+          {
+            "name": "end_of_life",
+            "type": "i64"
+          },
+          {
+            "name": "reason",
+            "type": "string"
+          },
+          {
+            "name": "migration_path",
+            "type": "string"
+          },
+          {
+            "name": "impact_level",
+            "type": {
+              "defined": {
+                "name": "ImpactLevel"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExtensionRegistry",
+      "docs": [
+        "链上扩展注册表 — 存储在 registry-factory 管理的 PDA 中",
+        "PDA seeds: [\"extension_registry\"]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "extensions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "AuthorizedCaller"
+                }
+              }
+            }
+          },
+          {
+            "name": "max_extensions",
+            "type": "u8"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExtensionRegistryAccount",
+      "docs": [
+        "链上扩展注册表账户 — 存储已授权的 Extension Program 列表",
+        "PDA seeds: [b\"extension_registry\"]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inner",
+            "type": {
+              "defined": {
+                "name": "ExtensionRegistry"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "FactoryConfig",
+      "docs": [
+        "工厂配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "max_deployments_per_user",
+            "type": "u32"
+          },
+          {
+            "name": "deployment_fee",
+            "type": "u64"
+          },
+          {
+            "name": "upgrade_fee",
+            "type": "u64"
+          },
+          {
+            "name": "require_approval",
+            "type": "bool"
+          },
+          {
+            "name": "auto_upgrade_enabled",
+            "type": "bool"
+          },
+          {
+            "name": "supported_registry_types",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "RegistryType"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "FeatureFlag",
+      "docs": [
+        "功能标志"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feature_name",
+            "type": "string"
+          },
+          {
+            "name": "enabled",
+            "type": "bool"
+          },
+          {
+            "name": "rollout_percentage",
+            "type": "u8"
+          },
+          {
+            "name": "target_users",
+            "type": {
+              "option": {
+                "vec": "pubkey"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ImpactLevel",
+      "docs": [
+        "影响级别"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Minor"
+          },
+          {
+            "name": "Major"
+          },
+          {
+            "name": "Breaking"
+          },
+          {
+            "name": "Critical"
+          }
+        ]
+      }
+    },
+    {
+      "name": "KeyValue",
+      "docs": [
+        "键值对数据结构"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "key",
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Permission",
+      "docs": [
+        "权限类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CreateContent"
+          },
+          {
+            "name": "EditContent"
+          },
+          {
+            "name": "DeleteContent"
+          },
+          {
+            "name": "ViewContent"
+          },
+          {
+            "name": "FollowUser"
+          },
+          {
+            "name": "UnfollowUser"
+          },
+          {
+            "name": "MessageUser"
+          },
+          {
+            "name": "ViewProfile"
+          },
+          {
+            "name": "EditProfile"
+          },
+          {
+            "name": "ViewFollowers"
+          },
+          {
+            "name": "ViewFollowing"
+          },
+          {
+            "name": "LikeContent"
+          },
+          {
+            "name": "CommentContent"
+          },
+          {
+            "name": "ShareContent"
+          },
+          {
+            "name": "ReportContent"
+          },
+          {
+            "name": "InteractWithContent"
+          },
+          {
+            "name": "JoinCommunity"
+          },
+          {
+            "name": "LeaveCommunity"
+          },
+          {
+            "name": "CreateCommunity"
+          },
+          {
+            "name": "ModerateCommunity"
+          },
+          {
+            "name": "InviteMembers"
+          },
+          {
+            "name": "RemoveMembers"
+          },
+          {
+            "name": "ManageSettings"
+          },
+          {
+            "name": "AccessAnalytics"
+          },
+          {
+            "name": "SystemAdmin"
+          },
+          {
+            "name": "VerifyIdentity"
+          },
+          {
+            "name": "Follow"
+          },
+          {
+            "name": "Message"
+          },
+          {
+            "name": "Comment"
+          },
+          {
+            "name": "Share"
+          },
+          {
+            "name": "ModerateContent"
+          },
+          {
+            "name": "ManageUsers"
+          },
+          {
+            "name": "ConfigureSystem"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "RegistryConfig",
+      "docs": [
+        "注册表配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "registry_name",
+            "type": "string"
+          },
+          {
+            "name": "max_entries",
+            "type": "u64"
+          },
+          {
+            "name": "registration_fee",
+            "type": "u64"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "moderators",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "settings",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "KeyValue"
+                }
+              }
+            }
+          },
+          {
+            "name": "feature_flags",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "FeatureFlag"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "RegistryFactory",
+      "docs": [
+        "注册表工厂主账户"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated",
+            "type": "i64"
+          },
+          {
+            "name": "total_deployments",
+            "type": "u64"
+          },
+          {
+            "name": "active_registries",
+            "type": "u64"
+          },
+          {
+            "name": "factory_config",
+            "type": {
+              "defined": {
+                "name": "FactoryConfig"
+              }
+            }
+          },
+          {
+            "name": "deployment_templates",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "DeploymentTemplate"
+                }
+              }
+            }
+          },
+          {
+            "name": "version_manager",
+            "type": {
+              "defined": {
+                "name": "VersionManager"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "RegistryFactoryAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inner",
+            "type": {
+              "defined": {
+                "name": "RegistryFactory"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "RegistryStatus",
+      "docs": [
+        "注册表状态"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Deploying"
+          },
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Paused"
+          },
+          {
+            "name": "Upgrading"
+          },
+          {
+            "name": "Deprecated"
+          },
+          {
+            "name": "Failed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RegistryType",
+      "docs": [
+        "注册表类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Identity"
+          },
+          {
+            "name": "Access"
+          },
+          {
+            "name": "Event"
+          },
+          {
+            "name": "Content"
+          },
+          {
+            "name": "Circle"
+          },
+          {
+            "name": "Messaging"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "SupportedVersion",
+      "docs": [
+        "支持的版本"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "version",
+            "type": "string"
+          },
+          {
+            "name": "release_date",
+            "type": "i64"
+          },
+          {
+            "name": "end_of_support",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "features",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "breaking_changes",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "migration_guide_uri",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TimeRange",
+      "docs": [
+        "时间范围"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "start_time",
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TypeCount",
+      "docs": [
+        "按类型计数"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "registry_type",
+            "type": {
+              "defined": {
+                "name": "RegistryType"
+              }
+            }
+          },
+          {
+            "name": "count",
+            "type": "u64"
+          },
+          {
+            "name": "percentage",
+            "type": "f64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpgradeMethod",
+      "docs": [
+        "升级方法"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Automatic"
+          },
+          {
+            "name": "Manual"
+          },
+          {
+            "name": "Scheduled"
+          },
+          {
+            "name": "Emergency"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpgradePath",
+      "docs": [
+        "升级路径"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "from_version",
+            "type": "string"
+          },
+          {
+            "name": "to_version",
+            "type": "string"
+          },
+          {
+            "name": "upgrade_steps",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "UpgradeStep"
+                }
+              }
+            }
+          },
+          {
+            "name": "estimated_time",
+            "type": "u64"
+          },
+          {
+            "name": "risk_level",
+            "type": {
+              "defined": {
+                "name": "UpgradeRisk"
+              }
+            }
+          },
+          {
+            "name": "rollback_supported",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpgradeRecord",
+      "docs": [
+        "升级记录"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "upgrade_id",
+            "type": "string"
+          },
+          {
+            "name": "from_version",
+            "type": "string"
+          },
+          {
+            "name": "to_version",
+            "type": "string"
+          },
+          {
+            "name": "upgraded_at",
+            "type": "i64"
+          },
+          {
+            "name": "upgraded_by",
+            "type": "pubkey"
+          },
+          {
+            "name": "upgrade_method",
+            "type": {
+              "defined": {
+                "name": "UpgradeMethod"
+              }
+            }
+          },
+          {
+            "name": "success",
+            "type": "bool"
+          },
+          {
+            "name": "error_details",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpgradeRisk",
+      "docs": [
+        "升级风险"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Low"
+          },
+          {
+            "name": "Medium"
+          },
+          {
+            "name": "High"
+          },
+          {
+            "name": "Critical"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpgradeStep",
+      "docs": [
+        "升级步骤"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "step_id",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "step_type",
+            "type": {
+              "defined": {
+                "name": "UpgradeStepType"
+              }
+            }
+          },
+          {
+            "name": "required_permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Permission"
+                }
+              }
+            }
+          },
+          {
+            "name": "estimated_time",
+            "type": "u64"
+          },
+          {
+            "name": "validation_script",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpgradeStepType",
+      "docs": [
+        "升级步骤类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "DataMigration"
+          },
+          {
+            "name": "ConfigUpdate"
+          },
+          {
+            "name": "ProgramUpgrade"
+          },
+          {
+            "name": "PermissionUpdate"
+          },
+          {
+            "name": "Verification"
+          },
+          {
+            "name": "Cleanup"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ValidationResult",
+      "docs": [
+        "验证结果"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "success",
+            "type": "bool"
+          },
+          {
+            "name": "score",
+            "type": "f64"
+          },
+          {
+            "name": "message",
+            "type": "string"
+          },
+          {
+            "name": "validator_id",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VersionManager",
+      "docs": [
+        "版本管理器"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "current_protocol_version",
+            "type": "string"
+          },
+          {
+            "name": "supported_versions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "SupportedVersion"
+                }
+              }
+            }
+          },
+          {
+            "name": "upgrade_paths",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "UpgradePath"
+                }
+              }
+            }
+          },
+          {
+            "name": "deprecation_schedule",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "DeprecationNotice"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

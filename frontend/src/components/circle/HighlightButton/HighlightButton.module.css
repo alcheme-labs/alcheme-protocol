@@ -1,0 +1,44 @@
+/* HighlightButton Styles */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    background: none;
+    border: 1px solid var(--color-border-soft);
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: var(--font-size-small);
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    transition: all var(--motion-fast) ease;
+    min-width: 40px;
+    justify-content: center;
+}
+
+.btn:hover:not(:disabled) {
+    border-color: var(--color-accent-gold);
+    color: var(--color-accent-gold);
+}
+
+.highlighted {
+    border-color: rgba(199, 168, 107, 0.3);
+    color: var(--color-accent-gold);
+    cursor: default;
+}
+
+.threshold {
+    border-color: var(--color-accent-gold);
+    background-color: rgba(199, 168, 107, 0.1);
+    box-shadow: 0 0 8px rgba(199, 168, 107, 0.15);
+}
+
+.icon {
+    display: inline-block;
+    font-size: 12px;
+}
+
+.count {
+    font-size: 11px;
+    font-weight: var(--font-weight-medium);
+}

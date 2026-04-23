@@ -1,0 +1,1200 @@
+{
+  "address": "4MZjksSnfSNa25ttV4smquKE6ggAmpZKjK74eDQLdoLx",
+  "metadata": {
+    "name": "messaging_manager",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Instant messaging manager for Alcheme Protocol"
+  },
+  "instructions": [
+    {
+      "name": "batch_upload",
+      "docs": [
+        "批量上链消息哈希"
+      ],
+      "discriminator": [
+        178,
+        121,
+        107,
+        242,
+        27,
+        192,
+        203,
+        119
+      ],
+      "accounts": [
+        {
+          "name": "batch",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "batch_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "conversation"
+        },
+        {
+          "name": "uploader",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "batch_id",
+          "type": "u64"
+        },
+        {
+          "name": "message_hashes",
+          "type": {
+            "vec": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "merkle_root",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_conversation",
+      "docs": [
+        "创建会话"
+      ],
+      "discriminator": [
+        30,
+        90,
+        208,
+        53,
+        75,
+        232,
+        26,
+        102
+      ],
+      "accounts": [
+        {
+          "name": "conversation",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  118,
+                  101,
+                  114,
+                  115,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "conversation_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "messaging_manager",
+          "writable": true
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "conversation_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "conversation_type",
+          "type": {
+            "defined": {
+              "name": "ConversationType"
+            }
+          }
+        },
+        {
+          "name": "participants",
+          "type": {
+            "vec": "pubkey"
+          }
+        },
+        {
+          "name": "metadata",
+          "type": {
+            "defined": {
+              "name": "ConversationMetadata"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "initialize",
+      "docs": [
+        "初始化消息管理器"
+      ],
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "messaging_manager",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  101,
+                  115,
+                  115,
+                  97,
+                  103,
+                  105,
+                  110,
+                  103,
+                  95,
+                  109,
+                  97,
+                  110,
+                  97,
+                  103,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "settings",
+          "type": {
+            "defined": {
+              "name": "MessagingSettings"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "mark_as_read",
+      "docs": [
+        "标记消息已读"
+      ],
+      "discriminator": [
+        122,
+        240,
+        10,
+        185,
+        117,
+        46,
+        200,
+        228
+      ],
+      "accounts": [
+        {
+          "name": "message",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  101,
+                  115,
+                  115,
+                  97,
+                  103,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "message_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "conversation"
+        },
+        {
+          "name": "reader",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "message_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "recall_message",
+      "docs": [
+        "撤回消息"
+      ],
+      "discriminator": [
+        158,
+        56,
+        245,
+        90,
+        81,
+        73,
+        51,
+        20
+      ],
+      "accounts": [
+        {
+          "name": "message",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  101,
+                  115,
+                  115,
+                  97,
+                  103,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "message_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "messaging_manager"
+        },
+        {
+          "name": "sender",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "message_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "send_message",
+      "docs": [
+        "发送消息元数据"
+      ],
+      "discriminator": [
+        57,
+        40,
+        34,
+        178,
+        189,
+        10,
+        65,
+        26
+      ],
+      "accounts": [
+        {
+          "name": "message",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  101,
+                  115,
+                  115,
+                  97,
+                  103,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "message_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "conversation",
+          "writable": true
+        },
+        {
+          "name": "messaging_manager",
+          "writable": true
+        },
+        {
+          "name": "sender",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "message_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "message_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "message_type",
+          "type": {
+            "defined": {
+              "name": "MessageType"
+            }
+          }
+        },
+        {
+          "name": "storage_uri",
+          "type": "string"
+        },
+        {
+          "name": "reply_to",
+          "type": {
+            "option": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_presence",
+      "docs": [
+        "更新在线状态"
+      ],
+      "discriminator": [
+        171,
+        81,
+        105,
+        200,
+        67,
+        178,
+        48,
+        126
+      ],
+      "accounts": [
+        {
+          "name": "presence",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  101,
+                  115,
+                  101,
+                  110,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "status",
+          "type": {
+            "defined": {
+              "name": "OnlineStatus"
+            }
+          }
+        },
+        {
+          "name": "custom_status",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Conversation",
+      "discriminator": [
+        171,
+        46,
+        180,
+        58,
+        245,
+        221,
+        103,
+        174
+      ]
+    },
+    {
+      "name": "MessageBatch",
+      "discriminator": [
+        174,
+        120,
+        126,
+        174,
+        100,
+        52,
+        213,
+        29
+      ]
+    },
+    {
+      "name": "MessageMetadata",
+      "discriminator": [
+        99,
+        170,
+        51,
+        219,
+        112,
+        22,
+        245,
+        83
+      ]
+    },
+    {
+      "name": "MessagingManager",
+      "discriminator": [
+        205,
+        67,
+        217,
+        25,
+        118,
+        19,
+        5,
+        191
+      ]
+    },
+    {
+      "name": "UserPresence",
+      "discriminator": [
+        253,
+        203,
+        228,
+        9,
+        221,
+        240,
+        81,
+        192
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "Conversation",
+      "docs": [
+        "会话账户"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "conversation_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "participants",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "conversation_type",
+            "type": {
+              "defined": {
+                "name": "ConversationType"
+              }
+            }
+          },
+          {
+            "name": "last_message_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "last_message_at",
+            "type": "i64"
+          },
+          {
+            "name": "message_count",
+            "type": "u64"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "created_by",
+            "type": "pubkey"
+          },
+          {
+            "name": "metadata",
+            "type": {
+              "defined": {
+                "name": "ConversationMetadata"
+              }
+            }
+          },
+          {
+            "name": "encryption_enabled",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ConversationMetadata",
+      "docs": [
+        "会话元数据"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "description",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "avatar_uri",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "admin",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "settings",
+            "type": {
+              "defined": {
+                "name": "ConversationSettings"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ConversationSettings",
+      "docs": [
+        "会话设置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "allow_new_members",
+            "type": "bool"
+          },
+          {
+            "name": "require_approval",
+            "type": "bool"
+          },
+          {
+            "name": "max_participants",
+            "type": "u32"
+          },
+          {
+            "name": "message_retention_days",
+            "type": {
+              "option": "u32"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ConversationType",
+      "docs": [
+        "会话类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Direct"
+          },
+          {
+            "name": "Group"
+          },
+          {
+            "name": "Channel"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MessageBatch",
+      "docs": [
+        "消息批次账户"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "batch_id",
+            "type": "u64"
+          },
+          {
+            "name": "conversation_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "message_hashes",
+            "type": {
+              "vec": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "merkle_root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "start_time",
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "type": "i64"
+          },
+          {
+            "name": "message_count",
+            "type": "u32"
+          },
+          {
+            "name": "batch_status",
+            "type": {
+              "defined": {
+                "name": "MessageBatchStatus"
+              }
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MessageBatchStatus",
+      "docs": [
+        "消息批次状态"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Collecting"
+          },
+          {
+            "name": "Sealed"
+          },
+          {
+            "name": "Verified"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MessageMetadata",
+      "docs": [
+        "消息元数据账户"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "message_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "message_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "sender",
+            "type": "pubkey"
+          },
+          {
+            "name": "conversation_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "message_type",
+            "type": {
+              "defined": {
+                "name": "MessageType"
+              }
+            }
+          },
+          {
+            "name": "read_receipts",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "ReadReceipt"
+                }
+              }
+            }
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "MessageStatus"
+              }
+            }
+          },
+          {
+            "name": "reply_to",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "storage_uri",
+            "type": "string"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MessageStatus",
+      "docs": [
+        "消息状态"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Sending"
+          },
+          {
+            "name": "Sent"
+          },
+          {
+            "name": "Delivered"
+          },
+          {
+            "name": "Read"
+          },
+          {
+            "name": "Failed"
+          },
+          {
+            "name": "Deleted"
+          },
+          {
+            "name": "Recalled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MessageType",
+      "docs": [
+        "消息类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Text"
+          },
+          {
+            "name": "Image"
+          },
+          {
+            "name": "Video"
+          },
+          {
+            "name": "Audio"
+          },
+          {
+            "name": "File"
+          },
+          {
+            "name": "Link"
+          },
+          {
+            "name": "Payment"
+          },
+          {
+            "name": "Contract"
+          },
+          {
+            "name": "System"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MessagingManager",
+      "docs": [
+        "消息管理器主账户"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated",
+            "type": "i64"
+          },
+          {
+            "name": "total_conversations",
+            "type": "u64"
+          },
+          {
+            "name": "total_messages",
+            "type": "u64"
+          },
+          {
+            "name": "active_users",
+            "type": "u64"
+          },
+          {
+            "name": "settings",
+            "type": {
+              "defined": {
+                "name": "MessagingSettings"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MessagingSettings",
+      "docs": [
+        "消息管理器设置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "max_group_size",
+            "type": "u32"
+          },
+          {
+            "name": "max_message_size",
+            "type": "u32"
+          },
+          {
+            "name": "batch_interval_seconds",
+            "type": "u32"
+          },
+          {
+            "name": "batch_size",
+            "type": "u32"
+          },
+          {
+            "name": "enable_read_receipts",
+            "type": "bool"
+          },
+          {
+            "name": "enable_message_recall",
+            "type": "bool"
+          },
+          {
+            "name": "recall_time_limit",
+            "type": "i64"
+          },
+          {
+            "name": "enable_encryption",
+            "type": "bool"
+          },
+          {
+            "name": "require_identity_verification",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OnlineStatus",
+      "docs": [
+        "在线状态"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Online"
+          },
+          {
+            "name": "Away"
+          },
+          {
+            "name": "Busy"
+          },
+          {
+            "name": "Offline"
+          },
+          {
+            "name": "Invisible"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReadReceipt",
+      "docs": [
+        "已读回执"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "reader",
+            "type": "pubkey"
+          },
+          {
+            "name": "read_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserPresence",
+      "docs": [
+        "用户在线状态账户"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "OnlineStatus"
+              }
+            }
+          },
+          {
+            "name": "last_seen",
+            "type": "i64"
+          },
+          {
+            "name": "custom_status",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

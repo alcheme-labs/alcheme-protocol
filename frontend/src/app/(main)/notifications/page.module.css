@@ -1,0 +1,151 @@
+/* Notifications Page Styles — Enhanced Phase 4 */
+.page {
+    position: relative;
+    min-height: 100dvh;
+    padding-top: calc(var(--safe-area-top) + var(--space-6));
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: var(--safe-area-top, 0);
+    z-index: 10;
+    background: rgba(31, 36, 33, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    margin: 0 calc(-1 * var(--space-4));
+    padding: var(--space-4) var(--space-4) var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
+.headerLeft {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.title {
+    font-size: var(--font-size-title);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.unreadBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background-color: var(--color-accent-gold);
+    color: var(--color-bg-base);
+    font-size: 11px;
+    font-weight: var(--font-weight-semibold);
+}
+
+.markAllBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    background: none;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-button);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--motion-fast) ease;
+}
+
+.markAllBtn:hover {
+    border-color: var(--color-accent-gold);
+    color: var(--color-accent-gold);
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+/* ── Notification Row ── */
+.notificationRow {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+}
+
+.iconBadge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.iconBadge.crystal {
+    background-color: rgba(199, 168, 107, 0.15);
+    color: var(--color-accent-gold);
+}
+
+.iconBadge.citation {
+    background-color: rgba(180, 195, 210, 0.1);
+    color: var(--color-text-secondary);
+}
+
+.iconBadge.draft {
+    background-color: rgba(199, 168, 107, 0.1);
+    color: var(--color-accent-amber);
+}
+
+.iconBadge.circle {
+    background-color: rgba(180, 195, 210, 0.08);
+    color: var(--color-text-secondary);
+}
+
+.iconBadge.highlight {
+    background-color: rgba(199, 168, 107, 0.12);
+    color: var(--color-accent-gold);
+}
+
+.iconBadge.forward {
+    background-color: rgba(180, 195, 210, 0.1);
+    color: var(--color-text-secondary);
+}
+
+.notificationBody {
+    flex: 1;
+    min-width: 0;
+}
+
+.notificationText {
+    font-size: var(--font-size-caption);
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-body);
+    margin-bottom: var(--space-1);
+}
+
+.notificationText.unread {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-medium);
+}
+
+.notificationTime {
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+}
+
+.unreadDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--color-accent-gold);
+    flex-shrink: 0;
+    margin-top: 8px;
+}

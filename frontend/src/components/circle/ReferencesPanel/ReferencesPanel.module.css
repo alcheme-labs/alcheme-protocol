@@ -1,0 +1,117 @@
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px;
+    border-radius: 18px;
+    border: 1px solid rgba(199, 168, 107, 0.1);
+    background:
+        linear-gradient(165deg, rgba(199, 168, 107, 0.08), rgba(199, 168, 107, 0.02) 40%),
+        rgba(17, 24, 22, 0.74);
+}
+
+.heading {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.eyebrow {
+    margin: 0;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--color-text-tertiary);
+}
+
+.title {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.3;
+    color: var(--color-accent-ivory-glow);
+}
+
+.hint {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 2px;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.sectionHeader > div {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sectionTitle {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.35;
+    color: var(--color-accent-ivory-glow);
+}
+
+.sectionHint,
+.status,
+.error,
+.summary {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.sectionHint,
+.status {
+    color: var(--color-text-secondary);
+}
+
+.error {
+    color: #f8b4b4;
+}
+
+.summary {
+    color: var(--color-text-primary);
+}
+
+.nameList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.namePill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(199, 168, 107, 0.16);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 12px;
+    color: var(--color-accent-ivory-glow);
+}
+
+.inlineAction {
+    min-height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(199, 168, 107, 0.18);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 11px;
+    color: var(--color-accent-ivory-glow);
+    cursor: pointer;
+}

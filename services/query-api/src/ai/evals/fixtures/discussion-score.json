@@ -1,0 +1,61 @@
+{
+  "rule_on_topic": {
+    "description": "Chinese debugging question stays on-topic under rule scoring.",
+    "input": {
+      "text": "部署失败了，怎么排查 validator 升级后的报错？",
+      "circleContext": "Solana validator 升级 部署 故障排查",
+      "useLLM": false
+    },
+    "expected": {
+      "method": "rule",
+      "semanticScore": 0.7,
+      "qualityScore": 0.7,
+      "spamScore": 0,
+      "confidence": 0.55,
+      "isOnTopic": true,
+      "rationale": "rule_signals_indicate_topic_alignment"
+    }
+  },
+  "rule_spam": {
+    "description": "Spammy mint/whitelist solicitation gets suppressed by rules.",
+    "input": {
+      "text": "免费 mint whitelist，加vx领空投 http://spam.example",
+      "circleContext": "Solana validator 升级 部署 故障排查",
+      "useLLM": false
+    },
+    "expected": {
+      "method": "rule",
+      "semanticScore": 0.05,
+      "qualityScore": 0.7,
+      "spamScore": 1,
+      "confidence": 0.55,
+      "isOnTopic": false,
+      "rationale": "rule_signals_indicate_low_alignment_or_spam_risk"
+    }
+  },
+  "hybrid_llm": {
+    "description": "Hybrid scoring blends rule anchors with structured LLM output.",
+    "input": {
+      "text": "部署失败了，怎么排查 validator 升级后的报错？",
+      "circleContext": "Solana validator 升级 部署 故障排查",
+      "useLLM": true
+    },
+    "llmResponse": {
+      "semantic_score": 0.92,
+      "quality_score": 0.83,
+      "spam_score": 0.08,
+      "confidence": 0.91,
+      "is_on_topic": true,
+      "rationale": "llm_confirms_discussion_alignment"
+    },
+    "expected": {
+      "method": "hybrid",
+      "semanticScore": 0.887,
+      "qualityScore": 0.804,
+      "spamScore": 0.064,
+      "confidence": 0.91,
+      "isOnTopic": true,
+      "rationale": "llm_confirms_discussion_alignment"
+    }
+  }
+}

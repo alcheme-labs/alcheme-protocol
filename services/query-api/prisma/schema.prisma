@@ -1,0 +1,1753 @@
+// Prisma Schema - 基于 PostgreSQL Schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 Int       @id @default(autoincrement())
+  handle             String    @unique @db.VarChar(32)
+  pubkey             String    @unique @db.VarChar(44)
+  displayName        String?   @map("display_name") @db.VarChar(128)
+  bio                String?
+  avatarUri          String?   @map("avatar_uri")
+  bannerUri          String?   @map("banner_uri")
+  website            String?   @db.VarChar(256)
+  location           String?   @db.VarChar(128)
+  metadataUri        String?   @map("metadata_uri")
+  
+  reputationScore    Decimal   @default(0) @map("reputation_score") @db.Decimal(10, 2)
+  followersCount     Int       @default(0) @map("followers_count")
+  followingCount     Int       @default(0) @map("following_count")
+  postsCount         Int       @default(0) @map("posts_count")
+  circlesCount       Int       @default(0) @map("circles_count")
+
+  // Verification Fields (Off-Chain managed)
+  email              String?   @unique @db.VarChar(255)
+  emailVerified      Boolean   @default(false) @map("email_verified")
+  
+  twitterId          String?   @unique @map("twitter_id") @db.VarChar(64)
+  twitterHandle      String?   @map("twitter_handle") @db.VarChar(32)
+  twitterVerified    Boolean   @default(false) @map("twitter_verified")
+
+  verificationLevel  Int       @default(0) @map("verification_level") // 0: None, 1: Email, 2: Twitter, 3: Both
+  
+  onChainAddress     String    @map("on_chain_address") @db.VarChar(44)
+  lastSyncedSlot     BigInt    @map("last_synced_slot")
+  
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+  
+  // Relations
+  posts              Post[]    @relation("AuthorPosts")
+  followers          Follow[]  @relation("Following")
+  following          Follow[]  @relation("Follower")
+  likes              Like[]
+  sentMessages       Message[] @relation("MessageSender")
+  receivedMessages   Message[] @relation("MessageRecipient")
+  circleMembers      CircleMember[]
+  joinRequests       CircleJoinRequest[] @relation("CircleJoinRequestUser")
+  reviewedJoinRequests CircleJoinRequest[] @relation("CircleJoinRequestReviewer")
+  sentInvites        CircleInvite[] @relation("CircleInviteSender")
+  targetedInvites    CircleInvite[] @relation("CircleInviteTarget")
+  acceptedInvites    CircleInvite[] @relation("CircleInviteAcceptor")
+  membershipEvents   CircleMembershipEvent[] @relation("CircleMembershipEventUser")
+  actedMembershipEvents CircleMembershipEvent[] @relation("CircleMembershipEventActor")
+  createdCircles     Circle[]  @relation("CircleCreator")
+  conversations      Conversation[] @relation("ConversationCreator")
+  conversationParticipants ConversationParticipant[]
+  authoredKnowledge  Knowledge[] @relation("AuthoredKnowledge")
+  draftComments      DraftComment[]
+  ghostDraftGenerationsRequested GhostDraftGeneration[] @relation("GhostDraftRequestedBy")
+  ghostDraftAcceptances GhostDraftAcceptance[] @relation("GhostDraftAcceptedBy")
+  acceptedDraftCandidates DraftCandidateAcceptance[] @relation("DraftCandidateAcceptedBy")
+  createdAgents      Agent[]    @relation("AgentCreatedBy")
+  ownedAgents        Agent[]    @relation("AgentOwner")
+  updatedAgentPolicies CircleAgentPolicy[] @relation("AgentPolicyUpdatedBy")
+  notifications      Notification[]
+  totem              UserTotem?
+  crystalEntitlements CrystalEntitlement[] @relation("CrystalEntitlementOwnerUser")
+  crystalReceipts    CrystalReceipt[] @relation("CrystalReceiptOwnerUser")
+  
+  @@index([handle])
+  @@index([pubkey])
+  @@index([reputationScore(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+  @@index([onChainAddress])
+  @@map("users")
+}
+
+model Post {
+  id                 Int       @id @default(autoincrement())
+  contentId          String    @unique @map("content_id") @db.VarChar(128)
+  authorId           Int       @map("author_id")
+  
+  text               String?
+  contentType        String    @map("content_type") @db.VarChar(32)
+  storageUri         String?   @map("storage_uri")
+  storageProvider    String?   @map("storage_provider") @db.VarChar(32)
+  
+  parentPostId       Int?      @map("parent_post_id")
+  threadRootId       Int?      @map("thread_root_id")
+  repostOfPostId     Int?      @map("repost_of_post_id")
+  repostOfAddress    String?   @map("repost_of_address") @db.VarChar(44)
+  replyDepth         Int       @default(0) @map("reply_depth")
+  
+  circleId           Int?      @map("circle_id")
+  tags               String[]  @default([])
+  
+  likesCount         Int       @default(0) @map("likes_count")
+  repostsCount       Int       @default(0) @map("reposts_count")
+  repliesCount       Int       @default(0) @map("replies_count")
+  commentsCount      Int       @default(0) @map("comments_count")
+  sharesCount        Int       @default(0) @map("shares_count")
+  viewsCount         Int       @default(0) @map("views_count")
+  heatScore          Decimal   @default(0) @map("heat_score") @db.Decimal(10, 4)
+  
+  status             PostStatus @default(Active)
+  visibility         Visibility @default(Public)
+  v2VisibilityLevel  String?    @map("v2_visibility_level") @db.VarChar(32)
+  v2AudienceKind     String?    @map("v2_audience_kind") @db.VarChar(32)
+  v2AudienceRef      Int?       @map("v2_audience_ref")
+  v2Status           String?    @map("v2_status") @db.VarChar(32)
+  isV2Private        Boolean    @default(false) @map("is_v2_private")
+  isV2Draft          Boolean    @default(false) @map("is_v2_draft")
+  onChainAddress     String    @map("on_chain_address") @db.VarChar(44)
+  lastSyncedSlot     BigInt    @map("last_synced_slot")
+  
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+  
+  // Relations
+  author             User      @relation("AuthorPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  parentPost         Post?     @relation("PostReplies", fields: [parentPostId], references: [id], onDelete: SetNull)
+  replies            Post[]    @relation("PostReplies")
+  threadRoot         Post?     @relation("ThreadRoot", fields: [threadRootId], references: [id], onDelete: SetNull)
+  thread             Post[]    @relation("ThreadRoot")
+  repostOf           Post?     @relation("PostReposts", fields: [repostOfPostId], references: [id], onDelete: SetNull)
+  reposts            Post[]    @relation("PostReposts")
+  circle             Circle?   @relation(fields: [circleId], references: [id], onDelete: SetNull)
+  likes              Like[]
+  draftComments      DraftComment[]
+  ghostDraftGenerations GhostDraftGeneration[]
+  ghostDraftAcceptances GhostDraftAcceptance[]
+  draftCandidateAcceptance DraftCandidateAcceptance?
+  
+  @@index([authorId])
+  @@index([createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([v2VisibilityLevel, v2Status])
+  @@index([v2AudienceKind, v2AudienceRef])
+  @@index([threadRootId])
+  @@index([parentPostId])
+  @@index([repostOfPostId])
+  @@index([circleId])
+  @@index([onChainAddress])
+  @@map("posts")
+}
+
+enum PostStatus {
+  Active       // 活跃 (= Published，兼容旧数据)
+  Draft        // 草稿
+  Published    // 已发布
+  Archived     // 已归档
+  Deleted      // 已删除
+  Moderated    // 审核中
+  Suspended    // 已暂停
+  Flagged      // 已标记
+  UnderReview  // 审核中 (链上状态)
+  Hidden       // 隐藏 (客户端侧状态)
+}
+
+enum Visibility {
+  Public
+  CircleOnly
+  FollowersOnly
+  Private
+}
+
+model Circle {
+  id                 Int       @id @default(autoincrement())
+  name               String    @db.VarChar(128)
+  description        String?
+  avatarUri          String?   @map("avatar_uri")
+  bannerUri          String?   @map("banner_uri")
+  
+  creatorId          Int       @map("creator_id")
+  
+  circleType         CircleType @default(Open) @map("circle_type")
+  joinRequirement    JoinRequirement @default(Free) @map("join_requirement")
+  
+  // 层级结构
+  level              Int       @default(0)  // 0=Plaza, 1=Crucible, 2=Sanctuary
+  parentCircleId     Int?      @map("parent_circle_id")
+  knowledgeCount     Int       @default(0) @map("knowledge_count")
+  genesisMode        String?   @map("genesis_mode") @db.VarChar(32) // canonical truth: 'BLANK' | 'SEEDED'
+  
+  membersCount       Int       @default(0) @map("members_count")
+  postsCount         Int       @default(0) @map("posts_count")
+  
+  // Derived from on-chain flags bitfield
+  kind               String    @default("main") @db.VarChar(16)    // "main" | "auxiliary"
+  mode               String    @default("knowledge") @db.VarChar(16) // "knowledge" | "social"
+  minCrystals        Int       @default(0) @map("min_crystals")     // bits 2-17 of flags
+  
+  onChainAddress     String    @unique @map("on_chain_address") @db.VarChar(44)
+  lastSyncedSlot     BigInt    @map("last_synced_slot")
+  
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+  
+  // Relations
+  creator            User      @relation("CircleCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  parentCircle       Circle?   @relation("CircleHierarchy", fields: [parentCircleId], references: [id], onDelete: SetNull)
+  childCircles       Circle[]  @relation("CircleHierarchy")
+  members            CircleMember[]
+  joinRequests       CircleJoinRequest[]
+  invites            CircleInvite[]
+  membershipEvents   CircleMembershipEvent[]
+  posts              Post[]
+  knowledge          Knowledge[]  @relation("CircleKnowledge")
+  crystalEntitlements CrystalEntitlement[]
+  crystalAssets      CrystalAsset[]
+  crystalReceipts    CrystalReceipt[]
+  knowledgeFrom      Knowledge[]  @relation("KnowledgeSource")
+  seededSourceNodes  SeededSourceNode[]
+  sourceMaterials    SourceMaterial[]
+  agents             Agent[]
+  agentPolicy        CircleAgentPolicy?
+  acceptedDraftCandidates DraftCandidateAcceptance[]
+  
+  @@index([creatorId])
+  @@index([circleType])
+  @@index([level])
+  @@index([parentCircleId])
+  @@index([createdAt(sort: Desc)])
+  @@index([membersCount(sort: Desc)])
+  @@index([onChainAddress])
+  @@map("circles")
+}
+
+model SeededSourceNode {
+  id          Int      @id @default(autoincrement())
+  circleId    Int      @map("circle_id")
+  parentId    Int?     @map("parent_id")
+  nodeType    String   @map("node_type") @db.VarChar(16) // "directory" | "file"
+  name        String   @db.VarChar(255)
+  path        String   @db.VarChar(1024)
+  depth       Int
+  sortOrder   Int      @default(0) @map("sort_order")
+  mimeType    String?  @map("mime_type") @db.VarChar(255)
+  contentText String?  @map("content_text")
+  contentLocator String? @map("content_locator")
+  contentHash String?  @map("content_hash") @db.Char(64)
+  byteSize    Int      @default(0) @map("byte_size")
+  lineCount   Int?     @map("line_count")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  circle      Circle            @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  parent      SeededSourceNode? @relation("SeededSourceNodeTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children    SeededSourceNode[] @relation("SeededSourceNodeTree")
+
+  @@unique([circleId, path])
+  @@index([circleId, parentId, sortOrder])
+  @@map("seeded_source_nodes")
+}
+
+model SourceMaterial {
+  id                 Int      @id @default(autoincrement())
+  circleId           Int      @map("circle_id")
+  uploadedByUserId   Int      @map("uploaded_by_user_id")
+  draftPostId        Int?     @map("draft_post_id")
+  discussionThreadId String?  @map("discussion_thread_id") @db.VarChar(64)
+  seededSourceNodeId Int?     @map("seeded_source_node_id")
+  name               String   @db.VarChar(255)
+  mimeType           String?  @map("mime_type") @db.VarChar(255)
+  byteSize           Int      @default(0) @map("byte_size")
+  extractionStatus   String   @default("ready") @map("extraction_status") @db.VarChar(32)
+  rawText            String?  @map("raw_text")
+  rawTextLocator     String?  @map("raw_text_locator")
+  contentDigest      String   @map("content_digest") @db.Char(64)
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
+
+  circle             Circle                @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  chunks             SourceMaterialChunk[]
+
+  @@index([circleId, createdAt(sort: Desc)])
+  @@index([draftPostId, createdAt(sort: Desc)])
+  @@index([discussionThreadId, createdAt(sort: Desc)])
+  @@index([seededSourceNodeId, createdAt(sort: Desc)])
+  @@map("source_materials")
+}
+
+model SourceMaterialChunk {
+  id               Int      @id @default(autoincrement())
+  sourceMaterialId Int      @map("source_material_id")
+  chunkIndex       Int      @map("chunk_index")
+  locatorType      String   @map("locator_type") @db.VarChar(32)
+  locatorRef       String   @map("locator_ref") @db.VarChar(128)
+  text             String
+  textLocator      String?  @map("text_locator")
+  textDigest       String   @map("text_digest") @db.Char(64)
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  sourceMaterial   SourceMaterial @relation(fields: [sourceMaterialId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceMaterialId, chunkIndex])
+  @@index([sourceMaterialId, chunkIndex])
+  @@map("source_material_chunks")
+}
+
+model Agent {
+  id               Int      @id @default(autoincrement())
+  circleId         Int      @map("circle_id")
+  agentPubkey      String   @unique @map("agent_pubkey") @db.VarChar(44)
+  handle           String   @db.VarChar(64)
+  displayName      String?  @map("display_name") @db.VarChar(128)
+  description      String?
+  ownerUserId      Int?     @map("owner_user_id")
+  createdByUserId  Int      @map("created_by_user_id")
+  status           String   @default("active") @db.VarChar(16)
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at")
+
+  circle           Circle   @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  owner            User?    @relation("AgentOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  createdBy        User     @relation("AgentCreatedBy", fields: [createdByUserId], references: [id], onDelete: Cascade)
+
+  @@unique([circleId, handle])
+  @@index([circleId, createdAt(sort: Desc)])
+  @@index([ownerUserId, createdAt(sort: Desc)])
+  @@index([createdByUserId, createdAt(sort: Desc)])
+  @@map("agents")
+}
+
+model CircleAgentPolicy {
+  circleId         Int      @id @map("circle_id")
+  triggerScope     String   @default("draft_only") @map("trigger_scope") @db.VarChar(32)
+  costDiscountBps  Int      @default(0) @map("cost_discount_bps")
+  reviewMode       String   @default("owner_review") @map("review_mode") @db.VarChar(32)
+  updatedByUserId  Int?     @map("updated_by_user_id")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at")
+
+  circle           Circle   @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  updatedBy        User?    @relation("AgentPolicyUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([updatedByUserId, updatedAt(sort: Desc)])
+  @@map("circle_agent_policies")
+}
+
+enum CircleType {
+  Open
+  Closed
+  Secret
+}
+
+enum JoinRequirement {
+  Free
+  ApprovalRequired
+  TokenGated
+  InviteOnly
+}
+
+enum CircleJoinRequestStatus {
+  Pending
+  Approved
+  Rejected
+  Cancelled
+  Expired
+}
+
+enum CircleInviteStatus {
+  Active
+  Accepted
+  Revoked
+  Expired
+}
+
+enum CircleMembershipEventType {
+  JoinRequested
+  JoinApproved
+  JoinRejected
+  Joined
+  Left
+  Banned
+  Unbanned
+  RoleChanged
+  IdentityChanged
+  InviteCreated
+  InviteAccepted
+}
+
+model CircleMember {
+  id                 Int       @id @default(autoincrement())
+  circleId           Int       @map("circle_id")
+  userId             Int       @map("user_id")
+  
+  role               MemberRole @default(Member)
+  status             MemberStatus @default(Active)
+  identityLevel      IdentityLevel @default(Visitor) @map("identity_level")
+  
+  onChainAddress     String    @unique @map("on_chain_address") @db.VarChar(44)
+  lastSyncedSlot     BigInt    @map("last_synced_slot")
+  
+  joinedAt           DateTime  @default(now()) @map("joined_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+  
+  // Relations
+  circle             Circle    @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([circleId, userId])
+  @@index([circleId])
+  @@index([userId])
+  @@index([status])
+  @@index([role])
+  @@index([identityLevel])
+  @@map("circle_members")
+}
+
+model CircleJoinRequest {
+  id                 Int       @id @default(autoincrement())
+  circleId           Int       @map("circle_id")
+  userId             Int       @map("user_id")
+  status             CircleJoinRequestStatus @default(Pending)
+  requestMessage     String?   @map("request_message")
+  decisionReason     String?   @map("decision_reason")
+  reviewedById       Int?      @map("reviewed_by_id")
+  reviewedAt         DateTime? @map("reviewed_at")
+  metadata           Json?
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  circle             Circle    @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  user               User      @relation("CircleJoinRequestUser", fields: [userId], references: [id], onDelete: Cascade)
+  reviewer           User?     @relation("CircleJoinRequestReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  membershipEvents   CircleMembershipEvent[]
+
+  @@index([circleId, status, createdAt(sort: Desc)])
+  @@index([userId, status, createdAt(sort: Desc)])
+  @@index([reviewedById, reviewedAt(sort: Desc)])
+  @@map("circle_join_requests")
+}
+
+model CircleInvite {
+  id                 Int       @id @default(autoincrement())
+  circleId           Int       @map("circle_id")
+  inviterId          Int       @map("inviter_id")
+  inviteeUserId      Int?      @map("invitee_user_id")
+  inviteeHandle      String?   @map("invitee_handle") @db.VarChar(64)
+  code               String    @unique @db.VarChar(128)
+  status             CircleInviteStatus @default(Active)
+  note               String?
+  acceptedById       Int?      @map("accepted_by_id")
+  acceptedAt         DateTime? @map("accepted_at")
+  expiresAt          DateTime? @map("expires_at")
+  metadata           Json?
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  circle             Circle    @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  inviter            User      @relation("CircleInviteSender", fields: [inviterId], references: [id], onDelete: Cascade)
+  invitee            User?     @relation("CircleInviteTarget", fields: [inviteeUserId], references: [id], onDelete: SetNull)
+  acceptedBy         User?     @relation("CircleInviteAcceptor", fields: [acceptedById], references: [id], onDelete: SetNull)
+  membershipEvents   CircleMembershipEvent[]
+
+  @@index([circleId, status, createdAt(sort: Desc)])
+  @@index([inviterId, createdAt(sort: Desc)])
+  @@index([inviteeUserId, status, createdAt(sort: Desc)])
+  @@index([inviteeHandle, status, createdAt(sort: Desc)])
+  @@index([expiresAt])
+  @@map("circle_invites")
+}
+
+model CircleMembershipEvent {
+  id                 BigInt    @id @default(autoincrement())
+  circleId           Int       @map("circle_id")
+  userId             Int       @map("user_id")
+  actorUserId        Int?      @map("actor_user_id")
+  eventType          CircleMembershipEventType @map("event_type")
+  roleBefore         MemberRole? @map("role_before")
+  roleAfter          MemberRole? @map("role_after")
+  statusBefore       MemberStatus? @map("status_before")
+  statusAfter        MemberStatus? @map("status_after")
+  joinRequestId      Int?      @map("join_request_id")
+  inviteId           Int?      @map("invite_id")
+  reason             String?
+  metadata           Json?
+  createdAt          DateTime  @default(now()) @map("created_at")
+
+  circle             Circle    @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  user               User      @relation("CircleMembershipEventUser", fields: [userId], references: [id], onDelete: Cascade)
+  actor              User?     @relation("CircleMembershipEventActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  joinRequest        CircleJoinRequest? @relation(fields: [joinRequestId], references: [id], onDelete: SetNull)
+  invite             CircleInvite? @relation(fields: [inviteId], references: [id], onDelete: SetNull)
+
+  @@index([circleId, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([actorUserId, createdAt(sort: Desc)])
+  @@index([eventType, createdAt(sort: Desc)])
+  @@map("circle_membership_events")
+}
+
+enum IdentityLevel {
+  Visitor
+  Initiate
+  Member
+  Elder
+}
+
+enum MemberRole {
+  Owner
+  Admin
+  Moderator
+  Member
+}
+
+enum MemberStatus {
+  Active
+  Banned
+  Left
+}
+
+model Follow {
+  id                 Int       @id @default(autoincrement())
+  followerId         Int       @map("follower_id")
+  followingId        Int       @map("following_id")
+  
+  onChainAddress     String    @unique @map("on_chain_address") @db.VarChar(44)
+  lastSyncedSlot     BigInt    @map("last_synced_slot")
+  
+  createdAt          DateTime  @default(now()) @map("created_at")
+  
+  // Relations
+  follower           User      @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following          User      @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+  
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+  @@index([createdAt(sort: Desc)])
+  @@map("follows")
+}
+
+model Like {
+  id                 Int       @id @default(autoincrement())
+  userId             Int       @map("user_id")
+  postId             Int       @map("post_id")
+  
+  onChainAddress     String    @unique @map("on_chain_address") @db.VarChar(44)
+  lastSyncedSlot     BigInt    @map("last_synced_slot")
+  
+  createdAt          DateTime  @default(now()) @map("created_at")
+  
+  // Relations
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post               Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, postId])
+  @@index([userId])
+  @@index([postId])
+  @@index([createdAt(sort: Desc)])
+  @@map("likes")
+}
+
+model Conversation {
+  id                 Int       @id @default(autoincrement())
+  conversationId     String    @unique @map("conversation_id") @db.VarChar(44) // on-chain pubkey
+  conversationType   ConversationType @default(Direct) @map("conversation_type")
+  
+  creatorId          Int       @map("creator_id")
+  
+  onChainAddress     String    @unique @map("on_chain_address") @db.VarChar(44)
+  lastSyncedSlot     BigInt    @map("last_synced_slot")
+  
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+  
+  // Relations
+  creator            User      @relation("ConversationCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  participants       ConversationParticipant[]
+  messages           Message[]
+  
+  @@index([creatorId])
+  @@index([conversationType])
+  @@index([createdAt(sort: Desc)])
+  @@map("conversations")
+}
+
+enum ConversationType {
+  Direct
+  Group
+  Channel
+}
+
+model ConversationParticipant {
+  id                 Int       @id @default(autoincrement())
+  conversationId     Int       @map("conversation_id")
+  userId             Int       @map("user_id")
+  
+  joinedAt           DateTime  @default(now()) @map("joined_at")
+  
+  // Relations
+  conversation       Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([conversationId, userId])
+  @@index([conversationId])
+  @@index([userId])
+  @@map("conversation_participants")
+}
+
+model Message {
+  id                 Int       @id @default(autoincrement())
+  messageId          String?   @unique @map("message_id") @db.VarChar(44) // on-chain pubkey
+  
+  conversationId     Int?      @map("conversation_id")
+  senderId           Int       @map("sender_id")
+  recipientId        Int?      @map("recipient_id") // nullable for group messages
+  
+  text               String
+  messageType        String    @default("Text") @map("message_type") @db.VarChar(32)
+  encrypted          Boolean   @default(false)
+  
+  replyToId          Int?      @map("reply_to_id")
+  
+  status             MessageStatus @default(Sent)
+  
+  onChainAddress     String    @unique @map("on_chain_address") @db.VarChar(44)
+  lastSyncedSlot     BigInt    @map("last_synced_slot")
+  
+  sentAt             DateTime  @default(now()) @map("sent_at")
+  readAt             DateTime? @map("read_at")
+  
+  // Relations
+  conversation       Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender             User      @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient          User?     @relation("MessageRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  replyTo            Message?  @relation("MessageReply", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies            Message[] @relation("MessageReply")
+  
+  @@index([conversationId, sentAt(sort: Desc)])
+  @@index([senderId, sentAt(sort: Desc)])
+  @@index([recipientId, sentAt(sort: Desc)])
+  @@index([status])
+  @@index([senderId, recipientId, sentAt(sort: Desc)])
+  @@map("messages")
+}
+
+enum MessageStatus {
+  Sent
+  Delivered
+  Read
+  Recalled
+  Deleted
+}
+
+model SyncCheckpoint {
+  id                    Int       @id @default(autoincrement())
+  programId             String    @unique @map("program_id") @db.VarChar(44)
+  programName           String    @map("program_name") @db.VarChar(64)
+  
+  lastProcessedSlot     BigInt    @map("last_processed_slot")
+  lastProcessedSignature String?  @map("last_processed_signature") @db.VarChar(88)
+  
+  totalEventsProcessed  BigInt    @default(0) @map("total_events_processed")
+  lastEventTimestamp    DateTime? @map("last_event_timestamp")
+  
+  lastSuccessfulSync    DateTime  @default(now()) @map("last_successful_sync")
+  syncErrorsCount       Int       @default(0) @map("sync_errors_count")
+  
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @default(now()) @updatedAt @map("updated_at")
+  
+  @@index([programId])
+  @@map("sync_checkpoints")
+}
+
+model IndexerRuntimeState {
+  id                 String   @id @db.VarChar(64)
+  indexerId          String   @unique @map("indexer_id") @db.VarChar(64)
+  listenerMode       String   @map("listener_mode") @db.VarChar(32)
+  phase              String   @db.VarChar(32)
+  currentSlot        BigInt?  @map("current_slot")
+  currentSlotTxCount Int?     @map("current_slot_tx_count")
+  currentTxIndex     Int?     @map("current_tx_index")
+  currentTxSignature String?  @map("current_tx_signature") @db.VarChar(88)
+  lastProgressAt     DateTime @map("last_progress_at")
+  lastError          String?  @map("last_error")
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([indexerId])
+  @@index([updatedAt(sort: Desc)])
+  @@map("indexer_runtime_state")
+}
+
+model IndexerProgramCursor {
+  programId         String   @map("program_id") @db.VarChar(44)
+  listenerMode      String   @map("listener_mode") @db.VarChar(32)
+  lastSignature     String?  @map("last_signature") @db.VarChar(88)
+  lastProcessedSlot BigInt   @map("last_processed_slot")
+  updatedAt         DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@id([programId, listenerMode])
+  @@index([listenerMode, updatedAt(sort: Desc)])
+  @@map("indexer_program_cursors")
+}
+
+model CircleDiscussionMessage {
+  id                 BigInt    @id @default(autoincrement())
+  envelopeId         String    @unique @map("envelope_id") @db.VarChar(96)
+  streamKey          String    @default("circle-discussion") @map("stream_key") @db.VarChar(64)
+  roomKey            String    @map("room_key") @db.VarChar(64)
+  circleId           Int       @map("circle_id")
+  senderPubkey       String    @map("sender_pubkey") @db.VarChar(44)
+  senderHandle       String?   @map("sender_handle") @db.VarChar(32)
+  messageKind        String    @default("plain") @map("message_kind") @db.VarChar(32)
+  subjectType        String?   @map("subject_type") @db.VarChar(32)
+  subjectId          String?   @map("subject_id") @db.VarChar(128)
+  metadata           Json?
+  payloadText        String    @map("payload_text")
+  payloadHash        String    @map("payload_hash") @db.Char(64)
+  nonce              String    @db.VarChar(64)
+  signature          String?   @db.VarChar(512)
+  signatureScheme    String    @default("ed25519") @map("signature_scheme") @db.VarChar(16)
+  signedMessage      String    @map("signed_message")
+  signatureVerified  Boolean   @default(false) @map("signature_verified")
+  authMode           String    @default("wallet_per_message") @map("auth_mode") @db.VarChar(32)
+  sessionId          String?   @map("session_id") @db.VarChar(64)
+  relevanceScore     Decimal   @default(1) @map("relevance_score") @db.Decimal(4, 3)
+  relevanceStatus    String    @default("ready") @map("relevance_status") @db.VarChar(16)
+  semanticScore      Decimal?  @map("semantic_score") @db.Decimal(4, 3)
+  embeddingScore     Decimal?  @map("embedding_score") @db.Decimal(4, 3)
+  qualityScore       Decimal?  @map("quality_score") @db.Decimal(4, 3)
+  spamScore          Decimal?  @map("spam_score") @db.Decimal(4, 3)
+  decisionConfidence Decimal?  @map("decision_confidence") @db.Decimal(4, 3)
+  relevanceMethod    String    @default("rule") @map("relevance_method") @db.VarChar(32)
+  actualMode         String?   @map("actual_mode") @db.VarChar(32)
+  analysisVersion    String?   @map("analysis_version") @db.VarChar(32)
+  topicProfileVersion String?  @map("topic_profile_version") @db.VarChar(128)
+  semanticFacets     Json      @default("[]") @map("semantic_facets")
+  focusScore         Decimal?  @map("focus_score") @db.Decimal(4, 3)
+  focusLabel         String?   @map("focus_label") @db.VarChar(16)
+  isFeatured         Boolean   @default(false) @map("is_featured")
+  featureReason      String?   @map("feature_reason") @db.VarChar(240)
+  featuredAt         DateTime? @map("featured_at")
+  analysisCompletedAt DateTime? @map("analysis_completed_at")
+  analysisErrorCode  String?   @map("analysis_error_code") @db.VarChar(64)
+  analysisErrorMessage String? @map("analysis_error_message")
+  authorAnnotations  Json      @default("[]") @map("author_annotations")
+  isEphemeral        Boolean   @default(false) @map("is_ephemeral")
+  expiresAt          DateTime? @map("expires_at")
+  clientTimestamp    DateTime  @map("client_timestamp")
+  lamport            BigInt
+  prevEnvelopeId     String?   @map("prev_envelope_id") @db.VarChar(96)
+  deleted            Boolean   @default(false)
+  tombstoneReason    String?   @map("tombstone_reason") @db.VarChar(64)
+  tombstonedAt       DateTime? @map("tombstoned_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([roomKey, lamport(sort: Desc)])
+  @@index([streamKey, lamport])
+  @@index([circleId, lamport(sort: Desc)])
+  @@index([senderPubkey, lamport(sort: Desc)])
+  @@index([sessionId])
+  @@index([relevanceScore])
+  @@index([relevanceStatus])
+  @@index([semanticScore])
+  @@index([spamScore])
+  @@index([circleId, isFeatured, featuredAt(sort: Desc)])
+  @@index([circleId, isEphemeral, lamport(sort: Desc)])
+  @@index([isEphemeral, expiresAt])
+  @@index([circleId, messageKind, lamport(sort: Desc)])
+  @@index([subjectType, subjectId, lamport(sort: Desc)])
+  @@index([subjectType, subjectId, messageKind, lamport(sort: Desc)])
+  @@index([circleId, subjectType, subjectId, lamport(sort: Desc)])
+  @@map("circle_discussion_messages")
+}
+
+model DiscussionMessageHighlight {
+  envelopeId         String    @map("envelope_id") @db.VarChar(96)
+  userId             Int       @map("user_id")
+  createdAt          DateTime  @default(now()) @map("created_at")
+
+  @@id([envelopeId, userId])
+  @@index([userId])
+  @@map("discussion_message_highlights")
+}
+
+model DiscussionSession {
+  sessionId      String    @id @map("session_id") @db.VarChar(64)
+  senderPubkey   String    @map("sender_pubkey") @db.VarChar(44)
+  senderHandle   String?   @map("sender_handle") @db.VarChar(32)
+  scope          String    @default("circle:*") @db.VarChar(64)
+  issuedAt       DateTime  @default(now()) @map("issued_at")
+  expiresAt      DateTime  @map("expires_at")
+  revoked        Boolean   @default(false)
+  lastSeenAt     DateTime? @map("last_seen_at")
+  clientMeta     Json?     @map("client_meta")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([senderPubkey])
+  @@index([expiresAt])
+  @@map("discussion_sessions")
+}
+
+model DraftDiscussionThread {
+  id            BigInt   @id @default(autoincrement())
+  draftPostId   Int      @map("draft_post_id")
+  targetType    String   @map("target_type") @db.VarChar(32)
+  targetRef     String   @map("target_ref") @db.VarChar(256)
+  targetVersion Int      @default(1) @map("target_version")
+  issueType     String   @default("question_and_supplement") @map("issue_type") @db.VarChar(32)
+  state         String   @db.VarChar(16)
+  createdBy     Int      @map("created_by")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([draftPostId, updatedAt(sort: Desc)])
+  @@index([draftPostId, state])
+  @@map("draft_discussion_threads")
+}
+
+model DraftDiscussionMessage {
+  id          BigInt   @id @default(autoincrement())
+  threadId    BigInt   @map("thread_id")
+  draftPostId Int      @map("draft_post_id")
+  authorId    Int      @map("author_id")
+  messageType String   @map("message_type") @db.VarChar(32)
+  content     String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([threadId, createdAt(sort: Desc)])
+  @@index([draftPostId, createdAt(sort: Desc)])
+  @@map("draft_discussion_messages")
+}
+
+model DraftDiscussionResolution {
+  id         BigInt   @id @default(autoincrement())
+  threadId   BigInt   @map("thread_id")
+  draftPostId Int     @map("draft_post_id")
+  fromState  String   @map("from_state") @db.VarChar(16)
+  toState    String   @map("to_state") @db.VarChar(16)
+  reason     String?
+  resolvedBy Int      @map("resolved_by")
+  resolvedAt DateTime @default(now()) @map("resolved_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([threadId, resolvedAt(sort: Desc)])
+  @@index([draftPostId, resolvedAt(sort: Desc)])
+  @@map("draft_discussion_resolutions")
+}
+
+model DraftDiscussionApplication {
+  id                 BigInt   @id @default(autoincrement())
+  threadId           BigInt   @map("thread_id")
+  draftPostId        Int      @map("draft_post_id")
+  appliedBy          Int      @map("applied_by")
+  appliedEditAnchorId String  @map("applied_edit_anchor_id") @db.VarChar(128)
+  appliedSnapshotHash String  @map("applied_snapshot_hash") @db.Char(64)
+  appliedDraftVersion Int     @map("applied_draft_version")
+  reason             String?
+  appliedAt          DateTime @default(now()) @map("applied_at")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@index([threadId, appliedAt(sort: Desc)])
+  @@index([draftPostId, appliedAt(sort: Desc)])
+  @@map("draft_discussion_applications")
+}
+
+model DraftVersionSnapshot {
+  id                   BigInt   @id @default(autoincrement())
+  draftPostId          Int      @map("draft_post_id")
+  draftVersion         Int      @map("draft_version")
+  contentSnapshot      String   @map("content_snapshot")
+  contentHash          String   @map("content_hash") @db.Char(64)
+  createdFromState     String   @map("created_from_state") @db.VarChar(32)
+  createdBy            Int?     @map("created_by")
+  sourceEditAnchorId   String?  @map("source_edit_anchor_id") @db.VarChar(128)
+  sourceSummaryHash    String?  @map("source_summary_hash") @db.Char(64)
+  sourceMessagesDigest String?  @map("source_messages_digest") @db.Char(64)
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  @@unique([draftPostId, draftVersion])
+  @@index([draftPostId, createdAt(sort: Desc)])
+  @@map("draft_version_snapshots")
+}
+
+model DraftWorkflowState {
+  draftPostId       Int       @unique @map("draft_post_id")
+  circleId          Int?      @map("circle_id")
+  documentStatus    String    @map("document_status") @db.VarChar(32)
+  currentSnapshotVersion Int  @default(1) @map("current_snapshot_version")
+  currentRound      Int       @default(1) @map("current_round")
+  reviewEntryMode   String    @default("auto_or_manual") @map("review_entry_mode") @db.VarChar(32)
+  draftingStartedAt DateTime? @map("drafting_started_at")
+  draftingEndsAt    DateTime? @map("drafting_ends_at")
+  reviewStartedAt   DateTime? @map("review_started_at")
+  reviewEndsAt      DateTime? @map("review_ends_at")
+  reviewWindowExpiredAt DateTime? @map("review_window_expired_at")
+  crystallizationPolicyProfileDigest String? @map("crystallization_policy_profile_digest") @db.Char(64)
+  crystallizationAnchorSignature String? @map("crystallization_anchor_signature") @db.VarChar(128)
+  transitionMode    String?   @map("transition_mode") @db.VarChar(32)
+  lastTransitionAt  DateTime? @map("last_transition_at")
+  lastTransitionBy  Int?      @map("last_transition_by")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@id([draftPostId])
+  @@index([circleId, documentStatus])
+  @@index([draftingEndsAt(sort: Asc)])
+  @@index([reviewEndsAt(sort: Asc)])
+  @@map("draft_workflow_state")
+}
+
+model CirclePolicyProfile {
+  circleId                  Int       @id @map("circle_id")
+  sourceType                String?   @map("source_type") @db.VarChar(32)
+  inheritanceMode           String?   @map("inheritance_mode") @db.VarChar(32)
+  inheritsFromProfileId     String?   @map("inherits_from_profile_id") @db.VarChar(128)
+  inheritsFromCircleId      Int?      @map("inherits_from_circle_id")
+  draftGenerationPolicy     Json?     @map("draft_generation_policy")
+  draftLifecycleTemplate    Json?     @map("draft_lifecycle_template")
+  draftWorkflowPolicy       Json?     @map("draft_workflow_policy")
+  blockEditEligibilityPolicy Json?    @map("block_edit_eligibility_policy")
+  forkPolicy                Json?     @map("fork_policy")
+  ghostPolicy               Json?     @map("ghost_policy")
+  localEditability          String?   @map("local_editability") @db.VarChar(16)
+  effectiveFrom             DateTime? @map("effective_from")
+  resolvedFromProfileVersion Int?     @map("resolved_from_profile_version")
+  configVersion             Int       @default(1) @map("config_version")
+  updatedBy                 Int?      @map("updated_by")
+  createdAt                 DateTime  @default(now()) @map("created_at")
+  updatedAt                 DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([effectiveFrom(sort: Desc)])
+  @@map("circle_policy_profiles")
+}
+
+model CircleSummarySnapshot {
+  summaryId                         String   @id @map("summary_id") @db.VarChar(128)
+  circleId                          Int      @map("circle_id")
+  version                           Int
+  issueMap                          Json     @map("issue_map")
+  conceptGraph                      Json     @map("concept_graph")
+  viewpointBranches                 Json     @map("viewpoint_branches")
+  factExplanationEmotionBreakdown   Json     @map("fact_explanation_emotion_breakdown")
+  emotionConflictContext            Json     @map("emotion_conflict_context")
+  sedimentationTimeline             Json     @map("sedimentation_timeline")
+  openQuestions                     Json     @map("open_questions")
+  generatedAt                       DateTime @map("generated_at")
+  generatedBy                       String   @map("generated_by") @db.VarChar(32)
+  generationMetadata                Json?    @map("generation_metadata")
+  createdAt                         DateTime @default(now()) @map("created_at")
+  updatedAt                         DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([circleId, version])
+  @@index([circleId, generatedAt(sort: Desc)])
+  @@map("circle_summary_snapshots")
+}
+
+model GovernanceProposal {
+  proposalId          String   @id @map("proposal_id") @db.VarChar(128)
+  circleId            Int      @map("circle_id")
+  actionType          String   @map("action_type") @db.VarChar(64)
+  targetType          String   @map("target_type") @db.VarChar(64)
+  targetId            String   @map("target_id") @db.VarChar(128)
+  targetVersion       Int?     @map("target_version")
+  status              String   @db.VarChar(32)
+  createdBy           Int?     @map("created_by")
+  electorateScope     String?  @map("electorate_scope") @db.VarChar(64)
+  voteRule            String?  @map("vote_rule") @db.VarChar(64)
+  thresholdValue      Int?     @map("threshold_value")
+  quorum              Int?
+  opensAt             DateTime? @map("opens_at")
+  closesAt            DateTime? @map("closes_at")
+  resolvedAt          DateTime? @map("resolved_at")
+  executedAt          DateTime? @map("executed_at")
+  executionError      String?  @map("execution_error")
+  executionMarker     String?  @unique @map("execution_marker") @db.VarChar(128)
+  policyProfileDigest String?  @map("policy_profile_digest") @db.Char(64)
+  configSnapshot      Json?    @map("config_snapshot")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @default(now()) @updatedAt @map("updated_at")
+
+  votes               GovernanceVote[]
+
+  @@index([circleId, actionType, createdAt(sort: Desc)])
+  @@index([targetType, targetId, createdAt(sort: Desc)])
+  @@map("governance_proposals")
+}
+
+model GovernanceVote {
+  id          BigInt   @id @default(autoincrement())
+  proposalId  String   @map("proposal_id") @db.VarChar(128)
+  voterUserId Int      @map("voter_user_id")
+  vote        String   @db.VarChar(16)
+  reason      String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  proposal    GovernanceProposal @relation(fields: [proposalId], references: [proposalId], onDelete: Cascade)
+
+  @@unique([proposalId, voterUserId])
+  @@index([proposalId, createdAt(sort: Desc)])
+  @@index([voterUserId, createdAt(sort: Desc)])
+  @@map("governance_votes")
+}
+
+model ForkDeclaration {
+  declarationId        String   @id @map("declaration_id") @db.VarChar(128)
+  sourceCircleId       Int      @map("source_circle_id")
+  targetCircleId       Int?     @map("target_circle_id")
+  actorUserId          Int      @map("actor_user_id")
+  declarationText      String   @map("declaration_text")
+  originAnchorRef      String?  @map("origin_anchor_ref") @db.VarChar(128)
+  qualificationSnapshot Json    @map("qualification_snapshot")
+  status               String   @db.VarChar(32)
+  executionAnchorDigest String? @map("execution_anchor_digest") @db.Char(64)
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([sourceCircleId, createdAt(sort: Desc)])
+  @@index([targetCircleId, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Asc)])
+  @@map("fork_declarations")
+}
+
+model CircleForkLineage {
+  lineageId            String   @id @map("lineage_id") @db.VarChar(128)
+  sourceCircleId       Int      @map("source_circle_id")
+  targetCircleId       Int      @map("target_circle_id")
+  declarationId        String   @unique @map("declaration_id") @db.VarChar(128)
+  createdBy            Int      @map("created_by")
+  originAnchorRef      String?  @map("origin_anchor_ref") @db.VarChar(128)
+  inheritanceSnapshot  Json     @map("inheritance_snapshot")
+  executionAnchorDigest String? @map("execution_anchor_digest") @db.Char(64)
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([sourceCircleId, targetCircleId])
+  @@index([sourceCircleId, createdAt(sort: Desc)])
+  @@index([targetCircleId, createdAt(sort: Desc)])
+  @@map("circle_fork_lineage")
+}
+
+model CircleForkRetentionState {
+  targetCircleId       Int      @id @map("target_circle_id")
+  sourceCircleId       Int      @map("source_circle_id")
+  declarationId        String?  @map("declaration_id") @db.VarChar(128)
+  currentCheckpointDay Int      @default(2) @map("current_checkpoint_day")
+  nextCheckAt          DateTime? @map("next_check_at")
+  inactiveStreak       Int      @default(0) @map("inactive_streak")
+  markerVisible        Boolean  @default(true) @map("marker_visible")
+  permanentAt          DateTime? @map("permanent_at")
+  hiddenAt             DateTime? @map("hidden_at")
+  lastEvaluatedAt      DateTime? @map("last_evaluated_at")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([nextCheckAt(sort: Asc)])
+  @@index([sourceCircleId, markerVisible])
+  @@map("circle_fork_retention_state")
+}
+
+model CircleActivityRollup {
+  id                    BigInt   @id @default(autoincrement())
+  circleId              Int      @map("circle_id")
+  windowStart           DateTime @map("window_start")
+  windowEnd             DateTime @map("window_end")
+  memberGrowthSignal    Decimal  @default(0) @map("member_growth_signal") @db.Decimal(10, 4)
+  contentGrowthSignal   Decimal  @default(0) @map("content_growth_signal") @db.Decimal(10, 4)
+  crystallizationSignal Decimal  @default(0) @map("crystallization_signal") @db.Decimal(10, 4)
+  activityScore         Decimal  @default(0) @map("activity_score") @db.Decimal(10, 4)
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([circleId, windowStart, windowEnd])
+  @@index([circleId, windowEnd(sort: Desc)])
+  @@map("circle_activity_rollups")
+}
+
+model RevisionDirectionProposal {
+  revisionProposalId  String    @id @map("revision_proposal_id") @db.VarChar(128)
+  draftPostId         Int       @map("draft_post_id")
+  draftVersion        Int       @map("draft_version")
+  scopeType           String    @map("scope_type") @db.VarChar(32)
+  scopeRef            String    @map("scope_ref")
+  proposedBy          Int?      @map("proposed_by")
+  summary             String
+  acceptanceMode      String    @map("acceptance_mode") @db.VarChar(32)
+  status              String    @db.VarChar(16)
+  acceptedBy          Int?      @map("accepted_by")
+  acceptedAt          DateTime? @map("accepted_at")
+  governanceProposalId String?  @unique @map("governance_proposal_id") @db.VarChar(128)
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([draftPostId, draftVersion, createdAt(sort: Desc)])
+  @@index([draftPostId, status, createdAt(sort: Desc)])
+  @@map("revision_direction_proposals")
+}
+
+model TemporaryEditGrant {
+  grantId             String    @id @map("grant_id") @db.VarChar(128)
+  draftPostId         Int       @map("draft_post_id")
+  blockId             String    @map("block_id") @db.VarChar(128)
+  granteeUserId       Int       @map("grantee_user_id")
+  requestedBy         Int       @map("requested_by")
+  grantedBy           Int?      @map("granted_by")
+  revokedBy           Int?      @map("revoked_by")
+  approvalMode        String    @map("approval_mode") @db.VarChar(32)
+  status              String    @db.VarChar(16)
+  governanceProposalId String?  @map("governance_proposal_id") @db.VarChar(128)
+  requestNote         String?   @map("request_note")
+  expiresAt           DateTime? @map("expires_at")
+  requestedAt         DateTime  @map("requested_at")
+  grantedAt           DateTime? @map("granted_at")
+  revokedAt           DateTime? @map("revoked_at")
+  updatedAt           DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([draftPostId, blockId, requestedAt(sort: Desc)])
+  @@index([draftPostId, granteeUserId, status, requestedAt(sort: Desc)])
+  @@map("temporary_edit_grants")
+}
+
+model DraftProofPackage {
+  id                   BigInt   @id @default(autoincrement())
+  draftPostId          Int      @map("draft_post_id")
+  proofPackageHash     String   @map("proof_package_hash") @db.Char(64)
+  sourceAnchorId       String   @map("source_anchor_id") @db.VarChar(128)
+  contributorsRoot     String   @map("contributors_root") @db.Char(64)
+  contributorsCount    Int      @map("contributors_count")
+  bindingVersion       Int      @default(2) @map("binding_version")
+  canonicalProofPackage Json    @map("canonical_proof_package")
+  generatedAt          DateTime @map("generated_at")
+  generatedBy          String   @map("generated_by") @db.VarChar(64)
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  issuances            DraftProofPackageIssuance[]
+
+  @@unique([draftPostId, proofPackageHash])
+  @@index([draftPostId, generatedAt(sort: Desc)])
+  @@map("draft_proof_packages")
+}
+
+model DraftProofPackageIssuance {
+  id             BigInt   @id @default(autoincrement())
+  proofPackageId BigInt   @map("proof_package_id")
+  issuerKeyId    String   @map("issuer_key_id") @db.VarChar(64)
+  issuedSignature String  @map("issued_signature") @db.VarChar(512)
+  issuedAt       DateTime @map("issued_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  proofPackage   DraftProofPackage @relation(fields: [proofPackageId], references: [id], onDelete: Cascade)
+
+  @@index([proofPackageId, issuedAt(sort: Desc)])
+  @@index([issuerKeyId, issuedAt(sort: Desc)])
+  @@map("draft_proof_package_issuances")
+}
+
+model OffchainSyncWatermark {
+  streamKey        String    @id @map("stream_key") @db.VarChar(64)
+  lastLamport      BigInt    @default(0) @map("last_lamport")
+  lastEnvelopeId   String?   @map("last_envelope_id") @db.VarChar(96)
+  lastIngestedAt   DateTime? @map("last_ingested_at")
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@map("offchain_sync_watermarks")
+}
+
+model OffchainPeerSyncState {
+  peerUrl            String    @id @map("peer_url") @db.VarChar(512)
+  lastRemoteLamport  BigInt    @default(0) @map("last_remote_lamport")
+  lastSuccessAt      DateTime? @map("last_success_at")
+  lastError          String?   @map("last_error")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@map("offchain_peer_sync_state")
+}
+
+model GhostRun {
+  id                Int      @id @default(autoincrement())
+  runKind           String   @map("run_kind") @db.VarChar(64)
+  status            String   @db.VarChar(16)
+  circleId          Int      @map("circle_id")
+  reason            String   @db.VarChar(64)
+  windowSize        Int      @map("window_size")
+  messageCount      Int?     @map("message_count")
+  focusedCount      Int?     @map("focused_count")
+  focusedRatio      Decimal? @map("focused_ratio") @db.Decimal(5, 4)
+  minMessages       Int      @map("min_messages")
+  minQuestionCount  Int      @map("min_question_count")
+  minFocusedRatio   Decimal  @map("min_focused_ratio") @db.Decimal(5, 4)
+  questionCount     Int?     @map("question_count")
+  summaryMethod     String?  @map("summary_method") @db.VarChar(32)
+  summaryPreview    String?  @map("summary_preview")
+  draftPostId       Int?     @map("draft_post_id")
+  metadata          Json?
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  @@index([runKind, createdAt(sort: Desc)])
+  @@index([circleId, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
+  @@map("ghost_runs")
+}
+
+model CircleGhostSetting {
+  circleId               Int      @id @map("circle_id")
+  relevanceMode          String?  @map("relevance_mode") @db.VarChar(16)
+  summaryUseLlm          Boolean? @map("summary_use_llm")
+  draftTriggerMode       String?  @map("draft_trigger_mode") @db.VarChar(24)
+  triggerSummaryUseLlm   Boolean? @map("trigger_summary_use_llm")
+  triggerGenerateComment Boolean? @map("trigger_generate_comment")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([updatedAt(sort: Desc)])
+  @@map("circle_ghost_settings")
+}
+
+model PendingCircleGhostSetting {
+  circleId               Int      @id @map("circle_id")
+  requestedByPubkey      String   @map("requested_by_pubkey") @db.VarChar(44)
+  relevanceMode          String?  @map("relevance_mode") @db.VarChar(16)
+  summaryUseLlm          Boolean? @map("summary_use_llm")
+  draftTriggerMode       String?  @map("draft_trigger_mode") @db.VarChar(24)
+  triggerSummaryUseLlm   Boolean? @map("trigger_summary_use_llm")
+  triggerGenerateComment Boolean? @map("trigger_generate_comment")
+  expiresAt              DateTime @map("expires_at")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([expiresAt])
+  @@index([requestedByPubkey])
+  @@index([updatedAt(sort: Desc)])
+  @@map("pending_circle_ghost_settings")
+}
+
+model IndexerFailedSlot {
+  id           BigInt   @id @default(autoincrement())
+  programId    String   @map("program_id") @db.VarChar(44)
+  slot         BigInt
+  eventSource  String   @default("local") @map("event_source") @db.VarChar(16)
+  firstFailedAt DateTime @default(now()) @map("first_failed_at")
+  lastFailedAt DateTime @default(now()) @map("last_failed_at")
+  lastReplayAt DateTime? @map("last_replay_at")
+  failedCount  Int      @default(1) @map("failed_count")
+  lastError    String?  @map("last_error")
+  resolved     Boolean  @default(false)
+  resolvedAt   DateTime? @map("resolved_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([programId, slot])
+  @@index([programId, resolved, slot])
+  @@index([resolved, lastFailedAt])
+  @@map("indexer_failed_slots")
+}
+
+model Knowledge {
+  id                 Int       @id @default(autoincrement())
+  knowledgeId        String    @unique @map("knowledge_id") @db.VarChar(64)
+  circleId           Int       @map("circle_id")
+  
+  title              String    @db.VarChar(256)
+  description        String?
+  ipfsCid            String?   @map("ipfs_cid") @db.VarChar(128)
+  contentHash        String?   @map("content_hash") @db.VarChar(64)  // hex-encoded SHA-256
+  
+  authorId           Int       @map("author_id")
+  qualityScore       Decimal   @default(0) @map("quality_score") @db.Decimal(10, 4)
+  heatScore          Decimal   @default(0) @map("heat_score") @db.Decimal(10, 4)
+  citationCount      Int       @default(0) @map("citation_count")
+  viewCount          Int       @default(0) @map("view_count")
+  
+  sourceCircleId     Int?      @map("source_circle_id")
+  sourceContentId    String?   @map("source_content_id") @db.VarChar(128)
+  
+  // Derived from on-chain flags bitfield + Merkle contributor tracking
+  version            Int       @default(1)                         // bits 0-15 of flags
+  contributorsRoot   String?   @map("contributors_root") @db.VarChar(64)  // hex-encoded Merkle root
+  contributorsCount  Int       @default(0) @map("contributors_count")
+  
+  onChainAddress     String    @unique @map("on_chain_address") @db.VarChar(44)
+  lastSyncedSlot     BigInt    @map("last_synced_slot")
+  
+  // Frozen crystal visual parameters (computed at crystallization, immutable)
+  // JSON: { "seed": "0x...", "hue": 200, "facets": 8 }
+  crystalParams      Json?     @map("crystal_params") @db.JsonB
+  
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+  
+  // Relations
+  circle             Circle    @relation("CircleKnowledge", fields: [circleId], references: [id], onDelete: Cascade)
+  author             User      @relation("AuthoredKnowledge", fields: [authorId], references: [id], onDelete: Cascade)
+  sourceCircle       Circle?   @relation("KnowledgeSource", fields: [sourceCircleId], references: [id], onDelete: SetNull)
+  contributions      KnowledgeContribution[]
+  binding            KnowledgeBinding?
+  crystalEntitlements CrystalEntitlement[]
+  crystalAsset       CrystalAsset?
+  crystalReceipts    CrystalReceipt[]
+  
+  @@index([circleId])
+  @@index([authorId])
+  @@index([qualityScore(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+  @@map("knowledge")
+}
+
+model KnowledgeBinding {
+  knowledgeId        String   @id @map("knowledge_id") @db.VarChar(64)
+  sourceAnchorId     String   @map("source_anchor_id") @db.Char(64)
+  proofPackageHash   String   @map("proof_package_hash") @db.Char(64)
+  contributorsRoot   String   @map("contributors_root") @db.Char(64)
+  contributorsCount  Int      @map("contributors_count")
+  bindingVersion     Int      @map("binding_version")
+  generatedAt        DateTime @map("generated_at")
+  boundAt            DateTime @map("bound_at")
+  boundBy            String   @map("bound_by") @db.VarChar(44)
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
+
+  knowledge          Knowledge @relation(fields: [knowledgeId], references: [knowledgeId], onDelete: Cascade)
+
+  @@index([proofPackageHash])
+  @@index([boundAt(sort: Desc)])
+  @@map("knowledge_binding")
+}
+
+model KnowledgeReference {
+  sourceKnowledgeId  String   @map("source_knowledge_id") @db.VarChar(64)
+  targetKnowledgeId  String   @map("target_knowledge_id") @db.VarChar(64)
+  referenceType      String   @default("citation") @map("reference_type") @db.VarChar(32)
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@id([sourceKnowledgeId, targetKnowledgeId])
+  @@index([targetKnowledgeId])
+  @@map("knowledge_references")
+}
+
+model KnowledgeVersionEvent {
+  id                   BigInt   @id @default(autoincrement())
+  knowledgeId          String   @map("knowledge_id") @db.VarChar(64)
+  eventType            String   @map("event_type") @db.VarChar(32)
+  version              Int
+  actorPubkey          String?  @map("actor_pubkey") @db.VarChar(44)
+  contributorsCount    Int?     @map("contributors_count")
+  contributorsRoot     String?  @map("contributors_root") @db.VarChar(64)
+  sourceEventTimestamp BigInt   @map("source_event_timestamp")
+  eventAt              DateTime @map("event_at")
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  @@unique([knowledgeId, eventType, version, sourceEventTimestamp])
+  @@index([knowledgeId, eventAt(sort: Desc)])
+  @@index([eventType, eventAt(sort: Desc)])
+  @@map("knowledge_version_events")
+}
+
+model KnowledgeContribution {
+  id                   Int       @id @default(autoincrement())
+  knowledgeId          Int       @map("knowledge_id")
+  contributorPubkey    String    @map("contributor_pubkey") @db.VarChar(44)
+  contributorHandle    String?   @map("contributor_handle") @db.VarChar(32)
+  contributionRole     String    @map("contribution_role") @db.VarChar(32)
+  contributionWeightBps Int      @map("contribution_weight_bps")
+  contributionWeight   Decimal   @map("contribution_weight") @db.Decimal(10, 4)
+  sourceDraftPostId    Int?      @map("source_draft_post_id")
+  sourceAnchorId       String?   @map("source_anchor_id") @db.VarChar(128)
+  sourcePayloadHash    String?   @map("source_payload_hash") @db.VarChar(64)
+  sourceSummaryHash    String?   @map("source_summary_hash") @db.VarChar(64)
+  sourceMessagesDigest String?   @map("source_messages_digest") @db.VarChar(64)
+  contributorsRoot     String?   @map("contributors_root") @db.VarChar(64)
+  contributorsCount    Int?      @map("contributors_count")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  knowledge            Knowledge @relation(fields: [knowledgeId], references: [id], onDelete: Cascade)
+
+  @@unique([knowledgeId, contributorPubkey, contributionRole])
+  @@index([knowledgeId, contributionWeight(sort: Desc)])
+  @@index([contributorPubkey])
+  @@map("knowledge_contributions")
+}
+
+model CrystalEntitlement {
+  id                   Int       @id @default(autoincrement())
+  knowledgeRowId       Int       @map("knowledge_row_id")
+  knowledgePublicId    String    @map("knowledge_public_id") @db.VarChar(64)
+  circleId             Int       @map("circle_id")
+  ownerPubkey          String    @map("owner_pubkey") @db.VarChar(44)
+  ownerUserId          Int?      @map("owner_user_id")
+  contributionRole     String    @map("contribution_role") @db.VarChar(32)
+  contributionWeightBps Int      @map("contribution_weight_bps")
+  proofPackageHash     String    @map("proof_package_hash") @db.Char(64)
+  sourceAnchorId       String    @map("source_anchor_id") @db.Char(64)
+  contributorsRoot     String    @map("contributors_root") @db.Char(64)
+  contributorsCount    Int       @map("contributors_count")
+  status               String    @default("active") @db.VarChar(16)
+  grantedAt            DateTime  @default(now()) @map("granted_at")
+  lastSyncedAt         DateTime  @default(now()) @map("last_synced_at")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  knowledge            Knowledge @relation(fields: [knowledgeRowId], references: [id], onDelete: Cascade)
+  circle               Circle    @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  ownerUser            User?     @relation("CrystalEntitlementOwnerUser", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  crystalReceipt       CrystalReceipt?
+
+  @@unique([knowledgeRowId, ownerPubkey])
+  @@index([ownerPubkey, status, circleId])
+  @@index([ownerUserId, status])
+  @@index([knowledgeRowId, status])
+  @@index([circleId, status])
+  @@map("crystal_entitlements")
+}
+
+model CrystalAsset {
+  id                 Int       @id @default(autoincrement())
+  knowledgeRowId     Int       @unique @map("knowledge_row_id")
+  knowledgePublicId  String    @map("knowledge_public_id") @db.VarChar(64)
+  circleId           Int       @map("circle_id")
+  ownerPubkey        String    @map("owner_pubkey") @db.VarChar(44)
+  masterAssetAddress String?   @map("master_asset_address") @db.VarChar(128)
+  assetStandard      String    @map("asset_standard") @db.VarChar(64)
+  mintStatus         String    @default("pending") @map("mint_status") @db.VarChar(24)
+  metadataUri        String?   @map("metadata_uri")
+  proofPackageHash   String    @map("proof_package_hash") @db.Char(64)
+  sourceAnchorId     String    @map("source_anchor_id") @db.Char(64)
+  contributorsRoot   String    @map("contributors_root") @db.Char(64)
+  contributorsCount  Int       @map("contributors_count")
+  mintedAt           DateTime? @map("minted_at")
+  lastError          String?   @map("last_error")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  knowledge          Knowledge @relation(fields: [knowledgeRowId], references: [id], onDelete: Cascade)
+  circle             Circle    @relation(fields: [circleId], references: [id], onDelete: Cascade)
+
+  @@index([circleId, mintStatus])
+  @@index([ownerPubkey])
+  @@map("crystal_assets")
+}
+
+model CrystalReceipt {
+  id                   Int       @id @default(autoincrement())
+  entitlementId        Int       @unique @map("entitlement_id")
+  knowledgeRowId       Int       @map("knowledge_row_id")
+  knowledgePublicId    String    @map("knowledge_public_id") @db.VarChar(64)
+  circleId             Int       @map("circle_id")
+  ownerPubkey          String    @map("owner_pubkey") @db.VarChar(44)
+  ownerUserId          Int?      @map("owner_user_id")
+  contributionRole     String    @map("contribution_role") @db.VarChar(32)
+  contributionWeightBps Int      @map("contribution_weight_bps")
+  receiptAssetAddress  String?   @map("receipt_asset_address") @db.VarChar(128)
+  assetStandard        String    @map("asset_standard") @db.VarChar(64)
+  transferMode         String    @default("non_transferable") @map("transfer_mode") @db.VarChar(32)
+  mintStatus           String    @default("pending") @map("mint_status") @db.VarChar(24)
+  metadataUri          String?   @map("metadata_uri")
+  proofPackageHash     String    @map("proof_package_hash") @db.Char(64)
+  sourceAnchorId       String    @map("source_anchor_id") @db.Char(64)
+  contributorsRoot     String    @map("contributors_root") @db.Char(64)
+  contributorsCount    Int       @map("contributors_count")
+  mintedAt             DateTime? @map("minted_at")
+  lastError            String?   @map("last_error")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  entitlement          CrystalEntitlement @relation(fields: [entitlementId], references: [id], onDelete: Cascade)
+  knowledge            Knowledge          @relation(fields: [knowledgeRowId], references: [id], onDelete: Cascade)
+  circle               Circle             @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  ownerUser            User?              @relation("CrystalReceiptOwnerUser", fields: [ownerUserId], references: [id], onDelete: SetNull)
+
+  // Safe under the current proof invariant: one pubkey does not persist as both
+  // Author and Discussant for the same crystallized knowledge item.
+  @@unique([knowledgeRowId, ownerPubkey])
+  @@index([ownerPubkey, mintStatus, circleId])
+  @@index([ownerUserId, mintStatus])
+  @@index([circleId, mintStatus])
+  @@map("crystal_receipts")
+}
+
+// ==================== 草稿行批注 (off-chain) ====================
+
+model DraftComment {
+  id                 Int       @id @default(autoincrement())
+  postId             Int       @map("post_id")
+  userId             Int       @map("user_id")
+  
+  content            String
+  lineRef            String?   @map("line_ref") @db.VarChar(128) // 行锚点引用
+  
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+  
+  // Relations
+  post               Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([postId, createdAt(sort: Desc)])
+  @@index([userId])
+  @@map("draft_comments")
+}
+
+model GhostDraftGeneration {
+  id                 Int       @id @default(autoincrement())
+  draftPostId        Int       @map("draft_post_id")
+  requestedByUserId  Int       @map("requested_by_user_id")
+  origin             String    @db.VarChar(16)
+  providerMode       String    @map("provider_mode") @db.VarChar(16)
+  model              String    @db.VarChar(128)
+  promptAsset        String    @map("prompt_asset") @db.VarChar(64)
+  promptVersion      String    @map("prompt_version") @db.VarChar(32)
+  sourceDigest       String    @map("source_digest") @db.Char(64)
+  ghostRunId         Int?      @map("ghost_run_id")
+  aiJobId            Int?      @map("ai_job_id")
+  draftText          String    @map("draft_text")
+  createdAt          DateTime  @default(now()) @map("created_at")
+
+  draftPost          Post      @relation(fields: [draftPostId], references: [id], onDelete: Cascade)
+  requestedBy        User      @relation("GhostDraftRequestedBy", fields: [requestedByUserId], references: [id], onDelete: Cascade)
+  acceptances        GhostDraftAcceptance[]
+
+  @@index([draftPostId, createdAt(sort: Desc)])
+  @@index([requestedByUserId, createdAt(sort: Desc)])
+  @@index([ghostRunId, createdAt(sort: Desc)])
+  @@map("ghost_draft_generations")
+}
+
+model AiJob {
+  id                 Int       @id @default(autoincrement())
+  jobType            String    @map("job_type") @db.VarChar(64)
+  dedupeKey          String?   @unique(map: "ai_jobs_dedupe_key_key") @map("dedupe_key") @db.VarChar(191)
+  scopeType          String    @map("scope_type") @db.VarChar(16)
+  scopeDraftPostId   Int?      @map("scope_draft_post_id")
+  scopeCircleId      Int?      @map("scope_circle_id")
+  requestedByUserId  Int?      @map("requested_by_user_id")
+  status             String    @db.VarChar(24)
+  attempts           Int       @default(0)
+  maxAttempts        Int       @default(3) @map("max_attempts")
+  availableAt        DateTime  @default(now()) @map("available_at")
+  claimedAt          DateTime? @map("claimed_at")
+  completedAt        DateTime? @map("completed_at")
+  workerId           String?   @map("worker_id") @db.VarChar(64)
+  claimToken         String?   @map("claim_token") @db.VarChar(64)
+  payloadJson        Json?     @map("payload_json")
+  resultJson         Json?     @map("result_json")
+  lastErrorCode      String?   @map("last_error_code") @db.VarChar(64)
+  lastErrorMessage   String?   @map("last_error_message")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([status, availableAt(sort: Asc), id(sort: Asc)])
+  @@index([scopeType, scopeDraftPostId, createdAt(sort: Desc)])
+  @@index([scopeType, scopeCircleId, createdAt(sort: Desc)])
+  @@index([requestedByUserId, createdAt(sort: Desc)])
+  @@map("ai_jobs")
+}
+
+model GhostDraftAcceptance {
+  id                     Int       @id @default(autoincrement())
+  ghostDraftGenerationId Int       @map("ghost_draft_generation_id")
+  draftPostId            Int       @map("draft_post_id")
+  acceptedByUserId       Int       @map("accepted_by_user_id")
+  acceptanceMode         String    @map("acceptance_mode") @db.VarChar(32)
+  acceptedSuggestionId   String?   @map("accepted_suggestion_id") @db.VarChar(191)
+  acceptedThreadIds      Json?     @map("accepted_thread_ids")
+  requestWorkingCopyHash String?   @map("request_working_copy_hash") @db.Char(64)
+  requestWorkingCopyUpdatedAt DateTime? @map("request_working_copy_updated_at")
+  resultingWorkingCopyHash String  @map("resulting_working_copy_hash") @db.Char(64)
+  changed                Boolean   @default(true)
+  acceptedAt             DateTime  @default(now()) @map("accepted_at")
+  createdAt              DateTime  @default(now()) @map("created_at")
+
+  generation             GhostDraftGeneration @relation(fields: [ghostDraftGenerationId], references: [id], onDelete: Cascade)
+  draftPost              Post      @relation(fields: [draftPostId], references: [id], onDelete: Cascade)
+  acceptedBy             User      @relation("GhostDraftAcceptedBy", fields: [acceptedByUserId], references: [id], onDelete: Cascade)
+
+  @@index([ghostDraftGenerationId, acceptedAt(sort: Desc)])
+  @@index([draftPostId, acceptedAt(sort: Desc)])
+  @@index([acceptedByUserId, acceptedAt(sort: Desc)])
+  @@map("ghost_draft_acceptances")
+}
+
+model DraftCandidateAcceptance {
+  id               Int      @id @default(autoincrement())
+  circleId         Int      @map("circle_id")
+  candidateId      String   @map("candidate_id") @db.VarChar(64)
+  draftPostId      Int      @unique @map("draft_post_id")
+  acceptedByUserId Int      @map("accepted_by_user_id")
+  acceptedAt       DateTime @default(now()) @map("accepted_at")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at")
+
+  circle           Circle   @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  draftPost        Post     @relation(fields: [draftPostId], references: [id], onDelete: Cascade)
+  acceptedBy       User     @relation("DraftCandidateAcceptedBy", fields: [acceptedByUserId], references: [id], onDelete: Cascade)
+
+  @@unique([circleId, candidateId])
+  @@index([circleId, acceptedAt(sort: Desc)])
+  @@index([acceptedByUserId, acceptedAt(sort: Desc)])
+  @@map("draft_candidate_acceptances")
+}
+
+// ==================== Tracker 服务写入的表 (只读) ====================
+
+model AuthorityScore {
+  id                 Int       @id @default(autoincrement())
+  crystalId          String    @map("crystal_id") @db.VarChar(128)
+  score              Decimal   @db.Decimal(18, 8)
+  epoch              Int
+  
+  calculatedAt       DateTime  @default(now()) @map("calculated_at")
+  
+  @@unique([crystalId, epoch])
+  @@index([crystalId])
+  @@index([epoch])
+  @@index([score(sort: Desc)])
+  @@map("authority_scores")
+}
+
+model AntiGamingFlag {
+  id                 Int       @id @default(autoincrement())
+  userPubkey         String    @map("user_pubkey") @db.VarChar(44)
+  flagType           String    @map("flag_type") @db.VarChar(64)
+  details            Json?
+  
+  createdAt          DateTime  @default(now()) @map("created_at")
+  
+  @@index([userPubkey])
+  @@index([flagType])
+  @@index([createdAt(sort: Desc)])
+  @@map("anti_gaming_flags")
+}
+
+model SettlementHistory {
+  id                 Int       @id @default(autoincrement())
+  crystalId          String    @map("crystal_id") @db.VarChar(128)
+  contributorPubkey  String    @map("contributor_pubkey") @db.VarChar(44)
+  contributionRole   String?   @map("contribution_role") @db.VarChar(32)
+  contributionWeight Decimal?  @map("contribution_weight") @db.Decimal(10, 4)
+  authorityScore     Decimal   @map("authority_score") @db.Decimal(18, 8)
+  reputationDelta    Decimal   @map("reputation_delta") @db.Decimal(18, 8)
+  txSignature        String?   @map("tx_signature") @db.VarChar(88)
+  
+  settledAt          DateTime  @default(now()) @map("settled_at")
+  
+  @@index([crystalId])
+  @@index([contributorPubkey])
+  @@index([settledAt(sort: Desc)])
+  @@map("settlement_history")
+}
+
+// ==================== 通知聚合 ====================
+
+model Notification {
+  id                 Int       @id @default(autoincrement())
+  userId             Int       @map("user_id")
+  
+  type               String    @db.VarChar(32) // 'like', 'comment', 'follow', 'mention', 'crystal', 'reputation'
+  title              String    @db.VarChar(256)
+  body               String?
+  
+  sourceType         String?   @map("source_type") @db.VarChar(32) // 'post', 'user', 'circle', 'knowledge'
+  sourceId           String?   @map("source_id") @db.VarChar(128)
+  circleId           Int?      @map("circle_id")
+  
+  read               Boolean   @default(false)
+  
+  createdAt          DateTime  @default(now()) @map("created_at")
+  
+  // Relations
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, read])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([type])
+  @@map("notifications")
+}
+
+// ==================== 图腾 (Totem) ====================
+
+model UserTotem {
+  userId          Int       @id @map("user_id")
+  stage           String    @default("seed") @db.VarChar(16)
+  crystalCount    Int       @default(0) @map("crystal_count")
+  citationCount   Int       @default(0) @map("citation_count")
+  circleCount     Int       @default(0) @map("circle_count")
+  lastActiveAt    DateTime  @default(now()) @map("last_active_at")
+  updatedAt       DateTime  @default(now()) @map("updated_at")
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_totem")
+}
+
+// ==================== 权限 & 关系 & 经济 (DbWriter 支撑) ====================
+
+model AccessRule {
+  id                 Int       @id @default(autoincrement())
+  userPubkey         String    @map("user_pubkey") @db.VarChar(44)
+  ruleId             String    @unique @map("rule_id") @db.VarChar(128)
+  permission         String    @db.VarChar(64) // 'read', 'write', 'admin', 'moderate'
+  accessLevel        String    @map("access_level") @db.VarChar(32) // 'circle', 'global'
+  
+  createdAt          DateTime  @default(now()) @map("created_at")
+  
+  @@index([userPubkey])
+  @@index([permission])
+  @@map("access_rules")
+}
+
+model Permission {
+  id                 Int       @id @default(autoincrement())
+  granterPubkey      String    @map("granter_pubkey") @db.VarChar(44)
+  granteePubkey      String    @map("grantee_pubkey") @db.VarChar(44)
+  permission         String    @db.VarChar(64)
+  
+  createdAt          DateTime  @default(now()) @map("created_at")
+  
+  @@unique([granterPubkey, granteePubkey, permission])
+  @@index([granteePubkey])
+  @@map("permissions")
+}
+
+model UserRelationship {
+  id                 Int       @id @default(autoincrement())
+  user1Pubkey        String    @map("user1_pubkey") @db.VarChar(44)
+  user2Pubkey        String    @map("user2_pubkey") @db.VarChar(44)
+  relationship       String    @db.VarChar(32) // 'friend', 'blocked', 'muted', 'trusted'
+  
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+  
+  @@unique([user1Pubkey, user2Pubkey])
+  @@index([user1Pubkey])
+  @@index([user2Pubkey])
+  @@map("user_relationships")
+}
+
+model TokenTransaction {
+  id                 Int       @id @default(autoincrement())
+  pubkey             String    @db.VarChar(44)
+  amount             BigInt
+  transactionType    String    @map("transaction_type") @db.VarChar(32) // 'mint', 'burn', 'transfer', 'reward'
+  purpose            String    @db.VarChar(128)
+  
+  createdAt          DateTime  @default(now()) @map("created_at")
+  
+  @@index([pubkey])
+  @@index([transactionType])
+  @@index([createdAt(sort: Desc)])
+  @@map("token_transactions")
+}

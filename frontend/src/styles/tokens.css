@@ -1,0 +1,109 @@
+/* ============================================================
+   Alcheme Design Tokens
+   Based on: 移动端设计最终版 §13 — Design Tokens & Constraints
+   ============================================================ */
+
+:root {
+  /* ── Color: Base ── */
+  --color-bg-base: #1F2421;
+  --color-bg-surface: #262D29;
+  --color-bg-elevated: #2E3632;
+
+  /* ── Color: Text ── */
+  --color-text-primary: #E7E4DD;
+  --color-text-secondary: #C5C0B7;
+  --color-text-tertiary: #A29E96;
+  --color-text-inverse: #1F2421;
+
+  /* ── Color: Accent (克制使用) ── */
+  --color-accent-gold: #C7A86B;
+  --color-accent-amber: #B98A54;
+  --color-accent-ivory-glow: #E5D9BE;
+
+  /* ── Color: Border ── */
+  --color-border-soft: rgba(231, 228, 221, 0.08);
+  --color-border-medium: rgba(231, 228, 221, 0.14);
+
+  /* ── Color: State ── */
+  --color-state-error: #C4665A;
+  --color-state-success: #7BAF6E;
+  --color-state-info: #6B8FC7;
+
+  /* ── Color: Ore / Alloy / Crystal ── */
+  --color-ore-bg: #252A27;
+  --color-ore-border: rgba(231, 228, 221, 0.05);
+  --color-alloy-bg: #2A2F2B;
+  --color-alloy-border: rgba(185, 138, 84, 0.25);
+  --color-alloy-glow: rgba(185, 138, 84, 0.08);
+  --color-crystal-bg: #2C322E;
+  --color-crystal-border: rgba(199, 168, 107, 0.35);
+  --color-crystal-glow: rgba(199, 168, 107, 0.12);
+
+  /* ── Typography ── */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-size-title: 24px;
+  --font-size-h2: 20px;
+  --font-size-body: 17px;
+  --font-size-caption: 13px;
+  --font-size-small: 11px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --line-height-body: 1.68;
+  --line-height-title: 1.3;
+  --letter-spacing-body: 0.1px;
+
+  /* ── Spacing ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* ── Border Radius ── */
+  --radius-sm: 8px;
+  --radius-card: 16px;
+  --radius-button: 12px;
+  --radius-sheet: 20px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-card: 0 8px 24px rgba(8, 12, 10, 0.28);
+  --shadow-float: 0 12px 32px rgba(8, 12, 10, 0.36);
+  --shadow-subtle: 0 2px 8px rgba(8, 12, 10, 0.18);
+
+  /* ── Blur ── */
+  --blur-sheet: 18px;
+  --blur-card: 12px;
+
+  /* ── Motion ── */
+  --motion-fast: 220ms;
+  --motion-normal: 360ms;
+  --motion-slow: 520ms;
+  --motion-breath-min: 14s;
+  --motion-breath-max: 22s;
+  --easing-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --easing-emphasis: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  /* ── Z-Index ── */
+  --z-base: 0;
+  --z-card: 10;
+  --z-header: 100;
+  --z-modal: 500;
+  --z-toast: 600;
+  --z-overlay: 400;
+
+  /* ── Safe Area ── */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+
+  /* ── Layout ── */
+  --content-max-width: 480px;
+  --bottom-nav-height: 64px;
+  --header-height: 56px;
+}

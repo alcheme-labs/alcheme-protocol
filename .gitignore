@@ -1,0 +1,92 @@
+.anchor
+.DS_Store
+target
+**/*.rs.bk
+node_modules
+test-ledger
+.yarn
+.history
+
+# Environment files and local secret material (keep templates)
+.env
+.env.*
+!**/.env.example
+!**/.env*.example
+!**/*.env.example
+!**/*.env*.example
+
+# Local keys / certs / signing material
+**/keypair.json
+**/*-keypair.json
+**/target-keypair.json
+**/*.pem
+**/*.key
+**/*.p8
+**/*.p12
+
+# Local runtime / cache artifacts
+.surfpool/logs/
+dump.rdb
+services/query-api/.collab-data/
+logs/
+backups/
+
+# Frontend generated test artifacts
+frontend/playwright-report/
+frontend/test-results/
+frontend/.next-playwright-default/
+frontend/.next-playwright-onboarding/
+frontend/.next-playwright-a11y/
+frontend/.next-*/
+
+# Local manual run artifacts
+test-results/
+
+# Local planning scratch files
+findings.md
+progress.md
+task_plan.md
+
+# Internal-only materials kept out of the first public repo cut
+docs/*
+!docs/schemas/
+!docs/schemas/**
+runbooks/
+deploy/demo/
+CHANGELOG.md
+CIRCLES_ARCHITECTURE.md
+FRONTEND_API_CONTRACT.md
+LOCAL_DEPLOYMENT.md
+QUICK_START.md
+ROADMAP.md
+next-session-prompt.md
+frontend/README.md
+frontend/docs/
+sdk/README.md
+services/README.md
+services/indexer-core/README.md
+services/query-api/README.md
+extensions/anchor-signer/README.md
+extensions/contribution-engine/README.md
+mobile-shell/ios/App/CapApp-SPM/README.md
+.github/workflows/deploy-devnet.yml
+.github/workflows/deploy-mainnet.yml
+scripts/archive-data.sh
+scripts/backup-database.sh
+scripts/cleanup-legacy.sh
+scripts/deploy-local.sh
+scripts/deploy-skip-content.sh
+scripts/deploy-without-content.sh
+scripts/deploy.sh
+scripts/generate-secrets.sh
+scripts/quick-test.sh
+scripts/reset-prelaunch-discussion-intelligence-state.ts
+scripts/restore-backup.sh
+scripts/start-monitoring.sh
+scripts/switch-env.sh
+scripts/verify-deploy-backup.sh
+tests/workflows/deploy-mainnet-workflow.test.mjs
+
+# Local browser automation artifacts
+.playwright-cli/
+output/playwright/

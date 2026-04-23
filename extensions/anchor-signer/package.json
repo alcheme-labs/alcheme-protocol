@@ -1,0 +1,12 @@
+{
+  "name": "@alcheme/anchor-signer",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "description": "Anchor signer service for query-api memo anchor submission",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "check": "node --check src/server.js"
+  }
+}

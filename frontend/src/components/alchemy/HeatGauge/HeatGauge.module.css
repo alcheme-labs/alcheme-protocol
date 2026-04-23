@@ -1,0 +1,92 @@
+/* HeatGauge.module.css — Enhanced Phase 3 */
+
+.gauge {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.track {
+    position: relative;
+    flex: 1;
+    height: 3px;
+    background-color: var(--color-bg-elevated, rgba(231, 228, 221, 0.06));
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.fill {
+    position: relative;
+    height: 100%;
+    border-radius: 99px;
+    z-index: 1;
+}
+
+.pulse {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: 99px;
+    z-index: 2;
+}
+
+.label {
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+}
+
+.temp {
+    font-size: 11px;
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    min-width: 28px;
+    text-align: right;
+}
+
+/* ── Active: 火热 ──────────────────── */
+.active .fill {
+    background: linear-gradient(90deg, var(--color-accent-amber), var(--color-accent-gold));
+    box-shadow: 0 0 6px rgba(199, 168, 107, 0.3);
+}
+
+.active .pulse {
+    background: linear-gradient(90deg, transparent, rgba(199, 168, 107, 0.4));
+}
+
+.active .label {
+    color: var(--color-accent-gold);
+}
+
+.active .temp {
+    color: var(--color-accent-gold);
+}
+
+/* ── Cooling: 冷却中 ───────────────── */
+.cooling .fill {
+    background: var(--color-accent-amber);
+}
+
+.cooling .label {
+    color: var(--color-text-secondary);
+}
+
+.cooling .temp {
+    color: var(--color-text-secondary);
+}
+
+/* ── Frozen: 已冻结 ────────────────── */
+.frozen .fill {
+    background: var(--color-text-tertiary);
+}
+
+.frozen .label {
+    color: var(--color-text-tertiary);
+    font-style: italic;
+}
+
+.frozen .temp {
+    color: var(--color-text-tertiary);
+    opacity: 0.6;
+}

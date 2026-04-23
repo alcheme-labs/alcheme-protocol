@@ -1,0 +1,12 @@
+{
+  "network": "http://127.0.0.1:8899",
+  "programIds": {
+    "identity": "75fXAp66PU3sgUcQCGJxdA4MKhFcyXXoGW8rhVk8zm4x",
+    "content": "FEut65PCemjUt7dRPe4GJhaj1u5czWndvgp7LCEbiV7y",
+    "access": "BNbDZu2djPT6rdqgsSEtyiCw4b8wteBNQDiyKS6GFxun",
+    "event": "uhPvVgDANHaUzUq2rYEVXJ9vGEBjWjNZ1E6gQJqdBUC",
+    "factory": "AYrzTqFdxpiH3VhCBzLsJQtzFqjoSRKYUvk29d797AQC",
+    "messaging": "4MZjksSnfSNa25ttV4smquKE6ggAmpZKjK74eDQLdoLx",
+    "circles": "GZswb1rGbZfoiapkvatDuMZrptVAX2p1pEVDSrMuyLqQ"
+  }
+}

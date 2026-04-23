@@ -1,0 +1,67 @@
+{
+  "name": "@alcheme/sdk",
+  "version": "0.1.1-devnet.1",
+  "license": "Apache-2.0",
+  "description": "SDK for the Alcheme Protocol on Solana",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alcheme-labs/alcheme-protocol.git",
+    "directory": "sdk"
+  },
+  "homepage": "https://github.com/alcheme-labs/alcheme-protocol/tree/main/sdk",
+  "bugs": {
+    "url": "https://github.com/alcheme-labs/alcheme-protocol/issues"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "STORAGE_GUIDE.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./idl/*.json": "./dist/idl/*.json",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "devnet"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepack": "npm run build",
+    "lint": "eslint src --ext .ts",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.31.1",
+    "@solana/web3.js": "^1.91.0",
+    "bn.js": "^5.2.1",
+    "js-sha256": "^0.11.1"
+  },
+  "peerDependencies": {
+    "@irys/sdk": "^0.2.0",
+    "@pinata/sdk": "^2.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@irys/sdk": {
+      "optional": true
+    },
+    "@pinata/sdk": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.5",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.24",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.3.3"
+  }
+}

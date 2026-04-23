@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0.0",
+  "extension_id": "contribution-engine",
+  "display_name": "Contribution Engine",
+  "program_id": "4EMGqMpeUHg2nDdWBrYkej1t5pR7LJL1ehBnXHRZJbVV",
+  "version": "0.1.0",
+  "sdk_package": "@alcheme/sdk",
+  "min_core_sdk_version": "0.1.0",
+  "required_permissions": ["ReputationWrite"],
+  "event_types": ["ContributionRecorded"],
+  "parser_contract_version": "v1",
+  "projection_tables": ["contribution_events"],
+  "rollback_strategy": "disable_parser_and_keep_core_path",
+  "status": "active",
+  "tags": ["reputation", "contribution"]
+}

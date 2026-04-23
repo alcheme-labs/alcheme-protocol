@@ -1,0 +1,338 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  # ==================== 协议边界与 Manifest 门禁 ====================
+  contract-guard-checks:
+    name: Contract Guard Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run consistency covenant checks
+        run: npm run check:covenant
+
+      - name: Validate extension manifests
+        run: npm run validate:extension-manifest
+
+      - name: Run manifest negative tests
+        run: npm run test:manifest-validation
+
+  # ==================== 智能合约测试 ====================
+  anchor-tests:
+    name: Anchor Smart Contract Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/v3.0.11/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+
+      - name: Install Anchor CLI
+        run: |
+          cargo install --git https://github.com/solana-foundation/anchor --tag v0.31.1 anchor-cli --locked
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build smart contracts
+        run: anchor build
+
+      - name: Run smart contract tests
+        run: anchor test --skip-local-validator
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        if: success()
+        with:
+          name: anchor-builds
+          path: target/deploy/*.so
+          retention-days: 7
+
+  # ==================== Rust 索引器测试 ====================
+  indexer-tests:
+    name: Indexer Core Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            services/indexer-core/target/
+          key: ${{ runner.os }}-indexer-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Run cargo fmt check
+        working-directory: services/indexer-core
+        run: cargo fmt -- --check
+
+      - name: Run clippy
+        working-directory: services/indexer-core
+        run: cargo clippy -- -D warnings
+
+      - name: Run tests
+        working-directory: services/indexer-core
+        env:
+          DATABASE_URL: postgresql://test_user:test_pass@localhost:5432/test_db
+        run: cargo test --verbose
+
+      - name: Build indexer
+        working-directory: services/indexer-core
+        run: cargo build --release
+
+  # ==================== TypeScript API 测试 ====================
+  query-api-tests:
+    name: Query API Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: services/query-api/package-lock.json
+
+      - name: Install dependencies
+        working-directory: services/query-api
+        run: npm ci
+
+      - name: Run Prisma migrations
+        working-directory: services/query-api
+        env:
+          DATABASE_URL: postgresql://test_user:test_pass@localhost:5432/test_db
+        run: npx prisma migrate deploy
+
+      - name: Run ESLint
+        working-directory: services/query-api
+        run: npm run lint
+
+      - name: Run Prettier check
+        working-directory: services/query-api
+        run: npx prettier --check "src/**/*.ts"
+
+      - name: Run tests
+        working-directory: services/query-api
+        env:
+          DATABASE_URL: postgresql://test_user:test_pass@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379
+          NODE_ENV: test
+        run: npm test
+
+      - name: Run tests with coverage
+        working-directory: services/query-api
+        env:
+          DATABASE_URL: postgresql://test_user:test_pass@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379
+          NODE_ENV: test
+        run: npm run test:coverage
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          files: services/query-api/coverage/lcov.info
+          flags: query-api
+          name: query-api-coverage
+
+      - name: Build API
+        working-directory: services/query-api
+        run: npm run build
+
+  # ==================== 前端/SDK 测试 ====================
+  sdk-tests:
+    name: SDK Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: sdk/package-lock.json
+
+      - name: Install dependencies
+        working-directory: sdk
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: sdk
+        run: npm run lint
+
+      - name: Run tests
+        working-directory: sdk
+        run: npm test
+
+      - name: Build SDK
+        working-directory: sdk
+        run: npm run build
+
+  frontend-tests:
+    name: Frontend Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Export frontend build env
+        run: |
+          node <<'EOF' >> "$GITHUB_ENV"
+          const ids = require('./config/devnet-program-ids.json');
+          console.log(`NEXT_PUBLIC_IDENTITY_PROGRAM_ID=${ids.identity}`);
+          console.log(`NEXT_PUBLIC_CONTENT_PROGRAM_ID=${ids.content}`);
+          console.log(`NEXT_PUBLIC_ACCESS_PROGRAM_ID=${ids.access}`);
+          console.log(`NEXT_PUBLIC_EVENT_PROGRAM_ID=${ids.event}`);
+          console.log(`NEXT_PUBLIC_FACTORY_PROGRAM_ID=${ids.factory}`);
+          console.log(`NEXT_PUBLIC_MESSAGING_PROGRAM_ID=${ids.messaging}`);
+          console.log(`NEXT_PUBLIC_CIRCLES_PROGRAM_ID=${ids.circles}`);
+          console.log(`NEXT_PUBLIC_CONTRIBUTION_ENGINE_PROGRAM_ID=${ids.contributionEngine}`);
+          console.log('NEXT_PUBLIC_GRAPHQL_URL=http://127.0.0.1:4000/graphql');
+          console.log('NEXT_PUBLIC_SOLANA_RPC_URL=https://api.devnet.solana.com');
+          EOF
+
+      - name: Run static contract tests
+        working-directory: frontend
+        run: npm run test:ci
+
+      - name: Run typecheck
+        working-directory: frontend
+        run: npm run typecheck
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+  # ==================== 代码质量汇总 ====================
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs:
+      [
+        contract-guard-checks,
+        anchor-tests,
+        indexer-tests,
+        query-api-tests,
+        frontend-tests,
+        sdk-tests,
+      ]
+
+    steps:
+      - name: Quality gate passed
+        run: echo "✅ All quality checks passed!"

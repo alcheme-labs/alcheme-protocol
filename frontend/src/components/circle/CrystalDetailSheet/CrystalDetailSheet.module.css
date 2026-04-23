@@ -1,0 +1,375 @@
+/* ══════════════════════════════════════
+   Crystal Detail Sheet
+   Full-screen bottom sheet for knowledge card
+   ══════════════════════════════════════ */
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.sheet {
+    width: 100%;
+    max-width: 500px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    background: rgba(38, 45, 41, 0.95);
+    backdrop-filter: blur(var(--blur-sheet));
+    -webkit-backdrop-filter: blur(var(--blur-sheet));
+    border-top: 1px solid rgba(199, 168, 107, 0.18);
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+}
+
+.handle {
+    width: 36px;
+    height: 4px;
+    margin: 10px auto 0;
+    border-radius: 2px;
+    background: rgba(231, 228, 221, 0.2);
+    flex-shrink: 0;
+}
+
+/* ── Scrollable content ── */
+.scrollArea {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: var(--space-4) var(--space-5) calc(var(--space-6) + var(--safe-area-bottom));
+}
+
+/* ── Header ── */
+.header {
+    margin-bottom: var(--space-4);
+}
+
+.statusBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: var(--font-weight-medium);
+    margin-bottom: var(--space-2);
+}
+
+.statusCrystal {
+    background: rgba(199, 168, 107, 0.12);
+    color: var(--color-accent-gold);
+    border: 1px solid rgba(199, 168, 107, 0.2);
+}
+
+.statusSettling {
+    background: rgba(199, 168, 107, 0.06);
+    color: var(--color-text-tertiary);
+    border: 1px solid rgba(199, 168, 107, 0.1);
+}
+
+.title {
+    font-size: 20px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    line-height: 1.4;
+    margin-bottom: var(--space-2);
+}
+
+.meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-caption);
+    color: var(--color-text-tertiary);
+    flex-wrap: wrap;
+}
+
+.metaGold {
+    color: var(--color-accent-gold);
+    opacity: 0.85;
+}
+
+/* ── Divider ── */
+.divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(231, 228, 221, 0.06);
+    margin: var(--space-4) 0;
+}
+
+/* ── Content body ── */
+.body {
+    font-size: var(--font-size-body);
+    line-height: 1.75;
+    color: var(--color-text-secondary);
+    white-space: pre-wrap;
+}
+
+.body p {
+    margin-bottom: var(--space-3);
+}
+
+.body strong {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-medium);
+}
+
+/* ── Source provenance ── */
+.sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: var(--space-3);
+}
+
+.sectionIcon {
+    color: var(--color-accent-gold);
+    opacity: 0.6;
+}
+
+.sourceList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.sourceItem {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: rgba(231, 228, 221, 0.04);
+    border: 1px solid rgba(231, 228, 221, 0.06);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-caption);
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+}
+
+.sourceAuthor {
+    color: var(--color-accent-gold);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.sourceText {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ── Contribution Ledger ── */
+.lineageCard {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: var(--space-2) var(--space-3);
+    margin-bottom: var(--space-3);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(199, 168, 107, 0.16);
+    background: rgba(199, 168, 107, 0.05);
+}
+
+.lineageHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.lineageRows {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.lineageRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.lineageLabel {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+}
+
+.lineageValue {
+    font-size: 11px;
+    color: var(--color-accent-gold);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+.ledger {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.ledgerGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ledgerRole {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 2px;
+}
+
+.ledgerEmoji {
+    font-size: 12px;
+}
+
+.ledgerRoleLabel {
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.03em;
+}
+
+.ledgerRoleWeight {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--color-accent-gold);
+    opacity: 0.6;
+}
+
+.ledgerMembers {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 20px;
+}
+
+.ledgerMember {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 4px var(--space-2);
+    border-radius: 6px;
+    background: rgba(231, 228, 221, 0.03);
+    transition: background var(--motion-fast) var(--easing-standard);
+}
+
+.ledgerMemberInfo {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 90px;
+    flex-shrink: 0;
+}
+
+.agentBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    border: 1px solid rgba(211, 166, 37, 0.24);
+    background: rgba(211, 166, 37, 0.1);
+    flex-shrink: 0;
+}
+
+.agentBadgeIcon {
+    color: var(--color-accent-gold);
+    opacity: 0.9;
+    flex-shrink: 0;
+}
+
+.agentBadgeText {
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-accent-gold);
+}
+
+.ledgerHandle {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ledgerWeightBar {
+    flex: 1;
+    height: 4px;
+    background: rgba(231, 228, 221, 0.06);
+    border-radius: 2px;
+    overflow: hidden;
+    min-width: 40px;
+}
+
+.ledgerWeightFill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg,
+            rgba(199, 168, 107, 0.35),
+            rgba(199, 168, 107, 0.55));
+    transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ledgerWeightLabel {
+    font-size: 10px;
+    color: var(--color-text-tertiary);
+    min-width: 28px;
+    text-align: right;
+    opacity: 0.8;
+}
+
+/* ── Actions bar ── */
+.actions {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: 1px solid rgba(231, 228, 221, 0.06);
+}
+
+.actionBtn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: var(--space-3);
+    background: rgba(231, 228, 221, 0.04);
+    border: 1px solid rgba(231, 228, 221, 0.08);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-caption);
+    cursor: pointer;
+    transition: background var(--motion-fast) var(--easing-standard),
+        border-color var(--motion-fast) var(--easing-standard);
+}
+
+.actionBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.actionBtn:active {
+    background: rgba(199, 168, 107, 0.12);
+    border-color: rgba(199, 168, 107, 0.2);
+}
+
+.actionBtnIcon {
+    color: var(--color-accent-ivory-glow);
+    opacity: 0.7;
+}

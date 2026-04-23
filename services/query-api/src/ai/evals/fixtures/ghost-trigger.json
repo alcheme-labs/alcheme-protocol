@@ -1,0 +1,60 @@
+{
+  "rule_low_signal": {
+    "description": "Low-signal discussions should not trigger draft workflow under rule fallback.",
+    "input": {
+      "circleName": "Alpha",
+      "circleDescription": "讨论场",
+      "mode": "notify_only",
+      "allowLLM": false,
+      "messageCount": 6,
+      "focusedRatio": 0.4,
+      "questionCount": 1,
+      "participantCount": 1,
+      "spamRatio": 0.05,
+      "topicHeat": 0.3,
+      "summary": "讨论还很分散。"
+    },
+    "expected": {
+      "shouldTrigger": false,
+      "recommendedAction": "none",
+      "reasonCode": "rule_signal_insufficient",
+      "reason": "discussion signal is insufficient",
+      "confidence": 0.7,
+      "riskFlags": ["low_signal"],
+      "method": "rule"
+    }
+  },
+  "llm_notify_guard": {
+    "description": "LLM responses cannot escalate notify_only mode to auto_draft.",
+    "input": {
+      "circleName": "Alpha",
+      "circleDescription": "讨论场",
+      "mode": "notify_only",
+      "allowLLM": true,
+      "messageCount": 12,
+      "focusedRatio": 0.82,
+      "questionCount": 3,
+      "participantCount": 4,
+      "spamRatio": 0.08,
+      "topicHeat": 0.72,
+      "summary": "当前讨论已经收敛到可以推进草稿的阶段。"
+    },
+    "llmResponse": {
+      "should_trigger": true,
+      "recommended_action": "auto_draft",
+      "reason_code": "llm_signal_pass",
+      "reason": "discussion is mature enough for auto drafting",
+      "confidence": 0.82,
+      "risk_flags": ["needs_review"]
+    },
+    "expected": {
+      "shouldTrigger": true,
+      "recommendedAction": "notify_only",
+      "reasonCode": "llm_signal_pass",
+      "reason": "discussion is mature enough for auto drafting",
+      "confidence": 0.82,
+      "riskFlags": ["needs_review"],
+      "method": "llm"
+    }
+  }
+}

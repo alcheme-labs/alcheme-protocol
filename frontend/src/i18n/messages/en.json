@@ -1,0 +1,2968 @@
+{
+  "Metadata": {
+    "title": "Alcheme — Turn Noise into Gold",
+    "description": "A decentralized protocol for order and knowledge assets. Refine fragmented discussion into traceable, valuable digital crystals."
+  },
+  "LanguageSwitcher": {
+    "label": "Language",
+    "ariaLabel": "Switch language",
+    "statusPending": "Updating…",
+    "options": {
+      "zh": "中文",
+      "en": "English",
+      "es": "Español",
+      "fr": "Français"
+    }
+  },
+  "BottomNav": {
+    "ariaLabel": "Main navigation",
+    "items": {
+      "home": "Home",
+      "circles": "Circles",
+      "compose": "Post",
+      "notifications": "Alerts",
+      "profile": "Me"
+    }
+  },
+  "IdentityRegistrationEntry": {
+    "eyebrow": "On-chain identity",
+    "primaryLabel": "Create identity"
+  },
+  "LandingPage": {
+    "tagline": "Turn noise into gold"
+  },
+  "HeatGauge": {
+    "meterLabel": "Heat {state} {value} degrees",
+    "displayLabel": "{state} · {value}°",
+    "states": {
+      "active": "Active",
+      "cooling": "Cooling",
+      "frozen": "Frozen"
+    }
+  },
+  "ConnectPage": {
+    "title": "Welcome back",
+    "walletHint": "Works with Solana wallets like Phantom and Solflare",
+    "common": {
+      "skip": "Just look around →"
+    },
+    "states": {
+      "connectingSession": {
+        "subtitle": "Checking whether this wallet already has an on-chain identity.",
+        "primaryLabel": "Checking…"
+      },
+      "unregistered": {
+        "subtitle": "Your wallet is connected, but you don't have an on-chain identity yet. Create one to join circles and enter the full contribution flow.",
+        "primaryLabel": "Create identity",
+        "skipLabel": "Maybe later, take me home →"
+      },
+      "sessionError": {
+        "subtitle": "We couldn't confirm your identity state. Please try again.",
+        "primaryLabel": "Try again",
+        "skipLabel": "Go home for now →"
+      },
+      "registered": {
+        "subtitle": "Identity confirmed. Taking you home now.",
+        "primaryLabel": "Heading home"
+      },
+      "default": {
+        "subtitle": "Connect your wallet and begin your Alcheme journey.",
+        "primaryLabel": "Connect wallet"
+      }
+    }
+  },
+  "RegisterIdentitySheet": {
+    "helper": {
+      "default": "Handles must be 3-32 characters, use letters/numbers/underscores, and cannot start with a number.",
+      "syncing": {
+        "joinCircle": "Your identity is on-chain. Waiting for indexing so we can continue joining this circle.",
+        "onboarding": "Your identity is on-chain. Waiting for indexing so we can finish signing you in."
+      }
+    },
+    "title": {
+      "joinCircle": "Create identity and join circle",
+      "onboarding": "Create on-chain identity"
+    },
+    "lead": {
+      "joinCircle": "This wallet is connected, but it does not have a sign-in-ready on-chain identity yet. Finish this step and we will continue joining the current circle automatically.",
+      "onboarding": "This wallet is connected, but it does not have a sign-in-ready on-chain identity yet. Once this is done, you can join circles and start contributing for real."
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "notNow": "Maybe later",
+      "submittingJoin": "Joining…",
+      "submittingCreate": "Creating…",
+      "registeringJoin": "Registering…",
+      "registeringCreate": "Creating…",
+      "createAndJoin": "Create and join",
+      "create": "Create identity",
+      "close": "Close"
+    },
+    "handle": {
+      "label": "Identity handle",
+      "placeholder": "For example alice_01"
+    }
+  },
+  "HomePage": {
+    "reminder": {
+      "sessionError": {
+        "title": "We couldn't confirm your identity",
+        "description": "Identity confirmation failed. Please try again.",
+        "primaryLabel": "Try again"
+      },
+      "unregistered": {
+        "title": "Wallet connected, identity still missing",
+        "description": "Create an identity to join circles, speak inside them and enter the full contribution flow.",
+        "primaryLabel": "Create identity",
+        "secondaryLabel": "Maybe later"
+      }
+    },
+    "header": {
+      "title": "Pick up your thread",
+      "subtitle": "Knowledge settles inside circles. The public feed only shows highlighted Lv0 signals.",
+      "flow": {
+        "public": "Public",
+        "following": "Following"
+      },
+      "walletConnected": "● Wallet connected"
+    },
+    "public": {
+      "discussions": {
+        "title": "Lv0 highlighted discussions",
+        "empty": "No highlighted discussions yet"
+      },
+      "crystals": {
+        "title": "Latest Lv0 crystals",
+        "empty": "No crystal output yet",
+        "openAria": "Open crystal {title}"
+      },
+      "meta": "{circleName} · @{authorHandle}"
+    },
+    "following": {
+      "title": "Following feed",
+      "empty": {
+        "following": "People you follow haven't posted anything visible yet. Check back soon.",
+        "none": "You aren't following any creators yet. Find a few to get started."
+      },
+      "untitled": "Untitled post",
+      "postMeta": "@{authorHandle} · {circleName} · Heat {heatLabel} {heat}°"
+    },
+    "heat": {
+      "states": {
+        "active": "Active",
+        "cooling": "Cooling",
+        "frozen": "Frozen"
+      }
+    },
+    "discover": {
+      "title": "Discover circles",
+      "empty": "No circles yet",
+      "noDescription": "No description yet",
+      "meta": "{members} members · {posts} posts"
+    },
+    "common": {
+      "circleFallback": "Circle"
+    }
+  },
+  "ComposePage": {
+    "title": "Share a thought",
+    "validation": {
+      "feedNotAllowed": "Knowledge-mode circles only support draft publishing.",
+      "draftNotAllowed": "Social-mode circles only support feed publishing."
+    },
+    "status": {
+      "joinedCircles": "Joined {count} circles",
+      "guest": "Guest mode (not in any circle)",
+      "label": "Current status"
+    },
+    "success": {
+      "title": "Posted",
+      "text": "Sent to {circleName} · {target}"
+    },
+    "common": {
+      "circleFallback": "Circle"
+    },
+    "actions": {
+      "backHomeAria": "Back to home",
+      "publish": "Post"
+    },
+    "composer": {
+      "placeholder": "Write your idea, question or insight…",
+      "charCount": "{count} chars"
+    },
+    "empty": {
+      "title": "No circle available for posting yet",
+      "description": "You're currently browsing as a guest. Quick posts must belong to a circle, so create one or join one first.",
+      "createCircle": "Create circle",
+      "joinCircle": "Join circle"
+    },
+    "selectors": {
+      "chooseRequired": "Choose a circle to post into (required)",
+      "createOrJoinFirst": "Create or join a circle first",
+      "auxiliaryPrefix": "Aux",
+      "levelLabel": "Level {level}"
+    },
+    "intent": {
+      "feed": "Feed",
+      "draft": "Draft",
+      "feedArea": "feed",
+      "draftArea": "draft area",
+      "feedTitleEnabled": "Publish to the feed",
+      "feedTitleDisabled": "Only social-mode circles support feed posts",
+      "draftTitleEnabled": "Publish to the draft area",
+      "draftTitleDisabled": "Only knowledge-mode circles support drafts"
+    },
+    "hint": "Quick publish supports both feed and draft intents: social circles default to feed, while knowledge circles can turn a thought straight into a draft for collaborative refinement."
+  },
+  "CirclesPage": {
+    "title": "Circles",
+    "subtitle": "Find the territory where your knowledge can settle",
+    "empty": "No matching circles found",
+    "actions": {
+      "createAria": "Create a new circle"
+    },
+    "search": {
+      "placeholder": "Search circles…",
+      "relatedResults": "Found {count} related content results as well"
+    },
+    "circle": {
+      "noDescription": "No description yet",
+      "meta": "{members} members · {posts} posts",
+      "type": {
+        "closed": "🔒 Controlled access",
+        "secret": "🔒 Secret",
+        "open": "Open"
+      }
+    }
+  },
+  "CreateCircleSheet": {
+    "header": {
+      "defaultTitle": "Create a circle",
+      "createAuxiliaryWithParent": "Create a side circle · {parentCircleName}"
+    },
+    "steps": {
+      "basicInfo": "Basic info",
+      "circleMode": "Circle mode",
+      "accessSettings": "Access",
+      "confirmCreate": "Review and create"
+    },
+    "stepIndicator": "Step {current} / {total}",
+    "fields": {
+      "creationScope": "Creation type",
+      "name": "Circle name",
+      "namePlaceholder": "For example: Async programming group",
+      "description": "Description (optional)",
+      "descriptionPlaceholder": "Describe the theme and purpose of this circle…",
+      "genesis": "Starting point",
+      "seededFiles": "Seeded source files",
+      "seededFilesHint": "At this stage these files are only used as source references and AI grounding. They do not turn the draft into a multi-file working copy.",
+      "seededFilesSelected": "{count} files selected:",
+      "aiCollaboration": "AI collaboration",
+      "draftAndReview": "Drafting and review",
+      "workflowPermissions": "Issue workflow permissions"
+    },
+    "creationScope": {
+      "auxiliary": {
+        "name": "Side circle",
+        "line1": "Lv.x.y",
+        "line2": "Discussion group / topic pod"
+      },
+      "nextLevel": {
+        "name": "Next-level circle",
+        "line1": "Lv.x+1",
+        "line2": "Main-circle expansion"
+      },
+      "fork": {
+        "name": "Fork",
+        "line1": "Circle-level branch",
+        "line2": "Independent future, lighter lineage coupling"
+      },
+      "nextLevelDisabledReason": "You don't currently meet the requirements to create the next-level circle.",
+      "nextLevelUnavailable": "This account can't create the next-level circle right now."
+    },
+    "mode": {
+      "social": {
+        "name": "Social mode",
+        "line1": "Discussion + feed",
+        "line2": "Great for interest groups and everyday exchange"
+      },
+      "knowledge": {
+        "name": "Knowledge mode",
+        "line1": "Discussion + drafts + library",
+        "line2": "Great for structured docs and subprojects"
+      }
+    },
+    "genesis": {
+      "blank": {
+        "line1": "Start from a blank draft",
+        "line2": "Best for a brand-new topic"
+      },
+      "seeded": {
+        "line1": "Bring in seed material first",
+        "line2": "Better when the topic already has source material"
+      },
+      "seededHint": "SEEDED still creates a single-document draft; it simply lets later steps reference uploaded material and source files."
+    },
+    "tabs": {
+      "plaza": "Discussion",
+      "feed": "Feed",
+      "crucible": "Drafts",
+      "sanctuary": "Library"
+    },
+    "roles": {
+      "Initiate": "Initiate",
+      "Member": "Member",
+      "Elder": "Elder",
+      "Moderator": "Moderator",
+      "Admin": "Senior admin",
+      "Owner": "Owner"
+    },
+    "reviewEntryModeHelp": {
+      "auto_only": "The editor closes automatically when time runs out and moves straight into issue review.",
+      "manual_only": "Only people with permission can manually end editing and move into issue review.",
+      "auto_or_manual": "It can enter review automatically when time runs out, or be ended manually earlier."
+    },
+    "ai": {
+      "summaryUseLlm": {
+        "title": "Use AI to generate discussion summaries",
+        "hint": "When enabled, the system will organize the recent discussion into a short summary.",
+        "warning": "When disabled, the system falls back to rule-based summaries, which may be less accurate."
+      },
+      "draftTriggerMode": {
+        "title": "What to do after a trigger",
+        "hint": "Once the system decides the discussion is ready to enter the draft workflow, should it only notify or create a draft immediately?",
+        "notifyOnly": "Notify only",
+        "autoDraft": "Create draft automatically"
+      },
+      "triggerSummaryUseLlm": {
+        "title": "Use AI to help decide whether to trigger a draft",
+        "hint": "When enabled, the system first organizes the recent discussion, then uses AI to help decide whether it should enter the draft workflow.",
+        "warning": "When disabled, the system falls back to rule-based trigger checks, which may be less accurate."
+      }
+    },
+    "review": {
+      "entryMode": {
+        "title": "How review begins",
+        "autoOnly": "Auto close",
+        "manualOnly": "Manual close",
+        "autoOrManual": "Either one"
+      },
+      "autoEntryWindow": {
+        "title": "Auto-entry timer",
+        "hint": "When this timer ends, the editor moves from drafting into issue review."
+      },
+      "reviewWindow": {
+        "title": "Review duration",
+        "hint": "When time is up, the current review round ends and the team can decide whether to revise again or crystallize."
+      },
+      "maxRevisionRounds": {
+        "title": "Max revision rounds"
+      }
+    },
+    "workflow": {
+      "createIssueMinRole": "Who can submit issues",
+      "followupIssueMinRole": "Who can add follow-ups",
+      "reviewIssueMinRole": "Who can review issues",
+      "retagIssueMinRole": "Who can retag issue types",
+      "applyIssueMinRole": "Who can mark issues resolved",
+      "manualEndDraftingMinRole": "Who can end drafting",
+      "advanceFromReviewMinRole": "Who can end the current review round",
+      "enterCrystallizationMinRole": "Who can start crystallization",
+      "allowAuthorWithdrawBeforeReview": "Authors can withdraw before review",
+      "allowModeratorRetagIssue": "Reviewers can change issue types"
+    },
+    "access": {
+      "free": {
+        "name": "Open",
+        "description": "Any member of the main circle can join freely"
+      },
+      "crystal": {
+        "name": "Crystal threshold",
+        "description": "Requires holding a minimum amount of crystals"
+      },
+      "invite": {
+        "name": "Invite only",
+        "description": "Only invited members can join"
+      }
+    },
+    "confirm": {
+      "labels": {
+        "creationScope": "Creation type",
+        "name": "Name",
+        "description": "Description",
+        "mode": "Mode",
+        "genesis": "Starting point",
+        "review": "Drafting and review",
+        "access": "Access",
+        "ai": "AI collaboration"
+      },
+      "creationScope": {
+        "auxiliary": "🧩 Side circle",
+        "nextLevel": "🪜 Next-level circle"
+      },
+      "mode": {
+        "social": "🌐 Social mode",
+        "knowledge": "📚 Knowledge mode"
+      },
+      "genesis": {
+        "seeded": "🌱 SEEDED · With seed material",
+        "blank": "📝 BLANK · Start from scratch"
+      },
+      "seededFilesAttached": "{count} seeded source files attached",
+      "reviewEntry": {
+        "autoOnly": "Auto close into review",
+        "manualOnly": "Manual close into review",
+        "autoOrManual": "Auto or manual entry into review"
+      },
+      "reviewSummary": {
+        "withAuto": " · auto-entry in {draftingWindowMinutes} min · review {reviewWindowMinutes} min · up to {maxRevisionRounds} rounds",
+        "manualOnly": " · review {reviewWindowMinutes} min · up to {maxRevisionRounds} rounds"
+      },
+      "access": {
+        "free": "🌍 Open",
+        "crystal": "💎 Requires ≥ {minCrystals} crystals",
+        "invite": "🔒 Invite only"
+      },
+      "ai": {
+        "summary": "Discussion summary: {mode}",
+        "draftTrigger": "Draft trigger: {mode}",
+        "triggerSummary": "Trigger summary: {mode}",
+        "llm": "LLM",
+        "rule": "Rule-based",
+        "autoDraft": "Auto draft",
+        "notifyOnly": "Notify only"
+      }
+    },
+    "common": {
+      "minutes": "min"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "back": "Back",
+      "next": "Next",
+      "create": "✨ Create circle",
+      "creating": "Creating…"
+    },
+    "errors": {
+      "seededRequired": "Select at least one seeded source file."
+    }
+  },
+  "FeedTab": {
+    "states": {
+      "empty": "Nothing new in this circle yet"
+    },
+    "repost": {
+      "fromAuthor": "Reposted from @{author}",
+      "emptyBody": "The original post had no text",
+      "fromOriginal": "Reposted from an original post",
+      "unavailable": "The original post isn't available here"
+    },
+    "actions": {
+      "like": "Like",
+      "liked": "Liked",
+      "comment": "Comment",
+      "openReplies": "Open replies",
+      "commentUnavailable": "Replies unavailable",
+      "repost": "Repost",
+      "repostReasons": {
+        "connect_wallet": "Connect your wallet first",
+        "join_circle": "Join this circle to repost",
+        "pending_membership": "Your join request is waiting for review",
+        "pending": "Reposting…",
+        "already_reposted": "Already reposted once"
+      }
+    },
+    "composer": {
+      "placeholder": "Share the next move in {circleName}",
+      "aria": "Compose a post for {circleName}",
+      "unavailable": "Composer unavailable"
+    }
+  },
+  "SanctuaryTab": {
+    "meta": {
+      "citedCount": "Cited {count} times"
+    },
+    "patina": {
+      "ancient": "🏛 Classic",
+      "weathering": "📜 Settling in"
+    }
+  },
+  "ForkReadiness": {
+    "defaults": {
+      "sourceCircleFallback": "Circle #{sourceCircleId}",
+      "sourceLevelPending": "Level pending",
+      "sourceLevel": "Level {level}",
+      "identityFloor": "Floor: {roleLabel}",
+      "contributionProgress": "{current} / {required} contributions",
+      "prefillSourceLabel": "Starts with the default profile (v{configVersion}).",
+      "slogan": "When disagreement points to a different future, forking is more honest than forcing alignment.",
+      "declarationPlaceholder": "Write down what this fork needs to protect, and why it should start independently from the current circle.",
+      "hintTitle": "Fork readiness",
+      "hintBody": "This view explains the contribution bar, identity floor, inheritance mode, and lineage scope. The actual create entry stays on the circle page."
+    },
+    "threshold": {
+      "disabled": "Forking isn't open in this circle yet.",
+      "base": "At least {minimumContributions} contributions, with status at or above {roleLabel}",
+      "withGovernance": "{base}, plus one governance approval.",
+      "ready": "{base}, and you can fork."
+    },
+    "inheritance": {
+      "locked": "The new circle starts with upstream settings and keeps them locked.",
+      "editable": "The new circle starts with upstream settings, then remains editable.",
+      "independent": "The new circle starts from independent settings instead of inheriting upstream."
+    },
+    "knowledgeLineage": {
+      "upstreamUntilForkNode": "Knowledge lineage follows upstream until the new fork node appears."
+    },
+    "roles": {
+      "Owner": "Owner",
+      "Admin": "Admin",
+      "Moderator": "Moderator",
+      "Member": "Member",
+      "Elder": "Elder",
+      "Initiate": "Initiate"
+    },
+    "qualification": {
+      "qualified": "You meet the current requirements and can fork.",
+      "forkDisabled": "Forking isn't open in this circle yet.",
+      "identityShortfall": "Your current role or identity is still below the {roleLabel} floor.",
+      "contributionShortfall": "Need {missing} more contributions before you can submit.",
+      "fallback": "You still don't meet the submit requirements."
+    },
+    "statusBadge": {
+      "qualified": "Ready to fork",
+      "forkDisabled": "Closed",
+      "identityShortfall": "Identity too low",
+      "contributionShortfall": "More contributions needed"
+    }
+  },
+  "ForkReadinessPanel": {
+    "eyebrow": "Fork conditions",
+    "labels": {
+      "sourceCircle": "Source circle",
+      "currentQualification": "Current qualification",
+      "contributionThreshold": "Contribution threshold",
+      "identityFloor": "Identity floor",
+      "level": "Level",
+      "entryThreshold": "Entry bar",
+      "inheritance": "Inheritance",
+      "knowledgeLineage": "Knowledge lineage",
+      "originMarker": "Origin marker",
+      "retentionRhythm": "Retention rhythm",
+      "prefill": "Default carry-over"
+    },
+    "values": {
+      "originMarker": "Shown later in the overview or lineage panel instead of the main layout.",
+      "retentionRhythm": "Checked on days 2 / 7 / 30 / 90 / 180, then hidden after two inactive checks."
+    }
+  },
+  "ForkCreateSheet": {
+    "header": {
+      "eyebrow": "Fork setup",
+      "title": "Fork · {sourceCircleName}"
+    },
+    "defaults": {
+      "name": "{sourceCircleName} Fork"
+    },
+    "roles": {
+      "Initiate": "Initiate",
+      "Member": "Member",
+      "Elder": "Elder",
+      "Moderator": "Moderator",
+      "Admin": "Senior admin",
+      "Owner": "Owner"
+    },
+    "eligibility": {
+      "title": "Why this fork can happen now",
+      "hint": "The source circle, qualification snapshot, and split rationale will all be written into this filing.",
+      "fallbackSlogan": "When disagreement points to a different future, forking is more honest than forcing alignment.",
+      "loading": "Checking the current fork conditions…",
+      "pendingTarget": "Fork circle #{targetCircleId} already exists. Finishing the filing won't create it again."
+    },
+    "setup": {
+      "title": "How the new circle starts",
+      "hint": "These fields become the starting config for the new circle. Everything except fork policy still follows the current write path."
+    },
+    "fields": {
+      "declaration": "Split rationale",
+      "declarationPlaceholder": "Write down what changes in direction justify this fork.",
+      "name": "Name",
+      "description": "Description",
+      "joinRequirement": "Join requirement",
+      "minCrystals": "Minimum crystals",
+      "draftLifecycleTemplate": "Draft lifecycle",
+      "draftWorkflowPolicy": "Draft workflow",
+      "ghostPolicy": "Ghost policy",
+      "forkPolicy": "Fork policy"
+    },
+    "access": {
+      "free": "Open",
+      "crystal": "Crystal threshold",
+      "invite": "Invite only",
+      "approval": "Approval required"
+    },
+    "reviewEntryMode": {
+      "auto_or_manual": "Auto or manual",
+      "auto_only": "Auto only",
+      "manual_only": "Manual only"
+    },
+    "ghostPolicy": {
+      "notify_only": "Notify only",
+      "auto_draft": "Auto draft"
+    },
+    "forkPolicy": {
+      "minimumContributions": "Minimum contributions: {count}",
+      "minimumRole": "Minimum role: {role}",
+      "requiresGovernanceVote": "Needs governance vote: {value}"
+    },
+    "common": {
+      "true": "Yes",
+      "false": "No"
+    },
+    "actions": {
+      "closeAria": "Close fork setup",
+      "close": "Maybe later",
+      "resumeSubmit": "Finish the filing",
+      "disabled": "Not ready yet",
+      "create": "Create fork circle"
+    }
+  },
+  "CircleDetailPage": {
+    "defaults": {
+      "unknownCircle": "Unknown circle",
+      "publicCircle": "Public circle",
+      "circleWithId": "Circle #{circleId}",
+      "unknownMember": "unknown"
+    },
+    "tabs": {
+      "plaza": "Discussion",
+      "feed": "Feed",
+      "crucible": "Drafts",
+      "sanctuary": "Knowledge"
+    },
+    "header": {
+      "backToCirclesAria": "Back to circles",
+      "meta": "{memberCount} members · {crystalCount} crystals",
+      "notificationsAria": "Open notifications",
+      "settingsAria": "Open circle settings"
+    },
+    "join": {
+      "processing": "Working…",
+      "banner": {
+        "connectWallet": "Connect wallet",
+        "connectWalletHint": "Connect your wallet before joining this circle.",
+        "registerIdentity": "Create identity",
+        "registerIdentityHint": "Create an identity before joining this circle.",
+        "retrySession": "Retry",
+        "retrySessionHint": "We couldn't confirm your identity state. Please try again."
+      },
+      "button": {
+        "join": "Join circle",
+        "createIdentity": "Create identity",
+        "joined": "Joined",
+        "pending": "Pending",
+        "approvalRequired": "Request access",
+        "inviteRequired": "Invite required",
+        "crystalRequirement": "{missingCrystals} crystals needed",
+        "restricted": "Restricted",
+        "rejoin": "Rejoin"
+      },
+      "hint": {
+        "visitorDefault": "Visitors can post ephemeral messages, but only members enter the formal archive.",
+        "createIdentity": "Create an identity before joining this circle.",
+        "pending": "Your join request is waiting for review.",
+        "approvalRequired": "This circle reviews join requests before approval.",
+        "inviteRequired": "This circle is invite-only. Ask an admin for access.",
+        "insufficientCrystals": "You need {required} crystals, and you currently have {current}.",
+        "banned": "Your access to this circle is currently restricted."
+      },
+      "errors": {
+        "walletRequired": "Connect your identity before joining the circle.",
+        "inviteRequired": "This circle is invite-only. Ask an admin for access.",
+        "insufficientCrystals": "You do not have enough crystals to join yet.",
+        "banned": "Your access to this circle is currently restricted.",
+        "requestStateChanged": "That request state changed. Refresh and try again.",
+        "membershipBridgeUnavailable": "Your identity was created, but the circle join finalization is temporarily unavailable. Please try joining again.",
+        "fallback": "Could not join the circle. Please try again."
+      }
+    },
+    "levels": {
+      "Visitor": "Visitor",
+      "Initiate": "Initiate",
+      "Member": "Member",
+      "Elder": "Elder"
+    },
+    "states": {
+      "visitor": "Visitor",
+      "initiate": "Initiate",
+      "member": "Member",
+      "curator": "Curator",
+      "owner": "Owner"
+    },
+    "identityProgress": {
+      "label": "Circle identity",
+      "labelInline": "Identity",
+      "nextLevel": "Next: {levelLabel}",
+      "summaryLink": "View summary"
+    },
+    "identityTransition": {
+      "badge": "Identity update",
+      "dismissAria": "Dismiss identity update"
+    },
+    "memberDirectory": {
+      "notice": {
+        "connectAndJoin": "Connect and join this circle to view members and roles.",
+        "joinRequired": "Member details are visible after you join this circle."
+      },
+      "errors": {
+        "profileUnavailable": "Member profile is not available right now.",
+        "loadFailed": "Could not load the member profile. Please try again."
+      },
+      "actionErrors": {
+        "forbidden": "Your current role cannot perform this action.",
+        "memberGone": "That member is no longer here, or their state already changed. Refresh and try again.",
+        "activeInviteExists": "That member already has an active invite.",
+        "alreadyMember": "That member is already in this circle.",
+        "protectedRole": "That member role cannot be changed here right now.",
+        "selfRemovalUnsupported": "You cannot remove yourself here. Use leave circle instead.",
+        "selfRoleChangeUnsupported": "Changing your own role is not supported here right now."
+      },
+      "followSyncing": "On-chain update confirmed, index sync still in progress."
+    },
+    "boundary": {
+      "back": "Back",
+      "backToMain": "Back to main circle",
+      "next": "Continue",
+      "nextLevel": "Next level",
+      "previousLevel": "Previous level"
+    },
+    "settings": {
+      "forwardPolicyNotice": "Forwarding policy is managed at the circle level and cannot be edited here yet.",
+      "deleteNotice": "Deleting a circle is still locked behind a safer review flow and is not available yet.",
+      "errors": {
+        "invalidCircleForAi": "This circle is invalid, so AI settings cannot be saved yet.",
+        "invalidCircleForDraftLifecycle": "This circle is invalid, so draft lifecycle settings cannot be saved yet.",
+        "invalidCircleForWorkflow": "This circle is invalid, so workflow permissions cannot be saved yet.",
+        "invalidCircleForAgents": "This circle is invalid, so agent governance cannot be saved yet.",
+        "loadAiFallback": "Could not load the AI settings, so the defaults are in use for now.",
+        "loadDraftPolicyFallback": "Could not load the draft workflow settings, so the defaults are in use for now.",
+        "loadAgentPolicyFallback": "Could not load the agent governance settings, so the defaults are in use for now.",
+        "saveAiFailed": "Could not save the AI settings. Please try again.",
+        "saveDraftLifecycleFailed": "Could not save the draft lifecycle settings. Please try again.",
+        "saveWorkflowFailed": "Could not save the workflow permissions. Please try again.",
+        "saveAgentsFailed": "Could not save the agent governance settings. Please try again.",
+        "invalidCircleForRoleChange": "This circle is invalid, so the member role cannot be changed.",
+        "memberWalletMissingForRoleChange": "This member is missing a wallet address, so the on-chain role update cannot proceed.",
+        "roleChangeFailed": "Could not change the member role. Please try again.",
+        "invalidCircleForRemoveMember": "This circle is invalid, so the member cannot be removed.",
+        "memberWalletMissingForRemoveMember": "This member is missing a wallet address, so the on-chain removal cannot proceed.",
+        "removeMemberFailed": "Could not remove the member. Please try again.",
+        "invalidCircleForLeave": "This circle is invalid, so you cannot leave it yet.",
+        "leaveFailed": "Could not leave the circle. Please try again."
+      }
+    },
+    "createCircle": {
+      "title": "Create circle · {name} (Lv.{level})",
+      "parentCircleName": "{name} (Level {level})",
+      "errors": {
+        "invalidParentCircle": "This circle is invalid, so creation cannot start yet.",
+        "noNextLevelPermission": "This account cannot create the next-level circle from here yet."
+      }
+    },
+    "invite": {
+      "errors": {
+        "selectMember": "Select at least one member to invite.",
+        "sendFailed": "Could not send the invite. Please try again."
+      }
+    },
+    "fork": {
+      "nextLevelPermission": {
+        "connectWallet": "Connect your wallet before creating the next-level circle.",
+        "insufficientRole": "Only the creator, circle admins, or the current top crystal contributor can create the next-level circle."
+      },
+      "errors": {
+        "invalidSourceCircle": "This circle is invalid, so a fork cannot start yet.",
+        "loadRequirementsFailed": "Could not load the fork requirements. Please try again.",
+        "pendingFinalizationDetected": "Fork circle #{targetCircleId} already exists. Only the final filing step is left, and finishing it will not create the circle again.",
+        "notQualified": "You still do not meet the current fork requirements.",
+        "pendingFinalizationStillReconciling": "Fork circle #{targetCircleId} already exists. The final filing is still reconciling, so try the last step again in a moment.",
+        "pendingFinalizationRetryLastStep": "Fork circle #{targetCircleId} already exists. Only the final filing step is left, so retry that last step.",
+        "prepareFilingFailed": "Could not file the fork lineage record, so the new circle has not started yet.",
+        "finalizationStillReconciling": "Fork circle #{targetCircleId} already exists. The final filing is still reconciling, so try the last step again in a moment.",
+        "finalizationRetryLastStep": "Fork circle #{targetCircleId} already exists. Only the final filing step is left, so retry that last step."
+      }
+    },
+    "forkLineage": {
+      "eyebrow": "Fork lineage",
+      "title": "Origin and fork lineage",
+      "syncing": "Syncing…",
+      "errors": {
+        "loadFailed": "The fork lineage feed is not available right now. Please try again later."
+      },
+      "badges": {
+        "currentFrom": "Current circle from",
+        "sourceFork": "Forked from here"
+      },
+      "meta": {
+        "originAnchor": "Origin anchor {anchor}",
+        "executionDigest": "Execution digest {digest}"
+      },
+      "status": {
+        "completed": "Completed",
+        "reconciliationPending": "Reconciling",
+        "prepared": "Prepared"
+      },
+      "marker": {
+        "permanentWithDate": "Permanent marker since {date}",
+        "permanent": "Permanent marker",
+        "hiddenWithDate": "Marker hidden since {date}",
+        "hidden": "Marker hidden",
+        "visibleWithCheckpoint": "Marker visible · checkpoint day {day}",
+        "visible": "Marker visible",
+        "pendingInit": "Marker state pending"
+      },
+      "schedule": {
+        "inactiveWithNextCheck": "{count} inactive checkpoints · next check {date}",
+        "inactiveOnly": "{count} inactive checkpoints",
+        "nextCheck": "Next check {date}",
+        "waitingNextCheck": "Waiting for the next lineage check"
+      }
+    }
+  },
+  "CircleSummaryPage": {
+    "errors": {
+      "fetchSnapshot": "Couldn't load the summary snapshot.",
+      "fetchOutputs": "Couldn't load the settled outputs.",
+      "fetchDraft": "Couldn't load the draft baseline.",
+      "fetchDraftCandidates": "Couldn't load the circle's draft candidates."
+    },
+    "warnings": {
+      "formalOutputReadFailed": "Formal CrystalOutput for knowledge {knowledgeId} is unavailable right now.",
+      "partialOutputs": "{count} formal CrystalOutput items are unavailable right now, so only the readable ones are shown. {firstWarning}"
+    }
+  },
+  "CircleSummaryReadinessPanel": {
+    "eyebrow": "Summary surface",
+    "title": "What this page is built from",
+    "status": {
+      "snapshotVersion": "Snapshot v{version}",
+      "waiting": "Waiting for the formal snapshot"
+    },
+    "cards": {
+      "truthSource": {
+        "title": "Current source of truth",
+        "snapshotNote": "This page is currently grounded in CircleSummarySnapshot v{version}, generated by {generatedBy}.",
+        "pendingSnapshotOnly": "This page only accepts the formal CircleSummarySnapshot as summary truth. Until that snapshot is readable, it keeps boundary notes only and does not fall back to scaffold truth.",
+        "snapshotTruthLive": "This page is already reading the formal summary truth."
+      },
+      "knowledgePath": {
+        "title": "Reads directly from the settled knowledge path",
+        "items": {
+          "identityAndVersion": "Identity and version of each settled conclusion",
+          "snapshotLineage": "The lineage exposed by contribution snapshots",
+          "citations": "Citation and back-reference relationships",
+          "versionHeat": "Version history and heat changes"
+        }
+      },
+      "draftBaseline": {
+        "title": "Adds the draft baseline only when needed",
+        "items": {
+          "draftIdentity": "Draft identity and current status",
+          "stableVersion": "Stable version and source fingerprint",
+          "workingCopy": "Editable body version and last update time"
+        },
+        "noteWithDraft": "The stable fields from draft #{draftPostId} are already available, so this page can use them as its draft baseline.",
+        "noteWithoutDraft": "There is still no single draft baseline, so the page stays anchored in the settled knowledge path.",
+        "degradationLead": "These are deliberate downgrade labels, not page failures."
+      },
+      "references": {
+        "title": "Reference readiness",
+        "note": "These are the stable fields the current reference UI depends on. The reference page reads them through the dedicated DraftReferenceLink path."
+      }
+    },
+    "chips": {
+      "version": "Version v{version}",
+      "model": "Model: {model}",
+      "providerMode": "Mode: {providerMode}",
+      "promptVersion": "Prompt: {promptAsset}@{promptVersion}",
+      "contextFingerprint": "Context fingerprint: {digest}"
+    },
+    "degradation": {
+      "prefix": "Current downgrade: {label}"
+    }
+  },
+  "CircleSummaryScaffold": {
+    "common": {
+      "backToCircle": "Back to circle"
+    },
+    "pending": {
+      "heroLead": "Formal summaries only come from CircleSummarySnapshot. Until that snapshot is readable, this page keeps the boundary clear instead of pretending to be the real thing.",
+      "snapshotLoading": "Loading the formal CircleSummarySnapshot…",
+      "snapshotEmpty": "There is no readable CircleSummarySnapshot yet, and this page will not pretend the scaffold route map is the formal summary truth."
+    },
+    "appendix": {
+      "title": "Supporting notes",
+      "meta": "This stays off the main stage and only explains the current boundary when needed.",
+      "loadingSnapshot": "Loading the formal summary snapshot…",
+      "loadingDraft": "Checking whether this page has a single stable draft baseline…",
+      "loadingOutputs": "Loading the settled output list for this circle…",
+      "sourceDraftReady": "This page can already trace back to the stable fields of draft #{draftPostId} to fill in the knowledge baseline.",
+      "forkLineageNote": "Fork source badges appear later and stay out of the main structure. They are checked on days 2, 7, 30, 90, and 180 in the overview or lineage view, hidden after two inactive checks, and kept permanently if they are still alive on the final check.",
+      "degradationPrefix": "Current downgrade: {label}",
+      "snapshotPriorityLead": "This page prefers formal snapshot v{version}. It was generated by",
+      "snapshotPriorityWithMode": ", and the actual sourcing mode was {providerMode}.",
+      "snapshotPriorityWithoutMode": "."
+    },
+    "sections": {
+      "primaryRoutes": {
+        "title": "Start from the main route",
+        "meta": "Follow one primary line first, then decide whether to branch out.",
+        "loading": "Organizing the settled main routes for this circle…",
+        "degradationPrefix": "Still missing: {label}",
+        "facts": {
+          "source": "Source",
+          "impact": "Impact",
+          "stabilizedAt": "Stabilized"
+        },
+        "empty": {
+          "routeLabel": "The main line is still forming",
+          "title": "This circle doesn't have a stable settlement yet",
+          "hint": "Keep building facts, explanations, and verifiable points of disagreement around the current theme first.",
+          "currentStartingPoint": "Current starting point",
+          "cardTitle": "Grow the first line that can truly stand on its own",
+          "cardHint": "Once the first settled result appears, this page can expand into a real route map.",
+          "status": "Still converging",
+          "bodyFallback": "There is no stable settlement yet, so keep focusing the topic through discussion and draft work.",
+          "facts": {
+            "missingLabel": "What's missing most",
+            "missingValue": "One conclusion that can hold steady",
+            "draftBaselineLabel": "Draft baseline",
+            "draftBaselineValueWithDraft": "Draft #{draftPostId} is already traceable",
+            "draftBaselineValueWithoutDraft": "No single draft baseline yet",
+            "nextStepLabel": "What to do now",
+            "nextStepValue": "Add facts, explanations, and verifiable disagreements"
+          }
+        }
+      },
+      "issueMap": {
+        "title": "What to read first",
+        "meta": "Start with the lines that already stand, then choose whether to go deeper."
+      },
+      "situation": {
+        "title": "Current state",
+        "meta": "Read the current progress in one glance."
+      },
+      "coverage": {
+        "title": "How solid are these lines",
+        "meta": "They are not equally reliable, so check the evidence strength first."
+      },
+      "timeline": {
+        "title": "How the settlement formed",
+        "meta": "Link the draft baseline and the crystal outputs in time order.",
+        "empty": "There are not enough stable settlement nodes yet to form a timeline."
+      },
+      "questions": {
+        "title": "What still isn't clear",
+        "meta": "Lay out the unresolved parts directly.",
+        "empty": "The main settlement threads are already visible. The fuller map, conflict context, and open-question snapshot can be added next."
+      },
+      "entry": {
+        "title": "How to enter now",
+        "meta": "Different roles benefit from different entry points.",
+        "newcomer": {
+          "role": "Newcomer",
+          "body": "Start from the current main topic and the most mature settled branch, then check whether a single draft baseline already exists."
+        },
+        "participant": {
+          "role": "Contributor",
+          "body": "Prioritize the evidence gaps called out in the unresolved questions, especially stable snapshots and source-draft bindings."
+        }
+      }
+    }
+  },
+  "CircleSummaryAdapter": {
+    "common": {
+      "timeTbd": "Date pending",
+      "unresolvedSource": "Source still unresolved"
+    },
+    "hero": {
+      "eyebrow": "Cognitive map",
+      "title": "Circle {circleId} knowledge map",
+      "lead": "Start with where the topic is converging, which branches have already settled, and what still needs evidence."
+    },
+    "issueMap": {
+      "stableConclusionTitle": "Start with the conclusion that has stabilized",
+      "stableConclusionBodyWithOutput": "The clearest settled thread right now is “{title}”, so that is the best place to enter this circle's map.",
+      "stableConclusionBodyWithoutOutput": "There is no stable settled output yet, so this page first helps you see what is converging and what is still taking shape.",
+      "draftBaselineTitle": "Then trace it back to the draft baseline",
+      "draftBaselineBodyWithDraft": "You can now go back to draft #{draftPostId} and its stable v{draftVersion} snapshot to understand how this settlement formed.",
+      "draftBaselineBodyWithoutDraft": "There is no single stable draft baseline yet, so enter from the settled outputs instead of pretending the draft truth is settled."
+    },
+    "route": {
+      "primaryLabel": "Main route",
+      "parallelLabel": "Parallel branch {index}",
+      "primaryHint": "If this is your first time in the circle, start here.",
+      "parallelHint": "Use this branch when you want to compare a different interpretation."
+    },
+    "branch": {
+      "statusPrimary": "Most mature now",
+      "statusParallel": "Parallel branch {index}",
+      "bindingWithDraft": "Bound back to draft #{draftPostId}",
+      "bindingMissing": "No stable source draft yet",
+      "evidenceSnapshot": "Snapshot-backed",
+      "evidenceSettlementFallback": "Settlement replay",
+      "evidenceUnknown": "Source pending",
+      "evidenceSummarySnapshot": "This branch already has stable snapshot evidence and can act as a trustworthy summary entry point.",
+      "evidenceSummarySettlementFallback": "This branch has clearly settled, but its source chain is still replay-level evidence.",
+      "evidenceSummaryUnknown": "This branch is visible, but the snapshot-level source evidence is still incomplete.",
+      "citationSummary": "Cited {citationCount} times · preview refs {outboundReferenceCount} / cited by {inboundReferenceCount}",
+      "versionPending": "Version pending"
+    },
+    "situation": {
+      "formedConclusionsLabel": "Settled conclusions",
+      "formedConclusionsDescription": "Start with what has already stabilized.",
+      "visibleEntriesLabel": "Visible entry points",
+      "visibleEntriesDescription": "This counts the routes you can enter now, not the full branch graph.",
+      "draftBaselineLabel": "Draft baseline",
+      "draftBaselinePending": "Pending",
+      "draftBaselineDescription": "Once a single draft is resolved, you can trace how the line actually grew."
+    },
+    "coverage": {
+      "snapshotLabel": "Snapshot-backed",
+      "snapshotDescription": "Settled outputs that already point back to stable snapshot evidence.",
+      "settlementLabel": "Settlement replay",
+      "settlementDescription": "Outputs are clearly settled, but the full snapshot chain is still incomplete.",
+      "unresolvedLabel": "Source pending",
+      "unresolvedDescription": "The result is visible, but its source evidence still needs to be grounded."
+    },
+    "timeline": {
+      "outputSummarySnapshot": "Settled into a knowledge output and can be traced back to stable snapshot evidence.",
+      "outputSummaryFallback": "Settled into a knowledge output, but the source chain still needs more evidence.",
+      "draftTitle": "Stable draft baseline v{draftVersion}",
+      "draftSummary": "Draft #{draftPostId} currently provides the body baseline for this knowledge map."
+    },
+    "questions": {
+      "noStableOutputTitle": "The first stable output has not appeared yet",
+      "noStableOutputBody": "Right now it is more honest to keep adding facts, explanations, and disagreements than to pretend there is already a clear conclusion.",
+      "noDraftBaselineTitle": "There is still no single draft baseline",
+      "noDraftBaselineBody": "The page still cannot reliably anchor everything back to one draft version, so you should enter from the settled outputs first.",
+      "missingSnapshotTitle": "Some settled outputs still lack stable snapshots",
+      "missingSnapshotBody": "These results are already visible, but their traceable snapshot evidence is still incomplete.",
+      "missingDraftBindingTitle": "Some outputs still do not bind back to a source draft",
+      "missingDraftBindingBody": "They are clearly settled, but not yet stably anchored back to a draft entry point."
+    },
+    "generatedBy": {
+      "systemLlm": "System LLM",
+      "userRequested": "Manual request",
+      "systemProjection": "System projection"
+    },
+    "providerMode": {
+      "builtin": "Builtin LLM",
+      "projection": "System projection",
+      "rule": "Rule summary",
+      "fallback": "Source pending"
+    },
+    "reference": {
+      "note": "The reference page consumes these stable fields through the dedicated DraftReferenceLink public-read surface rather than a temporary Team 00 window.",
+      "fields": {
+        "referenceId": "Reference ID",
+        "draftPostId": "Source draft",
+        "draftVersion": "Draft version",
+        "sourceBlockId": "Source block",
+        "crystalName": "Crystal name",
+        "crystalBlockAnchor": "Crystal segment",
+        "status": "Parse status"
+      }
+    },
+    "degradation": {
+      "selectedDraft": "No single draft baseline has been resolved yet",
+      "snapshotEvidence": "This conclusion still lacks stable snapshot evidence",
+      "draftBinding": "This conclusion still lacks a stable draft binding"
+    }
+  },
+  "CrystalOutputEvidencePanel": {
+    "binding": {
+      "snapshot": "Snapshot-backed",
+      "settlementFallback": "Settlement replay",
+      "unresolved": "Source pending"
+    },
+    "compact": {
+      "citations": "Cited {count}",
+      "draft": "Draft #{draftPostId}"
+    },
+    "eyebrow": "Crystal output",
+    "title": "Source and evidence",
+    "metrics": {
+      "version": {
+        "label": "Version"
+      },
+      "contributors": {
+        "label": "Contributors"
+      },
+      "citations": {
+        "label": "Total citations"
+      },
+      "preview": {
+        "label": "Reference preview (this page)",
+        "value": "Refs {outboundReferenceCount} / cited by {inboundReferenceCount}"
+      }
+    },
+    "rows": {
+      "common": {
+        "missing": "Not provided"
+      },
+      "sourceDraft": {
+        "label": "Source draft",
+        "empty": "No stable draft binding yet"
+      },
+      "anchor": {
+        "label": "Discussion anchor"
+      },
+      "summaryHash": {
+        "label": "Summary fingerprint"
+      },
+      "messageDigest": {
+        "label": "Message fingerprint"
+      }
+    },
+    "degradationPrefix": "Current downgrade: {label}"
+  },
+  "NotificationsPage": {
+    "title": "Notifications",
+    "actions": {
+      "markAllRead": "Mark all as read"
+    },
+    "states": {
+      "loading": "Loading…",
+      "error": "Couldn't load notifications. Please try again shortly.",
+      "empty": "No notifications yet"
+    }
+  },
+  "MemberCard": {
+    "roles": {
+      "owner": "Owner",
+      "curator": "Curator",
+      "member": "Member"
+    },
+    "meta": {
+      "handle": "@{handle} · Joined {joinedAgo}"
+    },
+    "followHint": {
+      "profileUnavailable": "This profile isn't ready yet, so following is temporarily unavailable."
+    },
+    "states": {
+      "loading": "Loading member profile…"
+    },
+    "stats": {
+      "citations": "Citations",
+      "crystals": "Crystals",
+      "circles": "Circles"
+    },
+    "sections": {
+      "sharedCircles": "Shared circles",
+      "recentActivity": "Recent activity"
+    },
+    "actions": {
+      "followPending": "Working…",
+      "following": "Following",
+      "follow": "Follow",
+      "message": "Message",
+      "invite": "Invite"
+    }
+  },
+  "InviteMemberSheet": {
+    "title": "Invite members",
+    "target": {
+      "label": "Invite into"
+    },
+    "search": {
+      "placeholder": "Search members…"
+    },
+    "states": {
+      "empty": "No matching members found",
+      "alreadyIn": "Already in the circle"
+    },
+    "roles": {
+      "curator": "Curator",
+      "member": "Member"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "sending": "Sending…",
+      "send": "Send invite{count, plural, =0 {} other { ({count})}}"
+    },
+    "toast": {
+      "success": "Sent {count} invites",
+      "partialSuccess": "Sent {successCount} invites, {failureCount} failed"
+    },
+    "errors": {
+      "sendFailed": "Couldn't send invites right now. Please try again."
+    }
+  },
+  "MessageActionSheet": {
+    "actions": {
+      "reply": "Reply",
+      "highlight": "Highlight",
+      "forward": "Forward",
+      "copy": "Copy",
+      "delete": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+  "ProfilePage": {
+    "fallbacks": {
+      "anonymous": "Anonymous",
+      "unknownHandle": "unknown",
+      "unknownCircle": "Unknown circle"
+    },
+    "common": {
+      "loading": "Loading…"
+    },
+    "errors": {
+      "walletIdentityNotReady": "This wallet identity isn't ready for on-chain profile updates yet.",
+      "indexerLagging": "Your profile was updated on-chain, but indexing is still catching up. Please try again shortly.",
+      "missingEditableIdentity": "This wallet does not have an editable on-chain identity yet. Create one or refresh your session and try again.",
+      "invalidUpdatePayload": "The on-chain program rejected this profile update payload. Refresh the page and try again.",
+      "saveFailed": "We couldn't save your profile right now. Please try again later."
+    },
+    "identityStates": {
+      "sessionError": {
+        "displayName": "Identity unavailable",
+        "bio": "We couldn't confirm your identity state. Please try again."
+      },
+      "connecting": {
+        "displayName": "Checking identity…",
+        "bio": "We're confirming the on-chain identity for this wallet.",
+        "headerHandle": "Verifying on-chain identity"
+      },
+      "unregistered": {
+        "displayName": "No identity yet",
+        "bio": "Create an on-chain identity first. Then you can join circles, speak inside them and enter the full settlement flow.",
+        "headerHandle": "Waiting for on-chain identity"
+      }
+    },
+    "identityEntry": {
+      "sessionError": {
+        "title": "We couldn't confirm your identity",
+        "description": "This wallet identity is temporarily unavailable. Please try again.",
+        "primaryLabel": "Try again"
+      },
+      "unregistered": {
+        "title": "Wallet connected, identity still missing",
+        "description": "Wallet {wallet} is still in guest mode. Before you join a circle, your posts remain dust messages.",
+        "primaryLabel": "Create identity"
+      }
+    },
+    "empty": {
+      "totem": {
+        "sessionError": "Once identity confirmation succeeds, your totem evolution will appear here.",
+        "connecting": "We're checking your identity. Your totem evolution will appear here once that finishes.",
+        "unregistered": "Create an identity and your totem evolution will appear here."
+      },
+      "crystals": {
+        "sessionError": "Once identity confirmation succeeds and you join a circle, your crystal history will appear here.",
+        "connecting": "We're checking your identity. Once that's done and you join a circle, your crystal history will appear here.",
+        "unregistered": "Join a circle and contribute something meaningful to begin growing crystals here."
+      },
+      "noCrystals": "You don't have any crystals yet. Contribute knowledge inside circles to grow them."
+    },
+    "actions": {
+      "connectWallet": "Connect wallet",
+      "editProfile": "Edit profile",
+      "disconnect": "Disconnect",
+      "openSettings": "Open settings"
+    },
+    "stats": {
+      "posts": "Posts",
+      "circles": "Circles",
+      "followers": "Followers",
+      "reputation": "Reputation"
+    },
+    "sections": {
+      "totem": "Totem",
+      "myCrystals": "My crystals"
+    },
+    "crystals": {
+      "citationCount": "Cited {count} times"
+    }
+  },
+  "ProfileSettingsSheet": {
+    "eyebrow": "Settings",
+    "title": "Preferences",
+    "actions": {
+      "closeAria": "Close settings drawer"
+    },
+    "language": {
+      "label": "Language",
+      "title": "Choose a language",
+      "hint": "By default we follow your device and browser language. You can also switch it manually here.",
+      "openAria": "Open language settings",
+      "backAria": "Back to settings",
+      "backLabel": "Back",
+      "currentLabel": "Current language",
+      "tapToSwitch": "Tap to switch to this language",
+      "pending": "Switching language…",
+      "options": {
+        "zh": "中文",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français"
+      }
+    }
+  },
+  "EditProfileModal": {
+    "title": "Edit profile",
+    "errors": {
+      "saveFailed": "We couldn't save your profile right now. Please try again later."
+    },
+    "fields": {
+      "displayName": {
+        "label": "Display name",
+        "placeholder": "Enter a display name"
+      },
+      "bio": {
+        "label": "Bio",
+        "placeholder": "Introduce yourself in one line",
+        "charCount": "{count}/120"
+      }
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving…",
+      "closeAria": "Close edit profile modal"
+    }
+  },
+  "TotemDisplay": {
+    "stages": {
+      "seed": {
+        "name": "Seed",
+        "description": "Seed: dormant ore, keeping watch over the first layer of order."
+      },
+      "sprout": {
+        "name": "Sprout",
+        "description": "Sprout: thought breaks the surface and amber veins begin to pulse."
+      },
+      "bloom": {
+        "name": "Bloom",
+        "description": "Bloom: a stable crystal cluster where geometric logic begins to settle."
+      },
+      "radiant": {
+        "name": "Radiant",
+        "description": "Radiant: multi-dimensional truths braid together into clear insight."
+      },
+      "legendary": {
+        "name": "Legendary",
+        "description": "Legendary: time has weight now — cold like crystal outside, warm like current within."
+      }
+    }
+  },
+  "KnowledgeDetailPage": {
+    "header": {
+      "title": "Knowledge crystal"
+    },
+    "fallbacks": {
+      "unknownMember": "unknown member"
+    },
+    "states": {
+      "notFound": {
+        "title": "Knowledge crystal not found",
+        "description": "This crystal may not have settled yet, or it may have been removed."
+      }
+    },
+    "meta": {
+      "citationCount": "Cited {count} times",
+      "heat": "Heat {label} {score}°",
+      "crystallizedDaysAgo": "Crystallized {count} days ago"
+    },
+    "sections": {
+      "timeline": "Version timeline",
+      "sourceCircle": "Source circle",
+      "citationLineage": "Citation lineage"
+    },
+    "heat": {
+      "active": "Active",
+      "cooling": "Cooling",
+      "frozen": "Frozen"
+    },
+    "timeline": {
+      "systemActor": "System",
+      "eventTitle": {
+        "contributorsUpdated": "Contribution ledger updated · {actor}",
+        "initialCrystal": "Crystal submitted · {actor}"
+      },
+      "detail": {
+        "contributors": "{count} contributors",
+        "initialPublish": "Initial publish"
+      },
+      "fallback": {
+        "initialTitle": "Initial crystallization",
+        "currentTitle": "Current version",
+        "currentDetail": "Current readable version"
+      },
+      "hint": {
+        "recorded": "This timeline is assembled from recorded version events.",
+        "partial": "Right now we show the first crystallization and the latest version. Intermediate changes are not expanded yet.",
+        "initialOnly": "This is still the initial version."
+      },
+      "currentBadge": "Current"
+    },
+    "errors": {
+      "fetchDraftReferenceLinks": "We couldn't load the draft reference entries.",
+      "fetchFormalOutput": "We couldn't load the formal CrystalOutput."
+    },
+    "formalOutput": {
+      "label": "Formal crystallization output",
+      "status": {
+        "loading": "Loading",
+        "error": "Temporarily unavailable",
+        "unavailable": "Not readable yet"
+      },
+      "loadingMessage": "Loading the formal CrystalOutput…",
+      "emptyMessage": "There is no consumable formal CrystalOutput yet, so this page does not pretend the contribution ledger is the final contract."
+    },
+    "contributors": {
+      "title": "Contributors ({count})",
+      "roles": {
+        "author": "Author",
+        "discussant": "Discussant",
+        "reviewer": "Reviewer",
+        "cited": "Cited contributor",
+        "unknown": "Contributor"
+      }
+    },
+    "lineage": {
+      "sourceTypeLabel": "Source type",
+      "sourceTypes": {
+        "snapshot": "Discussion anchor snapshot",
+        "settlementFallback": "Settlement replay fallback",
+        "unlabeled": "Unlabeled"
+      },
+      "rows": {
+        "sourceDraft": "Source draft",
+        "discussionAnchor": "Discussion anchor",
+        "summaryHash": "Summary fingerprint",
+        "messageDigest": "Message digest"
+      }
+    },
+    "summaryLink": {
+      "title": "Open circle summary",
+      "withDraft": "Open the summary view for this conclusion with draft #{draftPostId} →",
+      "default": "Start from the circle's settled summary view →",
+      "referencesLoading": "Loading draft reference entries from the formal citation surface…",
+      "referencesReady": "Loaded {totalCount} formal reference entries across {sourceBlockCount} source blocks.",
+      "referencesEmpty": "There are no formal DraftReferenceLink entries yet."
+    },
+    "sourceCircle": {
+      "open": "Open circle →"
+    },
+    "citations": {
+      "referencesTitle": "This crystal cites",
+      "referencesEmpty": "This crystal doesn't cite any others yet.",
+      "citedByTitle": "Cites this crystal",
+      "citedByEmpty": "Nothing upstream cites this crystal yet.",
+      "entryMeta": "{circleName} · Heat {heatLabel} {heatScore}° · Cited {citationCount}"
+    }
+  },
+  "KnowledgeDiscussionPanel": {
+    "fallbackSummary": "This crystal has already settled. The thread below should stay focused on its claims, derivation and impact.",
+    "errors": {
+      "loadThread": "The topic thread is temporarily unavailable. Please try again later.",
+      "connectWalletFirst": "Connect your wallet first.",
+      "permissionDenied": "This session can't post here right now. Reconnect your wallet or rejoin the source circle and try again.",
+      "postFailed": "We couldn't post this floor right now. Please try again later."
+    },
+    "title": "Topic thread",
+    "lead": "This crystal acts as the topic post. The replies below should only extend, challenge or annotate the knowledge itself.",
+    "topic": {
+      "kicker": "Topic post",
+      "rule": "Unlike the fast-moving Plaza chat, this space should hold arguments, objections and annotations worth revisiting."
+    },
+    "states": {
+      "membershipLoading": {
+        "title": "Checking access",
+        "description": "Only active members of the source circle can view this crystal's topic thread."
+      },
+      "locked": {
+        "title": "Topic thread locked",
+        "description": "Join the source circle to read or contribute to this crystal's thread."
+      },
+      "threadLoading": {
+        "title": "Opening the floors",
+        "description": "We're unfolding the discussion around this crystal into a readable thread."
+      },
+      "unavailable": {
+        "title": "Thread unavailable"
+      },
+      "empty": {
+        "description": "No one has left a floor yet. The first reply should add a derivation, raise an objection, or record a new judgment that surfaced when this crystal was used later."
+      }
+    },
+    "message": {
+      "floorLabel": "floor",
+      "unknownAuthor": "unknown"
+    },
+    "composer": {
+      "title": "Add the next floor",
+      "hint": "Add an annotation, challenge, derivation or citation path here instead of casual chat.",
+      "placeholder": "For example: how is this crystal being interpreted in a new circle, and which assumptions still need support?",
+      "walletRequired": "Connect your wallet before you leave a floor.",
+      "boundHint": "This reply is attached to the current crystal and carries its own heat."
+    },
+    "actions": {
+      "connectWallet": "Connect wallet",
+      "posting": "Posting…",
+      "submit": "Add this floor"
+    }
+  },
+  "KnowledgeCitationPanel": {
+    "title": "Cite this crystal",
+    "lead": "Manage or supplement citations for this already crystallized knowledge item by choosing one of your other crystals.",
+    "target": {
+      "label": "Current target"
+    },
+    "errors": {
+      "sourceNotFound": "No usable citation source was found. Refresh and try again.",
+      "engineUnavailable": "The citation engine is not available in this environment, so we can't submit an on-chain citation.",
+      "submitFailed": "We couldn't submit the citation. Please try again later."
+    },
+    "status": {
+      "submitted": "Citation submitted. Indexing will update counts and notifications shortly. tx: {signature}..."
+    },
+    "states": {
+      "loading": {
+        "title": "Loading your crystals",
+        "description": "Citation sources are chosen from the knowledge crystals you have already settled so you can supplement this crystallized result."
+      },
+      "error": {
+        "title": "We couldn't load your crystals right now",
+        "description": "Make sure your current session is signed in, then try again."
+      },
+      "empty": {
+        "title": "No citation source yet",
+        "description": "You need at least one other crystal before you can cite this one."
+      }
+    },
+    "sourceList": {
+      "ariaLabel": "Available citation sources",
+      "unassignedCircle": "No circle assigned",
+      "heat": "Heat {label} {score}°",
+      "citations": "Cited {count}"
+    },
+    "footer": {
+      "connectHint": "Connect your wallet to submit an on-chain citation.",
+      "defaultHint": "This panel manages formal citations for an already crystallized result. Citations use a real on-chain transaction, then the indexer writes the result back."
+    },
+    "actions": {
+      "connectWallet": "Connect wallet",
+      "submitting": "Submitting…",
+      "submit": "Submit citation"
+    },
+    "heat": {
+      "active": "Active",
+      "cooling": "Cooling",
+      "frozen": "Frozen"
+    }
+  },
+  "KnowledgeVersionDiffPanel": {
+    "title": "Version compare",
+    "subtitle": "For now this panel shows a structured compare built from version events rather than inventing historical body snapshots.",
+    "controls": {
+      "fromVersion": "From version",
+      "toVersion": "To version"
+    },
+    "states": {
+      "notEnoughVersions": "There aren't enough version points to compare yet.",
+      "loading": "Loading version diff…",
+      "error": "Version diff is temporarily unavailable: {message}",
+      "noDiff": "The currently selected versions do not have a readable diff yet.",
+      "noFieldChanges": "There are no readable differences between these two versions."
+    },
+    "notes": {
+      "metadataOnly": "Historical body snapshots are not stored yet, so this panel prioritizes event metadata differences. If one side happens to be the current version, the current readable title, description and content hash are included."
+    },
+    "snapshot": {
+      "eventType": "Event type: {value}",
+      "actor": "Actor: {value}",
+      "eventAt": "Event time: {value}",
+      "contentSnapshot": "Body snapshot: {value}",
+      "system": "System",
+      "readable": "Readable",
+      "unreadable": "Unreadable"
+    },
+    "labels": {
+      "from": "From",
+      "to": "To"
+    }
+  },
+  "DiscussionDiagnosticsPage": {
+    "title": "Discussion diagnostics",
+    "subtitle": "This is the full discussion AI debug view: not just the result, but also the input, runtime, output, decision path and failure state.",
+    "errors": {
+      "authentication_required": "Sign in with an account that has management access to this circle before loading diagnostics.",
+      "private_sidecar_required": "This diagnostics route only works on a private sidecar node. Make sure you're connected to the private diagnostics node.",
+      "discussion_message_not_found": "We couldn't find that message, or you don't manage this circle.",
+      "discussion_trigger_not_found": "This circle does not have any trigger runs yet.",
+      "discussion_analysis_diagnostics_failed": "We couldn't load the message analysis snapshot. Check query-api logs and your current sign-in state.",
+      "discussion_summary_diagnostics_failed": "We couldn't load the discussion summary snapshot. Check the summary route, cache and current sign-in state.",
+      "discussion_trigger_diagnostics_failed": "We couldn't load the trigger snapshot. Check ghost_runs and the related worker logs.",
+      "discussion_analysis_reanalyze_failed": "We couldn't requeue this analysis. Check permissions, node type and worker status.",
+      "invalidCircleId": "Enter a valid circle id."
+    },
+    "controls": {
+      "circleId": "Circle ID",
+      "circlePlaceholder": "Enter a circle id to load recent messages",
+      "envelopeId": "Envelope ID",
+      "envelopePlaceholder": "Enter a discussion envelope id"
+    },
+    "actions": {
+      "loadingMessages": "Loading…",
+      "loadRecentMessages": "Load recent messages",
+      "loadingAnalysis": "Loading…",
+      "loadAnalysis": "Load analysis snapshot",
+      "reanalyzing": "Requeueing…",
+      "reanalyze": "Requeue analysis"
+    },
+    "status": {
+      "reanalyzeQueued": "Requeued: job #{jobId} ({status})"
+    },
+    "sample": {
+      "title": "Current sample",
+      "emptyMessage": "[empty message]",
+      "currentBadge": "Current sample"
+    },
+    "recentMessages": {
+      "title": "Recent messages",
+      "deleted": "deleted"
+    },
+    "keyDiagnosticsTitle": "Key diagnostics",
+    "blocks": {
+      "input": "Input",
+      "runtime": "Runtime",
+      "output": "Output",
+      "decision": "Decision",
+      "failure": "Failure"
+    },
+    "metrics": {
+      "status": "Status",
+      "actualMode": "Actual mode",
+      "focusLabel": "Focus label",
+      "semanticScore": "Semantic score",
+      "embedding": "Embedding",
+      "featured": "Featured"
+    },
+    "sections": {
+      "analysis": {
+        "title": "Message analysis",
+        "scope": "message-scoped"
+      },
+      "summary": {
+        "title": "Discussion summary",
+        "scope": "circle-scoped"
+      },
+      "trigger": {
+        "title": "Trigger",
+        "scope": "circle-scoped"
+      },
+      "ghostDraft": {
+        "title": "Ghost draft",
+        "scope": "draft-scoped"
+      },
+      "humanOverrides": {
+        "title": "Human overrides",
+        "scope": "message-scoped"
+      }
+    },
+    "analysis": {
+      "topicProfileLabel": "Topic profile",
+      "decision": {
+        "offTopic": "Marked off-topic because the semantic score stayed below the focus threshold.",
+        "focused": "Marked focused because both semantic and focus signals cleared the focused threshold.",
+        "contextual": "Marked contextual because the message stayed inside topic context but did not clear the focused threshold."
+      },
+      "errorLabel": "Error details",
+      "rawJsonTitle": "View raw analysis JSON"
+    },
+    "summary": {
+      "metrics": {
+        "method": "Method",
+        "cache": "Cache",
+        "inputFidelity": "Input fidelity",
+        "model": "Model"
+      },
+      "cacheHit": "cache hit",
+      "cacheMiss": "cache miss",
+      "ruleBased": "rule-based",
+      "notLoaded": "summary diagnostics not loaded yet",
+      "decision": {
+        "cacheHit": "The summary came from cache.",
+        "cacheMiss": "The summary was generated from the current window.",
+        "currentConfig": "The summary was generated under the current config ({source}).",
+        "cachedVsCurrentConfig": "The cached summary was generated under {cachedSource}, while the current config is {currentSource}.",
+        "exactFidelity": "The source window exactly matches the cached summary input.",
+        "metadataOnlyFidelity": "Only the current window is available. The cached summary came from an older payload without exact source messages."
+      },
+      "rawJsonTitle": "View raw summary JSON"
+    },
+    "trigger": {
+      "metrics": {
+        "status": "Status",
+        "reason": "Reason",
+        "summaryMethod": "Summary method",
+        "messageCount": "Window messages"
+      },
+      "notLoaded": "trigger diagnostics not loaded yet",
+      "decision": {
+        "scopeNotice": "Circle trigger diagnostics are circle-scoped. The selected message only helps you compare whether it appears in windowEnvelopeIds."
+      },
+      "rawJsonTitle": "View raw trigger JSON"
+    },
+    "ghostDraft": {
+      "notConnected": "ghost draft diagnostics route will be connected in Task 4",
+      "failure": "ghost draft generation diagnostics are not wired yet in this batch"
+    },
+    "humanOverrides": {
+      "notConnected": "admin-only override surface will land in Task 6",
+      "currentRule": "Historical authorAnnotations are legacy display-only; admin overrides are not wired yet.",
+      "failure": "The human override governance surface is not available in this batch."
+    }
+  },
+  "CrystalDemoPage": {
+    "title": "Crystal visual prototype",
+    "subtitle": "Each crystal is driven by eight knowledge parameters, and every render stays deterministic.",
+    "loading": "Loading 3D…",
+    "parameters": {
+      "title": "Visual parameters",
+      "hue": "hue",
+      "clarity": "clarity",
+      "facets": "facets",
+      "texture": "texture",
+      "radiance": "radiance",
+      "patina": "patina",
+      "warmth": "warmth"
+    },
+    "variants": {
+      "title": "All variants"
+    },
+    "presets": {
+      "gold": {
+        "label": "🥇 Gold · young crystal",
+        "circleName": "Blockchain philosophy"
+      },
+      "sapphire": {
+        "label": "💎 Sapphire · mature crystal",
+        "circleName": "DeFi research"
+      },
+      "amethyst": {
+        "label": "🔮 Amethyst · enduring classic",
+        "circleName": "Cryptography fundamentals"
+      },
+      "jade": {
+        "label": "🌿 Jade · still under discussion",
+        "circleName": "Solana ecosystem"
+      }
+    }
+  },
+  "FeedThreadSheet": {
+    "header": {
+      "eyebrow": "Feed thread",
+      "title": "Replies around this post",
+      "closeAria": "Close feed thread"
+    },
+    "states": {
+      "noBody": "(No text)",
+      "empty": "Leave the first reply to keep this post moving."
+    },
+    "thread": {
+      "replyCount": "{count} replies",
+      "noReplies": "No replies yet"
+    },
+    "composer": {
+      "placeholder": "Write your reply…",
+      "disabledPlaceholder": "Connect your wallet to reply",
+      "helper": "Replies are saved into this post's thread.",
+      "readOnly": "You can only browse replies right now."
+    },
+    "actions": {
+      "sending": "Sending…",
+      "sendReply": "Send reply"
+    }
+  },
+  "AccessProgressBar": {
+    "states": {
+      "topTier": "You're already at the top tier"
+    },
+    "progress": {
+      "crystals": "{currentCrystals}/{nextTierCrystals} crystals",
+      "remaining": "{remaining} more to enter “{nextTierName}”"
+    }
+  },
+  "IdentityBadge": {
+    "labels": {
+      "visitor": "Visitor",
+      "initiate": "Participant",
+      "member": "Member",
+      "curator": "Curator",
+      "owner": "Founder"
+    }
+  },
+  "DraftCandidateInlineCard": {
+    "states": {
+      "open": {
+        "label": "Candidate",
+        "title": "This discussion has been identified as a draft candidate",
+        "hint": "The candidate is ready. Circle managers can review the source discussion and create a formal draft."
+      },
+      "proposal_active": {
+        "label": "Proposal active",
+        "title": "The draft-generation proposal is in progress",
+        "hint": "The candidate is moving through governance. A draft link will appear only after generation completes."
+      },
+      "accepted": {
+        "label": "Generated",
+        "title": "The candidate draft has become a real draft"
+      },
+      "generation_failed": {
+        "label": "Generation failed",
+        "title": "Draft generation did not complete"
+      },
+      "rejected": {
+        "label": "Rejected",
+        "title": "The draft-generation proposal was rejected"
+      },
+      "expired": {
+        "label": "Expired",
+        "title": "The draft-generation proposal expired"
+      },
+      "cancelled": {
+        "label": "Cancelled",
+        "title": "The draft-generation flow was cancelled"
+      },
+      "default": {
+        "label": "Candidate status",
+        "title": "Draft candidate status update"
+      }
+    },
+    "semanticFacets": {
+      "fact": "Fact",
+      "explanation": "Explanation",
+      "emotion": "Emotion",
+      "question": "Question",
+      "problem": "Problem",
+      "criteria": "Criteria",
+      "proposal": "Proposal",
+      "summary": "Summary"
+    },
+    "meta": {
+      "sourceMessages": "{count} source messages",
+      "authorAnnotation": "Author intent · {label}"
+    },
+    "errors": {
+      "failureReason": "Failure reason: {error}"
+    },
+    "recovery": {
+      "summary": "Governance recovery: {action}.",
+      "reusePassedProposal": "retry with an approved proposal",
+      "reproposalRequired": "create a new proposal before retrying"
+    },
+    "actions": {
+      "viewSource": "View source",
+      "createDraft": "Create draft",
+      "createDraftBusy": "Creating…",
+      "expandDetails": "Show details",
+      "collapseDetails": "Hide details",
+      "openDraft": "Open draft",
+      "retry": "Retry",
+      "cancel": "Cancel",
+      "retryTitle": "Retry this generation",
+      "retryDisabledTitle": "Retry permission is governed by policy",
+      "cancelTitle": "Cancel this candidate flow",
+      "cancelDisabledTitle": "Cancel permission is governed by policy"
+    }
+  },
+  "PlazaTab": {
+    "actions": {
+      "forward": "Forward"
+    },
+    "levels": {
+      "Visitor": "Visitor",
+      "Initiate": "Initiate",
+      "Member": "Member",
+      "Elder": "Elder"
+    },
+    "semanticFacets": {
+      "fact": "Fact",
+      "explanation": "Explanation",
+      "emotion": "Emotion",
+      "question": "Question",
+      "problem": "Problem",
+      "criteria": "Criteria",
+      "proposal": "Proposal",
+      "summary": "Summary"
+    },
+    "time": {
+      "justNow": "just now"
+    },
+    "filters": {
+      "title": "Filters",
+      "scopeLabel": "Scope",
+      "contentLabel": "Content",
+      "scope": {
+        "all": "All",
+        "focused": "Focused",
+        "mine": "Mine"
+      }
+    },
+    "states": {
+      "visitor": "Visitor",
+      "initiate": "Initiate",
+      "member": "Member",
+      "curator": "Curator",
+      "owner": "Owner",
+      "syncing": "Syncing discussion…",
+      "hiddenNoiseCount": "{count} low-signal messages hidden",
+      "sending": "Sending…"
+    },
+    "messages": {
+      "deleted": "[message deleted]",
+      "deletedVisibleToSender": "This message was deleted (visible to the sender).",
+      "ephemeral": "Ephemeral message · fades after 24h",
+      "offTopicReveal": "Off topic · tap to view",
+      "authorAnnotations": "Author annotation: {labels}"
+    },
+    "reply": {
+      "emptyBody": "Message body is empty",
+      "quoted": "↪ Reply to @{author}: {preview}\n{body}",
+      "banner": "Replying to @{author}",
+      "cancelAria": "Cancel reply"
+    },
+    "composer": {
+      "identityHint": "Posting as {stateLabel} · {hint}",
+      "identityHintOpenAria": "Show posting identity hint",
+      "replyPlaceholder": "Reply to @{author}…",
+      "placeholderJoined": "Share something in the plaza…",
+      "placeholderEphemeral": "Send an ephemeral message (won’t enter the formal archive)…",
+      "placeholderDisconnected": "Connect your wallet to send messages",
+      "sendAria": "Send",
+      "moreAria": "More actions",
+      "actions": {
+        "emoji": "Emoji",
+        "attachments": "Files soon",
+        "attachmentsUnavailable": "Discussion file uploads are not available yet",
+        "mention": "Mention"
+      },
+      "authorAnnotations": {
+        "title": "Author annotations",
+        "clear": "Clear",
+        "hint": "These annotations reflect the author’s intent only. System filtering follows backend semantic analysis."
+      }
+    },
+    "errors": {
+      "walletRequired": "Connect your wallet before sending a message.",
+      "syncFailed": "Could not sync discussion messages.",
+      "loadFailed": "Could not load discussion messages.",
+      "sendFailed": "Message failed to send.",
+      "forwardFailed": "Forwarding failed.",
+      "deleteFailed": "Could not delete the message."
+    },
+    "status": {
+      "forwardedToCircle": "Forwarded to {circleName}. Waiting for the target circle to sync it.",
+      "localDeleteOnly": "Wallet not connected, so this delete is only marked locally."
+    },
+    "candidate": {
+      "avatar": "✦",
+      "retryDenied": "Candidate {candidateId} cannot be retried under the current policy.",
+      "proposalId": " proposal {proposalId}.",
+      "currentProposal": " the current proposal.",
+      "retryReusePassedProposal": "Retry will reuse{proposalHint}",
+      "retryNeedsNewProposal": "Retry needs a new proposal instead of{proposalHint}",
+      "createDenied": "Candidate {candidateId} needs a circle manager to create the formal draft.",
+      "createSucceeded": "Candidate {candidateId} is now a formal draft.",
+      "createExistingDraft": "Candidate {candidateId} already has a formal draft.",
+      "createNotReady": "Candidate {candidateId} is not ready to generate a formal draft yet.",
+      "createMissingSources": "Candidate {candidateId} is missing source messages, so a draft cannot be created yet.",
+      "cancelDenied": "Candidate {candidateId} cannot be canceled under the current policy.",
+      "relatedProposal": " Related proposal {proposalId}.",
+      "cancelAvailable": "Candidate {candidateId} can be canceled now.{proposalHint}",
+      "sourceUnavailable": "This candidate does not have source messages you can jump to yet.",
+      "sourceFocused": "Jumped to the source discussion for candidate {candidateId}.",
+      "systemTag": "System",
+      "persistedNotice": "Persisted notice"
+    },
+    "forward": {
+      "cardLabel": "Forward card",
+      "sourceCircleFallback": "Source circle",
+      "sourceLevel": "Level {level}",
+      "unknownSourceAuthor": "unknown",
+      "forwardedBy": "Forwarded by @{handle}",
+      "viewSource": "View source",
+      "sourceDeleted": "Original message deleted",
+      "reason": {
+        "viewerNotJoined": "Join the circle before forwarding messages.",
+        "missingEnvelopeId": "This message does not have a stable forwarding ID yet.",
+        "deleted": "Deleted messages cannot be forwarded.",
+        "ephemeral": "Ephemeral messages do not enter the formal archive, so they cannot be forwarded.",
+        "forwardCard": "Forward cards cannot be forwarded again. Go back to the original message to forward it.",
+        "noTargets": "There are no eligible destination circles right now."
+      }
+    },
+    "auxShortcut": {
+      "crystals": " · {count} crystals"
+    }
+  },
+  "AccessGate": {
+    "description": "You need at least <strong>{required}</strong> crystals to enter this tier.",
+    "actions": {
+      "dismiss": "Got it"
+    }
+  },
+  "CirclePicker": {
+    "title": "Forward to",
+    "hint": "{count} messages selected · only eligible target circles are shown",
+    "meta": {
+      "level": "Level {level}"
+    },
+    "actions": {
+      "cancel": "Cancel"
+    }
+  },
+  "ChatRecordBubble": {
+    "source": "Chat record from {circle}",
+    "more": "{count} more messages…",
+    "count": "{count} messages total",
+    "actions": {
+      "viewAll": "View all →"
+    }
+  },
+  "NotificationPanel": {
+    "title": "Notifications",
+    "empty": "No notifications yet",
+    "actions": {
+      "markAllRead": "Mark all as read"
+    }
+  },
+  "TierPill": {
+    "hint": "← Swipe to switch →",
+    "meta": {
+      "level": "Level {level}",
+      "childLevel": "Level {parentLevel}.{childLevel}"
+    },
+    "actions": {
+      "createCircle": "Create circle"
+    }
+  },
+  "CollaborativeEditor": {
+    "placeholder": "Start writing the draft…",
+    "toolbar": {
+      "bold": "Bold",
+      "italic": "Italic",
+      "strike": "Strikethrough",
+      "heading": "Heading",
+      "subheading": "Subheading",
+      "bulletList": "Bulleted list",
+      "orderedList": "Numbered list",
+      "blockquote": "Quote",
+      "codeBlock": "Code block",
+      "highlight": "Highlight"
+    }
+  },
+  "CrucibleEditor": {
+    "fallback": {
+      "untitledDraft": "Untitled draft",
+      "emptyParagraph": "This paragraph does not have body text yet."
+    },
+    "anchorStatus": {
+      "anchored": "Anchored",
+      "failed": "Anchor failed",
+      "skipped": "Anchor skipped",
+      "syncing": "Anchoring…",
+      "idle": "Waiting to connect"
+    },
+    "errors": {
+      "applyAcceptedIssues": "Failed to apply accepted issues.",
+      "requestTemporaryGrant": "Failed to request temporary edit access.",
+      "issueTemporaryGrant": "Failed to approve temporary access.",
+      "revokeTemporaryGrant": "Failed to revoke temporary access."
+    },
+    "blocks": {
+      "title": "Paragraph {index}",
+      "typeLabel": "Paragraph block",
+      "statusLabel": "Ready for refinement",
+      "editabilityEditable": "Body editable",
+      "editabilityReadOnly": "Read-only",
+      "editabilityLocked": "Body locked",
+      "sourceVersion": "V{version}",
+      "statusLocked": "Locked",
+      "statusResolved": "Resolved",
+      "statusAcceptedPending": "Accepted, waiting to apply",
+      "statusInReview": "In review",
+      "statusSubmitted": "Submitted",
+      "statusReadyForMoreEdits": "Ready for more edits",
+      "editabilitySelected": "Selected"
+    },
+    "heat": {
+      "active": "Active",
+      "cooling": "Cooling",
+      "frozen": "Frozen"
+    },
+    "meta": {
+      "onlineCount": "{count} online",
+      "editCount": "{count} edits",
+      "contributorCount": "{count} contributors",
+      "commentCount": "{count} comments",
+      "issueCount": "{count} issues"
+    },
+    "actions": {
+      "completeEditingResolve": "Finish editing and resolve {count} issues",
+      "completeEditing": "Finish editing",
+      "editing": "Editing…",
+      "editParagraph": "Edit paragraph",
+      "viewDiscussion": "View discussion",
+      "submitting": "Submitting…",
+      "requestTemporaryGrant": "Request temporary access",
+      "processing": "Processing…",
+      "issueTemporaryGrant": "Issue temporary access",
+      "revokeTemporaryGrant": "Revoke temporary access",
+      "completing": "Finishing…",
+      "send": "Send"
+    },
+    "temporaryGrant": {
+      "title": "Temporary edit access",
+      "hint": "This paragraph is not directly editable right now. Use a temporary grant to enter its revision flow.",
+      "requested": "You already requested temporary access for this paragraph and it is waiting for approval.",
+      "managerRequested": "A temporary access request is waiting for approval for this paragraph.",
+      "managerActive": "A temporary access grant is active for this paragraph."
+    },
+    "issueCarry": {
+      "title": "This paragraph has accepted issues you can resolve during this edit",
+      "hint": "When you finish editing, every checked issue will be written into this paragraph’s application record so the resolution chain stays traceable. If this paragraph just used an issue-thread revision, the related issues will start preselected and you can still deselect them."
+    },
+    "placeholders": {
+      "continueParagraph": "Continue refining {title}…"
+    },
+    "readOnly": {
+      "editorDisconnected": "The collaborative editor is offline right now, so paragraph editing is temporarily unavailable.",
+      "commentLocked": "🔒 You need participant access or above to leave comments.",
+      "contentLocked": "🔒 Your current role can only view the body and cannot edit paragraphs directly."
+    },
+    "comments": {
+      "title": "Comments for paragraph {index}",
+      "empty": "There are no comments on this paragraph yet.",
+      "placeholder": "Leave a comment on this paragraph…"
+    }
+  },
+  "IdentityOnboardingProvider": {
+    "errors": {
+      "sessionConfirmation": "We could not confirm your identity state. Please try again.",
+      "invalidSignature": "Wallet signature verification failed. Please try again."
+    }
+  },
+  "AgentAdminPanel": {
+    "title": "Agent governance and audit",
+    "subtitle": "Review the current agent registry and set governance boundaries for automatic triggers, discounts and review thresholds.",
+    "ownerOnly": "Only the circle owner can edit this",
+    "sections": {
+      "registeredAgents": "Registered agents",
+      "policy": "Agent policy"
+    },
+    "states": {
+      "loading": "Loading the agent registry…",
+      "empty": "No agents are registered in this circle yet."
+    },
+    "fields": {
+      "triggerScope": {
+        "label": "Agent trigger scope",
+        "options": {
+          "disabled": "Disabled",
+          "draftOnly": "Draft only",
+          "circleWide": "Circle-wide"
+        }
+      },
+      "costDiscount": {
+        "label": "Cost discount (bps)",
+        "aria": "Agent discount"
+      },
+      "reviewMode": {
+        "label": "Review threshold",
+        "aria": "Agent review threshold",
+        "options": {
+          "ownerReview": "Owner review",
+          "adminReview": "Admin review",
+          "selfServe": "Self-serve"
+        }
+      }
+    },
+    "auditNote": "Trigger scope decides whether agents can participate in circle-level automation, discount governs cost policy, and review threshold decides whether Owner/Admin approval is required.",
+    "actions": {
+      "saving": "Saving…",
+      "save": "Save agent policy"
+    }
+  },
+  "CircleSettingsSheet": {
+    "header": {
+      "title": "{circleName} · Settings"
+    },
+    "sections": {
+      "basicInfo": "Basic info",
+      "permissions": "Permissions",
+      "aiCollab": "AI collaboration",
+      "dangerZone": "Danger zone"
+    },
+    "basic": {
+      "modeLabel": "Mode",
+      "modeSocial": "🌐 Social mode",
+      "modeKnowledge": "📚 Knowledge mode",
+      "accessLabel": "Access",
+      "accessFree": "🌍 Open",
+      "accessCrystal": "💎 ≥{count} crystals",
+      "accessInvite": "🔒 Invite only"
+    },
+    "permissions": {
+      "forwardTitle": "Allow forwarding out",
+      "forwardDescription": "Members can forward messages to other circles."
+    },
+    "common": {
+      "collapse": "Collapse",
+      "expand": "Click to view"
+    },
+    "identityRules": {
+      "title": "Circle identity rules",
+      "lead": "Members need an identity and must join the circle before speaking formally.",
+      "initiateStep": "Guest → Initiate",
+      "initiateText": "Become an initiate after sending {count} messages.",
+      "memberStep": "Initiate → Member",
+      "memberText": "Become a member after receiving {count} citations.",
+      "elderStep": "Member → Elder",
+      "elderText": "Reach the top {percentile}% of circle reputation to become an elder.",
+      "footnote": "Identity can decay after {count} days of inactivity."
+    },
+    "draftLifecycle": {
+      "title": "Draft workflow settings",
+      "reviewEntryLabel": "How review begins",
+      "reviewEntry": {
+        "autoOnly": "Auto end",
+        "manualOnly": "Manual end",
+        "autoOrManual": "Both allowed"
+      },
+      "help": {
+        "autoOnly": "Body editing ends automatically when the timer expires and moves into issue review.",
+        "manualOnly": "Only authorized members can end body editing manually and enter issue review.",
+        "autoOrManual": "Review starts automatically on timeout, but it can also be ended manually earlier."
+      },
+      "autoReviewTimeLabel": "Auto-enter review after",
+      "autoReviewTimeHint": "When the timer ends, body editing switches into issue review.",
+      "reviewWindowLabel": "Review stage length",
+      "reviewWindowHint": "When the timer ends, the round is considered complete and waits for the next revision or crystallization.",
+      "maxRoundsLabel": "Maximum revision rounds",
+      "save": "Save draft workflow settings"
+    },
+    "draftWorkflow": {
+      "title": "Issue and stage permissions",
+      "createIssue": "Who can submit issues",
+      "followupIssue": "Who can add follow-ups",
+      "reviewIssue": "Who can review issues",
+      "retagIssue": "Who can change issue type",
+      "applyIssue": "Who can confirm resolution",
+      "manualEndDrafting": "Who can end editing",
+      "advanceFromReview": "Who can end this review round",
+      "enterCrystallization": "Who can enter crystallization",
+      "allowAuthorWithdraw": "Authors can withdraw before review",
+      "allowModeratorRetag": "Reviewers can retag issue type",
+      "save": "Save issue and stage permissions"
+    },
+    "ghost": {
+      "source": {
+        "circle": "Current: circle-specific override",
+        "pending": "Current: pending override (goes live once the circle is indexed)",
+        "globalDefault": "Current: inherited global default"
+      },
+      "loading": "Loading configuration…",
+      "summaryUseLlmTitle": "Use AI to generate discussion summaries",
+      "summaryUseLlmDescription": "When enabled, the system will organize the recent discussion into a short summary.",
+      "summaryUseLlmWarning": "When disabled, the system falls back to rule-based summaries, which may be less accurate.",
+      "triggerModeLabel": "What to do after a trigger",
+      "triggerModeHint": "Once the system decides the discussion is ready to enter the draft workflow, should it only notify or create a draft immediately?",
+      "triggerModeNotifyOnly": "Notify only",
+      "triggerModeAutoDraft": "Create draft automatically",
+      "triggerSummaryUseLlmTitle": "Use AI to help decide whether to trigger a draft",
+      "triggerSummaryUseLlmDescription": "When enabled, the system first organizes the recent discussion, then uses AI to help decide whether it should enter the draft workflow.",
+      "triggerSummaryUseLlmWarning": "When disabled, the system falls back to rule-based trigger checks, which may be less accurate.",
+      "save": "Save AI settings"
+    },
+    "roleOptions": {
+      "initiate": "Initiate",
+      "member": "Member",
+      "elder": "Elder",
+      "moderator": "Moderator",
+      "admin": "Admin",
+      "owner": "Owner"
+    },
+    "memberRoles": {
+      "owner": "Owner",
+      "curator": "Curator",
+      "member": "Member"
+    },
+    "members": {
+      "directoryTitle": "Member directory",
+      "title": "Members ({count})",
+        "actions": {
+          "setCurator": "Make curator",
+          "unsetCurator": "Remove curator role",
+          "remove": "Remove member",
+          "invite": "Invite members",
+          "leave": "Leave circle"
+        }
+      },
+    "danger": {
+      "deleteCircle": "Dissolve this circle"
+    },
+    "errors": {
+      "roleChange": "Role update failed. Please try again.",
+      "removeMember": "Removing the member failed. Please try again.",
+      "leaveCircle": "Leaving the circle failed. Please try again."
+    },
+    "actions": {
+      "saving": "Saving…"
+    },
+    "units": {
+      "minutes": "minutes"
+    },
+    "reviewEntry": {
+      "help": {
+        "autoOnly": "Body editing ends automatically when the timer expires and the draft moves into issue review.",
+        "manualOnly": "Only authorized members can end body editing manually and enter issue review.",
+        "autoOrManual": "Review starts automatically on timeout, but it can also be ended manually earlier."
+      }
+    }
+  },
+  "CrystalDetailSheet": {
+    "errors": {
+      "loadFormalOutput": "Failed to load the formal CrystalOutput."
+    },
+    "roles": {
+      "author": "Author",
+      "discussant": "Discussant",
+      "reviewer": "Reviewer",
+      "cited": "Cited contributor",
+      "unknown": "Contributor"
+    },
+    "lineage": {
+      "sourceDraft": "Source draft",
+      "discussionAnchor": "Discussion anchor",
+      "summaryHash": "Summary hash",
+      "messagesDigest": "Messages digest",
+      "sourceType": "Source type",
+      "snapshotSource": "Discussion anchor snapshot",
+      "settlementFallback": "Settlement replay (fallback)",
+      "unlabeled": "Unlabeled"
+    },
+    "patina": {
+      "ancient": "🏛 Classic",
+      "settling": "📜 Settling",
+      "fresh": "✨ Fresh crystal"
+    },
+    "meta": {
+      "citedBy": "Cited {count} times",
+      "ageDays": "Crystallized {count} days ago"
+    },
+    "formalOutput": {
+      "label": "Formal crystal result",
+      "loading": "Loading",
+      "unavailable": "Unavailable",
+      "pending": "Not ready yet",
+      "loadingBody": "Loading the formal CrystalOutput…",
+      "pendingBody": "There is no consumable formal CrystalOutput yet, so this panel does not treat the inferred contribution ledger as the result contract."
+    },
+    "sections": {
+      "provenance": "Provenance",
+      "contributionLedger": "Contribution ledger"
+    },
+    "actions": {
+      "copy": "Copy",
+      "cite": "Cite",
+      "citePending": "Crystal citation is not available yet"
+    }
+  },
+  "DraftCard": {
+    "meta": {
+      "editors": "{count} editors",
+      "comments": "{count} comments"
+    }
+  },
+  "DraftDiscussionPanel": {
+    "fallback": {
+      "pendingTime": "Time pending"
+    },
+    "messages": {
+      "create": "Issue opened",
+      "followup": "Follow-up added",
+      "propose": "Resolution proposed",
+      "accept": "Resolution accepted",
+      "reject": "Resolution rejected",
+      "apply": "Resolution applied",
+      "withdraw": "Thread withdrawn",
+      "retag": "Issue retagged",
+      "update": "Updated",
+      "meta": "{authorId} · {time}",
+      "content": {
+        "retag": "Issue type was changed.",
+        "withdraw": "This thread was withdrawn.",
+        "accept": "The proposal was accepted.",
+        "reject": "The proposal was rejected.",
+        "apply": "The accepted change was applied to the draft.",
+        "empty": "No additional details were added.",
+        "retagWithType": "Issue type changed to {issueType}."
+      }
+    },
+    "issueTypes": {
+      "fact_correction": "Fact correction",
+      "expression_improvement": "Wording improvement",
+      "knowledge_supplement": "Knowledge supplement",
+      "question_and_supplement": "Question and supplement",
+      "fallback": "Issue"
+    },
+    "states": {
+      "open": "Submitted",
+      "proposed": "In review",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "withdrawn": "Withdrawn",
+      "applied": "Applied"
+    },
+    "targetTypes": {
+      "paragraph": "Paragraph",
+      "structure": "Structure",
+      "document": "Document"
+    },
+    "targetLabels": {
+      "paragraphNumber": "Paragraph {index}",
+      "paragraphRaw": "Paragraph · {value}",
+      "structureParagraphs": "Structure · paragraphs {values}",
+      "generic": "{type} · {value}"
+    },
+    "errors": {
+      "loadRevisionDirections": "Could not load accepted directions.",
+      "revisionSummaryRequired": "Accepted direction summary is required.",
+      "createRevisionDirection": "Could not save the accepted direction.",
+      "acceptRevisionDirection": "Could not mark the accepted direction as accepted.",
+      "rejectRevisionDirection": "Could not reject the accepted direction.",
+      "selectParagraph": "Choose a paragraph before opening this issue.",
+      "selectStructureRange": "Choose at least one paragraph for this structure issue.",
+      "createDescriptionRequired": "Describe the issue before submitting it.",
+      "createThread": "Could not create the issue thread.",
+      "followupRequired": "Write a follow-up before sending it.",
+      "reply": "Could not send the follow-up reply.",
+      "propose": "Could not submit the proposed resolution.",
+      "resolve": "Could not record the resolution decision.",
+      "withdraw": "Could not withdraw this thread.",
+      "apply": "Could not record the applied resolution."
+    },
+    "aria": {
+      "panel": "Draft discussion panel"
+    },
+    "header": {
+      "eyebrow": "Revision discussion",
+      "title": "Issues and resolutions"
+    },
+    "governance": {
+      "eyebrow": "Governance",
+      "labels": {
+        "target": "Target",
+        "actor": "Actor",
+        "audit": "Audit trail"
+      },
+      "actions": {
+        "drafting": "Revision in progress",
+        "review": "Review in progress",
+        "crystallizationActive": "Crystallization vote in progress",
+        "crystallizationFailed": "Recovering from crystallization failure",
+        "crystallized": "Crystallization complete",
+        "archived": "Archived",
+        "default": "Draft workflow in progress"
+      },
+      "values": {
+        "targetVersion": "Stable version v{version}"
+      },
+      "capabilities": {
+        "create": "Can submit issues",
+        "resolve": "Can review issues",
+        "apply": "Can apply accepted issues",
+        "crystallize": "Can enter crystallization"
+      },
+      "viewOnly": "View only",
+      "progress": {
+        "submitted": "Submitted",
+        "inReview": "In review",
+        "accepted": "Accepted",
+        "resolved": "Resolved"
+      }
+    },
+    "revisionDirections": {
+      "title": "Accepted directions",
+      "hint": "When a governance proposal passes, record the accepted direction here before applying changes to the draft.",
+      "summaryLabel": "Accepted direction",
+      "summaryPlaceholder": "Summarize what the accepted proposal requires.",
+      "acceptanceMode": {
+        "label": "Acceptance mode",
+        "managerConfirm": "Manager confirmation",
+        "roleConfirm": "Role confirmation",
+        "governanceVote": "Governance vote"
+      },
+      "status": {
+        "accepted": "Accepted",
+        "rejected": "Rejected",
+        "expired": "Expired",
+        "open": "Open"
+      },
+      "scope": {
+        "paragraph": "Paragraph {index}",
+        "document": "Whole document"
+      },
+      "submit": "Save accepted direction",
+      "acceptedTitle": "Accepted directions ready to apply",
+      "scopeMeta": "{scope} · {status} · {mode}",
+      "listTitle": "All accepted directions",
+      "governanceMeta": "Governance proposal {id}",
+      "actions": {
+        "accept": "Accept",
+        "reject": "Reject"
+      },
+      "governanceHint": "Passing the governance proposal does not edit the draft by itself. Record the accepted direction here first."
+    },
+    "create": {
+      "title": "Open a new issue",
+      "bindingHint": "This issue will be bound to stable version v{version}.",
+      "targetTypeLabel": "Target type",
+      "issueTypeLabel": "Issue type",
+      "paragraphTargetLabel": "Target paragraph",
+      "selectParagraph": "Select a paragraph",
+      "paragraphOption": "Paragraph {index} · {preview}",
+      "paragraphSelectedHint": "Issues will be attached to paragraph {index}.",
+      "paragraphSelectHint": "Pick the paragraph this issue is about.",
+      "structureLabel": "Target structure",
+      "structureHint": "Choose the paragraphs that define the structure change.",
+      "paragraphShort": "P{index}",
+      "selectedStructure": "Selected paragraphs: {values}",
+      "documentLabel": "Whole document",
+      "documentHint": "Use this when the issue affects the draft as a whole.",
+      "boundVersionLabel": "Bound stable version",
+      "boundVersionHint": "New issues opened here will target v{version}.",
+      "descriptionLabel": "Issue description",
+      "descriptionPlaceholder": "Describe the fact correction, wording change, knowledge gap, or open question.",
+      "insertCurrentReference": "Insert current file reference",
+      "submit": "Submit issue"
+    },
+    "threads": {
+      "title": "Issue threads",
+      "loading": "Loading issue threads…",
+      "empty": "No issue threads yet.",
+      "targetVersion": "v{version} · thread {id}",
+      "noMessages": "No messages in this thread yet.",
+      "evidence": {
+        "title": "Applied evidence",
+        "editAnchor": "Edit anchor: {id}",
+        "snapshotHash": "Snapshot hash: {hash}",
+        "draftVersion": "Draft version: v{version}"
+      },
+      "issueTypeLabel": "Issue type",
+      "replyPlaceholder": "Add a follow-up reply…",
+      "proposePlaceholder": "Describe the proposed resolution…",
+      "resolvePlaceholder": "Explain why this issue should be accepted or rejected…",
+      "applyPlaceholder": "Describe how the accepted resolution was applied…",
+      "actions": {
+        "reply": "Reply",
+        "withdraw": "Withdraw",
+        "propose": "Propose resolution",
+        "accept": "Accept",
+        "reject": "Reject",
+        "apply": "Apply resolution"
+      },
+      "emptySummary": "No additional context has been added to this issue yet."
+    }
+  },
+  "SeededFileTree": {
+    "aria": {
+      "section": "Seeded references"
+    },
+    "title": "Seeded references",
+    "hint": "Browse indexed files and choose a line reference to insert into the draft discussion.",
+    "currentRef": "Current reference: {reference}",
+    "loading": "Loading seeded files…",
+    "empty": "No seeded files yet.",
+    "preview": {
+      "unselected": "Select a file and a line"
+    }
+  },
+  "ReferencesPanel": {
+    "aria": {
+      "section": "References"
+    },
+    "eyebrow": "References",
+    "title": "References",
+    "hint": "Keep the draft's traceable references in one place.",
+    "formal": {
+      "title": "Formal references",
+      "hint": "Current formal knowledge references are detected from @crystal(...) markers that already exist in the draft.",
+      "insertAction": "Insert reference",
+      "loading": "Loading formal references…",
+      "empty": "There are no formal draft references yet.",
+      "summary": "{count} formal references across {sourceBlockCount} source blocks are currently visible.",
+      "note": "These entries come from @crystal(...) markers already present in the draft body. A richer draft-time picker is intentionally deferred for now."
+    },
+    "seeded": {
+      "title": "Seeded file evidence",
+      "hint": "Seeded circles can still choose file-line evidence here and insert the current @file:path:line reference into draft discussion."
+    }
+  },
+  "KnowledgeReferencePicker": {
+    "title": "Insert a reference",
+    "hint": "Pick from up to 50 already-loaded crystallized knowledge entries in this circle.",
+    "searchPlaceholder": "Search already-loaded circle knowledge",
+    "searchAriaLabel": "Search already-loaded circle knowledge",
+    "empty": "No current-circle knowledge matched this title filter.",
+    "close": "Close",
+    "version": "v{version}"
+  },
+  "CrucibleLifecycleHeader": {
+    "fallback": {
+      "notProvided": "Not provided"
+    },
+    "facets": {
+      "none": "None detected",
+      "fact": "Fact",
+      "explanation": "Explanation",
+      "emotion": "Emotion",
+      "question": "Question",
+      "problem": "Problem",
+      "criteria": "Criteria",
+      "proposal": "Proposal",
+      "summary": "Summary"
+    },
+    "annotations": {
+      "none": "None",
+      "fact": "Fact",
+      "explanation": "Explanation",
+      "emotion": "Emotion"
+    },
+    "sourceKind": {
+      "unavailable": "Source unavailable",
+      "acceptedCandidate": "Accepted candidate seed",
+      "reviewBoundSnapshot": "Review-bound snapshot",
+      "pending": "Source pending confirmation"
+    },
+    "warnings": {
+      "missingDraftSource": "The original source handoff is missing, so the draft source is shown as unavailable for now.",
+      "missingAnchorEvidence": "The current stable snapshot is missing draft-anchor evidence, so source details rely on the recorded handoff metadata.",
+      "legacyApplicationEvidence": "Some historical issue applications still rely on legacy evidence and are being normalized.",
+      "boundVersionOnly": "The current stable snapshot is still missing complete application evidence, so the bound version is shown for now.",
+      "fallback": "This draft still has one unresolved lifecycle detail."
+    },
+    "status": {
+      "drafting": "Drafting",
+      "review": "In review",
+      "crystallizationActive": "Crystallization active",
+      "crystallizationFailed": "Crystallization incomplete",
+      "crystallized": "Crystallized",
+      "archived": "Archived",
+      "inProgress": "In progress"
+    },
+    "meta": {
+      "pendingTime": "Time pending",
+      "latestUpdatePending": "Latest update pending",
+      "updated": "Updated {date}"
+    },
+    "reviewLead": "{count} issues are currently bound to v{version}",
+    "summary": {
+      "drafting": {
+        "manualWithIssues": "Revision round {round} is in progress. {count} issues are moving around v{version}, and review can be entered manually when the team is ready.",
+        "manualNoIssues": "Revision round {round} is in progress, and review can be entered manually when the team is ready.",
+        "autoWithIssues": "Revision round {round} is in progress. {count} issues are moving around v{version}, and review is expected around {window}.",
+        "autoNoIssues": "Revision round {round} is in progress, and review is expected around {window}."
+      },
+      "review": {
+        "expiredWithIssues": "The body is locked. Review has ended for {count} issues bound to v{version}; decide whether to start another round or enter crystallization.",
+        "expiredNoIssues": "The body is locked. Review for v{version} has ended; decide whether to start another round or enter crystallization.",
+        "activeWithIssues": "The body is locked. {count} issues bound to v{version} are under review, and this round is expected to end around {window}.",
+        "activeNoIssues": "The body is locked. The review round for v{version} is waiting for issues and is expected to end around {window}."
+      },
+      "archived": {
+        "withStableVersion": "This archived draft preserves stable v{version} and its discussion history. Restore it to continue with a new revision round.",
+        "withoutStableVersion": "This archived draft preserves the current body and discussion history. Restore it to continue with a new revision round."
+      },
+      "crystallizationActive": "The body is locked, and v{version} is in crystallization.",
+      "crystallizationFailed": "Crystallization did not complete for v{version}. You can continue resolving issues and try again later.",
+      "crystallized": "This draft crystallized successfully, and the stable result is v{version}.",
+      "default": "This draft is still advancing around v{version}."
+    },
+    "headline": "{status} · v{version}",
+    "header": {
+      "eyebrow": "Draft lifecycle"
+    },
+    "actions": {
+      "enterReview": {
+        "pending": "Entering review…",
+        "idle": "Enter review"
+      },
+      "advanceReview": {
+        "pending": "Advancing review…",
+        "idle": "Start next round"
+      },
+      "enterCrystallization": {
+        "pending": "Entering crystallization…",
+        "idle": "Enter crystallization"
+      },
+      "executeCrystallization": {
+        "pending": "Crystallizing…",
+        "idle": "Run crystallization"
+      },
+      "retryCrystallization": {
+        "pending": "Retrying crystallization…",
+        "idle": "Retry crystallization"
+      },
+      "rollbackCrystallization": {
+        "pending": "Rolling back…",
+        "idle": "Return to review"
+      },
+      "archive": {
+        "pending": "Archiving…",
+        "idle": "Archive draft"
+      },
+      "restore": {
+        "pending": "Restoring…",
+        "idle": "Restore draft"
+      }
+    },
+    "details": {
+      "collapse": "Hide details",
+      "expand": "Show details"
+    },
+    "cards": {
+      "source": {
+        "title": "Source handoff",
+        "lead": "Source handoff from {count} messages",
+        "candidateId": "Candidate {id}",
+        "messageCount": "{count} source messages",
+        "semanticFacets": "System facets: {labels}",
+        "authorAnnotations": "Author annotations: {labels}",
+        "lastProposal": "Last proposal: {id}",
+        "missingTitle": "Source handoff missing",
+        "missingHint": "This draft can still move forward, but its original source record is unavailable right now."
+      },
+      "baseline": {
+        "title": "Stable baseline",
+        "lead": "Stable snapshot v{version} is the current review baseline.",
+        "source": "Source: {label}",
+        "createdAt": "Created {date}",
+        "anchorId": "Anchor {id}"
+      },
+      "workingCopy": {
+        "title": "Working copy",
+        "draftingLead": "The working copy is editable and currently based on stable snapshot v{version}.",
+        "lockedLead": "The body is locked, so the working copy remains pinned to v{version}.",
+        "basedOnVersion": "Based on stable snapshot v{version}",
+        "updatedAt": "Last edited {date}"
+      },
+      "reviewProgress": {
+        "title": "Review progress",
+        "submittedInReview": "{submitted} submitted in review",
+        "acceptedResolved": "{accepted} accepted or resolved"
+      }
+    }
+  },
+  "CrucibleTab": {
+    "errors": {
+      "loadTemporaryEditGrants": "Could not load temporary edit access.",
+      "fetchDraftReferenceLinks": "Could not load the draft reference entries.",
+      "loadSourceMaterials": "Could not load source materials.",
+      "loadSeededReferences": "Could not load seeded references.",
+      "missingDraftContextForUpload": "Open a draft before uploading source materials.",
+      "uploadWithoutEditPermission": "You need edit access before uploading source materials.",
+      "unsupportedSourceMaterial": "That file type is not supported for source materials.",
+      "uploadSourceMaterial": "Could not upload the source material.",
+      "loadDraftLifecycle": "Could not load the draft lifecycle.",
+      "loadDiscussionThreads": "Could not load issue threads.",
+      "saveDraft": "Could not save the draft body.",
+      "reviewRequiresBody": "Add draft content before entering review.",
+      "enterReview": "Could not enter review.",
+      "advanceReview": "Could not start the next revision round.",
+      "enterCrystallization": "Could not enter crystallization.",
+      "retryCrystallization": "Could not retry crystallization.",
+      "rollbackCrystallization": "Could not return this draft to review.",
+      "archiveRequiresBody": "Add draft content before archiving this draft.",
+      "archiveDraft": "Could not archive the draft.",
+      "restoreDraft": "Could not restore the draft.",
+      "refreshDiscussionThreads": "Could not refresh issue threads.",
+      "discussionOperation": "Could not finish that discussion action.",
+      "missingDraftContextForCreateThread": "Open a draft before creating an issue thread.",
+      "missingDraftContextForPropose": "Open a draft before proposing a resolution.",
+      "missingDraftContextForResolve": "Open a draft before resolving an issue.",
+      "missingDraftContextForReply": "Open a draft before replying.",
+      "missingDraftContextForWithdraw": "Open a draft before withdrawing an issue thread.",
+      "missingDraftContextForApply": "Open a draft before applying a resolution.",
+      "missingDraftContextForApplyAcceptedIssues": "Open a draft before applying accepted issues.",
+      "applyAcceptedIssuesRequiresBody": "Add draft content before applying accepted issues.",
+      "applyAcceptedIssues": "Could not apply accepted issues.",
+      "sendComment": "Could not send the paragraph comment.",
+      "requestTemporaryEditGrant": "Could not request temporary edit access.",
+      "issueTemporaryEditGrant": "Could not approve temporary edit access.",
+      "revokeTemporaryEditGrant": "Could not revoke temporary edit access.",
+      "crystallizeRequiresBody": "Add draft content before crystallization.",
+      "executeCrystallization": "Could not execute crystallization."
+    },
+    "confirm": {
+      "applyAcceptedGhostThreads": "This stage change will also mark {count} AI-accepted issue threads as applied because their changes are already in the draft. Continue?"
+    },
+    "notices": {
+      "enterReviewSuccess": "Draft entered review.",
+      "advanceReviewSuccess": "Started the next revision round.",
+      "enterCrystallizationSuccess": "Draft entered crystallization.",
+      "retryCrystallizationSuccess": "Crystallization retry started.",
+      "rollbackCrystallizationSuccess": "Draft returned to review.",
+      "archiveSuccess": "Draft archived.",
+      "restoreSuccess": "Draft restored.",
+      "requestTemporaryEditGrantSuccess": "Temporary edit access request sent.",
+      "issueTemporaryEditGrantSuccess": "Temporary edit access granted.",
+      "revokeTemporaryEditGrantSuccess": "Temporary edit access revoked."
+    },
+    "fallback": {
+      "unknownMember": "Unknown member",
+      "untitledDraft": "Untitled draft"
+    },
+    "disabled": {
+      "maxRevisionRounds": "Maximum revision rounds reached ({count}).",
+      "walletRequiredForCrystallization": "Connect your wallet before entering crystallization.",
+      "policyProfileRequiredForCrystallization": "A policy profile is required before this draft can enter crystallization.",
+      "editAnchorRequiredForCrystallization": "Make one collaborative edit first and wait for the edit anchor to be created before crystallizing.",
+      "editAnchorPendingForCrystallization": "The latest collaborative edit anchor has not finished anchoring on-chain yet. Try again in a moment.",
+      "policyProfileRequiredForRetryCrystallization": "A policy profile is required before retrying crystallization.",
+      "walletRequiredForArchive": "Connect your wallet before archiving this draft.",
+      "policyProfileRequiredForArchive": "A policy profile is required before archiving this draft.",
+      "walletRequiredForRestore": "Connect your wallet before restoring this draft.",
+      "policyProfileRequiredForRestore": "A policy profile is required before restoring this draft."
+    },
+    "loading": {
+      "draftContent": "Loading draft…",
+      "draftLifecycle": "Loading lifecycle…"
+    },
+    "actions": {
+      "backToDraftList": "Back to drafts"
+    },
+    "editor": {
+      "bodyEyebrow": "Draft body",
+      "bodyTitle": "Working copy",
+      "bodyHint": "Edit the current draft body and resolve accepted issues directly in the text.",
+      "discussionEyebrow": "Discussion",
+      "discussionTitle": "Issue threads",
+      "discussionHint": "Track issues, proposals, and applied resolutions tied to this draft."
+    },
+    "ghostReveal": {
+      "title": "Issue-thread revision plan"
+    },
+    "permissions": {
+      "inactiveReason": "Only active circle members can perform this action.",
+      "roles": {
+        "owner": "owner",
+        "admin": "admin",
+        "moderator": "moderator",
+        "elder": "elder",
+        "member": "member",
+        "initiate": "initiate",
+        "higher": "a higher role"
+      },
+      "reasons": {
+        "createIssue": "This circle requires at least {role} to submit an issue.",
+        "followupIssue": "This circle requires at least {role} to add follow-up context to an issue.",
+        "withdrawOwnIssue": "This circle does not allow withdrawing your own issue before review starts.",
+        "reviewIssue": "This circle requires at least {role} to start or handle issue review.",
+        "retagIssue": "This circle requires at least {role} to retag an issue.",
+        "applyAcceptedIssue": "This circle requires at least {role} to mark an accepted issue as applied to the draft.",
+        "endDraftingEarly": "This circle requires at least {role} to end drafting early and move into review.",
+        "advanceFromReview": "This circle requires at least {role} to finish the current review round and move into the next revision.",
+        "enterCrystallization": "This circle requires at least {role} to enter crystallization.",
+        "retagIssueDisabled": "This circle does not currently allow retagging issues during review."
+      }
+    }
+  },
+  "GhostReveal": {
+    "metadata": {
+      "model": "Model: {model}",
+      "promptVersion": "{asset} · v{version}",
+      "sourceDigest": "Source digest {digest}"
+    },
+    "errors": {
+      "missingDraftContext": "Missing draft context, so the revision suggestion cannot be generated yet.",
+      "missingArtifact": "AI did not return a readable revision artifact.",
+      "missingContent": "AI did not return usable revision content.",
+      "generateFailed": "Failed to generate the revision suggestion. Please try again.",
+      "acceptFailed": "Failed to accept the revision plan. Please try again."
+    },
+    "states": {
+      "pending": {
+        "title": "Generating an issue-thread revision",
+        "hint": "The system is reading {count} pending issue threads and preparing a structured revision."
+      },
+      "error": {
+        "title": "Issue-thread revision failed",
+        "fallback": "Generation failed. Please try again."
+      },
+      "applied": {
+        "title": "Revision written into the draft",
+        "hint": "This issue-thread revision has been written into the current body. Related accepted paragraph issues will be preselected during later edits, and you can still deselect them."
+      },
+      "accepted": {
+        "title": "Revision plan accepted",
+        "hint": "This revision plan was accepted, but the current draft changed before it could be written in. Refresh the draft surface and try again."
+      },
+      "candidate": {
+        "title": "Issue-thread revision draft",
+        "emptyDraftHint": "The system generated paragraph-level revision suggestions from {count} pending issue threads.",
+        "existingDraftHint": "These revision suggestions were generated from {count} pending issue threads. Applying one will immediately update its target paragraph in the current draft.",
+        "carryHint": "Applying a plan also records the linked issue threads so later edits can keep their context aligned."
+      },
+      "idle": {
+        "title": "Issue-thread revision assist",
+        "hint": "This appears only during review and turns {count} pending issue threads into paragraph-level revision plans for the next drafting round."
+      }
+    },
+    "actions": {
+      "retry": "Retry",
+      "accept": "Apply to draft",
+      "ignore": "Ignore",
+      "generate": "Generate revision"
+    },
+    "candidate": {
+      "targetLabel": "{targetRef} · {count} linked issue threads"
+    },
+    "defaultTitle": "Issue-thread revision plan"
+  },
+  "SourceMaterialsPanel": {
+    "status": {
+      "aiReadable": "AI-readable",
+      "extracting": "Extracting",
+      "processing": "Processing"
+    },
+    "aria": {
+      "section": "Source materials",
+      "fileInput": "Upload source material file"
+    },
+    "title": "Source materials",
+    "hint": "Upload grounding files the AI can read while drafting and review are in progress.",
+    "actions": {
+      "uploadAndExtract": "Upload and extract"
+    },
+    "notices": {
+      "uploadDisabled": "You need edit access before uploading source materials."
+    },
+    "loading": "Loading source materials…",
+    "empty": "No source materials yet.",
+    "meta": {
+      "chunkDigest": "{chunkCount} chunks · digest {digest}"
+    }
+  },
+  "CreateCircleFlow": {
+    "errors": {
+      "metadataSyncFailed": "The circle was created, but the description could not be saved. You can retry from the circle settings page.",
+      "metadataSyncFailedSuffix": "The circle description could not be saved. You can retry from the circle settings page."
+    }
+  }
+}

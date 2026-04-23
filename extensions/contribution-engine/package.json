@@ -1,0 +1,23 @@
+{
+    "name": "@alcheme/contribution-engine-tests",
+    "version": "0.1.0",
+    "license": "Apache-2.0",
+    "private": true,
+    "description": "Tests for the Alcheme Contribution Engine extension",
+    "scripts": {
+        "test:program": "cd ../../ && anchor test -- --run extensions/contribution-engine/tests/contribution-engine.test.ts",
+        "test:tracker": "cd tracker && npm test",
+        "test": "npm run test:tracker"
+    },
+    "devDependencies": {
+        "@coral-xyz/anchor": "^0.31.1",
+        "@solana/web3.js": "^1.98.4",
+        "@types/chai": "^4.3.0",
+        "@types/mocha": "^10.0.0",
+        "bn.js": "^5.2.0",
+        "chai": "^4.3.0",
+        "mocha": "^10.0.0",
+        "ts-mocha": "^10.0.0",
+        "typescript": "^5.5.0"
+    }
+}

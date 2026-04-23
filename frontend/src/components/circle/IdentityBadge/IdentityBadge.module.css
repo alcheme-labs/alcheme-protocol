@@ -1,0 +1,68 @@
+/* ══════════════════════════════════════
+   IdentityBadge — User State Indicator
+   ══════════════════════════════════════ */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+.compact {
+    padding: 1px 4px;
+    font-size: 12px;
+}
+
+.icon {
+    font-size: 11px;
+    line-height: 1;
+}
+
+.label {
+    line-height: 1.2;
+}
+
+/* ── Visitor: 游客 — 半透明，烟尘感 ── */
+.visitor {
+    background: rgba(180, 195, 210, 0.08);
+    border: 1px dashed rgba(180, 195, 210, 0.2);
+    color: var(--color-text-tertiary);
+    opacity: 0.8;
+}
+
+/* ── Initiate: 入局者 — 新芽绿 ── */
+.initiate {
+    background: rgba(134, 179, 119, 0.10);
+    border: 1px solid rgba(134, 179, 119, 0.2);
+    color: rgba(134, 179, 119, 0.9);
+}
+
+/* ── Member: 成员 — 标准 ── */
+.member {
+    background: rgba(199, 168, 107, 0.10);
+    border: 1px solid rgba(199, 168, 107, 0.2);
+    color: var(--color-accent-gold);
+}
+
+/* ── Curator: 策展人 — 宝石蓝紫 ── */
+.curator {
+    background: rgba(160, 140, 200, 0.10);
+    border: 1px solid rgba(160, 140, 200, 0.25);
+    color: rgba(180, 160, 220, 0.9);
+}
+
+/* ── Owner: 创建者 — 金冠 ── */
+.owner {
+    background: rgba(199, 168, 107, 0.15);
+    border: 1px solid rgba(199, 168, 107, 0.3);
+    color: var(--color-accent-gold);
+    font-weight: var(--font-weight-semibold);
+}

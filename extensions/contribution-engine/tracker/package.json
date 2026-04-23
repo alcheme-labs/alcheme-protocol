@@ -1,0 +1,37 @@
+{
+    "name": "@alcheme/contribution-tracker",
+    "version": "0.1.0",
+    "license": "Apache-2.0",
+    "private": true,
+    "description": "Off-chain tracker service for the Alcheme Contribution Engine",
+    "main": "dist/index.js",
+    "scripts": {
+        "dev": "tsx watch src/index.ts",
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "test": "jest",
+        "lint": "eslint src --ext .ts"
+    },
+    "dependencies": {
+        "@coral-xyz/anchor": "^0.31.1",
+        "@solana/web3.js": "^1.98.4",
+        "bs58": "^6.0.0",
+        "dotenv": "^16.4.0",
+        "node-cron": "^3.0.3",
+        "pg": "^8.13.0",
+        "winston": "^3.14.0"
+    },
+    "devDependencies": {
+        "@types/jest": "^29.5.0",
+        "@types/node": "^20.14.0",
+        "@types/node-cron": "^3.0.11",
+        "@types/pg": "^8.11.0",
+        "jest": "^29.7.0",
+        "ts-jest": "^29.2.0",
+        "tsx": "^4.16.0",
+        "typescript": "^5.5.0"
+    },
+    "engines": {
+        "node": ">=20.0.0"
+    }
+}

@@ -1,0 +1,3152 @@
+{
+  "address": "BNbDZu2djPT6rdqgsSEtyiCw4b8wteBNQDiyKS6GFxun",
+  "metadata": {
+    "name": "access_controller",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Access Controller Program for SocialHub Protocol"
+  },
+  "docs": [
+    "Access Controller Program - 访问控制器程序"
+  ],
+  "instructions": [
+    {
+      "name": "apply_permission_template",
+      "docs": [
+        "应用权限模板"
+      ],
+      "discriminator": [
+        12,
+        71,
+        8,
+        253,
+        160,
+        133,
+        53,
+        3
+      ],
+      "accounts": [
+        {
+          "name": "access_controller",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "user",
+          "type": "pubkey"
+        },
+        {
+          "name": "template_id",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "batch_check_permissions",
+      "docs": [
+        "批量检查权限 (CPI)"
+      ],
+      "discriminator": [
+        19,
+        232,
+        231,
+        187,
+        189,
+        227,
+        77,
+        122
+      ],
+      "accounts": [
+        {
+          "name": "access_controller",
+          "writable": true
+        },
+        {
+          "name": "caller_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "requests",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "PermissionRequest"
+              }
+            }
+          }
+        }
+      ],
+      "returns": {
+        "vec": {
+          "defined": {
+            "name": "PermissionResult"
+          }
+        }
+      }
+    },
+    {
+      "name": "batch_set_permissions",
+      "docs": [
+        "批量设置权限"
+      ],
+      "discriminator": [
+        89,
+        252,
+        227,
+        203,
+        205,
+        221,
+        19,
+        186
+      ],
+      "accounts": [
+        {
+          "name": "access_controller",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "user",
+          "type": "pubkey"
+        },
+        {
+          "name": "rules",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "AccessRule"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "batch_update_relationship_permissions",
+      "docs": [
+        "批量更新关系权限"
+      ],
+      "discriminator": [
+        122,
+        136,
+        15,
+        232,
+        6,
+        115,
+        18,
+        219
+      ],
+      "accounts": [
+        {
+          "name": "access_controller",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  99,
+                  99,
+                  101,
+                  115,
+                  115,
+                  95,
+                  99,
+                  111,
+                  110,
+                  116,
+                  114,
+                  111,
+                  108,
+                  108,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "relationships",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "RelationshipUpdate"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "check_permission",
+      "docs": [
+        "检查权限 (CPI)"
+      ],
+      "discriminator": [
+        154,
+        199,
+        232,
+        242,
+        96,
+        72,
+        197,
+        236
+      ],
+      "accounts": [
+        {
+          "name": "access_controller",
+          "writable": true
+        },
+        {
+          "name": "caller_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "requester",
+          "type": "pubkey"
+        },
+        {
+          "name": "target",
+          "type": "pubkey"
+        },
+        {
+          "name": "permission",
+          "type": {
+            "defined": {
+              "name": "Permission"
+            }
+          }
+        },
+        {
+          "name": "context",
+          "type": {
+            "defined": {
+              "name": "PermissionContext"
+            }
+          }
+        }
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "create_permission_template",
+      "docs": [
+        "创建权限模板"
+      ],
+      "discriminator": [
+        157,
+        3,
+        196,
+        201,
+        24,
+        131,
+        75,
+        226
+      ],
+      "accounts": [
+        {
+          "name": "access_controller",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "template",
+          "type": {
+            "defined": {
+              "name": "PermissionTemplate"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "follow_user",
+      "docs": [
+        "建立最小关注关系事实"
+      ],
+      "discriminator": [
+        126,
+        176,
+        97,
+        36,
+        63,
+        145,
+        4,
+        134
+      ],
+      "accounts": [
+        {
+          "name": "access_controller",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  99,
+                  99,
+                  101,
+                  115,
+                  115,
+                  95,
+                  99,
+                  111,
+                  110,
+                  116,
+                  114,
+                  111,
+                  108,
+                  108,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "follow_relationship",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  111,
+                  108,
+                  108,
+                  111,
+                  119
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "follower"
+              },
+              {
+                "kind": "account",
+                "path": "followed"
+              }
+            ]
+          }
+        },
+        {
+          "name": "follower",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "followed"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "get_access_stats",
+      "docs": [
+        "获取访问统计"
+      ],
+      "discriminator": [
+        95,
+        18,
+        43,
+        171,
+        140,
+        92,
+        13,
+        93
+      ],
+      "accounts": [
+        {
+          "name": "access_controller"
+        }
+      ],
+      "args": [
+        {
+          "name": "time_range",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "TimeRange"
+              }
+            }
+          }
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "AccessStats"
+        }
+      }
+    },
+    {
+      "name": "get_audit_logs",
+      "docs": [
+        "获取审计日志"
+      ],
+      "discriminator": [
+        1,
+        218,
+        158,
+        90,
+        174,
+        3,
+        9,
+        144
+      ],
+      "accounts": [
+        {
+          "name": "access_controller"
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "filters",
+          "type": {
+            "defined": {
+              "name": "AuditFilters"
+            }
+          }
+        },
+        {
+          "name": "pagination",
+          "type": {
+            "defined": {
+              "name": "PaginationConfig"
+            }
+          }
+        }
+      ],
+      "returns": {
+        "vec": {
+          "defined": {
+            "name": "AuditLog"
+          }
+        }
+      }
+    },
+    {
+      "name": "get_user_permissions",
+      "docs": [
+        "获取用户权限 (CPI)"
+      ],
+      "discriminator": [
+        124,
+        23,
+        171,
+        226,
+        178,
+        232,
+        38,
+        85
+      ],
+      "accounts": [
+        {
+          "name": "access_controller"
+        },
+        {
+          "name": "caller_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "user",
+          "type": "pubkey"
+        },
+        {
+          "name": "target",
+          "type": "pubkey"
+        }
+      ],
+      "returns": {
+        "vec": {
+          "defined": {
+            "name": "Permission"
+          }
+        }
+      }
+    },
+    {
+      "name": "initialize_access_controller",
+      "docs": [
+        "初始化访问控制器"
+      ],
+      "discriminator": [
+        131,
+        55,
+        11,
+        158,
+        204,
+        109,
+        251,
+        17
+      ],
+      "accounts": [
+        {
+          "name": "access_controller",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  99,
+                  99,
+                  101,
+                  115,
+                  115,
+                  95,
+                  99,
+                  111,
+                  110,
+                  116,
+                  114,
+                  111,
+                  108,
+                  108,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "manage_relationship_mapping",
+      "docs": [
+        "管理关系映射"
+      ],
+      "discriminator": [
+        176,
+        99,
+        246,
+        15,
+        79,
+        150,
+        76,
+        142
+      ],
+      "accounts": [
+        {
+          "name": "access_controller",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  99,
+                  99,
+                  101,
+                  115,
+                  115,
+                  95,
+                  99,
+                  111,
+                  110,
+                  116,
+                  114,
+                  111,
+                  108,
+                  108,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "user1",
+          "type": "pubkey"
+        },
+        {
+          "name": "user2",
+          "type": "pubkey"
+        },
+        {
+          "name": "relationship_type",
+          "type": {
+            "defined": {
+              "name": "RelationshipType"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "remove_access_rule",
+      "docs": [
+        "删除访问规则"
+      ],
+      "discriminator": [
+        15,
+        133,
+        6,
+        237,
+        138,
+        51,
+        108,
+        247
+      ],
+      "accounts": [
+        {
+          "name": "access_controller",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "user",
+          "type": "pubkey"
+        },
+        {
+          "name": "rule_id",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "set_access_rules",
+      "docs": [
+        "设置访问规则"
+      ],
+      "discriminator": [
+        42,
+        184,
+        118,
+        181,
+        79,
+        208,
+        83,
+        238
+      ],
+      "accounts": [
+        {
+          "name": "access_controller",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "user",
+          "type": "pubkey"
+        },
+        {
+          "name": "permission",
+          "type": {
+            "defined": {
+              "name": "Permission"
+            }
+          }
+        },
+        {
+          "name": "access_rule",
+          "type": {
+            "defined": {
+              "name": "AccessRule"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_audit_config",
+      "docs": [
+        "设置审计配置"
+      ],
+      "discriminator": [
+        248,
+        107,
+        62,
+        108,
+        198,
+        201,
+        132,
+        53
+      ],
+      "accounts": [
+        {
+          "name": "access_controller",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "audit_enabled",
+          "type": "bool"
+        },
+        {
+          "name": "audit_settings",
+          "type": {
+            "defined": {
+              "name": "AuditSettings"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "unfollow_user",
+      "docs": [
+        "删除最小关注关系事实"
+      ],
+      "discriminator": [
+        204,
+        183,
+        196,
+        110,
+        97,
+        165,
+        226,
+        213
+      ],
+      "accounts": [
+        {
+          "name": "access_controller",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  99,
+                  99,
+                  101,
+                  115,
+                  115,
+                  95,
+                  99,
+                  111,
+                  110,
+                  116,
+                  114,
+                  111,
+                  108,
+                  108,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "follow_relationship",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  111,
+                  108,
+                  108,
+                  111,
+                  119
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "follower"
+              },
+              {
+                "kind": "account",
+                "path": "followed"
+              }
+            ]
+          }
+        },
+        {
+          "name": "follower",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "followed"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "update_controller_config",
+      "docs": [
+        "更新控制器配置"
+      ],
+      "discriminator": [
+        3,
+        196,
+        185,
+        227,
+        196,
+        218,
+        124,
+        65
+      ],
+      "accounts": [
+        {
+          "name": "access_controller",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_audit_settings",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "AuditSettings"
+              }
+            }
+          }
+        },
+        {
+          "name": "new_retention_policy",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "RetentionPolicy"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_permission_template",
+      "docs": [
+        "更新权限模板"
+      ],
+      "discriminator": [
+        32,
+        152,
+        186,
+        74,
+        55,
+        72,
+        25,
+        214
+      ],
+      "accounts": [
+        {
+          "name": "access_controller",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "template_id",
+          "type": "string"
+        },
+        {
+          "name": "template",
+          "type": {
+            "defined": {
+              "name": "PermissionTemplate"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_rule_status",
+      "docs": [
+        "更新规则状态"
+      ],
+      "discriminator": [
+        233,
+        72,
+        174,
+        51,
+        246,
+        250,
+        127,
+        53
+      ],
+      "accounts": [
+        {
+          "name": "access_controller",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "user",
+          "type": "pubkey"
+        },
+        {
+          "name": "rule_id",
+          "type": "string"
+        },
+        {
+          "name": "enabled",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "verify_access_token",
+      "docs": [
+        "验证访问令牌 (CPI)"
+      ],
+      "discriminator": [
+        236,
+        45,
+        206,
+        141,
+        130,
+        27,
+        248,
+        163
+      ],
+      "accounts": [
+        {
+          "name": "access_controller"
+        },
+        {
+          "name": "caller_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "token",
+          "type": {
+            "defined": {
+              "name": "AccessToken"
+            }
+          }
+        },
+        {
+          "name": "permission",
+          "type": {
+            "defined": {
+              "name": "Permission"
+            }
+          }
+        }
+      ],
+      "returns": "bool"
+    }
+  ],
+  "accounts": [
+    {
+      "name": "AccessControllerAccount",
+      "discriminator": [
+        167,
+        234,
+        141,
+        175,
+        137,
+        40,
+        159,
+        199
+      ]
+    },
+    {
+      "name": "FollowRelationshipAccount",
+      "discriminator": [
+        215,
+        59,
+        56,
+        254,
+        149,
+        123,
+        210,
+        131
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "AccessController",
+      "docs": [
+        "访问控制器主账户"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated",
+            "type": "i64"
+          },
+          {
+            "name": "default_permissions",
+            "type": {
+              "defined": {
+                "name": "DefaultPermissions"
+              }
+            }
+          },
+          {
+            "name": "permission_templates",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "PermissionTemplate"
+                }
+              }
+            }
+          },
+          {
+            "name": "custom_permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "CustomPermission"
+                }
+              }
+            }
+          },
+          {
+            "name": "access_level_configs",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "AccessLevelConfig"
+                }
+              }
+            }
+          },
+          {
+            "name": "relationship_mappings",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "RelationshipMapping"
+                }
+              }
+            }
+          },
+          {
+            "name": "rule_sets",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "RuleSet"
+                }
+              }
+            }
+          },
+          {
+            "name": "policy_configs",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "PolicyConfig"
+                }
+              }
+            }
+          },
+          {
+            "name": "conditional_rules",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "ConditionalRule"
+                }
+              }
+            }
+          },
+          {
+            "name": "audit_enabled",
+            "type": "bool"
+          },
+          {
+            "name": "audit_settings",
+            "type": {
+              "defined": {
+                "name": "AuditSettings"
+              }
+            }
+          },
+          {
+            "name": "retention_policy",
+            "type": {
+              "defined": {
+                "name": "RetentionPolicy"
+              }
+            }
+          },
+          {
+            "name": "total_checks",
+            "type": "u64"
+          },
+          {
+            "name": "access_granted",
+            "type": "u64"
+          },
+          {
+            "name": "access_denied",
+            "type": "u64"
+          },
+          {
+            "name": "last_stats_update",
+            "type": "i64"
+          },
+          {
+            "name": "metadata_uri",
+            "type": "string"
+          },
+          {
+            "name": "custom_settings",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "KeyValue"
+                }
+              }
+            }
+          },
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "ControllerStatus"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "AccessControllerAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inner",
+            "type": {
+              "defined": {
+                "name": "AccessController"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "AccessLevel",
+      "docs": [
+        "访问级别"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Public"
+          },
+          {
+            "name": "Followers"
+          },
+          {
+            "name": "Friends"
+          },
+          {
+            "name": "Private"
+          },
+          {
+            "name": "Custom"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AccessLevelConfig",
+      "docs": [
+        "访问级别配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "level",
+            "type": {
+              "defined": {
+                "name": "AccessLevel"
+              }
+            }
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "default_permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Permission"
+                }
+              }
+            }
+          },
+          {
+            "name": "restrictions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "AccessRestriction"
+                }
+              }
+            }
+          },
+          {
+            "name": "inheritance_rules",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "InheritanceRule"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "AccessRestriction",
+      "docs": [
+        "访问限制"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "restriction_type",
+            "type": {
+              "defined": {
+                "name": "RestrictionType"
+              }
+            }
+          },
+          {
+            "name": "value",
+            "type": "string"
+          },
+          {
+            "name": "enabled",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AccessRule",
+      "docs": [
+        "访问规则"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "rule_id",
+            "type": "string"
+          },
+          {
+            "name": "permission",
+            "type": {
+              "defined": {
+                "name": "Permission"
+              }
+            }
+          },
+          {
+            "name": "access_level",
+            "type": {
+              "defined": {
+                "name": "AccessLevel"
+              }
+            }
+          },
+          {
+            "name": "conditions",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "Conditions"
+                }
+              }
+            }
+          },
+          {
+            "name": "exceptions",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "priority",
+            "type": "u8"
+          },
+          {
+            "name": "enabled",
+            "type": "bool"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "expires_at",
+            "type": {
+              "option": "i64"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "AccessStats",
+      "docs": [
+        "访问统计"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "total_checks",
+            "type": "u64"
+          },
+          {
+            "name": "access_granted",
+            "type": "u64"
+          },
+          {
+            "name": "access_denied",
+            "type": "u64"
+          },
+          {
+            "name": "success_rate",
+            "type": "f64"
+          },
+          {
+            "name": "active_rules",
+            "type": "u64"
+          },
+          {
+            "name": "active_templates",
+            "type": "u64"
+          },
+          {
+            "name": "relationship_mappings",
+            "type": "u64"
+          },
+          {
+            "name": "last_updated",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AccessToken",
+      "docs": [
+        "访问令牌"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token_id",
+            "type": "string"
+          },
+          {
+            "name": "issued_to",
+            "type": "pubkey"
+          },
+          {
+            "name": "permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Permission"
+                }
+              }
+            }
+          },
+          {
+            "name": "scope",
+            "type": {
+              "defined": {
+                "name": "TokenScope"
+              }
+            }
+          },
+          {
+            "name": "issued_at",
+            "type": "i64"
+          },
+          {
+            "name": "expires_at",
+            "type": "i64"
+          },
+          {
+            "name": "revoked",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AuditExportFormat",
+      "docs": [
+        "审计导出格式"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Json"
+          },
+          {
+            "name": "Csv"
+          },
+          {
+            "name": "Binary"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "AuditFilters",
+      "docs": [
+        "审计过滤器"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user_filter",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "permission_filter",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "Permission"
+                }
+              }
+            }
+          },
+          {
+            "name": "result_filter",
+            "type": {
+              "option": "bool"
+            }
+          },
+          {
+            "name": "time_range",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "TimeRange"
+                }
+              }
+            }
+          },
+          {
+            "name": "resource_type_filter",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "ResourceType"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "AuditLog",
+      "docs": [
+        "审计日志"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "log_id",
+            "type": "string"
+          },
+          {
+            "name": "requester",
+            "type": "pubkey"
+          },
+          {
+            "name": "target",
+            "type": "pubkey"
+          },
+          {
+            "name": "permission",
+            "type": {
+              "defined": {
+                "name": "Permission"
+              }
+            }
+          },
+          {
+            "name": "granted",
+            "type": "bool"
+          },
+          {
+            "name": "reason",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "context",
+            "type": {
+              "defined": {
+                "name": "PermissionContext"
+              }
+            }
+          },
+          {
+            "name": "applicable_rules",
+            "type": {
+              "vec": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "AuditSettings",
+      "docs": [
+        "审计设置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "log_all_checks",
+            "type": "bool"
+          },
+          {
+            "name": "log_denied_access",
+            "type": "bool"
+          },
+          {
+            "name": "log_permission_changes",
+            "type": "bool"
+          },
+          {
+            "name": "log_policy_violations",
+            "type": "bool"
+          },
+          {
+            "name": "detailed_logging",
+            "type": "bool"
+          },
+          {
+            "name": "retention_days",
+            "type": "u32"
+          },
+          {
+            "name": "export_format",
+            "type": {
+              "defined": {
+                "name": "AuditExportFormat"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ConditionOperator",
+      "docs": [
+        "条件操作符"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Equal"
+          },
+          {
+            "name": "NotEqual"
+          },
+          {
+            "name": "GreaterThan"
+          },
+          {
+            "name": "LessThan"
+          },
+          {
+            "name": "GreaterThanOrEqual"
+          },
+          {
+            "name": "LessThanOrEqual"
+          },
+          {
+            "name": "Contains"
+          },
+          {
+            "name": "NotContains"
+          },
+          {
+            "name": "InRange"
+          },
+          {
+            "name": "NotInRange"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ConditionalRule",
+      "docs": [
+        "条件规则"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "rule_id",
+            "type": "string"
+          },
+          {
+            "name": "conditions",
+            "type": {
+              "defined": {
+                "name": "Conditions"
+              }
+            }
+          },
+          {
+            "name": "then_permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Permission"
+                }
+              }
+            }
+          },
+          {
+            "name": "else_permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Permission"
+                }
+              }
+            }
+          },
+          {
+            "name": "evaluation_order",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Conditions",
+      "docs": [
+        "条件限制"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "reputation_threshold",
+            "type": {
+              "option": "f64"
+            }
+          },
+          {
+            "name": "time_restrictions",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "TimeWindow"
+                }
+              }
+            }
+          },
+          {
+            "name": "location_restrictions",
+            "type": {
+              "option": {
+                "vec": "string"
+              }
+            }
+          },
+          {
+            "name": "device_restrictions",
+            "type": {
+              "option": {
+                "vec": "string"
+              }
+            }
+          },
+          {
+            "name": "custom_conditions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "CustomCondition"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ControllerStatus",
+      "docs": [
+        "控制器状态"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Paused"
+          },
+          {
+            "name": "Maintenance"
+          },
+          {
+            "name": "Emergency"
+          },
+          {
+            "name": "Upgrading"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CustomCondition",
+      "docs": [
+        "自定义条件"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "condition_type",
+            "type": "string"
+          },
+          {
+            "name": "operator",
+            "type": {
+              "defined": {
+                "name": "ConditionOperator"
+              }
+            }
+          },
+          {
+            "name": "value",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "CustomPermission",
+      "docs": [
+        "自定义权限"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "permission_id",
+            "type": "string"
+          },
+          {
+            "name": "permission_name",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "resource_types",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "ResourceType"
+                }
+              }
+            }
+          },
+          {
+            "name": "operations",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "created_by",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DefaultPermissions",
+      "docs": [
+        "默认权限配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "new_user_permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Permission"
+                }
+              }
+            }
+          },
+          {
+            "name": "public_permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Permission"
+                }
+              }
+            }
+          },
+          {
+            "name": "follower_permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Permission"
+                }
+              }
+            }
+          },
+          {
+            "name": "friend_permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Permission"
+                }
+              }
+            }
+          },
+          {
+            "name": "community_permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Permission"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "EnforcementLevel",
+      "docs": [
+        "执行级别"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Advisory"
+          },
+          {
+            "name": "Warning"
+          },
+          {
+            "name": "Blocking"
+          },
+          {
+            "name": "Strict"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExceptionType",
+      "docs": [
+        "例外类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "UserException"
+          },
+          {
+            "name": "ResourceException"
+          },
+          {
+            "name": "TimeException"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "FollowRelationship",
+      "docs": [
+        "最小关注关系事实"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "follower",
+            "type": "pubkey"
+          },
+          {
+            "name": "followed",
+            "type": "pubkey"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FollowRelationshipAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inner",
+            "type": {
+              "defined": {
+                "name": "FollowRelationship"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "InheritanceRule",
+      "docs": [
+        "继承规则"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "from_level",
+            "type": {
+              "defined": {
+                "name": "AccessLevel"
+              }
+            }
+          },
+          {
+            "name": "to_level",
+            "type": {
+              "defined": {
+                "name": "AccessLevel"
+              }
+            }
+          },
+          {
+            "name": "inherited_permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Permission"
+                }
+              }
+            }
+          },
+          {
+            "name": "conditions",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "Conditions"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "KeyValue",
+      "docs": [
+        "键值对数据结构"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "key",
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LimitationType",
+      "docs": [
+        "限制类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RateLimit"
+          },
+          {
+            "name": "TimeWindow"
+          },
+          {
+            "name": "ResourceCount"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "PaginationConfig",
+      "docs": [
+        "分页配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "page",
+            "type": "u32"
+          },
+          {
+            "name": "limit",
+            "type": "u32"
+          },
+          {
+            "name": "sort_by",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "sort_order",
+            "type": {
+              "defined": {
+                "name": "SortOrder"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Permission",
+      "docs": [
+        "权限类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CreateContent"
+          },
+          {
+            "name": "EditContent"
+          },
+          {
+            "name": "DeleteContent"
+          },
+          {
+            "name": "ViewContent"
+          },
+          {
+            "name": "FollowUser"
+          },
+          {
+            "name": "UnfollowUser"
+          },
+          {
+            "name": "MessageUser"
+          },
+          {
+            "name": "ViewProfile"
+          },
+          {
+            "name": "EditProfile"
+          },
+          {
+            "name": "ViewFollowers"
+          },
+          {
+            "name": "ViewFollowing"
+          },
+          {
+            "name": "LikeContent"
+          },
+          {
+            "name": "CommentContent"
+          },
+          {
+            "name": "ShareContent"
+          },
+          {
+            "name": "ReportContent"
+          },
+          {
+            "name": "InteractWithContent"
+          },
+          {
+            "name": "JoinCommunity"
+          },
+          {
+            "name": "LeaveCommunity"
+          },
+          {
+            "name": "CreateCommunity"
+          },
+          {
+            "name": "ModerateCommunity"
+          },
+          {
+            "name": "InviteMembers"
+          },
+          {
+            "name": "RemoveMembers"
+          },
+          {
+            "name": "ManageSettings"
+          },
+          {
+            "name": "AccessAnalytics"
+          },
+          {
+            "name": "SystemAdmin"
+          },
+          {
+            "name": "VerifyIdentity"
+          },
+          {
+            "name": "Follow"
+          },
+          {
+            "name": "Message"
+          },
+          {
+            "name": "Comment"
+          },
+          {
+            "name": "Share"
+          },
+          {
+            "name": "ModerateContent"
+          },
+          {
+            "name": "ManageUsers"
+          },
+          {
+            "name": "ConfigureSystem"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "PermissionContext",
+      "docs": [
+        "权限上下文"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "requester",
+            "type": "pubkey"
+          },
+          {
+            "name": "target",
+            "type": "pubkey"
+          },
+          {
+            "name": "permission",
+            "type": {
+              "defined": {
+                "name": "Permission"
+              }
+            }
+          },
+          {
+            "name": "resource_type",
+            "type": {
+              "defined": {
+                "name": "ResourceType"
+              }
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "source",
+            "type": "string"
+          },
+          {
+            "name": "additional_data",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "KeyValue"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "PermissionRequest",
+      "docs": [
+        "权限请求"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "requester",
+            "type": "pubkey"
+          },
+          {
+            "name": "target",
+            "type": "pubkey"
+          },
+          {
+            "name": "permission",
+            "type": {
+              "defined": {
+                "name": "Permission"
+              }
+            }
+          },
+          {
+            "name": "context",
+            "type": {
+              "defined": {
+                "name": "PermissionContext"
+              }
+            }
+          },
+          {
+            "name": "request_id",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PermissionResult",
+      "docs": [
+        "权限结果"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "request_id",
+            "type": "string"
+          },
+          {
+            "name": "granted",
+            "type": "bool"
+          },
+          {
+            "name": "reason",
+            "type": "string"
+          },
+          {
+            "name": "applicable_rules",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "checked_at",
+            "type": "i64"
+          },
+          {
+            "name": "expires_at",
+            "type": {
+              "option": "i64"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "PermissionTemplate",
+      "docs": [
+        "权限模板"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "template_id",
+            "type": "string"
+          },
+          {
+            "name": "template_name",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Permission"
+                }
+              }
+            }
+          },
+          {
+            "name": "access_levels",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "AccessLevel"
+                }
+              }
+            }
+          },
+          {
+            "name": "default_rules",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "AccessRule"
+                }
+              }
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "created_by",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PolicyAction",
+      "docs": [
+        "策略动作"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Allow"
+          },
+          {
+            "name": "Deny"
+          },
+          {
+            "name": "Warn"
+          },
+          {
+            "name": "Log"
+          },
+          {
+            "name": "Throttle"
+          },
+          {
+            "name": "Redirect"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PolicyConfig",
+      "docs": [
+        "策略配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "policy_id",
+            "type": "string"
+          },
+          {
+            "name": "policy_name",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "target_resources",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "ResourceType"
+                }
+              }
+            }
+          },
+          {
+            "name": "enforcement_level",
+            "type": {
+              "defined": {
+                "name": "EnforcementLevel"
+              }
+            }
+          },
+          {
+            "name": "rules",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "PolicyRule"
+                }
+              }
+            }
+          },
+          {
+            "name": "exceptions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "PolicyException"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "PolicyException",
+      "docs": [
+        "策略例外"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "exception_type",
+            "type": {
+              "defined": {
+                "name": "ExceptionType"
+              }
+            }
+          },
+          {
+            "name": "target",
+            "type": "pubkey"
+          },
+          {
+            "name": "reason",
+            "type": "string"
+          },
+          {
+            "name": "expires_at",
+            "type": {
+              "option": "i64"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "PolicyRule",
+      "docs": [
+        "策略规则"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "rule_type",
+            "type": {
+              "defined": {
+                "name": "PolicyRuleType"
+              }
+            }
+          },
+          {
+            "name": "conditions",
+            "type": {
+              "defined": {
+                "name": "Conditions"
+              }
+            }
+          },
+          {
+            "name": "action",
+            "type": {
+              "defined": {
+                "name": "PolicyAction"
+              }
+            }
+          },
+          {
+            "name": "severity",
+            "type": {
+              "defined": {
+                "name": "PolicySeverity"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "PolicyRuleType",
+      "docs": [
+        "策略规则类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RateLimiting"
+          },
+          {
+            "name": "ContentFiltering"
+          },
+          {
+            "name": "BehaviorMonitoring"
+          },
+          {
+            "name": "ComplianceCheck"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "PolicySeverity",
+      "docs": [
+        "策略严重性"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Low"
+          },
+          {
+            "name": "Medium"
+          },
+          {
+            "name": "High"
+          },
+          {
+            "name": "Critical"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RelationshipMapping",
+      "docs": [
+        "关系映射"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "relationship_type",
+            "type": {
+              "defined": {
+                "name": "RelationshipType"
+              }
+            }
+          },
+          {
+            "name": "access_level",
+            "type": {
+              "defined": {
+                "name": "AccessLevel"
+              }
+            }
+          },
+          {
+            "name": "permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Permission"
+                }
+              }
+            }
+          },
+          {
+            "name": "auto_grant",
+            "type": "bool"
+          },
+          {
+            "name": "conditions",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "Conditions"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "RelationshipType",
+      "docs": [
+        "关系类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Follower"
+          },
+          {
+            "name": "Following"
+          },
+          {
+            "name": "Friend"
+          },
+          {
+            "name": "Blocked"
+          },
+          {
+            "name": "Muted"
+          },
+          {
+            "name": "Moderator"
+          },
+          {
+            "name": "Admin"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RelationshipUpdate",
+      "docs": [
+        "关系更新结构体"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user1",
+            "type": "pubkey"
+          },
+          {
+            "name": "user2",
+            "type": "pubkey"
+          },
+          {
+            "name": "relationship_type",
+            "type": {
+              "defined": {
+                "name": "RelationshipType"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ResourceType",
+      "docs": [
+        "资源类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "UserProfile"
+          },
+          {
+            "name": "Content"
+          },
+          {
+            "name": "Community"
+          },
+          {
+            "name": "Message"
+          },
+          {
+            "name": "Analytics"
+          },
+          {
+            "name": "Settings"
+          },
+          {
+            "name": "System"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "RestrictionType",
+      "docs": [
+        "限制类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TimeWindow"
+          },
+          {
+            "name": "Location"
+          },
+          {
+            "name": "Device"
+          },
+          {
+            "name": "Reputation"
+          },
+          {
+            "name": "Age"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "RetentionPolicy",
+      "docs": [
+        "保留策略"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "audit_log_retention_days",
+            "type": "u32"
+          },
+          {
+            "name": "permission_history_retention_days",
+            "type": "u32"
+          },
+          {
+            "name": "auto_cleanup",
+            "type": "bool"
+          },
+          {
+            "name": "archive_to_external",
+            "type": "bool"
+          },
+          {
+            "name": "archive_endpoint",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "RuleSet",
+      "docs": [
+        "规则集"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "rule_set_id",
+            "type": "string"
+          },
+          {
+            "name": "rule_set_name",
+            "type": "string"
+          },
+          {
+            "name": "rules",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "AccessRule"
+                }
+              }
+            }
+          },
+          {
+            "name": "enabled",
+            "type": "bool"
+          },
+          {
+            "name": "priority",
+            "type": "u8"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SortOrder",
+      "docs": [
+        "排序顺序"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Ascending"
+          },
+          {
+            "name": "Descending"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TimeRange",
+      "docs": [
+        "时间范围"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "start_time",
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TimeWindow",
+      "docs": [
+        "时间窗口"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "start_time",
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "type": "i64"
+          },
+          {
+            "name": "days_of_week",
+            "type": {
+              "option": "bytes"
+            }
+          },
+          {
+            "name": "hours_of_day",
+            "type": {
+              "option": "bytes"
+            }
+          },
+          {
+            "name": "timezone",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenLimitation",
+      "docs": [
+        "令牌限制"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "limitation_type",
+            "type": {
+              "defined": {
+                "name": "LimitationType"
+              }
+            }
+          },
+          {
+            "name": "value",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenScope",
+      "docs": [
+        "令牌范围"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "resource_types",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "ResourceType"
+                }
+              }
+            }
+          },
+          {
+            "name": "specific_resources",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "limitations",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "TokenLimitation"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

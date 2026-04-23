@@ -1,0 +1,4104 @@
+{
+  "address": "uhPvVgDANHaUzUq2rYEVXJ9vGEBjWjNZ1E6gQJqdBUC",
+  "metadata": {
+    "name": "event_emitter",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Event Emitter Program for SocialHub Protocol"
+  },
+  "docs": [
+    "Event Emitter Program - 全局事件系统"
+  ],
+  "instructions": [
+    {
+      "name": "archive_event_batch",
+      "docs": [
+        "归档事件批次"
+      ],
+      "discriminator": [
+        49,
+        67,
+        159,
+        208,
+        62,
+        199,
+        193,
+        95
+      ],
+      "accounts": [
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "batch_id",
+          "type": "u64"
+        },
+        {
+          "name": "arweave_tx_id",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "batch_emit_events",
+      "docs": [
+        "批量发射事件"
+      ],
+      "discriminator": [
+        211,
+        87,
+        79,
+        254,
+        236,
+        16,
+        19,
+        54
+      ],
+      "accounts": [
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  98,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "event_emitter.event_sequence",
+                "account": "EventEmitterAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "events",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "ProtocolEvent"
+              }
+            }
+          }
+        },
+        {
+          "name": "priority",
+          "type": {
+            "defined": {
+              "name": "EventPriority"
+            }
+          }
+        }
+      ],
+      "returns": {
+        "vec": "u64"
+      }
+    },
+    {
+      "name": "cleanup_expired_events",
+      "docs": [
+        "清理过期事件"
+      ],
+      "discriminator": [
+        114,
+        157,
+        49,
+        211,
+        161,
+        62,
+        169,
+        70
+      ],
+      "accounts": [
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "cutoff_timestamp",
+          "type": "i64"
+        }
+      ],
+      "returns": "u64"
+    },
+    {
+      "name": "emit_access_event",
+      "docs": [
+        "发射权限事件 (CPI)"
+      ],
+      "discriminator": [
+        217,
+        9,
+        161,
+        218,
+        13,
+        61,
+        10,
+        243
+      ],
+      "accounts": [
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  98,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "event_emitter.event_sequence",
+                "account": "EventEmitterAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "caller_program"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "event",
+          "type": {
+            "defined": {
+              "name": "ProtocolEvent"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "emit_content_anchor_v2_light",
+      "docs": [
+        "发射内容锚点事件 (v2 轻量路径, CPI)"
+      ],
+      "discriminator": [
+        37,
+        53,
+        63,
+        117,
+        230,
+        201,
+        148,
+        53
+      ],
+      "accounts": [
+        {
+          "name": "event_emitter",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "event",
+          "type": {
+            "defined": {
+              "name": "ProtocolEvent"
+            }
+          }
+        }
+      ],
+      "returns": "u64"
+    },
+    {
+      "name": "emit_content_event",
+      "docs": [
+        "发射内容事件 (CPI)"
+      ],
+      "discriminator": [
+        191,
+        201,
+        239,
+        253,
+        157,
+        123,
+        32,
+        149
+      ],
+      "accounts": [
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  98,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "event_emitter.event_sequence",
+                "account": "EventEmitterAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "caller_program"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "event",
+          "type": {
+            "defined": {
+              "name": "ProtocolEvent"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "emit_event",
+      "docs": [
+        "发射单个事件"
+      ],
+      "discriminator": [
+        82,
+        133,
+        188,
+        136,
+        167,
+        139,
+        209,
+        52
+      ],
+      "accounts": [
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  98,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "event_emitter.event_sequence",
+                "account": "EventEmitterAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "event",
+          "type": {
+            "defined": {
+              "name": "ProtocolEvent"
+            }
+          }
+        },
+        {
+          "name": "priority",
+          "type": {
+            "defined": {
+              "name": "EventPriority"
+            }
+          }
+        }
+      ],
+      "returns": "u64"
+    },
+    {
+      "name": "emit_identity_event",
+      "docs": [
+        "发射身份事件 (CPI)"
+      ],
+      "discriminator": [
+        148,
+        147,
+        67,
+        22,
+        158,
+        38,
+        80,
+        176
+      ],
+      "accounts": [
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  98,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "event_emitter.event_sequence",
+                "account": "EventEmitterAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "caller_program"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "event",
+          "type": {
+            "defined": {
+              "name": "ProtocolEvent"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "get_archive_stats",
+      "docs": [
+        "获取归档统计"
+      ],
+      "discriminator": [
+        182,
+        96,
+        116,
+        202,
+        181,
+        17,
+        115,
+        75
+      ],
+      "accounts": [
+        {
+          "name": "event_emitter"
+        }
+      ],
+      "args": [],
+      "returns": {
+        "defined": {
+          "name": "ArchiveStats"
+        }
+      }
+    },
+    {
+      "name": "get_event_stats",
+      "docs": [
+        "获取事件统计"
+      ],
+      "discriminator": [
+        168,
+        69,
+        58,
+        36,
+        187,
+        20,
+        227,
+        222
+      ],
+      "accounts": [
+        {
+          "name": "event_emitter"
+        }
+      ],
+      "args": [
+        {
+          "name": "time_range",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "TimeRange"
+              }
+            }
+          }
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "EventStats"
+        }
+      }
+    },
+    {
+      "name": "get_user_event_history",
+      "docs": [
+        "获取用户事件历史"
+      ],
+      "discriminator": [
+        100,
+        223,
+        179,
+        255,
+        212,
+        175,
+        147,
+        124
+      ],
+      "accounts": [
+        {
+          "name": "event_emitter"
+        },
+        {
+          "name": "target_user"
+        }
+      ],
+      "args": [
+        {
+          "name": "user",
+          "type": "pubkey"
+        },
+        {
+          "name": "event_types",
+          "type": {
+            "option": {
+              "vec": {
+                "defined": {
+                  "name": "EventType"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "limit",
+          "type": "u32"
+        }
+      ],
+      "returns": {
+        "vec": {
+          "defined": {
+            "name": "ProtocolEvent"
+          }
+        }
+      }
+    },
+    {
+      "name": "initialize_event_emitter",
+      "docs": [
+        "初始化事件发射器"
+      ],
+      "discriminator": [
+        120,
+        74,
+        252,
+        228,
+        214,
+        247,
+        40,
+        194
+      ],
+      "accounts": [
+        {
+          "name": "event_emitter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  101,
+                  109,
+                  105,
+                  116,
+                  116,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "storage_config",
+          "type": {
+            "defined": {
+              "name": "EventStorageConfig"
+            }
+          }
+        },
+        {
+          "name": "retention_policy",
+          "type": {
+            "defined": {
+              "name": "EventRetentionPolicy"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "query_events",
+      "docs": [
+        "查询事件"
+      ],
+      "discriminator": [
+        180,
+        48,
+        100,
+        165,
+        220,
+        78,
+        9,
+        39
+      ],
+      "accounts": [
+        {
+          "name": "event_emitter"
+        },
+        {
+          "name": "event_batch"
+        }
+      ],
+      "args": [
+        {
+          "name": "filters",
+          "type": {
+            "defined": {
+              "name": "EventFilters"
+            }
+          }
+        },
+        {
+          "name": "pagination",
+          "type": {
+            "defined": {
+              "name": "PaginationConfig"
+            }
+          }
+        }
+      ],
+      "returns": {
+        "vec": {
+          "defined": {
+            "name": "ProtocolEvent"
+          }
+        }
+      }
+    },
+    {
+      "name": "subscribe_to_events",
+      "docs": [
+        "创建事件订阅"
+      ],
+      "discriminator": [
+        167,
+        115,
+        152,
+        79,
+        248,
+        194,
+        43,
+        19
+      ],
+      "accounts": [
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_subscription",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  115,
+                  117,
+                  98,
+                  115,
+                  99,
+                  114,
+                  105,
+                  112,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "subscriber"
+              }
+            ]
+          }
+        },
+        {
+          "name": "subscriber",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "event_types",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "EventType"
+              }
+            }
+          }
+        },
+        {
+          "name": "filters",
+          "type": {
+            "defined": {
+              "name": "EventFilters"
+            }
+          }
+        },
+        {
+          "name": "delivery_config",
+          "type": {
+            "defined": {
+              "name": "DeliveryConfig"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "toggle_subscription",
+      "docs": [
+        "暂停/恢复订阅"
+      ],
+      "discriminator": [
+        116,
+        74,
+        228,
+        51,
+        156,
+        211,
+        158,
+        85
+      ],
+      "accounts": [
+        {
+          "name": "event_subscription",
+          "writable": true
+        },
+        {
+          "name": "subscriber",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "active",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "unsubscribe_from_events",
+      "docs": [
+        "取消事件订阅"
+      ],
+      "discriminator": [
+        35,
+        10,
+        23,
+        151,
+        234,
+        95,
+        182,
+        235
+      ],
+      "accounts": [
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_subscription",
+          "writable": true
+        },
+        {
+          "name": "subscriber",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "update_event_emitter_config",
+      "docs": [
+        "更新事件发射器配置"
+      ],
+      "discriminator": [
+        121,
+        201,
+        217,
+        130,
+        15,
+        130,
+        137,
+        65
+      ],
+      "accounts": [
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_storage_config",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "EventStorageConfig"
+              }
+            }
+          }
+        },
+        {
+          "name": "new_retention_policy",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "EventRetentionPolicy"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_subscription",
+      "docs": [
+        "更新事件订阅"
+      ],
+      "discriminator": [
+        178,
+        93,
+        201,
+        243,
+        105,
+        32,
+        73,
+        210
+      ],
+      "accounts": [
+        {
+          "name": "event_subscription",
+          "writable": true
+        },
+        {
+          "name": "subscriber",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_event_types",
+          "type": {
+            "option": {
+              "vec": {
+                "defined": {
+                  "name": "EventType"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "new_filters",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "EventFilters"
+              }
+            }
+          }
+        },
+        {
+          "name": "new_delivery_config",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "DeliveryConfig"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "EventBatchAccount",
+      "discriminator": [
+        194,
+        197,
+        38,
+        162,
+        85,
+        121,
+        31,
+        149
+      ]
+    },
+    {
+      "name": "EventEmitterAccount",
+      "discriminator": [
+        4,
+        206,
+        57,
+        197,
+        239,
+        110,
+        2,
+        30
+      ]
+    },
+    {
+      "name": "EventSubscriptionAccount",
+      "discriminator": [
+        255,
+        251,
+        150,
+        22,
+        231,
+        212,
+        61,
+        202
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "AccessLevel",
+      "docs": [
+        "访问级别"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Public"
+          },
+          {
+            "name": "Followers"
+          },
+          {
+            "name": "Friends"
+          },
+          {
+            "name": "Private"
+          },
+          {
+            "name": "Custom"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AccessRuleChange",
+      "docs": [
+        "访问规则变更"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Created"
+          },
+          {
+            "name": "Updated"
+          },
+          {
+            "name": "Deleted"
+          },
+          {
+            "name": "Enabled"
+          },
+          {
+            "name": "Disabled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ArchiveStats",
+      "docs": [
+        "归档统计"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "total_archived_batches",
+            "type": "u64"
+          },
+          {
+            "name": "total_archived_events",
+            "type": "u64"
+          },
+          {
+            "name": "archive_storage_used",
+            "type": "u64"
+          },
+          {
+            "name": "successful_archives",
+            "type": "u64"
+          },
+          {
+            "name": "failed_archives",
+            "type": "u64"
+          },
+          {
+            "name": "average_archive_time",
+            "type": "f64"
+          },
+          {
+            "name": "last_archive_time",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BatchStatus",
+      "docs": [
+        "批次状态"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Full"
+          },
+          {
+            "name": "Processing"
+          },
+          {
+            "name": "Archived"
+          },
+          {
+            "name": "Failed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CircleMemberRole",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Owner"
+          },
+          {
+            "name": "Admin"
+          },
+          {
+            "name": "Moderator"
+          },
+          {
+            "name": "Member"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CircleMemberStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Inactive"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CircleMembershipAction",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Joined"
+          },
+          {
+            "name": "Left"
+          },
+          {
+            "name": "Added"
+          },
+          {
+            "name": "Removed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentAnchorRelation",
+      "docs": [
+        "v2 最小锚点关系"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Reply",
+            "fields": [
+              {
+                "name": "parent_content",
+                "type": "pubkey"
+              }
+            ]
+          },
+          {
+            "name": "Repost",
+            "fields": [
+              {
+                "name": "original_content",
+                "type": "pubkey"
+              }
+            ]
+          },
+          {
+            "name": "Quote",
+            "fields": [
+              {
+                "name": "quoted_content",
+                "type": "pubkey"
+              }
+            ]
+          },
+          {
+            "name": "ReplyById",
+            "fields": [
+              {
+                "name": "parent_content_id",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "RepostById",
+            "fields": [
+              {
+                "name": "original_content_id",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "QuoteById",
+            "fields": [
+              {
+                "name": "quoted_content_id",
+                "type": "u64"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentStatus",
+      "docs": [
+        "内容状态"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Draft"
+          },
+          {
+            "name": "Published"
+          },
+          {
+            "name": "Archived"
+          },
+          {
+            "name": "Deleted"
+          },
+          {
+            "name": "Moderated"
+          },
+          {
+            "name": "Suspended"
+          },
+          {
+            "name": "Flagged"
+          },
+          {
+            "name": "UnderReview"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentType",
+      "docs": [
+        "内容类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Text"
+          },
+          {
+            "name": "Image"
+          },
+          {
+            "name": "Video"
+          },
+          {
+            "name": "Audio"
+          },
+          {
+            "name": "Document"
+          },
+          {
+            "name": "Link"
+          },
+          {
+            "name": "Poll"
+          },
+          {
+            "name": "Event"
+          },
+          {
+            "name": "Live"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ConversationType",
+      "docs": [
+        "会话类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Direct"
+          },
+          {
+            "name": "Group"
+          },
+          {
+            "name": "Channel"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CustomFilter",
+      "docs": [
+        "自定义过滤器"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "field_name",
+            "type": "string"
+          },
+          {
+            "name": "operator",
+            "type": {
+              "defined": {
+                "name": "FilterOperator"
+              }
+            }
+          },
+          {
+            "name": "value",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeliveryConfig",
+      "docs": [
+        "投递配置"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Immediate"
+          },
+          {
+            "name": "Batched",
+            "fields": [
+              {
+                "name": "interval_seconds",
+                "type": "u32"
+              }
+            ]
+          },
+          {
+            "name": "OnQuery"
+          },
+          {
+            "name": "Webhook",
+            "fields": [
+              {
+                "name": "url",
+                "type": "string"
+              },
+              {
+                "name": "auth_token",
+                "type": {
+                  "option": "string"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              {
+                "name": "config",
+                "type": {
+                  "vec": {
+                    "defined": {
+                      "name": "KeyValue"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeliveryStats",
+      "docs": [
+        "投递统计"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "total_delivered",
+            "type": "u64"
+          },
+          {
+            "name": "successful_deliveries",
+            "type": "u64"
+          },
+          {
+            "name": "failed_deliveries",
+            "type": "u64"
+          },
+          {
+            "name": "last_delivery_attempt",
+            "type": "i64"
+          },
+          {
+            "name": "average_delivery_time",
+            "type": "f64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EarningSource",
+      "docs": [
+        "收入来源"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ContentCreation"
+          },
+          {
+            "name": "ContentInteraction"
+          },
+          {
+            "name": "Referral"
+          },
+          {
+            "name": "Staking"
+          },
+          {
+            "name": "Validation"
+          },
+          {
+            "name": "Moderation"
+          },
+          {
+            "name": "Other",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "EmergencyActionType",
+      "docs": [
+        "紧急行动类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SystemPause"
+          },
+          {
+            "name": "SystemResume"
+          },
+          {
+            "name": "AccountFreeze"
+          },
+          {
+            "name": "AccountUnfreeze"
+          },
+          {
+            "name": "ContentTakedown"
+          },
+          {
+            "name": "SecurityAlert"
+          },
+          {
+            "name": "NetworkMaintenance"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventBatch",
+      "docs": [
+        "事件批次账户"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "batch_id",
+            "type": "u64"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "events",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "ProtocolEvent"
+                }
+              }
+            }
+          },
+          {
+            "name": "archived",
+            "type": "bool"
+          },
+          {
+            "name": "arweave_tx_id",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "events_count",
+            "type": "u32"
+          },
+          {
+            "name": "batch_status",
+            "type": {
+              "defined": {
+                "name": "BatchStatus"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventBatchAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inner",
+            "type": {
+              "defined": {
+                "name": "EventBatch"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventEmitter",
+      "docs": [
+        "事件发射器主账户"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_events",
+            "type": "u64"
+          },
+          {
+            "name": "event_sequence",
+            "type": "u64"
+          },
+          {
+            "name": "storage_config",
+            "type": {
+              "defined": {
+                "name": "EventStorageConfig"
+              }
+            }
+          },
+          {
+            "name": "retention_policy",
+            "type": {
+              "defined": {
+                "name": "EventRetentionPolicy"
+              }
+            }
+          },
+          {
+            "name": "subscription_count",
+            "type": "u64"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventEmitterAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inner",
+            "type": {
+              "defined": {
+                "name": "EventEmitter"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventFilters",
+      "docs": [
+        "事件过滤器"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "source_programs",
+            "type": {
+              "option": {
+                "vec": "pubkey"
+              }
+            }
+          },
+          {
+            "name": "user_filter",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "content_types",
+            "type": {
+              "option": {
+                "vec": {
+                  "defined": {
+                    "name": "ContentType"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name": "time_range",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "TimeRange"
+                }
+              }
+            }
+          },
+          {
+            "name": "event_priority",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "EventPriority"
+                }
+              }
+            }
+          },
+          {
+            "name": "custom_filters",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "CustomFilter"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventPriority",
+      "docs": [
+        "事件优先级"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Low"
+          },
+          {
+            "name": "Normal"
+          },
+          {
+            "name": "High"
+          },
+          {
+            "name": "Critical"
+          },
+          {
+            "name": "Emergency"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventPriorityCount",
+      "docs": [
+        "按优先级的事件计数"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "priority",
+            "type": {
+              "defined": {
+                "name": "EventPriority"
+              }
+            }
+          },
+          {
+            "name": "count",
+            "type": "u64"
+          },
+          {
+            "name": "percentage",
+            "type": "f64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventRetentionPolicy",
+      "docs": [
+        "事件保留策略"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "chain_retention_days",
+            "type": "u32"
+          },
+          {
+            "name": "archive_retention_days",
+            "type": "u32"
+          },
+          {
+            "name": "auto_cleanup",
+            "type": "bool"
+          },
+          {
+            "name": "priority_retention",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "PriorityRetention"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventStats",
+      "docs": [
+        "事件统计"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "total_events",
+            "type": "u64"
+          },
+          {
+            "name": "events_by_type",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "EventTypeCount"
+                }
+              }
+            }
+          },
+          {
+            "name": "events_by_priority",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "EventPriorityCount"
+                }
+              }
+            }
+          },
+          {
+            "name": "average_events_per_day",
+            "type": "f64"
+          },
+          {
+            "name": "peak_events_per_hour",
+            "type": "u64"
+          },
+          {
+            "name": "current_batch_count",
+            "type": "u32"
+          },
+          {
+            "name": "archived_batch_count",
+            "type": "u32"
+          },
+          {
+            "name": "storage_usage",
+            "type": {
+              "defined": {
+                "name": "StorageUsage"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventStorageConfig",
+      "docs": [
+        "事件存储配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "chain_storage_limit",
+            "type": "u32"
+          },
+          {
+            "name": "archive_to_arweave",
+            "type": "bool"
+          },
+          {
+            "name": "use_compression",
+            "type": "bool"
+          },
+          {
+            "name": "batch_size",
+            "type": "u32"
+          },
+          {
+            "name": "auto_archive_after_days",
+            "type": "u32"
+          },
+          {
+            "name": "max_event_size",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventSubscription",
+      "docs": [
+        "事件订阅账户"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "subscriber",
+            "type": "pubkey"
+          },
+          {
+            "name": "event_types",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "EventType"
+                }
+              }
+            }
+          },
+          {
+            "name": "filters",
+            "type": {
+              "defined": {
+                "name": "EventFilters"
+              }
+            }
+          },
+          {
+            "name": "delivery_config",
+            "type": {
+              "defined": {
+                "name": "DeliveryConfig"
+              }
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "last_delivered",
+            "type": "i64"
+          },
+          {
+            "name": "active",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "delivery_stats",
+            "type": {
+              "defined": {
+                "name": "DeliveryStats"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventSubscriptionAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inner",
+            "type": {
+              "defined": {
+                "name": "EventSubscription"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventType",
+      "docs": [
+        "事件类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Identity"
+          },
+          {
+            "name": "Profile"
+          },
+          {
+            "name": "Verification"
+          },
+          {
+            "name": "Reputation"
+          },
+          {
+            "name": "Content"
+          },
+          {
+            "name": "Interaction"
+          },
+          {
+            "name": "Messaging"
+          },
+          {
+            "name": "Moderation"
+          },
+          {
+            "name": "Circle"
+          },
+          {
+            "name": "Knowledge"
+          },
+          {
+            "name": "Access"
+          },
+          {
+            "name": "Permission"
+          },
+          {
+            "name": "System"
+          },
+          {
+            "name": "Registry"
+          },
+          {
+            "name": "Upgrade"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventTypeCount",
+      "docs": [
+        "按类型的事件计数"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "event_type",
+            "type": {
+              "defined": {
+                "name": "EventType"
+              }
+            }
+          },
+          {
+            "name": "count",
+            "type": "u64"
+          },
+          {
+            "name": "percentage",
+            "type": "f64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FilterOperator",
+      "docs": [
+        "过滤操作符"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Equals"
+          },
+          {
+            "name": "NotEquals"
+          },
+          {
+            "name": "Contains"
+          },
+          {
+            "name": "NotContains"
+          },
+          {
+            "name": "GreaterThan"
+          },
+          {
+            "name": "LessThan"
+          },
+          {
+            "name": "InRange"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FollowActionType",
+      "docs": [
+        "关注动作类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Follow"
+          },
+          {
+            "name": "Unfollow"
+          },
+          {
+            "name": "Block"
+          },
+          {
+            "name": "Unblock"
+          },
+          {
+            "name": "Mute"
+          },
+          {
+            "name": "Unmute"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InteractionType",
+      "docs": [
+        "互动类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Like"
+          },
+          {
+            "name": "Dislike"
+          },
+          {
+            "name": "Share"
+          },
+          {
+            "name": "Comment"
+          },
+          {
+            "name": "Bookmark"
+          },
+          {
+            "name": "Report"
+          },
+          {
+            "name": "View"
+          }
+        ]
+      }
+    },
+    {
+      "name": "KeyValue",
+      "docs": [
+        "键值对数据结构"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "key",
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MessageType",
+      "docs": [
+        "消息类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Text"
+          },
+          {
+            "name": "Image"
+          },
+          {
+            "name": "Video"
+          },
+          {
+            "name": "Audio"
+          },
+          {
+            "name": "File"
+          },
+          {
+            "name": "Link"
+          },
+          {
+            "name": "Payment"
+          },
+          {
+            "name": "Contract"
+          },
+          {
+            "name": "System"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ModerationAction",
+      "docs": [
+        "审核动作"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Warning"
+          },
+          {
+            "name": "ContentRemoval"
+          },
+          {
+            "name": "AccountSuspension"
+          },
+          {
+            "name": "AccountBan"
+          },
+          {
+            "name": "ContentFlagging"
+          },
+          {
+            "name": "ContentApproval"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PaginationConfig",
+      "docs": [
+        "分页配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "page",
+            "type": "u32"
+          },
+          {
+            "name": "limit",
+            "type": "u32"
+          },
+          {
+            "name": "sort_by",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "sort_order",
+            "type": {
+              "defined": {
+                "name": "SortOrder"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Permission",
+      "docs": [
+        "权限类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CreateContent"
+          },
+          {
+            "name": "EditContent"
+          },
+          {
+            "name": "DeleteContent"
+          },
+          {
+            "name": "ViewContent"
+          },
+          {
+            "name": "FollowUser"
+          },
+          {
+            "name": "UnfollowUser"
+          },
+          {
+            "name": "MessageUser"
+          },
+          {
+            "name": "ViewProfile"
+          },
+          {
+            "name": "EditProfile"
+          },
+          {
+            "name": "ViewFollowers"
+          },
+          {
+            "name": "ViewFollowing"
+          },
+          {
+            "name": "LikeContent"
+          },
+          {
+            "name": "CommentContent"
+          },
+          {
+            "name": "ShareContent"
+          },
+          {
+            "name": "ReportContent"
+          },
+          {
+            "name": "InteractWithContent"
+          },
+          {
+            "name": "JoinCommunity"
+          },
+          {
+            "name": "LeaveCommunity"
+          },
+          {
+            "name": "CreateCommunity"
+          },
+          {
+            "name": "ModerateCommunity"
+          },
+          {
+            "name": "InviteMembers"
+          },
+          {
+            "name": "RemoveMembers"
+          },
+          {
+            "name": "ManageSettings"
+          },
+          {
+            "name": "AccessAnalytics"
+          },
+          {
+            "name": "SystemAdmin"
+          },
+          {
+            "name": "VerifyIdentity"
+          },
+          {
+            "name": "Follow"
+          },
+          {
+            "name": "Message"
+          },
+          {
+            "name": "Comment"
+          },
+          {
+            "name": "Share"
+          },
+          {
+            "name": "ModerateContent"
+          },
+          {
+            "name": "ManageUsers"
+          },
+          {
+            "name": "ConfigureSystem"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "PriorityRetention",
+      "docs": [
+        "优先级保留策略"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "event_type",
+            "type": {
+              "defined": {
+                "name": "EventType"
+              }
+            }
+          },
+          {
+            "name": "retention_days",
+            "type": "u32"
+          },
+          {
+            "name": "priority",
+            "type": {
+              "defined": {
+                "name": "EventPriority"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProfileUpdateType",
+      "docs": [
+        "档案更新类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "BasicInfo"
+          },
+          {
+            "name": "PrivacySettings"
+          },
+          {
+            "name": "NotificationPreferences"
+          },
+          {
+            "name": "DisplayPreferences"
+          },
+          {
+            "name": "CustomAttributes"
+          },
+          {
+            "name": "AppSpecificData"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProtocolEvent",
+      "docs": [
+        "完整的协议事件定义"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "IdentityRegistered",
+            "fields": [
+              {
+                "name": "identity_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "handle",
+                "type": "string"
+              },
+              {
+                "name": "verification_level",
+                "type": {
+                  "defined": {
+                    "name": "VerificationLevel"
+                  }
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              },
+              {
+                "name": "registry_id",
+                "type": "pubkey"
+              }
+            ]
+          },
+          {
+            "name": "HandleRegistered",
+            "fields": [
+              {
+                "name": "handle",
+                "type": "string"
+              },
+              {
+                "name": "identity_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "is_primary",
+                "type": "bool"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "HandleTransferred",
+            "fields": [
+              {
+                "name": "handle",
+                "type": "string"
+              },
+              {
+                "name": "from_owner",
+                "type": "pubkey"
+              },
+              {
+                "name": "to_owner",
+                "type": "pubkey"
+              },
+              {
+                "name": "transfer_reason",
+                "type": {
+                  "defined": {
+                    "name": "TransferReason"
+                  }
+                }
+              },
+              {
+                "name": "transfer_fee",
+                "type": "u64"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "ProfileUpdated",
+            "fields": [
+              {
+                "name": "identity_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "updated_fields",
+                "type": {
+                  "vec": "string"
+                }
+              },
+              {
+                "name": "update_type",
+                "type": {
+                  "defined": {
+                    "name": "ProfileUpdateType"
+                  }
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "VerificationAttributeAdded",
+            "fields": [
+              {
+                "name": "identity_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "attribute_type",
+                "type": "string"
+              },
+              {
+                "name": "verifier",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "ReputationUpdated",
+            "fields": [
+              {
+                "name": "identity_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "old_reputation",
+                "type": "f64"
+              },
+              {
+                "name": "new_reputation",
+                "type": "f64"
+              },
+              {
+                "name": "reason",
+                "type": "string"
+              },
+              {
+                "name": "updated_by",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "ContentCreated",
+            "fields": [
+              {
+                "name": "content_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "author",
+                "type": "pubkey"
+              },
+              {
+                "name": "content_type",
+                "type": {
+                  "defined": {
+                    "name": "ContentType"
+                  }
+                }
+              },
+              {
+                "name": "storage_strategy",
+                "type": {
+                  "defined": {
+                    "name": "StorageStrategy"
+                  }
+                }
+              },
+              {
+                "name": "visibility",
+                "type": {
+                  "defined": {
+                    "name": "AccessLevel"
+                  }
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "ContentAnchoredV2",
+            "fields": [
+              {
+                "name": "content_id",
+                "type": "u64"
+              },
+              {
+                "name": "author",
+                "type": "pubkey"
+              },
+              {
+                "name": "content_hash",
+                "type": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              },
+              {
+                "name": "uri_ref",
+                "type": "string"
+              },
+              {
+                "name": "relation",
+                "type": {
+                  "defined": {
+                    "name": "ContentAnchorRelation"
+                  }
+                }
+              },
+              {
+                "name": "visibility",
+                "type": {
+                  "defined": {
+                    "name": "AccessLevel"
+                  }
+                }
+              },
+              {
+                "name": "audience_kind",
+                "type": {
+                  "defined": {
+                    "name": "V2AudienceKind"
+                  }
+                }
+              },
+              {
+                "name": "audience_ref",
+                "type": "u8"
+              },
+              {
+                "name": "status",
+                "type": {
+                  "defined": {
+                    "name": "ContentStatus"
+                  }
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "ContentAnchorUpdatedV2",
+            "fields": [
+              {
+                "name": "content_id",
+                "type": "u64"
+              },
+              {
+                "name": "content_version",
+                "type": "u32"
+              },
+              {
+                "name": "content_hash",
+                "type": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              },
+              {
+                "name": "uri_ref",
+                "type": "string"
+              },
+              {
+                "name": "author",
+                "type": "pubkey"
+              },
+              {
+                "name": "audience_kind",
+                "type": {
+                  "defined": {
+                    "name": "V2AudienceKind"
+                  }
+                }
+              },
+              {
+                "name": "audience_ref",
+                "type": "u8"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "ContentUpdated",
+            "fields": [
+              {
+                "name": "content_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "author",
+                "type": "pubkey"
+              },
+              {
+                "name": "updated_fields",
+                "type": {
+                  "vec": "string"
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "ContentInteraction",
+            "fields": [
+              {
+                "name": "content_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "actor",
+                "type": "pubkey"
+              },
+              {
+                "name": "interaction_type",
+                "type": {
+                  "defined": {
+                    "name": "InteractionType"
+                  }
+                }
+              },
+              {
+                "name": "metadata",
+                "type": {
+                  "option": "string"
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "ContentModerated",
+            "fields": [
+              {
+                "name": "content_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "moderator",
+                "type": "pubkey"
+              },
+              {
+                "name": "action",
+                "type": {
+                  "defined": {
+                    "name": "ModerationAction"
+                  }
+                }
+              },
+              {
+                "name": "reason",
+                "type": "string"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "ContentStatusChanged",
+            "fields": [
+              {
+                "name": "content_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "old_status",
+                "type": {
+                  "defined": {
+                    "name": "ContentStatus"
+                  }
+                }
+              },
+              {
+                "name": "new_status",
+                "type": {
+                  "defined": {
+                    "name": "ContentStatus"
+                  }
+                }
+              },
+              {
+                "name": "changed_by",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "ContentStatusChangedV2",
+            "fields": [
+              {
+                "name": "content_id",
+                "type": "u64"
+              },
+              {
+                "name": "old_status",
+                "type": {
+                  "defined": {
+                    "name": "ContentStatus"
+                  }
+                }
+              },
+              {
+                "name": "new_status",
+                "type": {
+                  "defined": {
+                    "name": "ContentStatus"
+                  }
+                }
+              },
+              {
+                "name": "changed_by",
+                "type": "pubkey"
+              },
+              {
+                "name": "audience_kind",
+                "type": {
+                  "defined": {
+                    "name": "V2AudienceKind"
+                  }
+                }
+              },
+              {
+                "name": "audience_ref",
+                "type": "u8"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "CircleCreated",
+            "fields": [
+              {
+                "name": "circle_id",
+                "type": "u8"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "level",
+                "type": "u8"
+              },
+              {
+                "name": "parent_circle",
+                "type": {
+                  "option": "u8"
+                }
+              },
+              {
+                "name": "flags",
+                "type": "u64"
+              },
+              {
+                "name": "creator",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "CircleFlagsUpdated",
+            "fields": [
+              {
+                "name": "circle_id",
+                "type": "u8"
+              },
+              {
+                "name": "old_flags",
+                "type": "u64"
+              },
+              {
+                "name": "new_flags",
+                "type": "u64"
+              },
+              {
+                "name": "updated_by",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "CircleMembershipChanged",
+            "fields": [
+              {
+                "name": "circle_id",
+                "type": "u8"
+              },
+              {
+                "name": "member",
+                "type": "pubkey"
+              },
+              {
+                "name": "role",
+                "type": {
+                  "defined": {
+                    "name": "CircleMemberRole"
+                  }
+                }
+              },
+              {
+                "name": "status",
+                "type": {
+                  "defined": {
+                    "name": "CircleMemberStatus"
+                  }
+                }
+              },
+              {
+                "name": "action",
+                "type": {
+                  "defined": {
+                    "name": "CircleMembershipAction"
+                  }
+                }
+              },
+              {
+                "name": "actor",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "KnowledgeSubmitted",
+            "fields": [
+              {
+                "name": "knowledge_id",
+                "type": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              },
+              {
+                "name": "circle_id",
+                "type": "u8"
+              },
+              {
+                "name": "author",
+                "type": "pubkey"
+              },
+              {
+                "name": "content_hash",
+                "type": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              },
+              {
+                "name": "title",
+                "type": "string"
+              },
+              {
+                "name": "flags",
+                "type": "u64"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "ContributorsUpdated",
+            "fields": [
+              {
+                "name": "knowledge_id",
+                "type": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              },
+              {
+                "name": "contributors_root",
+                "type": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              },
+              {
+                "name": "contributors_count",
+                "type": "u16"
+              },
+              {
+                "name": "version",
+                "type": "u16"
+              },
+              {
+                "name": "updated_by",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "ContributorProofBound",
+            "fields": [
+              {
+                "name": "knowledge_id",
+                "type": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              },
+              {
+                "name": "source_anchor_id",
+                "type": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              },
+              {
+                "name": "proof_package_hash",
+                "type": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              },
+              {
+                "name": "contributors_root",
+                "type": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              },
+              {
+                "name": "contributors_count",
+                "type": "u16"
+              },
+              {
+                "name": "binding_version",
+                "type": "u16"
+              },
+              {
+                "name": "generated_at",
+                "type": "i64"
+              },
+              {
+                "name": "bound_by",
+                "type": "pubkey"
+              },
+              {
+                "name": "bound_at",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "ProofAttestorRegistered",
+            "fields": [
+              {
+                "name": "attestor",
+                "type": "pubkey"
+              },
+              {
+                "name": "registered_by",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "ConversationCreated",
+            "fields": [
+              {
+                "name": "conversation_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "conversation_type",
+                "type": {
+                  "defined": {
+                    "name": "ConversationType"
+                  }
+                }
+              },
+              {
+                "name": "creator",
+                "type": "pubkey"
+              },
+              {
+                "name": "participants",
+                "type": {
+                  "vec": "pubkey"
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "MessageSent",
+            "fields": [
+              {
+                "name": "message_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "conversation_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "sender",
+                "type": "pubkey"
+              },
+              {
+                "name": "message_type",
+                "type": {
+                  "defined": {
+                    "name": "MessageType"
+                  }
+                }
+              },
+              {
+                "name": "reply_to",
+                "type": {
+                  "option": "pubkey"
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "MessageRead",
+            "fields": [
+              {
+                "name": "message_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "reader",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "MessageRecalled",
+            "fields": [
+              {
+                "name": "message_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "sender",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "PresenceUpdated",
+            "fields": [
+              {
+                "name": "user_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "status",
+                "type": "string"
+              },
+              {
+                "name": "custom_status",
+                "type": {
+                  "option": "string"
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "AccessRuleCreated",
+            "fields": [
+              {
+                "name": "user",
+                "type": "pubkey"
+              },
+              {
+                "name": "rule_id",
+                "type": "string"
+              },
+              {
+                "name": "permission",
+                "type": {
+                  "defined": {
+                    "name": "Permission"
+                  }
+                }
+              },
+              {
+                "name": "access_level",
+                "type": {
+                  "defined": {
+                    "name": "AccessLevel"
+                  }
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "AccessRuleUpdated",
+            "fields": [
+              {
+                "name": "user",
+                "type": "pubkey"
+              },
+              {
+                "name": "rule_id",
+                "type": "string"
+              },
+              {
+                "name": "permission",
+                "type": {
+                  "defined": {
+                    "name": "Permission"
+                  }
+                }
+              },
+              {
+                "name": "rule_change",
+                "type": {
+                  "defined": {
+                    "name": "AccessRuleChange"
+                  }
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "PermissionGranted",
+            "fields": [
+              {
+                "name": "granter",
+                "type": "pubkey"
+              },
+              {
+                "name": "grantee",
+                "type": "pubkey"
+              },
+              {
+                "name": "permission",
+                "type": {
+                  "defined": {
+                    "name": "Permission"
+                  }
+                }
+              },
+              {
+                "name": "scope",
+                "type": {
+                  "option": "pubkey"
+                }
+              },
+              {
+                "name": "expires_at",
+                "type": {
+                  "option": "i64"
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "PermissionDenied",
+            "fields": [
+              {
+                "name": "requester",
+                "type": "pubkey"
+              },
+              {
+                "name": "permission",
+                "type": {
+                  "defined": {
+                    "name": "Permission"
+                  }
+                }
+              },
+              {
+                "name": "target",
+                "type": {
+                  "option": "pubkey"
+                }
+              },
+              {
+                "name": "reason",
+                "type": "string"
+              },
+              {
+                "name": "denial_code",
+                "type": "u32"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "RelationshipChanged",
+            "fields": [
+              {
+                "name": "user1",
+                "type": "pubkey"
+              },
+              {
+                "name": "user2",
+                "type": "pubkey"
+              },
+              {
+                "name": "old_relationship",
+                "type": {
+                  "defined": {
+                    "name": "RelationshipType"
+                  }
+                }
+              },
+              {
+                "name": "new_relationship",
+                "type": {
+                  "defined": {
+                    "name": "RelationshipType"
+                  }
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "ProgramUpgraded",
+            "fields": [
+              {
+                "name": "program_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "old_version",
+                "type": "string"
+              },
+              {
+                "name": "new_version",
+                "type": "string"
+              },
+              {
+                "name": "upgrade_authority",
+                "type": "pubkey"
+              },
+              {
+                "name": "upgrade_data",
+                "type": "bytes"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "RegistryDeployed",
+            "fields": [
+              {
+                "name": "registry_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "registry_type",
+                "type": {
+                  "defined": {
+                    "name": "RegistryType"
+                  }
+                }
+              },
+              {
+                "name": "deployer",
+                "type": "pubkey"
+              },
+              {
+                "name": "config",
+                "type": {
+                  "defined": {
+                    "name": "RegistryConfig"
+                  }
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "RegistryUpgraded",
+            "fields": [
+              {
+                "name": "registry_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "old_version",
+                "type": "string"
+              },
+              {
+                "name": "new_version",
+                "type": "string"
+              },
+              {
+                "name": "upgrade_data",
+                "type": "bytes"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "EmergencyAction",
+            "fields": [
+              {
+                "name": "action_type",
+                "type": {
+                  "defined": {
+                    "name": "EmergencyActionType"
+                  }
+                }
+              },
+              {
+                "name": "triggered_by",
+                "type": "pubkey"
+              },
+              {
+                "name": "affected_accounts",
+                "type": {
+                  "vec": "pubkey"
+                }
+              },
+              {
+                "name": "reason",
+                "type": "string"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "TokensEarned",
+            "fields": [
+              {
+                "name": "identity_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "amount",
+                "type": "u64"
+              },
+              {
+                "name": "source",
+                "type": {
+                  "defined": {
+                    "name": "EarningSource"
+                  }
+                }
+              },
+              {
+                "name": "transaction_id",
+                "type": "string"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "TokensSpent",
+            "fields": [
+              {
+                "name": "identity_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "amount",
+                "type": "u64"
+              },
+              {
+                "name": "purpose",
+                "type": {
+                  "defined": {
+                    "name": "SpendingPurpose"
+                  }
+                }
+              },
+              {
+                "name": "transaction_id",
+                "type": "string"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "FollowAction",
+            "fields": [
+              {
+                "name": "follower",
+                "type": "pubkey"
+              },
+              {
+                "name": "followed",
+                "type": "pubkey"
+              },
+              {
+                "name": "action",
+                "type": {
+                  "defined": {
+                    "name": "FollowActionType"
+                  }
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "SocialStatsUpdated",
+            "fields": [
+              {
+                "name": "identity_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "stat_type",
+                "type": {
+                  "defined": {
+                    "name": "SocialStatType"
+                  }
+                }
+              },
+              {
+                "name": "old_value",
+                "type": "u64"
+              },
+              {
+                "name": "new_value",
+                "type": "u64"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "RegistryConfig",
+      "docs": [
+        "注册表配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "max_entries",
+            "type": "u64"
+          },
+          {
+            "name": "registration_fee",
+            "type": "u64"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "settings",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "KeyValue"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "RegistryType",
+      "docs": [
+        "注册表类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Identity"
+          },
+          {
+            "name": "Content"
+          },
+          {
+            "name": "Access"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "RelationshipType",
+      "docs": [
+        "关系类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Follower"
+          },
+          {
+            "name": "Following"
+          },
+          {
+            "name": "Friend"
+          },
+          {
+            "name": "Blocked"
+          },
+          {
+            "name": "Muted"
+          },
+          {
+            "name": "Moderator"
+          },
+          {
+            "name": "Admin"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SocialStatType",
+      "docs": [
+        "社交统计类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "FollowerCount"
+          },
+          {
+            "name": "FollowingCount"
+          },
+          {
+            "name": "ContentCount"
+          },
+          {
+            "name": "InteractionCount"
+          },
+          {
+            "name": "ReputationScore"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SortOrder",
+      "docs": [
+        "排序顺序"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Ascending"
+          },
+          {
+            "name": "Descending"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SpendingPurpose",
+      "docs": [
+        "支出目的"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ContentCreation"
+          },
+          {
+            "name": "ContentPromotion"
+          },
+          {
+            "name": "FeatureUpgrade"
+          },
+          {
+            "name": "Donation"
+          },
+          {
+            "name": "Transfer"
+          },
+          {
+            "name": "ServiceFee"
+          },
+          {
+            "name": "Other",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "StorageStrategy",
+      "docs": [
+        "存储策略"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "OnChain"
+          },
+          {
+            "name": "Arweave"
+          },
+          {
+            "name": "IPFS"
+          },
+          {
+            "name": "Hybrid"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "StorageUsage",
+      "docs": [
+        "存储使用情况"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "chain_storage_used",
+            "type": "u64"
+          },
+          {
+            "name": "chain_storage_limit",
+            "type": "u64"
+          },
+          {
+            "name": "archive_storage_used",
+            "type": "u64"
+          },
+          {
+            "name": "compression_ratio",
+            "type": "f64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TimeRange",
+      "docs": [
+        "时间范围"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "start_time",
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TransferReason",
+      "docs": [
+        "转移原因"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Sale"
+          },
+          {
+            "name": "Gift"
+          },
+          {
+            "name": "Inheritance"
+          },
+          {
+            "name": "Recovery"
+          },
+          {
+            "name": "Administrative"
+          },
+          {
+            "name": "Auction"
+          }
+        ]
+      }
+    },
+    {
+      "name": "V2AudienceKind",
+      "docs": [
+        "v2 内容受众类型（紧凑控制面）"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Public"
+          },
+          {
+            "name": "Private"
+          },
+          {
+            "name": "FollowersOnly"
+          },
+          {
+            "name": "CircleOnly"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VerificationLevel",
+      "docs": [
+        "验证等级"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Basic"
+          },
+          {
+            "name": "Verified"
+          },
+          {
+            "name": "Premium"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+/* ═══════════════════════════════════════
+   Breathing Background — pure opacity overlay
+   Design Doc §6: 14-22s cycle, ±1.5-2%
+   "用户不应立即察觉呼吸存在"
+
+   纯色 + opacity 动画:
+   - 无 mix-blend-mode（iOS Safari 兼容）
+   - 无 radial-gradient（均匀提亮，不打聚光灯）
+   - 只动画 opacity（GPU 最高效路径）
+   ═══════════════════════════════════════ */
+
+.container {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* ── Breath layer: 18s slow brightness cycle ── */
+@keyframes breathe {
+
+    0%,
+    100% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.015;
+    }
+}
+
+.breathLayer {
+    position: absolute;
+    inset: 0;
+    /* 纯色：暖白。均匀覆盖整个屏幕 */
+    background: rgb(231, 228, 221);
+    animation: breathe 18s ease-in-out infinite;
+    will-change: opacity;
+}
+
+/* ── Warm accent layer: 22s gold tint cycle ── */
+@keyframes warmBreathe {
+
+    0%,
+    100% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.01;
+    }
+}
+
+.warmLayer {
+    position: absolute;
+    inset: 0;
+    /* 纯色：金色暖调 */
+    background: rgb(199, 168, 107);
+    animation: warmBreathe 22s ease-in-out infinite;
+    animation-delay: -4s;
+    /* offset from breathLayer for organic feel */
+    will-change: opacity;
+}
+
+/* Warm temperature: gold tint slightly more visible */
+.warm .warmLayer {
+    animation-name: warmBreatheStrong;
+}
+
+@keyframes warmBreatheStrong {
+
+    0%,
+    100% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.018;
+    }
+}
+
+/* Cool temperature: suppress warm layer */
+.cool .warmLayer {
+    opacity: 0;
+    animation: none;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+
+    .breathLayer,
+    .warmLayer {
+        animation: none;
+        opacity: 0;
+    }
+}

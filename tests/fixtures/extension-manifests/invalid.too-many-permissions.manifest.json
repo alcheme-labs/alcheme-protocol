@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0.0",
+  "extension_id": "contribution-engine",
+  "display_name": "Contribution Engine",
+  "program_id": "2Nu27qEettMe6v1uqb1Gz2LB38pfEM8u4ioVKA8xkWd8",
+  "version": "0.1.0",
+  "sdk_package": "@alcheme/sdk-extension-contribution-engine",
+  "min_core_sdk_version": "0.1.0",
+  "required_permissions": [
+    "IdentityRead",
+    "IdentityVerify",
+    "IdentityUpdate",
+    "ContentRead",
+    "ContentValidate",
+    "ContentCreate",
+    "ContentStatusUpdate",
+    "AccessCheck",
+    "AccessRuleRead",
+    "EventEmit",
+    "EventQuery"
+  ],
+  "event_types": ["ContributionRecorded"],
+  "parser_contract_version": "v1",
+  "projection_tables": ["contribution_events"],
+  "rollback_strategy": "disable_parser_and_keep_core_path"
+}

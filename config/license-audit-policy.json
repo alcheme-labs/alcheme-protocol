@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "defaultPolicy": {
+    "strongCopyleft": "forbid",
+    "watchlist": "review"
+  },
+  "approvedWatchlistRules": [
+    {
+      "packagePattern": "^rpc-websockets$",
+      "licensePattern": "^LGPL-3.0-only$",
+      "reason": "Accepted for the initial public release as a transitive dependency of @solana/web3.js and related real-time tooling. Keep under review for future replacement."
+    },
+    {
+      "scope": "root",
+      "packagePattern": "^web3-utils$",
+      "licensePattern": "^LGPL-3.0$",
+      "reason": "Accepted for the initial public release as a transitive dependency of the current root toolchain."
+    },
+    {
+      "scope": "root",
+      "packagePattern": "^@ethereumjs/(rlp|util)$",
+      "licensePattern": "^MPL-2.0$",
+      "reason": "Accepted as a transitive dependency in the root JavaScript toolchain."
+    },
+    {
+      "scope": "frontend",
+      "packagePattern": "^(@axe-core/playwright|axe-core)$",
+      "licensePattern": "^MPL-2.0$",
+      "reason": "Accepted as development-only accessibility tooling."
+    },
+    {
+      "scope": "frontend",
+      "packagePattern": "^@img/sharp",
+      "licensePattern": "LGPL-3.0-or-later",
+      "reason": "Accepted as platform-specific sharp/libvips binaries used by the frontend image pipeline."
+    }
+  ]
+}

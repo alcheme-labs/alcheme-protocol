@@ -1,0 +1,2194 @@
+{
+  "address": "75fXAp66PU3sgUcQCGJxdA4MKhFcyXXoGW8rhVk8zm4x",
+  "metadata": {
+    "name": "identity_registry",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Identity Registry Program for SocialHub Protocol"
+  },
+  "docs": [
+    "Identity Registry Program - 身份注册表程序"
+  ],
+  "instructions": [
+    {
+      "name": "add_verification_attribute",
+      "docs": [
+        "添加验证属性"
+      ],
+      "discriminator": [
+        98,
+        50,
+        205,
+        187,
+        96,
+        71,
+        84,
+        13
+      ],
+      "accounts": [
+        {
+          "name": "user_identity",
+          "writable": true
+        },
+        {
+          "name": "verifier",
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "attribute",
+          "type": {
+            "defined": {
+              "name": "VerifiedAttribute"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "check_handle_availability",
+      "docs": [
+        "检查用户名可用性 (CPI)"
+      ],
+      "discriminator": [
+        107,
+        122,
+        171,
+        113,
+        23,
+        228,
+        140,
+        139
+      ],
+      "accounts": [
+        {
+          "name": "handle_mapping",
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  97,
+                  110,
+                  100,
+                  108,
+                  101,
+                  95,
+                  109,
+                  97,
+                  112,
+                  112,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "handle"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "handle",
+          "type": "string"
+        }
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "get_identity_info",
+      "docs": [
+        "获取身份信息 (CPI)"
+      ],
+      "discriminator": [
+        224,
+        234,
+        189,
+        39,
+        119,
+        129,
+        177,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "user_identity"
+        }
+      ],
+      "args": [
+        {
+          "name": "identity_id",
+          "type": "pubkey"
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "UserIdentity"
+        }
+      }
+    },
+    {
+      "name": "get_user_reputation",
+      "docs": [
+        "获取用户声誉 (CPI)"
+      ],
+      "discriminator": [
+        199,
+        248,
+        177,
+        27,
+        84,
+        53,
+        28,
+        146
+      ],
+      "accounts": [
+        {
+          "name": "user_identity"
+        }
+      ],
+      "args": [
+        {
+          "name": "identity_id",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "initialize_identity_registry",
+      "docs": [
+        "初始化身份注册表"
+      ],
+      "discriminator": [
+        141,
+        80,
+        35,
+        207,
+        147,
+        35,
+        120,
+        236
+      ],
+      "accounts": [
+        {
+          "name": "identity_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  100,
+                  101,
+                  110,
+                  116,
+                  105,
+                  116,
+                  121,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "registry_name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "registry_name",
+          "type": "string"
+        },
+        {
+          "name": "metadata_uri",
+          "type": "string"
+        },
+        {
+          "name": "settings",
+          "type": {
+            "defined": {
+              "name": "RegistrySettings"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "register_identity",
+      "docs": [
+        "注册新身份"
+      ],
+      "discriminator": [
+        164,
+        118,
+        227,
+        177,
+        47,
+        176,
+        187,
+        248
+      ],
+      "accounts": [
+        {
+          "name": "identity_registry",
+          "writable": true
+        },
+        {
+          "name": "user_identity",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114,
+                  95,
+                  105,
+                  100,
+                  101,
+                  110,
+                  116,
+                  105,
+                  116,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "identity_registry"
+              },
+              {
+                "kind": "arg",
+                "path": "handle"
+              }
+            ]
+          }
+        },
+        {
+          "name": "handle_mapping",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  97,
+                  110,
+                  100,
+                  108,
+                  101,
+                  95,
+                  109,
+                  97,
+                  112,
+                  112,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "handle"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "handle",
+          "type": "string"
+        },
+        {
+          "name": "privacy_settings",
+          "type": {
+            "defined": {
+              "name": "PrivacyConfig"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_content_stats",
+      "docs": [
+        "更新内容创作统计"
+      ],
+      "discriminator": [
+        244,
+        246,
+        57,
+        177,
+        234,
+        160,
+        103,
+        121
+      ],
+      "accounts": [
+        {
+          "name": "user_identity",
+          "writable": true
+        },
+        {
+          "name": "caller_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_created_delta",
+          "type": "u64"
+        },
+        {
+          "name": "interactions_delta",
+          "type": "u64"
+        },
+        {
+          "name": "quality_score_update",
+          "type": "f64"
+        }
+      ]
+    },
+    {
+      "name": "update_economic_stats",
+      "docs": [
+        "更新经济统计"
+      ],
+      "discriminator": [
+        178,
+        212,
+        166,
+        230,
+        51,
+        204,
+        204,
+        22
+      ],
+      "accounts": [
+        {
+          "name": "user_identity",
+          "writable": true
+        },
+        {
+          "name": "caller_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "tokens_earned_delta",
+          "type": "u64"
+        },
+        {
+          "name": "tokens_spent_delta",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "update_identity",
+      "docs": [
+        "更新身份信息"
+      ],
+      "discriminator": [
+        130,
+        54,
+        88,
+        104,
+        222,
+        124,
+        238,
+        252
+      ],
+      "accounts": [
+        {
+          "name": "user_identity",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "updates",
+          "type": {
+            "defined": {
+              "name": "IdentityUpdates"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_reputation",
+      "docs": [
+        "更新声誉分数"
+      ],
+      "discriminator": [
+        194,
+        220,
+        43,
+        201,
+        54,
+        209,
+        49,
+        178
+      ],
+      "accounts": [
+        {
+          "name": "user_identity",
+          "writable": true
+        },
+        {
+          "name": "identity_registry",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "reputation_delta",
+          "type": "f64"
+        },
+        {
+          "name": "trust_delta",
+          "type": "f64"
+        },
+        {
+          "name": "reason",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "update_reputation_by_extension",
+      "docs": [
+        "通过扩展程序更新声誉（需要 ReputationWrite 权限）"
+      ],
+      "discriminator": [
+        81,
+        140,
+        40,
+        228,
+        32,
+        221,
+        215,
+        128
+      ],
+      "accounts": [
+        {
+          "name": "user_identity",
+          "writable": true
+        },
+        {
+          "name": "identity_registry",
+          "writable": true
+        },
+        {
+          "name": "caller_program"
+        },
+        {
+          "name": "extension_registry"
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "reputation_delta",
+          "type": "f64"
+        },
+        {
+          "name": "trust_delta",
+          "type": "f64"
+        },
+        {
+          "name": "reason",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "update_social_stats",
+      "docs": [
+        "更新社交统计"
+      ],
+      "discriminator": [
+        120,
+        247,
+        159,
+        164,
+        77,
+        179,
+        30,
+        109
+      ],
+      "accounts": [
+        {
+          "name": "user_identity",
+          "writable": true
+        },
+        {
+          "name": "caller_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "follower_delta",
+          "type": "i64"
+        },
+        {
+          "name": "following_delta",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "verify_identity",
+      "docs": [
+        "验证身份 (CPI)"
+      ],
+      "discriminator": [
+        177,
+        162,
+        9,
+        111,
+        44,
+        84,
+        80,
+        21
+      ],
+      "accounts": [
+        {
+          "name": "user_identity"
+        }
+      ],
+      "args": [
+        {
+          "name": "identity_id",
+          "type": "pubkey"
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "UserIdentity"
+        }
+      }
+    }
+  ],
+  "accounts": [
+    {
+      "name": "HandleMappingAccount",
+      "discriminator": [
+        123,
+        232,
+        139,
+        80,
+        83,
+        125,
+        93,
+        61
+      ]
+    },
+    {
+      "name": "IdentityRegistryAccount",
+      "discriminator": [
+        154,
+        254,
+        118,
+        4,
+        115,
+        36,
+        125,
+        78
+      ]
+    },
+    {
+      "name": "UserIdentityAccount",
+      "discriminator": [
+        102,
+        55,
+        252,
+        41,
+        161,
+        21,
+        234,
+        15
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "AccessLevel",
+      "docs": [
+        "访问级别"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Public"
+          },
+          {
+            "name": "Followers"
+          },
+          {
+            "name": "Friends"
+          },
+          {
+            "name": "Private"
+          },
+          {
+            "name": "Custom"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AppData",
+      "docs": [
+        "应用特定数据"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "app_id",
+            "type": "string"
+          },
+          {
+            "name": "app_name",
+            "type": "string"
+          },
+          {
+            "name": "data_type",
+            "type": "string"
+          },
+          {
+            "name": "data",
+            "type": "bytes"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          },
+          {
+            "name": "permissions",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "AppPermission"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "AppPermission",
+      "docs": [
+        "应用权限"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ReadProfile"
+          },
+          {
+            "name": "WriteProfile"
+          },
+          {
+            "name": "ReadContent"
+          },
+          {
+            "name": "WriteContent"
+          },
+          {
+            "name": "ReadSocial"
+          },
+          {
+            "name": "WriteSocial"
+          },
+          {
+            "name": "ReadEconomic"
+          },
+          {
+            "name": "WriteEconomic"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CommunityStanding",
+      "docs": [
+        "社区地位"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NewMember"
+          },
+          {
+            "name": "Regular"
+          },
+          {
+            "name": "Trusted"
+          },
+          {
+            "name": "Contributor"
+          },
+          {
+            "name": "Moderator"
+          },
+          {
+            "name": "Leader"
+          },
+          {
+            "name": "Banned"
+          },
+          {
+            "name": "Suspended"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentFilter",
+      "docs": [
+        "内容过滤器"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "filter_type",
+            "type": {
+              "defined": {
+                "name": "ContentFilterType"
+              }
+            }
+          },
+          {
+            "name": "enabled",
+            "type": "bool"
+          },
+          {
+            "name": "severity",
+            "type": {
+              "defined": {
+                "name": "FilterSeverity"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentFilterType",
+      "docs": [
+        "内容过滤类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Adult"
+          },
+          {
+            "name": "Violence"
+          },
+          {
+            "name": "Profanity"
+          },
+          {
+            "name": "Spam"
+          },
+          {
+            "name": "Political"
+          },
+          {
+            "name": "Religious"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "CurrencyDisplay",
+      "docs": [
+        "货币显示"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "primary_currency",
+            "type": "string"
+          },
+          {
+            "name": "show_usd_equivalent",
+            "type": "bool"
+          },
+          {
+            "name": "decimal_places",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DateFormat",
+      "docs": [
+        "日期格式"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ISO8601"
+          },
+          {
+            "name": "US"
+          },
+          {
+            "name": "EU"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "DisplayConfig",
+      "docs": [
+        "显示配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "theme",
+            "type": {
+              "defined": {
+                "name": "DisplayTheme"
+              }
+            }
+          },
+          {
+            "name": "language",
+            "type": "string"
+          },
+          {
+            "name": "timezone",
+            "type": "string"
+          },
+          {
+            "name": "date_format",
+            "type": {
+              "defined": {
+                "name": "DateFormat"
+              }
+            }
+          },
+          {
+            "name": "currency_display",
+            "type": {
+              "defined": {
+                "name": "CurrencyDisplay"
+              }
+            }
+          },
+          {
+            "name": "content_filters",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "ContentFilter"
+                }
+              }
+            }
+          },
+          {
+            "name": "layout_preferences",
+            "type": {
+              "defined": {
+                "name": "LayoutPreferences"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "DisplayTheme",
+      "docs": [
+        "显示主题"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Light"
+          },
+          {
+            "name": "Dark"
+          },
+          {
+            "name": "Auto"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "FeeDistribution",
+      "docs": [
+        "费用分配"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "protocol_percentage",
+            "type": "u8"
+          },
+          {
+            "name": "registry_percentage",
+            "type": "u8"
+          },
+          {
+            "name": "validator_percentage",
+            "type": "u8"
+          },
+          {
+            "name": "community_percentage",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FeeStructure",
+      "docs": [
+        "费用结构"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "registration_fee",
+            "type": "u64"
+          },
+          {
+            "name": "handle_transfer_fee",
+            "type": "u64"
+          },
+          {
+            "name": "verification_fee",
+            "type": "u64"
+          },
+          {
+            "name": "premium_features_fee",
+            "type": "u64"
+          },
+          {
+            "name": "fee_recipient",
+            "type": "pubkey"
+          },
+          {
+            "name": "fee_distribution",
+            "type": {
+              "defined": {
+                "name": "FeeDistribution"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "FeedLayout",
+      "docs": [
+        "信息流布局"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Timeline"
+          },
+          {
+            "name": "Grid"
+          },
+          {
+            "name": "List"
+          },
+          {
+            "name": "Cards"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FilterSeverity",
+      "docs": [
+        "过滤严格度"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Low"
+          },
+          {
+            "name": "Medium"
+          },
+          {
+            "name": "High"
+          },
+          {
+            "name": "Strict"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HandleMapping",
+      "docs": [
+        "用户名映射 - Handle Manager 核心数据结构"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "handle",
+            "type": "string"
+          },
+          {
+            "name": "identity_id",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "expires_at",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "transfer_history",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "HandleTransfer"
+                }
+              }
+            }
+          },
+          {
+            "name": "is_primary",
+            "type": "bool"
+          },
+          {
+            "name": "is_reserved",
+            "type": "bool"
+          },
+          {
+            "name": "reservation_data",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "ReservationData"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "HandleMappingAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inner",
+            "type": {
+              "defined": {
+                "name": "HandleMapping"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "HandleTransfer",
+      "docs": [
+        "用户名转移记录"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "from_owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "to_owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "transferred_at",
+            "type": "i64"
+          },
+          {
+            "name": "transfer_fee",
+            "type": "u64"
+          },
+          {
+            "name": "transfer_reason",
+            "type": {
+              "defined": {
+                "name": "TransferReason"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "IdentityRegistry",
+      "docs": [
+        "身份注册表 - 主要管理结构"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated",
+            "type": "i64"
+          },
+          {
+            "name": "total_identities",
+            "type": "u64"
+          },
+          {
+            "name": "active_identities",
+            "type": "u64"
+          },
+          {
+            "name": "total_handles_created",
+            "type": "u64"
+          },
+          {
+            "name": "registry_name",
+            "type": "string"
+          },
+          {
+            "name": "metadata_uri",
+            "type": "string"
+          },
+          {
+            "name": "settings",
+            "type": {
+              "defined": {
+                "name": "RegistrySettings"
+              }
+            }
+          },
+          {
+            "name": "validation_config",
+            "type": {
+              "defined": {
+                "name": "ValidationConfig"
+              }
+            }
+          },
+          {
+            "name": "fee_structure",
+            "type": {
+              "defined": {
+                "name": "FeeStructure"
+              }
+            }
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "RegistryStatus"
+              }
+            }
+          },
+          {
+            "name": "custom_settings",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "KeyValue"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "IdentityRegistryAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inner",
+            "type": {
+              "defined": {
+                "name": "IdentityRegistry"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "IdentityUpdates",
+      "docs": [
+        "身份更新数据结构"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "display_name",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "bio",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "avatar_uri",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "banner_uri",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "website",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "location",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "metadata_uri",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "custom_attributes",
+            "type": {
+              "option": {
+                "vec": {
+                  "defined": {
+                    "name": "KeyValue"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "KeyValue",
+      "docs": [
+        "键值对数据结构"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "key",
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LayoutPreferences",
+      "docs": [
+        "布局偏好"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feed_layout",
+            "type": {
+              "defined": {
+                "name": "FeedLayout"
+              }
+            }
+          },
+          {
+            "name": "sidebar_enabled",
+            "type": "bool"
+          },
+          {
+            "name": "compact_mode",
+            "type": "bool"
+          },
+          {
+            "name": "auto_play_media",
+            "type": "bool"
+          },
+          {
+            "name": "show_previews",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NotificationConfig",
+      "docs": [
+        "通知配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "email_notifications",
+            "type": "bool"
+          },
+          {
+            "name": "push_notifications",
+            "type": "bool"
+          },
+          {
+            "name": "in_app_notifications",
+            "type": "bool"
+          },
+          {
+            "name": "notification_types",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "NotificationType"
+                }
+              }
+            }
+          },
+          {
+            "name": "quiet_hours",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "QuietHours"
+                }
+              }
+            }
+          },
+          {
+            "name": "frequency_limit",
+            "type": {
+              "defined": {
+                "name": "NotificationFrequency"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "NotificationFrequency",
+      "docs": [
+        "通知频率"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Immediate"
+          },
+          {
+            "name": "Hourly"
+          },
+          {
+            "name": "Daily"
+          },
+          {
+            "name": "Weekly"
+          },
+          {
+            "name": "Disabled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NotificationType",
+      "docs": [
+        "通知类型"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NewFollower"
+          },
+          {
+            "name": "ContentLiked"
+          },
+          {
+            "name": "ContentShared"
+          },
+          {
+            "name": "ContentCommented"
+          },
+          {
+            "name": "Mentioned"
+          },
+          {
+            "name": "DirectMessage"
+          },
+          {
+            "name": "SystemUpdate"
+          },
+          {
+            "name": "SecurityAlert"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PrivacyConfig",
+      "docs": [
+        "隐私配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "profile_visibility",
+            "type": {
+              "defined": {
+                "name": "AccessLevel"
+              }
+            }
+          },
+          {
+            "name": "content_visibility",
+            "type": {
+              "defined": {
+                "name": "AccessLevel"
+              }
+            }
+          },
+          {
+            "name": "social_graph_visibility",
+            "type": {
+              "defined": {
+                "name": "AccessLevel"
+              }
+            }
+          },
+          {
+            "name": "activity_visibility",
+            "type": {
+              "defined": {
+                "name": "AccessLevel"
+              }
+            }
+          },
+          {
+            "name": "economic_data_visibility",
+            "type": {
+              "defined": {
+                "name": "AccessLevel"
+              }
+            }
+          },
+          {
+            "name": "allow_direct_messages",
+            "type": "bool"
+          },
+          {
+            "name": "allow_mentions",
+            "type": "bool"
+          },
+          {
+            "name": "allow_content_indexing",
+            "type": "bool"
+          },
+          {
+            "name": "data_retention_days",
+            "type": {
+              "option": "u32"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "QuietHours",
+      "docs": [
+        "安静时间"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "start_hour",
+            "type": "u8"
+          },
+          {
+            "name": "end_hour",
+            "type": "u8"
+          },
+          {
+            "name": "timezone",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RegistrySettings",
+      "docs": [
+        "注册表设置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "allow_handle_transfers",
+            "type": "bool"
+          },
+          {
+            "name": "require_verification",
+            "type": "bool"
+          },
+          {
+            "name": "enable_reputation_system",
+            "type": "bool"
+          },
+          {
+            "name": "enable_social_features",
+            "type": "bool"
+          },
+          {
+            "name": "enable_economic_tracking",
+            "type": "bool"
+          },
+          {
+            "name": "max_handles_per_identity",
+            "type": "u32"
+          },
+          {
+            "name": "handle_reservation_period",
+            "type": "i64"
+          },
+          {
+            "name": "minimum_handle_length",
+            "type": "u32"
+          },
+          {
+            "name": "maximum_handle_length",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RegistryStatus",
+      "docs": [
+        "注册表状态"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Paused"
+          },
+          {
+            "name": "Upgrading"
+          },
+          {
+            "name": "Deprecated"
+          },
+          {
+            "name": "Emergency"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReservationData",
+      "docs": [
+        "保留数据"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "reserved_by",
+            "type": "pubkey"
+          },
+          {
+            "name": "reserved_at",
+            "type": "i64"
+          },
+          {
+            "name": "reservation_fee",
+            "type": "u64"
+          },
+          {
+            "name": "reservation_period",
+            "type": "i64"
+          },
+          {
+            "name": "auto_release",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TransferReason",
+      "docs": [
+        "转移原因"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Sale"
+          },
+          {
+            "name": "Gift"
+          },
+          {
+            "name": "Inheritance"
+          },
+          {
+            "name": "Recovery"
+          },
+          {
+            "name": "Administrative"
+          },
+          {
+            "name": "Auction"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserIdentity",
+      "docs": [
+        "用户身份数据结构 - 完整实现"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "identity_id",
+            "type": "pubkey"
+          },
+          {
+            "name": "primary_handle",
+            "type": "string"
+          },
+          {
+            "name": "alternative_handles",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "last_active",
+            "type": "i64"
+          },
+          {
+            "name": "verification_level",
+            "type": {
+              "defined": {
+                "name": "VerificationLevel"
+              }
+            }
+          },
+          {
+            "name": "verified_attributes",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "VerifiedAttribute"
+                }
+              }
+            }
+          },
+          {
+            "name": "verification_history",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "VerificationRecord"
+                }
+              }
+            }
+          },
+          {
+            "name": "follower_count",
+            "type": "u64"
+          },
+          {
+            "name": "following_count",
+            "type": "u64"
+          },
+          {
+            "name": "connection_strength",
+            "type": "f64"
+          },
+          {
+            "name": "social_rank",
+            "type": "u32"
+          },
+          {
+            "name": "content_created",
+            "type": "u64"
+          },
+          {
+            "name": "total_interactions",
+            "type": "u64"
+          },
+          {
+            "name": "content_quality_score",
+            "type": "f64"
+          },
+          {
+            "name": "reputation_score",
+            "type": "f64"
+          },
+          {
+            "name": "trust_score",
+            "type": "f64"
+          },
+          {
+            "name": "community_standing",
+            "type": {
+              "defined": {
+                "name": "CommunityStanding"
+              }
+            }
+          },
+          {
+            "name": "tokens_earned",
+            "type": "u64"
+          },
+          {
+            "name": "tokens_spent",
+            "type": "u64"
+          },
+          {
+            "name": "economic_activity_score",
+            "type": "f64"
+          },
+          {
+            "name": "last_economic_activity",
+            "type": "i64"
+          },
+          {
+            "name": "privacy_settings",
+            "type": {
+              "defined": {
+                "name": "PrivacyConfig"
+              }
+            }
+          },
+          {
+            "name": "notification_preferences",
+            "type": {
+              "defined": {
+                "name": "NotificationConfig"
+              }
+            }
+          },
+          {
+            "name": "display_preferences",
+            "type": {
+              "defined": {
+                "name": "DisplayConfig"
+              }
+            }
+          },
+          {
+            "name": "metadata_uri",
+            "type": "string"
+          },
+          {
+            "name": "custom_attributes",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "KeyValue"
+                }
+              }
+            }
+          },
+          {
+            "name": "app_specific_data",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "AppData"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserIdentityAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inner",
+            "type": {
+              "defined": {
+                "name": "UserIdentity"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ValidationConfig",
+      "docs": [
+        "验证配置"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "required_validators",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "optional_validators",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "minimum_validation_score",
+            "type": "f64"
+          },
+          {
+            "name": "validation_timeout",
+            "type": "i64"
+          },
+          {
+            "name": "auto_approve_threshold",
+            "type": "f64"
+          },
+          {
+            "name": "require_manual_review",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VerificationLevel",
+      "docs": [
+        "验证等级"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Basic"
+          },
+          {
+            "name": "Verified"
+          },
+          {
+            "name": "Premium"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VerificationRecord",
+      "docs": [
+        "验证记录"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "verification_id",
+            "type": "string"
+          },
+          {
+            "name": "verification_type",
+            "type": "string"
+          },
+          {
+            "name": "verifier",
+            "type": "pubkey"
+          },
+          {
+            "name": "verified_at",
+            "type": "i64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "VerificationStatus"
+              }
+            }
+          },
+          {
+            "name": "proof_uri",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "notes",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "VerificationStatus",
+      "docs": [
+        "验证状态"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Pending"
+          },
+          {
+            "name": "Approved"
+          },
+          {
+            "name": "Rejected"
+          },
+          {
+            "name": "Expired"
+          },
+          {
+            "name": "Revoked"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VerifiedAttribute",
+      "docs": [
+        "验证属性"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "attribute_type",
+            "type": "string"
+          },
+          {
+            "name": "attribute_value",
+            "type": "string"
+          },
+          {
+            "name": "verifier",
+            "type": "pubkey"
+          },
+          {
+            "name": "verified_at",
+            "type": "i64"
+          },
+          {
+            "name": "expires_at",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "verification_proof",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ]
+}

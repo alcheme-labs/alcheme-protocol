@@ -1,0 +1,216 @@
+/* ═══════════════════════════════════════
+   Life-Feel CSS Consumption Layer
+   
+   Maps CSS variables produced by hooks
+   (useColorTemperature, useCuriosity, usePatina)
+   to actual visual effects.
+   
+   Design Doc §5-§8+§10
+   ═══════════════════════════════════════ */
+
+/* ── Default variable values (overridden by hooks) ── */
+:root {
+    /* Color temperature */
+    --dynamic-bg-tint: rgba(231, 228, 221, 0.02);
+    --dynamic-contrast: 1.0;
+    --dynamic-warmth: 0.01;
+    --dynamic-gold-opacity: 0.6;
+    --dynamic-transition: 900ms;
+
+    /* Curiosity engine */
+    --curiosity-contrast: 1.0;
+    --curiosity-sharpness: 0;
+    --curiosity-edge-glow: 0;
+    --curiosity-transition: 1200ms;
+
+    /* Time patina */
+    --patina-edge-clarity: 0;
+    --patina-surface-depth: 0;
+    --patina-warmth: 0;
+    --patina-transition: 2000ms;
+}
+
+/* ═══════════════════════════════════════
+   §5 Color Temperature Overlay
+   "响应必须是渐进式，绝不能瞬间变化"
+   ═══════════════════════════════════════ */
+
+/* Apply to any container with life-feel variables */
+[data-life-feel]::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: var(--dynamic-bg-tint);
+    transition: background var(--dynamic-transition) ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Content contrast filter — combines color temp + curiosity */
+[data-life-feel]>* {
+    transition: filter var(--dynamic-transition) ease;
+    filter:
+        contrast(var(--dynamic-contrast)) contrast(var(--curiosity-contrast));
+}
+
+/* ═══════════════════════════════════════
+   §7 Curiosity Engine CSS
+   "AI 只能像光一样存在"
+   ═══════════════════════════════════════ */
+
+/* Curiosity edge glow — applied to referenced content */
+.lf-curiosity-glow {
+    transition: box-shadow var(--curiosity-transition) ease;
+    box-shadow:
+        0 0 calc(var(--curiosity-edge-glow) * 8px) calc(var(--curiosity-edge-glow) * 2px) rgba(199, 168, 107, calc(var(--curiosity-edge-glow) * 0.08));
+}
+
+/* Curiosity sharpness — apply to text content */
+.lf-curiosity-sharp {
+    transition: text-shadow var(--curiosity-transition) ease;
+    text-shadow:
+        0 0 var(--curiosity-sharpness) rgba(231, 228, 221, 0.15);
+}
+
+/* ═══════════════════════════════════════
+   §8 Time Patina CSS
+   "活物会留下痕迹"
+   ═══════════════════════════════════════ */
+
+/* Patina warmth — applied to aged content cards */
+.lf-patina {
+    transition:
+        background-color var(--patina-transition) ease,
+        border-color var(--patina-transition) ease;
+    background-color: rgba(199, 168, 107, var(--patina-warmth));
+    border-color: rgba(199, 168, 107, calc(var(--patina-edge-clarity) * 0.1));
+}
+
+/* Patina surface depth — deepened bg for ancient content */
+.lf-patina-surface {
+    transition: box-shadow var(--patina-transition) ease;
+    box-shadow:
+        inset 0 1px 3px rgba(0, 0, 0, var(--patina-surface-depth));
+}
+
+/* ═══════════════════════════════════════
+   §6 Pulse & Fade-In Utility Classes
+   ═══════════════════════════════════════ */
+
+/* Pulse: subtle scale for attention */
+@keyframes lf-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.008);
+    }
+}
+
+.lf-pulse {
+    animation: lf-pulse 2.5s ease-in-out 2;
+}
+
+/* Fade-in: "新内容淡入过程中速度先稍快后缓慢减速" */
+@keyframes lf-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.lf-fade-in {
+    animation: lf-fade-in 500ms cubic-bezier(0.25, 0.1, 0.25, 1.0) both;
+}
+
+/* Staggered fade-in for lists */
+.lf-fade-in-stagger>* {
+    opacity: 0;
+    animation: lf-fade-in 400ms cubic-bezier(0.25, 0.1, 0.25, 1.0) both;
+}
+
+.lf-fade-in-stagger>*:nth-child(1) {
+    animation-delay: 0ms;
+}
+
+.lf-fade-in-stagger>*:nth-child(2) {
+    animation-delay: 80ms;
+}
+
+.lf-fade-in-stagger>*:nth-child(3) {
+    animation-delay: 160ms;
+}
+
+.lf-fade-in-stagger>*:nth-child(4) {
+    animation-delay: 240ms;
+}
+
+.lf-fade-in-stagger>*:nth-child(5) {
+    animation-delay: 320ms;
+}
+
+.lf-fade-in-stagger>*:nth-child(6) {
+    animation-delay: 400ms;
+}
+
+.lf-fade-in-stagger>*:nth-child(7) {
+    animation-delay: 480ms;
+}
+
+.lf-fade-in-stagger>*:nth-child(8) {
+    animation-delay: 560ms;
+}
+
+.lf-fade-in-stagger>*:nth-child(n+9) {
+    animation-delay: 640ms;
+}
+
+/* ═══════════════════════════════════════
+   §5 Warm gold edge for consensus
+   "形成共识 → 柔金边缘出现"
+   ═══════════════════════════════════════ */
+
+@keyframes lf-warm-glow {
+
+    0%,
+    100% {
+        border-color: transparent;
+    }
+
+    50% {
+        border-color: rgba(199, 168, 107, 0.2);
+    }
+}
+
+.lf-warm-glow {
+    animation: lf-warm-glow 4s ease-in-out infinite;
+    border: 1px solid transparent;
+}
+
+/* ═══════════════════════════════════════
+   Reduced motion
+   "低端机降级策略：静态背景 + 关闭非必要装饰动效"
+   ═══════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .lf-pulse,
+    .lf-warm-glow {
+        animation: none;
+    }
+
+    .lf-fade-in,
+    .lf-fade-in-stagger>* {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+}

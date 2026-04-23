@@ -1,0 +1,1386 @@
+{
+  "address": "2Nu27qEettMe6v1uqb1Gz2LB38pfEM8u4ioVKA8xkWd8",
+  "metadata": {
+    "name": "contribution_engine",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Contribution tracking and reputation settlement engine for Alcheme Protocol"
+  },
+  "instructions": [
+    {
+      "name": "add_reference",
+      "docs": [
+        "添加内容引用关系"
+      ],
+      "discriminator": [
+        44,
+        177,
+        113,
+        132,
+        170,
+        117,
+        55,
+        196
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "reference",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  102
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "source_content"
+              },
+              {
+                "kind": "account",
+                "path": "target_content"
+              }
+            ]
+          }
+        },
+        {
+          "name": "source_content",
+          "docs": [
+            "引用发起方（新内容）"
+          ]
+        },
+        {
+          "name": "target_content",
+          "docs": [
+            "被引用方（旧内容）"
+          ]
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "ref_type",
+          "type": {
+            "defined": {
+              "name": "ReferenceType"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "close_ledger",
+      "docs": [
+        "关闭账本（贡献登记完成后）"
+      ],
+      "discriminator": [
+        236,
+        179,
+        19,
+        235,
+        59,
+        77,
+        121,
+        118
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "ledger",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  100,
+                  103,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "ledger.crystal_id",
+                "account": "ContributionLedger"
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_ledger",
+      "docs": [
+        "创建贡献账本（每个 Crystal 一个）"
+      ],
+      "discriminator": [
+        90,
+        40,
+        32,
+        71,
+        55,
+        108,
+        24,
+        216
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "ledger",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  100,
+                  103,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "crystal_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "crystal_id",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "initialize_engine",
+      "docs": [
+        "初始化 Contribution Engine 全局配置"
+      ],
+      "discriminator": [
+        17,
+        158,
+        153,
+        215,
+        119,
+        242,
+        156,
+        107
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "max_entries_per_crystal",
+          "type": "u16"
+        },
+        {
+          "name": "min_weight",
+          "type": "f64"
+        }
+      ]
+    },
+    {
+      "name": "query_contribution",
+      "docs": [
+        "查询贡献详情"
+      ],
+      "discriminator": [
+        12,
+        205,
+        112,
+        202,
+        90,
+        90,
+        64,
+        193
+      ],
+      "accounts": [
+        {
+          "name": "ledger",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  100,
+                  103,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "ledger.crystal_id",
+                "account": "ContributionLedger"
+              }
+            ]
+          }
+        },
+        {
+          "name": "entry",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  110,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "entry.crystal_id",
+                "account": "ContributionEntry"
+              },
+              {
+                "kind": "account",
+                "path": "entry.contributor",
+                "account": "ContributionEntry"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [],
+      "returns": {
+        "defined": {
+          "name": "ContributionDetail"
+        }
+      }
+    },
+    {
+      "name": "query_ledger_summary",
+      "docs": [
+        "查询账本摘要"
+      ],
+      "discriminator": [
+        183,
+        55,
+        108,
+        230,
+        119,
+        78,
+        197,
+        64
+      ],
+      "accounts": [
+        {
+          "name": "ledger",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  100,
+                  103,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "ledger.crystal_id",
+                "account": "ContributionLedger"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [],
+      "returns": {
+        "defined": {
+          "name": "LedgerSummary"
+        }
+      }
+    },
+    {
+      "name": "record_contribution",
+      "docs": [
+        "记录单条贡献"
+      ],
+      "discriminator": [
+        121,
+        55,
+        143,
+        174,
+        85,
+        36,
+        104,
+        228
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "ledger",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  100,
+                  103,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "ledger.crystal_id",
+                "account": "ContributionLedger"
+              }
+            ]
+          }
+        },
+        {
+          "name": "entry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  110,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "ledger.crystal_id",
+                "account": "ContributionLedger"
+              },
+              {
+                "kind": "account",
+                "path": "contributor"
+              }
+            ]
+          }
+        },
+        {
+          "name": "contributor",
+          "docs": [
+            "贡献者 (不需要签名，由 authority 代为记录)"
+          ]
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "role",
+          "type": {
+            "defined": {
+              "name": "ContributionRole"
+            }
+          }
+        },
+        {
+          "name": "weight",
+          "type": "f64"
+        }
+      ]
+    },
+    {
+      "name": "settle_reputation",
+      "docs": [
+        "CPI 结算声誉 → identity-registry"
+      ],
+      "discriminator": [
+        102,
+        49,
+        59,
+        20,
+        44,
+        124,
+        68,
+        241
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "ledger",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  100,
+                  103,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "ledger.crystal_id",
+                "account": "ContributionLedger"
+              }
+            ]
+          }
+        },
+        {
+          "name": "entry",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  110,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "entry.crystal_id",
+                "account": "ContributionEntry"
+              },
+              {
+                "kind": "account",
+                "path": "entry.contributor",
+                "account": "ContributionEntry"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user_identity",
+          "docs": [
+            "贡献者的 UserIdentity 账户 (被更新声誉)"
+          ],
+          "writable": true
+        },
+        {
+          "name": "identity_registry",
+          "docs": [
+            "IdentityRegistry 全局状态"
+          ],
+          "writable": true
+        },
+        {
+          "name": "caller_program",
+          "docs": [
+            "本程序的 Program ID 账户 (用于 CPI 权限检查)"
+          ]
+        },
+        {
+          "name": "extension_registry",
+          "docs": [
+            "ExtensionRegistry PDA (registry-factory 管理)"
+          ]
+        },
+        {
+          "name": "identity_registry_program",
+          "docs": [
+            "identity-registry 程序"
+          ],
+          "address": "75fXAp66PU3sgUcQCGJxdA4MKhFcyXXoGW8rhVk8zm4x"
+        },
+        {
+          "name": "admin",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "authority_score",
+          "type": "f64"
+        }
+      ]
+    },
+    {
+      "name": "update_config",
+      "docs": [
+        "更新评分配置（仅 admin）"
+      ],
+      "discriminator": [
+        29,
+        158,
+        252,
+        191,
+        10,
+        83,
+        219,
+        99
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "max_entries_per_crystal",
+          "type": {
+            "option": "u16"
+          }
+        },
+        {
+          "name": "min_weight",
+          "type": {
+            "option": "f64"
+          }
+        },
+        {
+          "name": "role_weights",
+          "type": {
+            "option": {
+              "array": [
+                "f64",
+                4
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_contribution_score",
+      "docs": [
+        "更新贡献分数（仅 admin）"
+      ],
+      "discriminator": [
+        98,
+        23,
+        217,
+        1,
+        14,
+        233,
+        86,
+        11
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "ledger",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  100,
+                  103,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "ledger.crystal_id",
+                "account": "ContributionLedger"
+              }
+            ]
+          }
+        },
+        {
+          "name": "entry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  110,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "entry.crystal_id",
+                "account": "ContributionEntry"
+              },
+              {
+                "kind": "account",
+                "path": "entry.contributor",
+                "account": "ContributionEntry"
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_weight",
+          "type": "f64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "ContributionConfig",
+      "discriminator": [
+        54,
+        238,
+        7,
+        128,
+        232,
+        73,
+        230,
+        107
+      ]
+    },
+    {
+      "name": "ContributionEntry",
+      "discriminator": [
+        39,
+        81,
+        135,
+        76,
+        97,
+        164,
+        208,
+        122
+      ]
+    },
+    {
+      "name": "ContributionLedger",
+      "discriminator": [
+        143,
+        22,
+        67,
+        94,
+        33,
+        213,
+        165,
+        70
+      ]
+    },
+    {
+      "name": "Reference",
+      "discriminator": [
+        33,
+        77,
+        82,
+        38,
+        38,
+        67,
+        45,
+        199
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 13000,
+      "name": "LedgerAlreadyExists",
+      "msg": "贡献账本已存在"
+    },
+    {
+      "code": 13001,
+      "name": "LedgerNotFound",
+      "msg": "贡献账本未找到"
+    },
+    {
+      "code": 13002,
+      "name": "LedgerClosed",
+      "msg": "账本已关闭，不可修改"
+    },
+    {
+      "code": 13003,
+      "name": "LedgerNotClosed",
+      "msg": "账本尚未关闭，无法结算"
+    },
+    {
+      "code": 13010,
+      "name": "ContributionExists",
+      "msg": "贡献记录已存在"
+    },
+    {
+      "code": 13011,
+      "name": "ContributionNotFound",
+      "msg": "贡献记录未找到"
+    },
+    {
+      "code": 13012,
+      "name": "InvalidRole",
+      "msg": "无效的贡献角色"
+    },
+    {
+      "code": 13013,
+      "name": "InvalidWeight",
+      "msg": "权重超出有效范围 (0.0 ~ 1.0)"
+    },
+    {
+      "code": 13014,
+      "name": "MaxEntriesExceeded",
+      "msg": "超过每个 Crystal 的最大贡献条目数"
+    },
+    {
+      "code": 13020,
+      "name": "ReferenceExists",
+      "msg": "引用关系已存在"
+    },
+    {
+      "code": 13021,
+      "name": "ReferenceNotFound",
+      "msg": "引用关系未找到"
+    },
+    {
+      "code": 13022,
+      "name": "InvalidReferenceType",
+      "msg": "无效的引用类型"
+    },
+    {
+      "code": 13023,
+      "name": "SelfReferenceNotAllowed",
+      "msg": "不允许自引用"
+    },
+    {
+      "code": 13030,
+      "name": "Unauthorized",
+      "msg": "未授权操作"
+    },
+    {
+      "code": 13031,
+      "name": "EngineNotInitialized",
+      "msg": "引擎未初始化"
+    },
+    {
+      "code": 13032,
+      "name": "InvalidConfig",
+      "msg": "无效的配置参数"
+    },
+    {
+      "code": 13040,
+      "name": "WeightOverflow",
+      "msg": "角色权重总和超过 1.0"
+    },
+    {
+      "code": 13041,
+      "name": "SettlementFailed",
+      "msg": "声誉结算失败"
+    },
+    {
+      "code": 13042,
+      "name": "AlreadySettled",
+      "msg": "该账本声誉已结算"
+    }
+  ],
+  "types": [
+    {
+      "name": "ContributionConfig",
+      "docs": [
+        "全局配置 — 引擎初始化时创建",
+        "PDA: [b\"config\"]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "admin",
+            "docs": [
+              "管理员（可更新配置、触发结算）"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "max_entries_per_crystal",
+            "docs": [
+              "每个 Crystal 最大贡献条目数"
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "min_weight",
+            "docs": [
+              "最小有效权重 (低于此值的贡献不记录)"
+            ],
+            "type": "f64"
+          },
+          {
+            "name": "role_weights",
+            "docs": [
+              "角色默认权重配置 [author, discussant, reviewer, cited]"
+            ],
+            "type": {
+              "array": [
+                "f64",
+                4
+              ]
+            }
+          },
+          {
+            "name": "created_at",
+            "docs": [
+              "创建时间"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "last_updated",
+            "docs": [
+              "最后更新时间"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "total_ledgers",
+            "docs": [
+              "已记录的账本总数"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "total_references",
+            "docs": [
+              "已记录的引用总数"
+            ],
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContributionDetail",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "crystal_id",
+            "type": "pubkey"
+          },
+          {
+            "name": "contributor",
+            "type": "pubkey"
+          },
+          {
+            "name": "role",
+            "type": {
+              "defined": {
+                "name": "ContributionRole"
+              }
+            }
+          },
+          {
+            "name": "weight",
+            "type": "f64"
+          },
+          {
+            "name": "recorded_at",
+            "type": "i64"
+          },
+          {
+            "name": "ledger_closed",
+            "type": "bool"
+          },
+          {
+            "name": "total_contributors",
+            "type": "u16"
+          },
+          {
+            "name": "total_weight",
+            "type": "f64"
+          },
+          {
+            "name": "reputation_settled",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContributionEntry",
+      "docs": [
+        "贡献条目 — 单条贡献记录",
+        "PDA: [b\"entry\", crystal_id, contributor]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "crystal_id",
+            "docs": [
+              "对应的 Crystal ID"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "contributor",
+            "docs": [
+              "贡献者"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "role",
+            "docs": [
+              "贡献角色"
+            ],
+            "type": {
+              "defined": {
+                "name": "ContributionRole"
+              }
+            }
+          },
+          {
+            "name": "weight",
+            "docs": [
+              "权重 (0.0 ~ 1.0 内的实际分配值)"
+            ],
+            "type": "f64"
+          },
+          {
+            "name": "recorded_at",
+            "docs": [
+              "记录时间"
+            ],
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContributionLedger",
+      "docs": [
+        "贡献账本 — 每个 Crystal 一个",
+        "PDA: [b\"ledger\", crystal_id]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "crystal_id",
+            "docs": [
+              "对应的 Crystal 内容 ID"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "total_contributors",
+            "docs": [
+              "贡献者总数"
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "closed",
+            "docs": [
+              "是否已关闭 (关闭后不可添加新贡献)"
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "total_weight",
+            "docs": [
+              "总权重校验 (应接近 1.0)"
+            ],
+            "type": "f64"
+          },
+          {
+            "name": "created_at",
+            "docs": [
+              "创建时间"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "last_updated",
+            "docs": [
+              "最后更新时间"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "reputation_settled",
+            "docs": [
+              "是否已结算声誉"
+            ],
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContributionRole",
+      "docs": [
+        "贡献角色 — 对应 VFS §3.3 的四种角色",
+        "同一 Crystal 所有角色权重之和 = 1.0"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Author"
+          },
+          {
+            "name": "Discussant"
+          },
+          {
+            "name": "Reviewer"
+          },
+          {
+            "name": "Cited"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LedgerSummary",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "crystal_id",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_contributors",
+            "type": "u16"
+          },
+          {
+            "name": "total_weight",
+            "type": "f64"
+          },
+          {
+            "name": "closed",
+            "type": "bool"
+          },
+          {
+            "name": "reputation_settled",
+            "type": "bool"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Reference",
+      "docs": [
+        "引用关系 — 内容间的引用",
+        "PDA: [b\"ref\", source_id, target_id]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "source_id",
+            "docs": [
+              "引用发起方（新内容）"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "target_id",
+            "docs": [
+              "被引用方（旧内容）"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "ref_type",
+            "docs": [
+              "引用类型"
+            ],
+            "type": {
+              "defined": {
+                "name": "ReferenceType"
+              }
+            }
+          },
+          {
+            "name": "weight",
+            "docs": [
+              "引用权重 (由 ref_type 决定)"
+            ],
+            "type": "f64"
+          },
+          {
+            "name": "creator",
+            "docs": [
+              "创建者"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "created_at",
+            "docs": [
+              "创建时间"
+            ],
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReferenceType",
+      "docs": [
+        "引用类型 — 对应 VFS §3.2",
+        "影响 Authority PageRank 计算"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Import"
+          },
+          {
+            "name": "Citation"
+          },
+          {
+            "name": "Mention"
+          },
+          {
+            "name": "ForkOrigin"
+          }
+        ]
+      }
+    }
+  ]
+}

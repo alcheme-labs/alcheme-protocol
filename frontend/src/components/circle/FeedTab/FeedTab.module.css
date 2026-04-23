@@ -1,0 +1,232 @@
+.feedContainer {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: var(--space-3) 0;
+}
+
+/* ── Post Card ── */
+.feedPost {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid rgba(231, 228, 221, 0.04);
+}
+
+.feedPostHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+.feedAvatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(199, 168, 107, 0.08);
+    border: 1px solid rgba(199, 168, 107, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-accent-gold);
+    flex-shrink: 0;
+}
+
+.feedAuthorInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.feedAuthor {
+    font-size: 14px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.feedTime {
+    font-size: 11px;
+    color: var(--color-text-muted);
+}
+
+/* ── Content ── */
+.feedContent {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-3);
+    white-space: pre-wrap;
+}
+
+.repostCard {
+    margin-bottom: var(--space-3);
+    padding: var(--space-3);
+    border-radius: 18px;
+    border: 1px solid rgba(231, 228, 221, 0.08);
+    background: rgba(231, 228, 221, 0.04);
+}
+
+.repostMeta {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 6px;
+}
+
+.repostBody {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-text-primary);
+    white-space: pre-wrap;
+}
+
+.repostTime {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+}
+
+/* ── Image Grid ── */
+.feedImages {
+    display: grid;
+    gap: 4px;
+    margin-bottom: var(--space-3);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+}
+
+.feedImages1 {
+    grid-template-columns: 1fr;
+}
+
+.feedImages2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.feedImages3 {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+}
+
+.feedImage {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    background: rgba(231, 228, 221, 0.04);
+}
+
+.feedImagePlaceholder {
+    width: 100%;
+    aspect-ratio: 1;
+    background: linear-gradient(135deg, rgba(199, 168, 107, 0.06), rgba(199, 168, 107, 0.02));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+/* ── Actions ── */
+.feedActions {
+    display: flex;
+    gap: var(--space-4);
+}
+
+.feedAction {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 0;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    cursor: pointer;
+    transition: color var(--motion-fast) var(--easing-standard);
+}
+
+.feedAction:active {
+    color: var(--color-accent-gold);
+}
+
+.feedAction:disabled {
+    color: var(--color-text-tertiary);
+    opacity: 0.46;
+    cursor: not-allowed;
+}
+
+.feedActionActive {
+    color: var(--color-accent-gold);
+}
+
+/* ── Compose Bar ── */
+.feedCompose {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid rgba(231, 228, 221, 0.06);
+    background: rgba(31, 36, 33, 0.95);
+}
+
+.feedComposeInput {
+    flex: 1;
+    padding: var(--space-2) var(--space-3);
+    background: rgba(231, 228, 221, 0.04);
+    border: 1px solid rgba(231, 228, 221, 0.08);
+    border-radius: 20px;
+    color: var(--color-text-primary);
+    font-size: 14px;
+    outline: none;
+    text-align: left;
+    cursor: pointer;
+}
+
+.feedComposeInput:disabled {
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.feedComposeBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(199, 168, 107, 0.12);
+    border: none;
+    color: var(--color-accent-gold);
+    cursor: pointer;
+}
+
+.feedComposeBtn:active {
+    background: rgba(199, 168, 107, 0.2);
+}
+
+.feedComposeBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ── Empty ── */
+.feedEmpty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6) var(--space-4);
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.feedEmptyIcon {
+    opacity: 0.3;
+    margin-bottom: var(--space-3);
+}
+
+.feedEmptyText {
+    font-size: 14px;
+    color: var(--color-text-muted);
+}

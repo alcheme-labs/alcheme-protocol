@@ -1,0 +1,80 @@
+{
+  "rule_consensus": {
+    "description": "Rule summarizer highlights questions, action points, and latest signals.",
+    "input": {
+      "circleName": "Alpha",
+      "circleDescription": "讨论场",
+      "useLLM": false,
+      "messages": [
+        {
+          "senderHandle": "alice",
+          "senderPubkey": "alice-pubkey",
+          "text": "为什么部署后还是报错？",
+          "createdAt": "2026-03-24T21:00:00.000Z",
+          "relevanceScore": 0.92
+        },
+        {
+          "senderHandle": "bob",
+          "senderPubkey": "bob-pubkey",
+          "text": "先重启索引服务，再同步最新 schema。",
+          "createdAt": "2026-03-24T21:01:00.000Z",
+          "relevanceScore": 0.88
+        },
+        {
+          "senderHandle": "carol",
+          "senderPubkey": "carol-pubkey",
+          "text": "我已经确认数据库迁移跑完了。",
+          "createdAt": "2026-03-24T21:02:00.000Z",
+          "relevanceScore": 0.73
+        }
+      ]
+    },
+    "expected": {
+      "method": "rule",
+      "messageCount": 3,
+      "summary": "近 3 条消息中，3 条与当前主题高度相关。\n核心问题：「为什么部署后还是报错？」\n推进事项：「为什么部署后还是报错？」；「先重启索引服务，再同步最新 schema。」\n最新进展：alice：为什么部署后还是报错？；bob：先重启索引服务，再同步最新 schema。；carol：我已经确认数据库迁移跑完了。",
+      "generationMetadata": {
+        "providerMode": "rule",
+        "model": "rule-based",
+        "promptAsset": "discussion-summary",
+        "promptVersion": "v1"
+      }
+    }
+  },
+  "llm_consensus": {
+    "description": "LLM summarizer preserves the returned summary text and metadata contract.",
+    "input": {
+      "circleName": "Alpha",
+      "circleDescription": "讨论场",
+      "useLLM": true,
+      "messages": [
+        {
+          "senderHandle": "alice",
+          "senderPubkey": "alice-pubkey",
+          "text": "我们已经对结论 A 形成了共识。",
+          "createdAt": "2026-03-24T21:00:00.000Z",
+          "relevanceScore": 0.95
+        },
+        {
+          "senderHandle": "bob",
+          "senderPubkey": "bob-pubkey",
+          "text": "还需要补一条来源证据。",
+          "createdAt": "2026-03-24T21:01:00.000Z",
+          "relevanceScore": 0.82
+        }
+      ]
+    },
+    "llmText": "当前共识：结论 A 已形成。\n未解决问题：证据链待补。\n下一步建议：补齐引用。",
+    "expected": {
+      "method": "llm",
+      "messageCount": 2,
+      "summary": "当前共识：结论 A 已形成。\n未解决问题：证据链待补。\n下一步建议：补齐引用。",
+      "generationMetadata": {
+        "providerMode": "builtin",
+        "model": "qwen2.5:7b",
+        "promptAsset": "discussion-summary",
+        "promptVersion": "v1"
+      }
+    }
+  }
+}

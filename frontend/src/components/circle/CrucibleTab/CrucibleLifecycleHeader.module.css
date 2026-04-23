@@ -1,0 +1,250 @@
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 14px;
+    padding: 16px;
+    border: 1px solid rgba(199, 168, 107, 0.1);
+    border-radius: 18px;
+    background:
+        linear-gradient(165deg, rgba(199, 168, 107, 0.07), rgba(199, 168, 107, 0.015) 40%),
+        rgba(21, 28, 25, 0.78);
+    box-shadow:
+        0 10px 28px rgba(0, 0, 0, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.015);
+}
+
+.headerRow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.headerRow > div {
+    min-width: 0;
+    width: 100%;
+}
+
+.eyebrow {
+    margin: 0 0 4px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--color-text-tertiary);
+}
+
+.title {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.3;
+    color: var(--color-accent-ivory-glow);
+}
+
+.subtitle {
+    margin: 6px 0 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+}
+
+.metaLine {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-text-tertiary);
+    text-align: right;
+}
+
+.metaRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.actionRow {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.actionButtonRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.primaryAction {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px solid rgba(199, 168, 107, 0.22);
+    border-radius: 999px;
+    background: rgba(199, 168, 107, 0.08);
+    color: var(--color-accent-gold);
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, opacity 0.18s ease;
+}
+
+.primaryAction:disabled {
+    opacity: 0.68;
+    cursor: not-allowed;
+}
+
+.primaryAction[data-pending='true']:disabled {
+    cursor: wait;
+}
+
+.primaryAction:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(199, 168, 107, 0.24);
+}
+
+.actionHint {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-text-tertiary);
+}
+
+.detailsToggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    width: fit-content;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-accent-gold);
+    font-size: 12px;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: color 0.18s ease, transform 0.18s ease, opacity 0.18s ease;
+}
+
+.detailsToggle:focus-visible {
+    outline: none;
+    border-radius: 6px;
+    box-shadow: 0 0 0 2px rgba(199, 168, 107, 0.28);
+}
+
+.detailsToggle:active {
+    transform: translateY(1px);
+}
+
+.detailsToggleIcon {
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 500;
+    transform: translateY(-1px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .detailsToggle:hover {
+        color: var(--color-accent-ivory-glow);
+        opacity: 0.92;
+    }
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(199, 168, 107, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.cardTitle {
+    margin: 0;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: var(--color-accent-gold);
+}
+
+.cardLead {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--color-accent-ivory-glow);
+}
+
+.cardLine {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    word-break: break-word;
+}
+
+.warningList {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.warningItem {
+    margin: 0;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(220, 108, 90, 0.32);
+    background: rgba(220, 108, 90, 0.12);
+    color: #f4c7be;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+@media (max-width: 768px) {
+    .panel {
+        padding: 14px;
+        gap: 12px;
+    }
+
+    .headerRow {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .metaRow {
+        width: 100%;
+    }
+
+    .actionRow {
+        width: 100%;
+    }
+
+    .actionButtonRow {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .primaryAction {
+        width: 100%;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detailsToggle {
+        align-self: flex-start;
+    }
+
+    .metaLine {
+        text-align: right;
+    }
+}

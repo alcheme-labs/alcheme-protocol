@@ -1,0 +1,183 @@
+/* Circles Page Styles */
+.page {
+    position: relative;
+    min-height: 100dvh;
+    padding-top: calc(var(--safe-area-top) + var(--space-6));
+}
+
+.header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    position: sticky;
+    top: var(--safe-area-top, 0);
+    z-index: 10;
+    background: rgba(31, 36, 33, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    margin: 0 calc(-1 * var(--space-4));
+    padding: var(--space-4) var(--space-4) var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
+.createBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-gold, #c9a227);
+    background: transparent;
+    color: var(--color-gold, #c9a227);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    flex-shrink: 0;
+}
+
+.createBtn:hover {
+    background: var(--color-gold, #c9a227);
+    color: var(--color-bg-base, #0e0e12);
+    box-shadow: 0 0 12px hsla(45, 70%, 47%, 0.3);
+}
+
+.createBtn:active {
+    transform: scale(0.95);
+}
+
+.title {
+    font-size: var(--font-size-title);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-2);
+}
+
+.subtitle {
+    font-size: var(--font-size-body);
+    color: var(--color-text-tertiary);
+}
+
+/* ── Search ── */
+.searchBar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-button);
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-5);
+}
+
+.searchIcon {
+    color: var(--color-text-tertiary);
+}
+
+.searchInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-body);
+    font-family: inherit;
+    outline: none;
+}
+
+.searchInput::placeholder {
+    color: var(--color-text-tertiary);
+}
+
+/* ── List ── */
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.circleLink {
+    text-decoration: none;
+    display: block;
+}
+
+.circleHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
+.circleAvatar {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-bg-elevated);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+}
+
+.circleInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.circleName {
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-1);
+}
+
+.circleType {
+    font-size: var(--font-size-small);
+    color: var(--color-text-tertiary);
+}
+
+.circleDesc {
+    font-size: var(--font-size-caption);
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-body);
+    margin-bottom: var(--space-2);
+}
+
+.circleArrow {
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+}
+
+.circleFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.circleMeta {
+    font-size: var(--font-size-caption);
+    color: var(--color-text-tertiary);
+}
+
+.circleTiers {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--font-size-small);
+    color: var(--color-accent-gold);
+    opacity: 0.8;
+}
+
+.empty {
+    text-align: center;
+    padding: var(--space-8) var(--space-4);
+    color: var(--color-text-tertiary);
+}
+
+.searchHint {
+    text-align: center;
+    font-size: var(--font-size-caption);
+    color: var(--color-text-tertiary);
+    margin-top: var(--space-4);
+    opacity: 0.7;
+}

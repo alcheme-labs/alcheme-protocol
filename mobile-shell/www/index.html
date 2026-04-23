@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Alcheme Mobile Shell</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(circle at top, #27352d 0%, #111714 60%, #090c0a 100%);
+        color: #f5efe2;
+        font-family: "SF Pro Display", "PingFang SC", "Helvetica Neue", sans-serif;
+      }
+
+      main {
+        width: min(28rem, calc(100vw - 3rem));
+        padding: 1.5rem;
+        border: 1px solid rgba(245, 239, 226, 0.14);
+        border-radius: 1.25rem;
+        background: rgba(17, 23, 20, 0.78);
+        box-shadow: 0 28px 60px rgba(0, 0, 0, 0.32);
+      }
+
+      h1 {
+        margin: 0 0 0.75rem;
+        font-size: 1.25rem;
+      }
+
+      p {
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      code {
+        color: #d3b36c;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Alcheme Mobile Shell</h1>
+      <p>
+        这个壳会优先加载 <code>ALCHEME_MOBILE_SERVER_URL</code> 指向的局域网地址。
+        如果你看到了这个页面，说明原生壳已经启动，但还没有拿到可访问的前端 URL。
+      </p>
+    </main>
+  </body>
+</html>
