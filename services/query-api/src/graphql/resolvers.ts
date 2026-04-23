@@ -1383,10 +1383,34 @@ export const resolvers = {
             }
             return Number(circle.minCrystals ?? 0);
         },
-        stats: (circle: any) => ({
-            members: circle.membersCount,
-            posts: circle.postsCount,
-        }),
+        stats: async (circle: any, _: any, { prisma }: Context) => {
+            if (!Number.isFinite(Number(circle?.id)) || Number(circle.id) <= 0) {
+                return {
+                    members: Math.max(0, Number(circle?.membersCount ?? 0)),
+                    posts: Math.max(0, Number(circle?.postsCount ?? 0)),
+                };
+            }
+
+            const circleId = Number(circle.id);
+            const [members, posts] = await Promise.all([
+                prisma.circleMember.count({
+                    where: {
+                        circleId,
+                        status: MemberStatus.Active,
+                    },
+                }),
+                prisma.post.count({
+                    where: {
+                        circleId,
+                    },
+                }),
+            ]);
+
+            return {
+                members: Math.max(0, members),
+                posts: Math.max(0, posts),
+            };
+        },
 
         creator: async (circle: any, _: any, { prisma }: Context) => {
             if (circle.creator) return circle.creator;
