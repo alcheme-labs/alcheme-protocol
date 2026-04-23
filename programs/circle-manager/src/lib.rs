@@ -88,8 +88,8 @@ pub mod circle_manager {
         instructions::update_circle_member_role(ctx, role)
     }
 
-    pub fn claim_circle_membership(
-        ctx: Context<ClaimCircleMembership>,
+    pub fn claim_circle_membership<'info>(
+        ctx: Context<'_, '_, 'info, 'info, ClaimCircleMembership<'info>>,
         admission: CircleMembershipAdmission,
         issuer_key_id: Pubkey,
         issued_signature: [u8; 64],
@@ -170,6 +170,29 @@ pub mod circle_manager {
         attestor: Pubkey,
     ) -> Result<()> {
         instructions::register_proof_attestor(ctx, attestor)
+    }
+
+    /// 初始化成员准入签发者注册表
+    pub fn initialize_membership_attestor_registry(
+        ctx: Context<InitializeMembershipAttestorRegistry>,
+    ) -> Result<()> {
+        instructions::initialize_membership_attestor_registry(ctx)
+    }
+
+    /// 注册成员准入签发者（admin-only）
+    pub fn register_membership_attestor(
+        ctx: Context<RegisterMembershipAttestor>,
+        attestor: Pubkey,
+    ) -> Result<()> {
+        instructions::register_membership_attestor(ctx, attestor)
+    }
+
+    /// 撤销成员准入签发者（admin-only）
+    pub fn revoke_membership_attestor(
+        ctx: Context<RevokeMembershipAttestor>,
+        attestor: Pubkey,
+    ) -> Result<()> {
+        instructions::revoke_membership_attestor(ctx, attestor)
     }
 
     /// 绑定贡献证明（创建 KnowledgeBinding PDA）

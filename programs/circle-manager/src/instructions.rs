@@ -7,6 +7,7 @@ use crate::state::*;
 
 const KNOWLEDGE_BINDING_SEED: &[u8] = b"knowledge_binding";
 const PROOF_ATTESTOR_REGISTRY_SEED: &[u8] = b"proof_attestor_registry";
+const MEMBERSHIP_ATTESTOR_REGISTRY_SEED: &[u8] = b"membership_attestor_registry";
 const PROOF_BINDING_CANONICAL_DOMAIN: &[u8] = b"alcheme:proof_binding:v1";
 
 // ==================== Initialize ====================
@@ -547,14 +548,36 @@ pub struct ClaimCircleMembership<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn claim_circle_membership(
-    ctx: Context<ClaimCircleMembership>,
+pub fn claim_circle_membership<'info>(
+    ctx: Context<'_, '_, 'info, 'info, ClaimCircleMembership<'info>>,
     admission: CircleMembershipAdmission,
     issuer_key_id: Pubkey,
     issued_signature: [u8; 64],
 ) -> Result<()> {
+    let issuer_authorized = if issuer_key_id == ctx.accounts.circle_manager.admin {
+        true
+    } else {
+        let (registry_pda, _) =
+            Pubkey::find_program_address(&[MEMBERSHIP_ATTESTOR_REGISTRY_SEED], &crate::ID);
+        let registry_info = ctx
+            .remaining_accounts
+            .iter()
+            .find(|account| account.key() == registry_pda);
+
+        if let Some(registry_info) = registry_info {
+            let registry = Account::<MembershipAttestorRegistry>::try_from(registry_info)?;
+            require!(
+                registry.admin == ctx.accounts.circle_manager.admin,
+                AlchemeError::Unauthorized
+            );
+            registry.is_registered(&issuer_key_id)
+        } else {
+            false
+        }
+    };
+
     require!(
-        issuer_key_id == ctx.accounts.circle_manager.admin,
+        issuer_authorized,
         AlchemeError::Unauthorized
     );
     require!(
@@ -1164,6 +1187,39 @@ pub fn initialize_proof_attestor_registry(
 }
 
 #[derive(Accounts)]
+pub struct InitializeMembershipAttestorRegistry<'info> {
+    #[account(
+        init,
+        payer = admin,
+        space = MembershipAttestorRegistry::SPACE,
+        seeds = [MEMBERSHIP_ATTESTOR_REGISTRY_SEED],
+        bump
+    )]
+    pub membership_attestor_registry: Account<'info, MembershipAttestorRegistry>,
+
+    #[account(
+        seeds = [b"circle_manager"],
+        bump = circle_manager.bump,
+        constraint = circle_manager.admin == admin.key() @ AlchemeError::Unauthorized
+    )]
+    pub circle_manager: Account<'info, CircleManager>,
+
+    #[account(mut)]
+    pub admin: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
+}
+
+pub fn initialize_membership_attestor_registry(
+    ctx: Context<InitializeMembershipAttestorRegistry>,
+) -> Result<()> {
+    ctx.accounts
+        .membership_attestor_registry
+        .initialize(ctx.bumps.membership_attestor_registry, ctx.accounts.admin.key())?;
+    Ok(())
+}
+
+#[derive(Accounts)]
 pub struct RegisterProofAttestor<'info> {
     #[account(
         mut,
@@ -1214,6 +1270,84 @@ pub fn register_proof_attestor(
         },
     )?;
 
+    Ok(())
+}
+
+#[derive(Accounts)]
+pub struct RegisterMembershipAttestor<'info> {
+    #[account(
+        mut,
+        seeds = [MEMBERSHIP_ATTESTOR_REGISTRY_SEED],
+        bump = membership_attestor_registry.bump
+    )]
+    pub membership_attestor_registry: Account<'info, MembershipAttestorRegistry>,
+
+    #[account(mut)]
+    pub admin: Signer<'info>,
+
+    /// CHECK: Event Emitter program
+    pub event_program: AccountInfo<'info>,
+
+    /// CHECK: Event Emitter account
+    #[account(mut)]
+    pub event_emitter: AccountInfo<'info>,
+
+    /// CHECK: Event Batch account
+    #[account(mut)]
+    pub event_batch: AccountInfo<'info>,
+
+    pub system_program: Program<'info, System>,
+}
+
+pub fn register_membership_attestor(
+    ctx: Context<RegisterMembershipAttestor>,
+    attestor: Pubkey,
+) -> Result<()> {
+    let registry = &mut ctx.accounts.membership_attestor_registry;
+    require!(
+        registry.admin == ctx.accounts.admin.key(),
+        AlchemeError::Unauthorized
+    );
+    registry.register_attestor(attestor)?;
+    Ok(())
+}
+
+#[derive(Accounts)]
+pub struct RevokeMembershipAttestor<'info> {
+    #[account(
+        mut,
+        seeds = [MEMBERSHIP_ATTESTOR_REGISTRY_SEED],
+        bump = membership_attestor_registry.bump
+    )]
+    pub membership_attestor_registry: Account<'info, MembershipAttestorRegistry>,
+
+    #[account(mut)]
+    pub admin: Signer<'info>,
+
+    /// CHECK: Event Emitter program
+    pub event_program: AccountInfo<'info>,
+
+    /// CHECK: Event Emitter account
+    #[account(mut)]
+    pub event_emitter: AccountInfo<'info>,
+
+    /// CHECK: Event Batch account
+    #[account(mut)]
+    pub event_batch: AccountInfo<'info>,
+
+    pub system_program: Program<'info, System>,
+}
+
+pub fn revoke_membership_attestor(
+    ctx: Context<RevokeMembershipAttestor>,
+    attestor: Pubkey,
+) -> Result<()> {
+    let registry = &mut ctx.accounts.membership_attestor_registry;
+    require!(
+        registry.admin == ctx.accounts.admin.key(),
+        AlchemeError::Unauthorized
+    );
+    registry.revoke_attestor(&attestor)?;
     Ok(())
 }
 

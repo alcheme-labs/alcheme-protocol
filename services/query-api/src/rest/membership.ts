@@ -880,6 +880,8 @@ export function membershipRouter(prisma: PrismaClient, redis: Redis): Router {
                 });
             }
 
+            // Query API decides the join policy; on-chain finalization only
+            // checks that the grant was signed by a trusted attestor.
             const grant = issueMembershipAdmissionGrant({
                 circleId,
                 memberPubkey: actor.pubkey,

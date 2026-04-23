@@ -124,6 +124,9 @@ export function issueMembershipAdmissionGrant(input: {
     issuedAt?: Date | string | number;
     expiresAt?: Date | string | number;
 }): MembershipAdmissionGrant {
+    // This issuer is a trusted membership attestor configured for the current
+    // environment. After the registry upgrade it no longer needs to be the
+    // circle_manager admin, but it must still match the configured secret.
     const issuerKeyId = normalizePubkey(
         String(process.env.MEMBERSHIP_BRIDGE_ISSUER_KEY_ID || ''),
         'missing_membership_bridge_issuer_key_id',

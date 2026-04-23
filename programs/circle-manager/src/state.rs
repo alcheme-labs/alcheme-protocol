@@ -113,6 +113,16 @@ pub struct ProofAttestorRegistry {
     pub last_updated: i64,
 }
 
+/// 成员准入签发者注册表（admin 管理）
+#[account]
+pub struct MembershipAttestorRegistry {
+    pub bump: u8,
+    pub admin: Pubkey,
+    pub attestors: Vec<Pubkey>,
+    pub created_at: i64,
+    pub last_updated: i64,
+}
+
 /// 传递提案
 #[account]
 pub struct TransferProposal {
@@ -361,6 +371,56 @@ impl ProofAttestorRegistry {
             AlchemeError::InvalidOperation
         );
         self.attestors.push(attestor);
+        self.last_updated = Clock::get()?.unix_timestamp;
+        Ok(())
+    }
+
+    pub fn is_registered(&self, attestor: &Pubkey) -> bool {
+        self.attestors.contains(attestor)
+    }
+}
+
+impl MembershipAttestorRegistry {
+    pub const MAX_ATTESTORS: usize = 32;
+    pub const SPACE: usize =
+        8 +  // discriminator
+        1 +  // bump
+        32 + // admin
+        4 + (32 * Self::MAX_ATTESTORS) + // attestors vec
+        8 +  // created_at
+        8;   // last_updated
+
+    pub fn initialize(&mut self, bump: u8, admin: Pubkey) -> Result<()> {
+        let now = Clock::get()?.unix_timestamp;
+        self.bump = bump;
+        self.admin = admin;
+        self.attestors = Vec::new();
+        self.created_at = now;
+        self.last_updated = now;
+        Ok(())
+    }
+
+    pub fn register_attestor(&mut self, attestor: Pubkey) -> Result<()> {
+        require!(
+            !self.attestors.contains(&attestor),
+            AlchemeError::InvalidOperation
+        );
+        require!(
+            self.attestors.len() < Self::MAX_ATTESTORS,
+            AlchemeError::InvalidOperation
+        );
+        self.attestors.push(attestor);
+        self.last_updated = Clock::get()?.unix_timestamp;
+        Ok(())
+    }
+
+    pub fn revoke_attestor(&mut self, attestor: &Pubkey) -> Result<()> {
+        let original_len = self.attestors.len();
+        self.attestors.retain(|registered| registered != attestor);
+        require!(
+            self.attestors.len() != original_len,
+            AlchemeError::InvalidOperation
+        );
         self.last_updated = Clock::get()?.unix_timestamp;
         Ok(())
     }

@@ -11,5 +11,8 @@ test('normalizeJoinActionError surfaces membership bridge configuration failures
   assert.match(source, /missing_membership_bridge_issuer_key_id/);
   assert.match(source, /missing_membership_bridge_issuer_secret/);
   assert.match(source, /membership_bridge_issuer_key_mismatch/);
+  assert.match(source, /Error Number: 12001/);
+  assert.match(source, /custom program error: 0x2ee1/);
+  assert.match(source, /权限不足/);
   assert.match(source, /copy\.errors\.membershipBridgeUnavailable/);
 });

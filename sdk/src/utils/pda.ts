@@ -16,6 +16,7 @@ export const SEEDS = {
   CIRCLE_MEMBER: Buffer.from("circle_member"),
   KNOWLEDGE_BINDING: Buffer.from("knowledge_binding"),
   PROOF_ATTESTOR_REGISTRY: Buffer.from("proof_attestor_registry"),
+  MEMBERSHIP_ATTESTOR_REGISTRY: Buffer.from("membership_attestor_registry"),
   EVENT_EMITTER: Buffer.from("event_emitter"),
   EVENT_BATCH: Buffer.from("event_batch"),
   EVENT_SUBSCRIPTION: Buffer.from("event_subscription"),
@@ -176,6 +177,13 @@ export class PdaUtils {
   findProofAttestorRegistryPda(): PublicKey {
     return PublicKey.findProgramAddressSync(
       [SEEDS.PROOF_ATTESTOR_REGISTRY],
+      this.programIds.circles
+    )[0];
+  }
+
+  findMembershipAttestorRegistryPda(): PublicKey {
+    return PublicKey.findProgramAddressSync(
+      [SEEDS.MEMBERSHIP_ATTESTOR_REGISTRY],
       this.programIds.circles
     )[0];
   }

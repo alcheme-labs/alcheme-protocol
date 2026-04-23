@@ -2,8 +2,14 @@ FROM node:20-alpine AS build-base
 
 RUN apk add --no-cache python3 make g++ eudev-dev
 
-WORKDIR /app/frontend
+WORKDIR /app
 FROM build-base AS builder
+
+WORKDIR /app/sdk
+COPY sdk/package*.json ./
+RUN npm ci
+COPY sdk ./
+RUN npm run build
 
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
@@ -53,6 +59,12 @@ ENV NEXT_PUBLIC_EXTENSION_CONTRIBUTION_ENGINE_URL=${NEXT_PUBLIC_EXTENSION_CONTRI
 RUN npm run build
 
 FROM build-base
+
+WORKDIR /app/sdk
+COPY --from=builder /app/sdk/package.json ./package.json
+COPY --from=builder /app/sdk/README.md ./README.md
+COPY --from=builder /app/sdk/STORAGE_GUIDE.md ./STORAGE_GUIDE.md
+COPY --from=builder /app/sdk/dist ./dist
 
 WORKDIR /app/frontend
 COPY frontend/package*.json ./

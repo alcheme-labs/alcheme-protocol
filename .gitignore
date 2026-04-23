@@ -38,6 +38,7 @@ frontend/.next-playwright-default/
 frontend/.next-playwright-onboarding/
 frontend/.next-playwright-a11y/
 frontend/.next-*/
+sdk/dist/
 
 # Local manual run artifacts
 test-results/

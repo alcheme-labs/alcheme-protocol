@@ -4,7 +4,7 @@
     "name": "circle_manager",
     "version": "0.1.0",
     "spec": "0.1.0",
-    "description": "Circle-based knowledge governance for SocialHub Protocol"
+    "description": "Circle-based knowledge governance for Alcheme Protocol"
   },
   "instructions": [
     {
@@ -125,6 +125,59 @@
         {
           "name": "curator",
           "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "anchor_circle_fork",
+      "discriminator": [
+        36,
+        86,
+        251,
+        184,
+        130,
+        162,
+        19,
+        60
+      ],
+      "accounts": [
+        {
+          "name": "source_circle"
+        },
+        {
+          "name": "target_circle"
+        },
+        {
+          "name": "fork_anchor",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "source_circle_id",
+          "type": "u8"
+        },
+        {
+          "name": "target_circle_id",
+          "type": "u8"
+        },
+        {
+          "name": "fork_declaration_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
         }
       ]
     },
@@ -473,6 +526,131 @@
       ]
     },
     {
+      "name": "claim_circle_membership",
+      "discriminator": [
+        75,
+        251,
+        62,
+        148,
+        76,
+        237,
+        166,
+        130
+      ],
+      "accounts": [
+        {
+          "name": "circle_manager",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  105,
+                  114,
+                  99,
+                  108,
+                  101,
+                  95,
+                  109,
+                  97,
+                  110,
+                  97,
+                  103,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "circle"
+        },
+        {
+          "name": "circle_member",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  105,
+                  114,
+                  99,
+                  108,
+                  101,
+                  95,
+                  109,
+                  101,
+                  109,
+                  98,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "circle"
+              },
+              {
+                "kind": "account",
+                "path": "member"
+              }
+            ]
+          }
+        },
+        {
+          "name": "member",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "instructions_sysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "admission",
+          "type": {
+            "defined": {
+              "name": "CircleMembershipAdmission"
+            }
+          }
+        },
+        {
+          "name": "issuer_key_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "issued_signature",
+          "type": {
+            "array": [
+              "u8",
+              64
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "cpi_promote_knowledge",
       "docs": [
         "通过扩展程序提升知识评分（需要 CircleExtend 权限 + circle/knowledge 关系一致）"
@@ -714,6 +892,101 @@
         {
           "name": "circle_manager",
           "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  105,
+                  114,
+                  99,
+                  108,
+                  101,
+                  95,
+                  109,
+                  97,
+                  110,
+                  97,
+                  103,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_membership_attestor_registry",
+      "docs": [
+        "初始化成员准入签发者注册表"
+      ],
+      "discriminator": [
+        15,
+        249,
+        81,
+        169,
+        224,
+        162,
+        207,
+        20
+      ],
+      "accounts": [
+        {
+          "name": "membership_attestor_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  101,
+                  109,
+                  98,
+                  101,
+                  114,
+                  115,
+                  104,
+                  105,
+                  112,
+                  95,
+                  97,
+                  116,
+                  116,
+                  101,
+                  115,
+                  116,
+                  111,
+                  114,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "circle_manager",
           "pda": {
             "seeds": [
               {
@@ -1074,6 +1347,91 @@
       ]
     },
     {
+      "name": "register_membership_attestor",
+      "docs": [
+        "注册成员准入签发者（admin-only）"
+      ],
+      "discriminator": [
+        150,
+        56,
+        76,
+        11,
+        107,
+        143,
+        45,
+        37
+      ],
+      "accounts": [
+        {
+          "name": "membership_attestor_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  101,
+                  109,
+                  98,
+                  101,
+                  114,
+                  115,
+                  104,
+                  105,
+                  112,
+                  95,
+                  97,
+                  116,
+                  116,
+                  101,
+                  115,
+                  116,
+                  111,
+                  114,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "attestor",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
       "name": "register_proof_attestor",
       "docs": [
         "注册贡献证明签发者（admin-only）"
@@ -1127,6 +1485,7 @@
         },
         {
           "name": "admin",
+          "writable": true,
           "signer": true
         },
         {
@@ -1227,6 +1586,91 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "revoke_membership_attestor",
+      "docs": [
+        "撤销成员准入签发者（admin-only）"
+      ],
+      "discriminator": [
+        129,
+        48,
+        236,
+        222,
+        102,
+        242,
+        134,
+        66
+      ],
+      "accounts": [
+        {
+          "name": "membership_attestor_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  101,
+                  109,
+                  98,
+                  101,
+                  114,
+                  115,
+                  104,
+                  105,
+                  112,
+                  95,
+                  97,
+                  116,
+                  116,
+                  101,
+                  115,
+                  116,
+                  111,
+                  114,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "attestor",
+          "type": "pubkey"
+        }
+      ]
     },
     {
       "name": "submit_ai_evaluation",
@@ -1389,6 +1833,7 @@
         },
         {
           "name": "authority",
+          "writable": true,
           "signer": true
         },
         {
@@ -1411,6 +1856,91 @@
         {
           "name": "flags",
           "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "update_circle_member_role",
+      "discriminator": [
+        255,
+        47,
+        146,
+        182,
+        228,
+        210,
+        4,
+        197
+      ],
+      "accounts": [
+        {
+          "name": "circle"
+        },
+        {
+          "name": "circle_member",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  105,
+                  114,
+                  99,
+                  108,
+                  101,
+                  95,
+                  109,
+                  101,
+                  109,
+                  98,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "circle"
+              },
+              {
+                "kind": "account",
+                "path": "member"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "member"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "role",
+          "type": {
+            "defined": {
+              "name": "CircleMemberRole"
+            }
+          }
         }
       ]
     },
@@ -1472,6 +2002,7 @@
         },
         {
           "name": "authority",
+          "writable": true,
           "signer": true
         },
         {
@@ -1602,6 +2133,19 @@
       ]
     },
     {
+      "name": "CircleForkAnchor",
+      "discriminator": [
+        248,
+        9,
+        225,
+        190,
+        232,
+        45,
+        253,
+        142
+      ]
+    },
+    {
       "name": "CircleManager",
       "discriminator": [
         232,
@@ -1651,6 +2195,19 @@
         66,
         106,
         231
+      ]
+    },
+    {
+      "name": "MembershipAttestorRegistry",
+      "discriminator": [
+        26,
+        85,
+        57,
+        220,
+        240,
+        83,
+        43,
+        29
       ]
     },
     {
@@ -1829,6 +2386,42 @@
       }
     },
     {
+      "name": "CircleForkAnchor",
+      "docs": [
+        "Fork 轻锚点 sidecar（避免把 live parent 依赖灌回 Circle 主账户）"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "source_circle_id",
+            "type": "u8"
+          },
+          {
+            "name": "target_circle_id",
+            "type": "u8"
+          },
+          {
+            "name": "fork_declaration_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
       "name": "CircleManager",
       "docs": [
         "圈层管理器"
@@ -1937,6 +2530,67 @@
           },
           {
             "name": "Inactive"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CircleMembershipAdmission",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "circle_id",
+            "type": "u8"
+          },
+          {
+            "name": "member",
+            "type": "pubkey"
+          },
+          {
+            "name": "role",
+            "type": {
+              "defined": {
+                "name": "CircleMemberRole"
+              }
+            }
+          },
+          {
+            "name": "kind",
+            "type": {
+              "defined": {
+                "name": "CircleMembershipAdmissionKind"
+              }
+            }
+          },
+          {
+            "name": "artifact_id",
+            "type": "u64"
+          },
+          {
+            "name": "issued_at",
+            "type": "i64"
+          },
+          {
+            "name": "expires_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CircleMembershipAdmissionKind",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Open"
+          },
+          {
+            "name": "Invite"
+          },
+          {
+            "name": "Approval"
           }
         ]
       }
@@ -2241,6 +2895,39 @@
           {
             "name": "auto_quality_check",
             "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MembershipAttestorRegistry",
+      "docs": [
+        "成员准入签发者注册表（admin 管理）"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "attestors",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated",
+            "type": "i64"
           }
         ]
       }

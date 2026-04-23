@@ -38,6 +38,7 @@ export interface CircleJoinCopy {
         insufficientCrystals: string;
         banned: string;
         requestStateChanged: string;
+        membershipBridgeUnavailable: string;
         fallback: string;
     };
 }
@@ -69,6 +70,7 @@ const DEFAULT_JOIN_COPY: CircleJoinCopy = {
         insufficientCrystals: 'You do not have enough crystals to join yet.',
         banned: 'Your access to this circle is currently restricted.',
         requestStateChanged: 'That request state changed. Refresh and try again.',
+        membershipBridgeUnavailable: 'Your identity was created, but the circle join finalization is temporarily unavailable. Please try joining again.',
         fallback: 'Could not join the circle. Please try again.',
     },
 };
@@ -101,6 +103,7 @@ export function createCircleJoinCopy(t: CircleUiTranslator): CircleJoinCopy {
             insufficientCrystals: t('join.errors.insufficientCrystals'),
             banned: t('join.errors.banned'),
             requestStateChanged: t('join.errors.requestStateChanged'),
+            membershipBridgeUnavailable: t('join.errors.membershipBridgeUnavailable'),
             fallback: t('join.errors.fallback'),
         },
     };
@@ -210,6 +213,19 @@ export function normalizeJoinActionError(raw: unknown, copy: CircleJoinCopy = DE
     if (message.includes('insufficient_crystals')) return copy.errors.insufficientCrystals;
     if (message.includes('membership_banned')) return copy.errors.banned;
     if (message.includes('join_request_not_pending')) return copy.errors.requestStateChanged;
+    if (
+        message.includes('missing_membership_bridge_issuer_key_id')
+        || message.includes('missing_membership_bridge_issuer_secret')
+        || message.includes('membership_bridge_issuer_key_mismatch')
+        || message.includes('membership attestor')
+        || message.includes('membership_attestor_registry')
+        || message.includes('Error Code: Unauthorized')
+        || message.includes('Error Number: 12001')
+        || message.includes('custom program error: 0x2ee1')
+        || message.includes('权限不足')
+    ) {
+        return copy.errors.membershipBridgeUnavailable;
+    }
     return message || copy.errors.fallback;
 }
 

@@ -172,6 +172,22 @@ afterAll(() => {
     }
 });
 
+function setMembershipIssuerEnv(input: {
+    keyId?: string | null;
+    secret?: string | null;
+}) {
+    if (input.keyId === undefined) {
+        delete process.env.MEMBERSHIP_BRIDGE_ISSUER_KEY_ID;
+    } else {
+        process.env.MEMBERSHIP_BRIDGE_ISSUER_KEY_ID = input.keyId ?? '';
+    }
+    if (input.secret === undefined) {
+        delete process.env.MEMBERSHIP_BRIDGE_ISSUER_SECRET;
+    } else {
+        process.env.MEMBERSHIP_BRIDGE_ISSUER_SECRET = input.secret ?? '';
+    }
+}
+
 describe('membership admission bridge routes', () => {
     test('GET /circles/:id/me surfaces invite-backed can_join for invite-only circles', async () => {
         const prisma = createJoinPrismaMock({
@@ -314,12 +330,81 @@ describe('membership admission bridge routes', () => {
                     role: 'Member',
                     kind: 'Open',
                     artifactId: 0,
+                    issuerKeyId: process.env.MEMBERSHIP_BRIDGE_ISSUER_KEY_ID,
                 }),
             },
         });
         expect((prisma.circleMember.create as any)).not.toHaveBeenCalled();
         expect((prisma.circleMember.update as any)).not.toHaveBeenCalled();
         expect(next).not.toHaveBeenCalled();
+    });
+
+    test('POST /circles/:id/join forwards a clear error when the membership attestor secret is missing', async () => {
+        const prisma = createJoinPrismaMock();
+        const router = membershipRouter(prisma as any, { publish: jest.fn(async () => 1) } as any);
+        const handler = getRouteHandler(router, '/circles/:id/join', 'post');
+        const previousKey = process.env.MEMBERSHIP_BRIDGE_ISSUER_KEY_ID;
+        const previousSecret = process.env.MEMBERSHIP_BRIDGE_ISSUER_SECRET;
+
+        setMembershipIssuerEnv({
+            keyId: previousKey ?? null,
+            secret: '',
+        });
+
+        try {
+            const req = {
+                params: { id: '7' },
+                userId: 88,
+                body: {},
+            } as any;
+            const res = createMockResponse();
+            const next = jest.fn();
+
+            await handler(req, res as any, next);
+
+            expect(next).toHaveBeenCalledWith(expect.objectContaining({
+                message: 'missing_membership_bridge_issuer_secret',
+            }));
+        } finally {
+            setMembershipIssuerEnv({
+                keyId: previousKey ?? null,
+                secret: previousSecret ?? null,
+            });
+        }
+    });
+
+    test('POST /circles/:id/join forwards a clear error when the membership attestor key and secret mismatch', async () => {
+        const prisma = createJoinPrismaMock();
+        const router = membershipRouter(prisma as any, { publish: jest.fn(async () => 1) } as any);
+        const handler = getRouteHandler(router, '/circles/:id/join', 'post');
+        const previousKey = process.env.MEMBERSHIP_BRIDGE_ISSUER_KEY_ID;
+        const previousSecret = process.env.MEMBERSHIP_BRIDGE_ISSUER_SECRET;
+
+        setMembershipIssuerEnv({
+            keyId: new PublicKey('4wBqpZM9xaGgkQ8WXVbwyodH4qzM7gc3KJ2YMBX1AHzm').toBase58(),
+            secret: previousSecret ?? null,
+        });
+
+        try {
+            const req = {
+                params: { id: '7' },
+                userId: 88,
+                body: {},
+            } as any;
+            const res = createMockResponse();
+            const next = jest.fn();
+
+            await handler(req, res as any, next);
+
+            expect(next).toHaveBeenCalledWith(expect.objectContaining({
+                message: 'membership_bridge_issuer_key_mismatch',
+            }));
+        } finally {
+            setMembershipIssuerEnv({
+                keyId: previousKey ?? null,
+                secret: previousSecret ?? null,
+            });
+        }
     });
 
     test('POST /circles/:id/join blocks on entitlement-backed crystal deficits', async () => {

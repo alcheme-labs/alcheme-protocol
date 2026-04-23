@@ -398,6 +398,7 @@ export class CirclesModule extends BaseModule<CircleManagerIdl> {
       [Buffer.from("circle_manager")],
       this.programId,
     );
+    const membershipAttestorRegistry = this.pda.findMembershipAttestorRegistryPda();
     const circlePDA = this.findCirclePda(params.circleId);
     const circleMemberPda = this.findCircleMemberPda(params.circleId, this.provider.publicKey);
     const eventAccounts = await this.resolveEventAccounts();
@@ -444,6 +445,7 @@ export class CirclesModule extends BaseModule<CircleManagerIdl> {
         { pubkey: eventAccounts.eventEmitter, isSigner: false, isWritable: true },
         { pubkey: eventAccounts.eventBatch, isSigner: false, isWritable: true },
         { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+        { pubkey: membershipAttestorRegistry, isSigner: false, isWritable: false },
       ],
       data: instructionData,
     });
@@ -527,6 +529,24 @@ export class CirclesModule extends BaseModule<CircleManagerIdl> {
     return tx;
   }
 
+  async initializeMembershipAttestorRegistry(): Promise<string> {
+    const registryPda = this.pda.findMembershipAttestorRegistryPda();
+    const [circleManagerPda] = PublicKey.findProgramAddressSync(
+      [Buffer.from("circle_manager")],
+      this.programId,
+    );
+    const tx = await (this.program.methods as any)
+      .initializeMembershipAttestorRegistry()
+      .accounts({
+        membershipAttestorRegistry: registryPda,
+        circleManager: circleManagerPda,
+        admin: this.provider.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
+    return tx;
+  }
+
   async registerProofAttestor(attestor: PublicKey): Promise<string> {
     const registryPda = this.pda.findProofAttestorRegistryPda();
     const eventAccounts = await this.resolveEventAccounts();
@@ -534,6 +554,40 @@ export class CirclesModule extends BaseModule<CircleManagerIdl> {
       .registerProofAttestor(attestor)
       .accounts({
         proofAttestorRegistry: registryPda,
+        admin: this.provider.publicKey,
+        eventProgram: eventAccounts.eventProgram,
+        eventEmitter: eventAccounts.eventEmitter,
+        eventBatch: eventAccounts.eventBatch,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
+    return tx;
+  }
+
+  async registerMembershipAttestor(attestor: PublicKey): Promise<string> {
+    const registryPda = this.pda.findMembershipAttestorRegistryPda();
+    const eventAccounts = await this.resolveEventAccounts();
+    const tx = await (this.program.methods as any)
+      .registerMembershipAttestor(attestor)
+      .accounts({
+        membershipAttestorRegistry: registryPda,
+        admin: this.provider.publicKey,
+        eventProgram: eventAccounts.eventProgram,
+        eventEmitter: eventAccounts.eventEmitter,
+        eventBatch: eventAccounts.eventBatch,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
+    return tx;
+  }
+
+  async revokeMembershipAttestor(attestor: PublicKey): Promise<string> {
+    const registryPda = this.pda.findMembershipAttestorRegistryPda();
+    const eventAccounts = await this.resolveEventAccounts();
+    const tx = await (this.program.methods as any)
+      .revokeMembershipAttestor(attestor)
+      .accounts({
+        membershipAttestorRegistry: registryPda,
         admin: this.provider.publicKey,
         eventProgram: eventAccounts.eventProgram,
         eventEmitter: eventAccounts.eventEmitter,
