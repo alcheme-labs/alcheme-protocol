@@ -41,6 +41,7 @@ frontend/.next-*/
 
 # Local manual run artifacts
 test-results/
+txtx.yml
 
 # Local planning scratch files
 findings.md
