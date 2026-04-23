@@ -7,7 +7,7 @@
   - the legacy `circle_manager.admin` issuer for compatibility, or
   - any issuer registered in the membership attestor registry.
 - `query-api` still decides open / invite / approval policy, but now signs grants with a trusted membership attestor instead of assuming the admin wallet.
-- `frontend` now consumes the local repo SDK (`file:../sdk`) so demo builds can pick up unreleased contract-account changes without waiting on an npm publish.
+- `frontend` should consume a freshly published SDK patch release before demo rebuilds.
 
 ## Rollout order
 
@@ -57,13 +57,14 @@ MEMBERSHIP_BRIDGE_ISSUER_SECRET=<matching secret>
 
 The configured key must already be registered on-chain.
 
-## Why the frontend switched to `file:../sdk`
+## SDK rollout rule
 
-This repo previously relied on a published `@alcheme/sdk` prerelease for demo builds. That created a stale-package trap: contract upgrades could land before the demo frontend had a compatible SDK package published. The frontend now installs the SDK from the repo root so:
+Keep `frontend` on a published `@alcheme/sdk` prerelease instead of a local file dependency. To avoid stale-account-layout failures after contract upgrades:
 
-- local builds use the current contract account layout,
-- Docker builds compile the SDK before `frontend npm ci`,
-- demo rebuilds do not depend on an out-of-band npm publish step.
+- bump the SDK patch version,
+- publish that SDK release to npm under the `devnet` tag,
+- update `frontend/package.json` and `frontend/package-lock.json`,
+- then rebuild demo.
 
 ## Current compatibility rule
 
