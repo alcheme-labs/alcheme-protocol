@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useI18n } from '@/i18n/useI18n';
@@ -27,16 +27,19 @@ export default function EditProfileModal({
     const [bio, setBio] = useState(initialData.bio);
     const [saving, setSaving] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const saveInFlightRef = useRef(false);
 
     useEffect(() => {
         if (!isOpen) return;
         setDisplayName(initialData.displayName);
         setBio(initialData.bio);
         setErrorMessage(null);
+        saveInFlightRef.current = false;
     }, [initialData.bio, initialData.displayName, isOpen]);
 
     const handleSave = useCallback(async () => {
-        if (!displayName.trim()) return;
+        if (saveInFlightRef.current || !displayName.trim()) return;
+        saveInFlightRef.current = true;
         setSaving(true);
         setErrorMessage(null);
         try {
@@ -46,6 +49,7 @@ export default function EditProfileModal({
             setErrorMessage(error instanceof Error ? error.message : t('errors.saveFailed'));
         } finally {
             setSaving(false);
+            saveInFlightRef.current = false;
         }
     }, [bio, displayName, onClose, onSave, t]);
 

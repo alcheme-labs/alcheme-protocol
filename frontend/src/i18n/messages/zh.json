@@ -2961,8 +2961,36 @@
   },
   "CreateCircleFlow": {
     "errors": {
+      "walletNotConnected": "请先连接钱包再创建圈层。",
+      "userRejected": "你取消了钱包签名，圈层未创建。",
+      "insufficientFunds": "钱包 SOL 余额不足，无法支付链上手续费。",
+      "constraintSeeds": "圈层程序配置与当前网络不匹配（PDA 校验失败）。请检查 RPC 与 Program ID。",
+      "circleManagerMissing": "圈层管理器尚未初始化，请先由管理员执行 initialize。",
+      "simulationFailed": "交易模拟失败。请确认钱包网络与当前 RPC 一致，并检查圈层程序是否已正确部署与初始化。",
+      "accountNotReady": "钱包余额不足或账户未激活，请先转入少量 SOL 后重试。",
+      "genericFailure": "创建圈层失败，请稍后重试。",
+      "parentCircleOutOfRange": "parentCircle 超出链上 u8 范围 (0-255)。",
+      "walletSignerMissing": "钱包未连接，无法签名交易。",
+      "payerAccountMissing": "当前钱包账户 {wallet} 不存在或未激活。",
+      "circleProgramMissing": "圈层程序未部署到当前 RPC（{rpc}）。请检查 NEXT_PUBLIC_SOLANA_RPC_URL / NEXT_PUBLIC_CIRCLES_PROGRAM_ID。",
+      "circleManagerMissingDetailed": "圈层管理器未初始化（{pda}）。请先由管理员执行 circles.initialize()。",
+      "eventProgramMissing": "事件程序未部署到当前 RPC（{rpc}）。请检查 NEXT_PUBLIC_EVENT_PROGRAM_ID。",
+      "eventEmitterMissing": "事件发射器未初始化（{pda}）。请先执行 initialize_event_emitter。",
+      "circleIdAllocationFailed": "创建圈层失败：未能分配可用的 circle_id。",
+      "circleIdMissing": "创建圈层失败：未获取圈层 ID。",
+      "forkAnchorSyncFailed": "圈层已创建，但 Fork 轻锚点写入失败，可稍后补写。",
+      "indexerLagging": "交易已上链，但索引尚未追平，稍后刷新可见。",
+      "signatureSlotMissing": "交易已提交，暂未获取确认槽位。",
+      "readModelLagging": "圈层已创建，但新圈层暂未出现在圈层列表读模型中，稍后刷新可见。",
       "metadataSyncFailed": "圈层已创建，但圈层描述保存失败，可在圈层设置页重试。",
-      "metadataSyncFailedSuffix": "圈层描述保存失败，可在圈层设置页重试。"
+      "ghostSettingsSyncFailed": "圈层已创建，但 AI 配置保存失败，可在圈层设置页重试。",
+      "genesisModeSyncFailed": "圈层已创建，但内容起点保存失败，可在圈层设置页重试。",
+      "seededSourcesSyncFailed": "圈层已创建，但 Seeded 源文件导入失败，可稍后重试。",
+      "joinPolicySyncFailed": "圈层已创建，但准入策略同步失败，可在圈层设置页重试。",
+      "draftLifecycleSyncFailed": "圈层已创建，但草稿流程设置保存失败，可在圈层设置页重试。",
+      "workflowPolicySyncFailed": "圈层已创建，但问题单与阶段权限保存失败，可在圈层设置页重试。",
+      "postCreateSyncPending": "圈层已创建，后续配置仍在保存中；可稍后在圈层设置页重试。",
+      "postCreateSyncFailed": "圈层已创建，但后续配置保存失败，可稍后在圈层设置页重试。"
     }
   }
 }

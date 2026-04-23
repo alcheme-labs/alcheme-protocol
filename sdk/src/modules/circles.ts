@@ -1,6 +1,7 @@
 import { Ed25519Program, PublicKey, SYSVAR_INSTRUCTIONS_PUBKEY, SystemProgram, Transaction, TransactionInstruction } from "@solana/web3.js";
 import { BN, Program } from "@coral-xyz/anchor";
 import { BaseModule } from "./base";
+import { sendTransactionWithAlreadyProcessedRecovery } from "../utils/transactions";
 import * as idl from "../idl/circle_manager.json";
 import * as eventEmitterIdl from "../idl/event_emitter.json";
 import { Idl } from "@coral-xyz/anchor";
@@ -176,27 +177,48 @@ export class CirclesModule extends BaseModule<CircleManagerIdl> {
     );
     const eventAccounts = await this.resolveEventAccounts();
 
-    const tx = await this.program.methods
-      .createCircle(
-        params.circleId,
-        params.name,
-        params.level,
-        params.parentCircle ?? null,
-        this.encodeKnowledgeGovernance(params.knowledgeGovernance),
-        this.encodeDecisionEngine(params.decisionEngine)
-      )
-      .accounts({
-        circle: circlePDA,
-        circleManager: managerPDA,
-        creator: this.provider.publicKey,
-        eventProgram: eventAccounts.eventProgram,
-        eventEmitter: eventAccounts.eventEmitter,
-        eventBatch: eventAccounts.eventBatch,
-        systemProgram: SystemProgram.programId,
-      })
-      .rpc();
+    const tx = await sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
+      this.program.methods
+        .createCircle(
+          params.circleId,
+          params.name,
+          params.level,
+          params.parentCircle ?? null,
+          this.encodeKnowledgeGovernance(params.knowledgeGovernance),
+          this.encodeDecisionEngine(params.decisionEngine)
+        )
+        .accounts({
+          circle: circlePDA,
+          circleManager: managerPDA,
+          creator: this.provider.publicKey,
+          eventProgram: eventAccounts.eventProgram,
+          eventEmitter: eventAccounts.eventEmitter,
+          eventBatch: eventAccounts.eventBatch,
+          systemProgram: SystemProgram.programId,
+        })
+        .transaction()
+    );
 
     return tx;
+  }
+
+  async updateCircleFlags(circleId: number, flags: BN): Promise<string> {
+    const circlePDA = this.findCirclePda(circleId);
+    const eventAccounts = await this.resolveEventAccounts();
+
+    return sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
+      this.program.methods
+        .updateCircleFlags(flags)
+        .accounts({
+          circle: circlePDA,
+          authority: this.provider.publicKey,
+          eventProgram: eventAccounts.eventProgram,
+          eventEmitter: eventAccounts.eventEmitter,
+          eventBatch: eventAccounts.eventBatch,
+          systemProgram: SystemProgram.programId,
+        })
+        .transaction()
+    );
   }
 
   async anchorCircleFork(params: AnchorCircleForkParams): Promise<string> {

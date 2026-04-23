@@ -2961,8 +2961,36 @@
   },
   "CreateCircleFlow": {
     "errors": {
+      "walletNotConnected": "Connect your wallet before creating a circle.",
+      "userRejected": "You cancelled the wallet signature, so the circle was not created.",
+      "insufficientFunds": "Your wallet does not have enough SOL to pay the on-chain fee.",
+      "constraintSeeds": "The circle program configuration does not match this network (PDA validation failed). Check the RPC and Program ID.",
+      "circleManagerMissing": "The circle manager has not been initialized yet. Ask an admin to run initialize first.",
+      "simulationFailed": "Transaction simulation failed. Make sure the wallet network matches the current RPC, and verify that the circle programs were deployed and initialized correctly.",
+      "accountNotReady": "This wallet account is missing or not funded yet. Send a small amount of SOL and try again.",
+      "genericFailure": "We couldn't create the circle right now. Please try again.",
+      "parentCircleOutOfRange": "The parent circle value is outside the on-chain u8 range (0-255).",
+      "walletSignerMissing": "The wallet is not ready to sign this transaction.",
+      "payerAccountMissing": "The current wallet account {wallet} does not exist on-chain or is not funded yet.",
+      "circleProgramMissing": "The circle program is not deployed on the current RPC ({rpc}). Check NEXT_PUBLIC_SOLANA_RPC_URL and NEXT_PUBLIC_CIRCLES_PROGRAM_ID.",
+      "circleManagerMissingDetailed": "The circle manager is not initialized yet ({pda}). Ask an admin to run circles.initialize() first.",
+      "eventProgramMissing": "The event program is not deployed on the current RPC ({rpc}). Check NEXT_PUBLIC_EVENT_PROGRAM_ID.",
+      "eventEmitterMissing": "The event emitter is not initialized yet ({pda}). Run initialize_event_emitter first.",
+      "circleIdAllocationFailed": "Circle creation failed because no available circle_id could be allocated.",
+      "circleIdMissing": "Circle creation failed because the new circle_id was never resolved.",
+      "forkAnchorSyncFailed": "The circle was created, but the fork anchor could not be written yet. You can retry later.",
+      "indexerLagging": "The transaction is on-chain, but indexing is still catching up. Refresh again shortly.",
+      "signatureSlotMissing": "The transaction was submitted, but we could not determine its confirmation slot yet.",
+      "readModelLagging": "The circle was created, but it is not visible in the circle list read model yet. Refresh again shortly.",
       "metadataSyncFailed": "The circle was created, but the description could not be saved. You can retry from the circle settings page.",
-      "metadataSyncFailedSuffix": "The circle description could not be saved. You can retry from the circle settings page."
+      "ghostSettingsSyncFailed": "The circle was created, but the AI settings could not be saved. You can retry from the circle settings page.",
+      "genesisModeSyncFailed": "The circle was created, but the genesis mode could not be saved. You can retry from the circle settings page.",
+      "seededSourcesSyncFailed": "The circle was created, but the seeded source files could not be imported yet. You can retry later.",
+      "joinPolicySyncFailed": "The circle was created, but the access policy could not be saved. You can retry from the circle settings page.",
+      "draftLifecycleSyncFailed": "The circle was created, but the draft lifecycle settings could not be saved. You can retry from the circle settings page.",
+      "workflowPolicySyncFailed": "The circle was created, but the workflow permissions could not be saved. You can retry from the circle settings page.",
+      "postCreateSyncPending": "The circle was created, but the follow-up configuration is still saving. You can retry from the circle settings page later.",
+      "postCreateSyncFailed": "The circle was created, but the follow-up configuration could not be saved. You can retry from the circle settings page later."
     }
   }
 }

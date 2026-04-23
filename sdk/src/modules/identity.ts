@@ -5,6 +5,10 @@ import { AccessModule } from "./access";
 import * as idl from "../idl/identity_registry.json";
 import * as eventEmitterIdl from "../idl/event_emitter.json";
 import { Idl } from "@coral-xyz/anchor";
+import {
+  isAlreadyProcessedTransactionError,
+  sendTransactionWithAlreadyProcessedRecovery,
+} from "../utils/transactions";
 
 // Define types roughly to help with intellisense (in a real scenario these are generated)
 export type IdentityRegistryIdl = Idl;
@@ -39,6 +43,8 @@ export async function withEventBatchSeedRetry<T>(
   throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
+export { isAlreadyProcessedTransactionError, sendTransactionWithAlreadyProcessedRecovery };
+
 export class IdentityModule extends BaseModule<IdentityRegistryIdl> {
   private eventProgram: Program<Idl>;
   private accessModule: AccessModule;
@@ -72,20 +78,22 @@ export class IdentityModule extends BaseModule<IdentityRegistryIdl> {
     };
 
     return this.withResolvedEventAccountsRetry((eventAccounts) =>
-      this.program.methods
-        .registerIdentity(handle, privacySettings)
-        .accounts({
-          // @ts-ignore - Dynamic account resolution usually works but for strict typing we need generated types
-          identityRegistry,
-          userIdentity: userIdentityPda,
-          handleMapping: handleMappingPda,
-          user: this.provider.publicKey,
-          systemProgram: SystemProgram.programId,
-          eventProgram: eventAccounts.eventProgram,
-          eventEmitter: eventAccounts.eventEmitter,
-          eventBatch: eventAccounts.eventBatch,
-        })
-        .rpc()
+      sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
+        this.program.methods
+          .registerIdentity(handle, privacySettings)
+          .accounts({
+            // @ts-ignore - Dynamic account resolution usually works but for strict typing we need generated types
+            identityRegistry,
+            userIdentity: userIdentityPda,
+            handleMapping: handleMappingPda,
+            user: this.provider.publicKey,
+            systemProgram: SystemProgram.programId,
+            eventProgram: eventAccounts.eventProgram,
+            eventEmitter: eventAccounts.eventEmitter,
+            eventBatch: eventAccounts.eventBatch,
+          })
+          .transaction()
+      )
     );
   }
 
@@ -109,17 +117,19 @@ export class IdentityModule extends BaseModule<IdentityRegistryIdl> {
     const normalizedUpdates = toIdentityUpdatePayload(updates);
 
     return this.withResolvedEventAccountsRetry((eventAccounts) =>
-      this.program.methods
-        .updateIdentity(normalizedUpdates)
-        .accounts({
-          userIdentity: userIdentityPda,
-          user: this.provider.publicKey,
-          systemProgram: SystemProgram.programId,
-          eventProgram: eventAccounts.eventProgram,
-          eventEmitter: eventAccounts.eventEmitter,
-          eventBatch: eventAccounts.eventBatch,
-        })
-        .rpc()
+      sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
+        this.program.methods
+          .updateIdentity(normalizedUpdates)
+          .accounts({
+            userIdentity: userIdentityPda,
+            user: this.provider.publicKey,
+            systemProgram: SystemProgram.programId,
+            eventProgram: eventAccounts.eventProgram,
+            eventEmitter: eventAccounts.eventEmitter,
+            eventBatch: eventAccounts.eventBatch,
+          })
+          .transaction()
+      )
     );
   }
 
@@ -128,17 +138,19 @@ export class IdentityModule extends BaseModule<IdentityRegistryIdl> {
     const userIdentityPda = this.pda.findUserIdentityPda(registry, handle);
 
     return this.withResolvedEventAccountsRetry((eventAccounts) =>
-      this.program.methods
-        .addVerificationAttribute(attribute)
-        .accounts({
-          userIdentity: userIdentityPda,
-          verifier: this.provider.publicKey,
-          systemProgram: SystemProgram.programId,
-          eventProgram: eventAccounts.eventProgram,
-          eventEmitter: eventAccounts.eventEmitter,
-          eventBatch: eventAccounts.eventBatch,
-        })
-        .rpc()
+      sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
+        this.program.methods
+          .addVerificationAttribute(attribute)
+          .accounts({
+            userIdentity: userIdentityPda,
+            verifier: this.provider.publicKey,
+            systemProgram: SystemProgram.programId,
+            eventProgram: eventAccounts.eventProgram,
+            eventEmitter: eventAccounts.eventEmitter,
+            eventBatch: eventAccounts.eventBatch,
+          })
+          .transaction()
+      )
     );
   }
 

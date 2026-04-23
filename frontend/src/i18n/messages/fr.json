@@ -2961,8 +2961,36 @@
   },
   "CreateCircleFlow": {
     "errors": {
+      "walletNotConnected": "Connecte ton portefeuille avant de créer un cercle.",
+      "userRejected": "Tu as annulé la signature du portefeuille, donc le cercle n’a pas été créé.",
+      "insufficientFunds": "Le portefeuille n’a pas assez de SOL pour payer les frais on-chain.",
+      "constraintSeeds": "La configuration du programme de cercles ne correspond pas à ce réseau (échec de la validation PDA). Vérifie le RPC et le Program ID.",
+      "circleManagerMissing": "Le gestionnaire de cercles n’est pas encore initialisé. Demande à un administrateur d’exécuter initialize d’abord.",
+      "simulationFailed": "La simulation de transaction a échoué. Vérifie que le réseau du portefeuille correspond bien au RPC actuel et que les programmes de cercles sont correctement déployés et initialisés.",
+      "accountNotReady": "Le compte de ce portefeuille n’existe pas encore on-chain ou n’est pas approvisionné. Envoie un petit montant de SOL puis réessaie.",
+      "genericFailure": "Nous n’avons pas pu créer le cercle pour le moment. Réessaie.",
+      "parentCircleOutOfRange": "La valeur de parentCircle est hors de la plage on-chain u8 (0-255).",
+      "walletSignerMissing": "Le portefeuille n’est pas prêt à signer cette transaction.",
+      "payerAccountMissing": "Le compte du portefeuille actuel {wallet} n’existe pas on-chain ou n’est pas encore approvisionné.",
+      "circleProgramMissing": "Le programme de cercles n’est pas déployé sur le RPC actuel ({rpc}). Vérifie NEXT_PUBLIC_SOLANA_RPC_URL et NEXT_PUBLIC_CIRCLES_PROGRAM_ID.",
+      "circleManagerMissingDetailed": "Le gestionnaire de cercles n’est pas encore initialisé ({pda}). Demande à un administrateur d’exécuter circles.initialize() d’abord.",
+      "eventProgramMissing": "Le programme d’événements n’est pas déployé sur le RPC actuel ({rpc}). Vérifie NEXT_PUBLIC_EVENT_PROGRAM_ID.",
+      "eventEmitterMissing": "L’émetteur d’événements n’est pas encore initialisé ({pda}). Exécute initialize_event_emitter d’abord.",
+      "circleIdAllocationFailed": "La création du cercle a échoué, car aucun circle_id disponible n’a pu être attribué.",
+      "circleIdMissing": "La création du cercle a échoué, car le nouveau circle_id n’a pas été résolu.",
+      "forkAnchorSyncFailed": "Le cercle a été créé, mais l’ancre de fork n’a pas encore pu être écrite. Tu pourras réessayer plus tard.",
+      "indexerLagging": "La transaction est bien on-chain, mais l’indexation est encore en train de rattraper son retard. Réessaie dans un instant.",
+      "signatureSlotMissing": "La transaction a été envoyée, mais nous n’avons pas encore pu déterminer son slot de confirmation.",
+      "readModelLagging": "Le cercle a été créé, mais il n’apparaît pas encore dans le modèle de lecture de la liste des cercles. Réessaie dans un instant.",
       "metadataSyncFailed": "Le cercle a bien été créé, mais la description n’a pas pu être enregistrée. Vous pouvez réessayer depuis la page des réglages du cercle.",
-      "metadataSyncFailedSuffix": "La description du cercle n’a pas pu être enregistrée. Vous pouvez réessayer depuis la page des réglages du cercle."
+      "ghostSettingsSyncFailed": "Le cercle a été créé, mais la configuration IA n’a pas pu être enregistrée. Vous pouvez réessayer depuis la page des réglages du cercle.",
+      "genesisModeSyncFailed": "Le cercle a été créé, mais le mode de genèse n’a pas pu être enregistré. Vous pouvez réessayer depuis la page des réglages du cercle.",
+      "seededSourcesSyncFailed": "Le cercle a été créé, mais les fichiers Seeded n’ont pas encore pu être importés. Vous pouvez réessayer plus tard.",
+      "joinPolicySyncFailed": "Le cercle a été créé, mais la politique d’accès n’a pas pu être enregistrée. Vous pouvez réessayer depuis la page des réglages du cercle.",
+      "draftLifecycleSyncFailed": "Le cercle a été créé, mais les réglages du cycle de vie des brouillons n’ont pas pu être enregistrés. Vous pouvez réessayer depuis la page des réglages du cercle.",
+      "workflowPolicySyncFailed": "Le cercle a été créé, mais les permissions du workflow n’ont pas pu être enregistrées. Vous pouvez réessayer depuis la page des réglages du cercle.",
+      "postCreateSyncPending": "Le cercle a été créé, mais la configuration suivante est encore en cours d’enregistrement. Vous pourrez réessayer plus tard depuis la page des réglages du cercle.",
+      "postCreateSyncFailed": "Le cercle a été créé, mais la configuration suivante n’a pas pu être enregistrée. Vous pourrez réessayer plus tard depuis la page des réglages du cercle."
     }
   }
 }

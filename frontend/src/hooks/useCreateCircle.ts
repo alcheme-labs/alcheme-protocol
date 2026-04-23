@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useAlchemeSDK } from './useAlchemeSDK';
 import { BN } from '@coral-xyz/anchor';
 import { PublicKey, SystemProgram } from '@solana/web3.js';
@@ -66,13 +66,15 @@ interface UseCreateCircleReturn {
     txSignature: string | null;
 }
 
-function normalizeCreateCircleError(error: unknown): string {
+type CreateCircleTranslator = ReturnType<typeof useI18n>;
+
+function normalizeCreateCircleError(error: unknown, t: CreateCircleTranslator): string {
     const raw = error instanceof Error ? error.message : String(error ?? '');
     const logs = Array.isArray((error as any)?.logs) ? (error as any).logs.join(' ') : '';
     const message = `${raw} ${logs}`.toLowerCase();
 
     if (message.includes('wallet not connected') || message.includes('not connected')) {
-        return '请先连接钱包再创建圈层。';
+        return t('errors.walletNotConnected');
     }
 
     if (
@@ -81,15 +83,15 @@ function normalizeCreateCircleError(error: unknown): string {
         message.includes('denied transaction') ||
         message.includes('rejected the request')
     ) {
-        return '你取消了钱包签名，圈层未创建。';
+        return t('errors.userRejected');
     }
 
     if (message.includes('insufficient funds') || message.includes('insufficient lamports')) {
-        return '钱包 SOL 余额不足，无法支付链上手续费。';
+        return t('errors.insufficientFunds');
     }
 
     if (message.includes('constraintseeds') || message.includes('constraint seeds')) {
-        return '圈层程序配置与当前网络不匹配（PDA 校验失败）。请检查 RPC 与 Program ID。';
+        return t('errors.constraintSeeds');
     }
 
     if (
@@ -98,7 +100,7 @@ function normalizeCreateCircleError(error: unknown): string {
         message.includes('could not find account') ||
         message.includes('not initialized')
     ) {
-        return '圈层管理器尚未初始化，请先由管理员执行 initialize。';
+        return t('errors.circleManagerMissing');
     }
 
     if (
@@ -107,7 +109,7 @@ function normalizeCreateCircleError(error: unknown): string {
         message.includes('unknown error occurred') ||
         message.includes('custom program error')
     ) {
-        return '交易模拟失败。请确认钱包网络与当前 RPC 一致，并检查圈层程序是否已正确部署与初始化。';
+        return t('errors.simulationFailed');
     }
 
     if (
@@ -115,10 +117,14 @@ function normalizeCreateCircleError(error: unknown): string {
         message.includes('attempt to debit an account but found no record of a prior credit') ||
         message.includes('no prior credit')
     ) {
-        return '钱包余额不足或账户未激活，请先转入少量 SOL 后重试。';
+        return t('errors.accountNotReady');
     }
 
-    return raw || '创建圈层失败';
+    return raw || t('errors.genericFailure');
+}
+
+function appendCreateCircleNotice(previous: string | null, next: string): string {
+    return previous ? `${previous} ${next}` : next;
 }
 
 function encodeCircleFlags(
@@ -420,439 +426,394 @@ export function useCreateCircle(): UseCreateCircleReturn {
     const [indexed, setIndexed] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [txSignature, setTxSignature] = useState<string | null>(null);
+    const inFlightRef = useRef<Promise<{
+        txSignature: string;
+        circleId: number;
+    } | null> | null>(null);
 
     const createCircle = useCallback(async (options: CreateCircleOptions): Promise<{
         txSignature: string;
         circleId: number;
     } | null> => {
-        const isE2EMockMode = process.env.NEXT_PUBLIC_E2E_WALLET_MOCK === '1';
+        if (inFlightRef.current) return inFlightRef.current;
 
-        if (!publicKey) {
-            setError('请先连接钱包');
-            return null;
-        }
-        if (isE2EMockMode) {
-            setError(getBrowserOnlyMockUnsupportedError('create_circle'));
-            return null;
-        }
-        if (!sdk) {
-            setError('请先连接钱包');
-            return null;
-        }
+        const run = (async () => {
+            const isE2EMockMode = process.env.NEXT_PUBLIC_E2E_WALLET_MOCK === '1';
 
-        const signerUnavailableError = getCreateCircleSignerUnavailableError(signMessage);
-        if (signerUnavailableError) {
-            setError(signerUnavailableError);
-            return null;
-        }
-
-        setLoading(true);
-        setSyncing(false);
-        setIndexed(false);
-        setError(null);
-        setTxSignature(null);
-
-        try {
-            if (options.parentCircle !== undefined && (options.parentCircle < 0 || options.parentCircle > 255)) {
-                throw new Error('parentCircle 超出链上 u8 范围 (0-255)');
+            if (!publicKey) {
+                setError(t('errors.walletNotConnected'));
+                return null;
+            }
+            if (isE2EMockMode) {
+                setError(getBrowserOnlyMockUnsupportedError('create_circle'));
+                return null;
+            }
+            if (!sdk) {
+                setError(t('errors.walletNotConnected'));
+                return null;
             }
 
-            const targetKind = options.kind ?? 'main';
-            const targetMode = options.mode ?? 'knowledge';
-            const targetMinCrystals = options.minCrystals ?? 0;
-            let tx: string | null = null;
-            let createdCircleId: number | null = null;
-            let e2eSignatureSlot: number | null = null;
-
-            const activeSdk = sdk;
-            if (!activeSdk) {
-                throw new Error('请先连接钱包。');
+            const signerUnavailableError = getCreateCircleSignerUnavailableError(signMessage);
+            if (signerUnavailableError) {
+                setError(signerUnavailableError);
+                return null;
             }
 
-            const payer = activeSdk.provider.publicKey;
-            if (!payer) {
-                throw new Error('钱包未连接，无法签名交易。');
-            }
+            setLoading(true);
+            setSyncing(false);
+            setIndexed(false);
+            setError(null);
+            setTxSignature(null);
 
-            const payerAccount = await activeSdk.connection.getAccountInfo(payer);
-            if (!payerAccount) {
-                throw new Error(
-                    `当前钱包 ${payer.toBase58()} 账户不存在或未激活`,
-                );
-            }
-
-            const [circleManagerPda] = PublicKey.findProgramAddressSync(
-                [new TextEncoder().encode('circle_manager')],
-                activeSdk.circles.programId,
-            );
-
-            const [eventEmitterPda] = PublicKey.findProgramAddressSync(
-                [new TextEncoder().encode('event_emitter')],
-                activeSdk.event.programId,
-            );
-
-            const [programAccount, managerAccount, eventProgramAccount, eventEmitterAccount] = await Promise.all([
-                activeSdk.connection.getAccountInfo(activeSdk.circles.programId),
-                activeSdk.connection.getAccountInfo(circleManagerPda),
-                activeSdk.connection.getAccountInfo(activeSdk.event.programId),
-                activeSdk.connection.getAccountInfo(eventEmitterPda),
-            ]);
-
-            if (!programAccount?.executable) {
-                throw new Error(
-                    `圈层程序未部署到当前 RPC（${activeSdk.connection.rpcEndpoint}）。请检查 NEXT_PUBLIC_SOLANA_RPC_URL / NEXT_PUBLIC_CIRCLES_PROGRAM_ID。`,
-                );
-            }
-
-            if (!managerAccount) {
-                throw new Error(
-                    `圈层管理器未初始化（${circleManagerPda.toBase58()}）。请先由管理员执行 circles.initialize()。`,
-                );
-            }
-
-            if (!eventProgramAccount?.executable) {
-                throw new Error(
-                    `事件程序未部署到当前 RPC（${activeSdk.connection.rpcEndpoint}）。请检查 NEXT_PUBLIC_EVENT_PROGRAM_ID。`,
-                );
-            }
-
-            if (!eventEmitterAccount) {
-                throw new Error(
-                    `事件发射器未初始化（${eventEmitterPda.toBase58()}）。请先执行 initialize_event_emitter。`,
-                );
-            }
-
-            const nextCircleId = () => ((Date.now() + Math.floor(Math.random() * 10_000)) % 255) + 1;
-            let lastError: Error | null = null;
-
-            for (let attempt = 0; attempt < 4; attempt += 1) {
-                const circleId = nextCircleId();
-                try {
-                    tx = await activeSdk.circles.createCircle({
-                        circleId,
-                        name: options.name,
-                        level: options.level ?? 0,
-                        parentCircle: options.parentCircle,
-                        knowledgeGovernance: {
-                            minQualityScore: 50,
-                            minCuratorReputation: 10,
-                            transferCooldown: new BN(3600),
-                            maxTransfersPerDay: 10,
-                            requirePeerReview: false,
-                            peerReviewCount: 0,
-                            autoQualityCheck: true,
-                        },
-                        decisionEngine: {
-                            votingGovernance: {
-                                minVotes: new BN(1),
-                                voteDuration: new BN(86400),
-                                quorumPercentage: 50,
-                            },
-                        },
-                    });
-                    createdCircleId = circleId;
-                    break;
-                } catch (error) {
-                    lastError = error instanceof Error ? error : new Error('创建圈层失败');
-                    const message = String(lastError.message || '').toLowerCase();
-                    const isCollision =
-                        message.includes('already in use')
-                        || message.includes('already exists')
-                        || message.includes('account in use');
-                    if (!isCollision) {
-                        throw lastError;
-                    }
+            try {
+                if (options.parentCircle !== undefined && (options.parentCircle < 0 || options.parentCircle > 255)) {
+                    throw new Error(t('errors.parentCircleOutOfRange'));
                 }
-            }
 
-            if (!tx) {
-                throw lastError || new Error('创建圈层失败：未能分配可用的 circle_id');
-            }
+                const targetKind = options.kind ?? 'main';
+                const targetMode = options.mode ?? 'knowledge';
+                const targetMinCrystals = options.minCrystals ?? 0;
+                let tx: string | null = null;
+                let createdCircleId: number | null = null;
+                let e2eSignatureSlot: number | null = null;
 
-            if (createdCircleId === null) {
-                throw new Error('创建圈层失败：未获取圈层 ID');
-            }
+                const activeSdk = sdk;
+                if (!activeSdk) {
+                    throw new Error(t('errors.walletNotConnected'));
+                }
 
-            const targetFlags = encodeCircleFlags(targetKind, targetMode, targetMinCrystals);
-            const needFlagUpdate =
-                targetKind !== 'main' ||
-                targetMode !== 'knowledge' ||
-                targetMinCrystals > 0;
+                const payer = activeSdk.provider.publicKey;
+                if (!payer) {
+                    throw new Error(t('errors.walletSignerMissing'));
+                }
 
-            let flagsUpdateTx: string | null = null;
-            if (needFlagUpdate) {
-                const circlesModule = activeSdk.circles as any;
-                const [circlePda] = PublicKey.findProgramAddressSync(
-                    [new TextEncoder().encode('circle'), Uint8Array.of(createdCircleId)],
+                const payerAccount = await activeSdk.connection.getAccountInfo(payer);
+                if (!payerAccount) {
+                    throw new Error(
+                        t('errors.payerAccountMissing', {wallet: payer.toBase58()}),
+                    );
+                }
+
+                const [circleManagerPda] = PublicKey.findProgramAddressSync(
+                    [new TextEncoder().encode('circle_manager')],
                     activeSdk.circles.programId,
                 );
 
-                const eventAccounts = await circlesModule.resolveEventAccounts();
-                flagsUpdateTx = await circlesModule.program.methods
-                    .updateCircleFlags(targetFlags)
-                    .accounts({
-                        circle: circlePda,
-                        authority: payer,
-                        eventProgram: eventAccounts.eventProgram,
-                        eventEmitter: eventAccounts.eventEmitter,
-                        eventBatch: eventAccounts.eventBatch,
-                        systemProgram: SystemProgram.programId,
-                    })
-                    .rpc();
-            }
+                const [eventEmitterPda] = PublicKey.findProgramAddressSync(
+                    [new TextEncoder().encode('event_emitter')],
+                    activeSdk.event.programId,
+                );
 
-            let forkAnchorTx: string | null = null;
-            if (options.forkAnchor) {
-                try {
-                    forkAnchorTx = await (activeSdk.circles as any).anchorCircleFork({
-                        sourceCircleId: options.forkAnchor.sourceCircleId,
-                        targetCircleId: createdCircleId,
-                        forkDeclarationDigest: options.forkAnchor.forkDeclarationDigest,
-                    });
-                } catch (anchorError) {
-                    console.warn('[useCreateCircle] anchor fork failed', anchorError);
-                    setError((prev) =>
-                        prev
-                            ? `${prev} Fork 轻锚点写入失败，可稍后补写。`
-                            : '圈层已创建，但 Fork 轻锚点写入失败，可稍后补写。',
+                const [programAccount, managerAccount, eventProgramAccount, eventEmitterAccount] = await Promise.all([
+                    activeSdk.connection.getAccountInfo(activeSdk.circles.programId),
+                    activeSdk.connection.getAccountInfo(circleManagerPda),
+                    activeSdk.connection.getAccountInfo(activeSdk.event.programId),
+                    activeSdk.connection.getAccountInfo(eventEmitterPda),
+                ]);
+
+                if (!programAccount?.executable) {
+                    throw new Error(
+                        t('errors.circleProgramMissing', {rpc: activeSdk.connection.rpcEndpoint}),
                     );
                 }
-            }
 
-            const signaturesToTrack = [tx, flagsUpdateTx, forkAnchorTx].filter(
-                (sig): sig is string => typeof sig === 'string' && sig.length > 0,
-            );
-            const signatureSlots = await Promise.all(
-                signaturesToTrack.map((sig) => waitForSignatureSlot(activeSdk.connection, sig)),
-            );
-            const resolvedSlots = signatureSlots.filter(
-                (slot): slot is number => typeof slot === 'number' && slot > 0,
-            );
-            e2eSignatureSlot = resolvedSlots.length > 0 ? Math.max(...resolvedSlots) : null;
-
-            setTxSignature(tx);
-
-            setSyncing(true);
-            const targetIndexedSlot = e2eSignatureSlot;
-
-            if (targetIndexedSlot !== null) {
-                const indexWait = await waitForIndexedSlot(targetIndexedSlot);
-                if (!indexWait.ok) {
-                    setError('交易已上链，但索引尚未追平，稍后刷新可见。');
+                if (!managerAccount) {
+                    throw new Error(
+                        t('errors.circleManagerMissingDetailed', {pda: circleManagerPda.toBase58()}),
+                    );
                 }
-            } else {
-                setError('交易已提交，暂未获取确认槽位。');
-            }
 
-            const circleVisible = await waitForCircleReadModelVisibility({
-                circleId: createdCircleId,
-            });
-            setIndexed(circleVisible);
-            if (!circleVisible) {
-                setError((prev) =>
-                    prev
-                        ? `${prev} 新圈层暂未出现在圈层列表读模型中，稍后刷新可见。`
-                        : '圈层已创建，但新圈层暂未出现在圈层列表读模型中，稍后刷新可见。',
+                if (!eventProgramAccount?.executable) {
+                    throw new Error(
+                        t('errors.eventProgramMissing', {rpc: activeSdk.connection.rpcEndpoint}),
+                    );
+                }
+
+                if (!eventEmitterAccount) {
+                    throw new Error(
+                        t('errors.eventEmitterMissing', {pda: eventEmitterPda.toBase58()}),
+                    );
+                }
+
+                const nextCircleId = () => ((Date.now() + Math.floor(Math.random() * 10_000)) % 255) + 1;
+                let lastError: Error | null = null;
+
+                for (let attempt = 0; attempt < 4; attempt += 1) {
+                    const circleId = nextCircleId();
+                    try {
+                        tx = await activeSdk.circles.createCircle({
+                            circleId,
+                            name: options.name,
+                            level: options.level ?? 0,
+                            parentCircle: options.parentCircle,
+                            knowledgeGovernance: {
+                                minQualityScore: 50,
+                                minCuratorReputation: 10,
+                                transferCooldown: new BN(3600),
+                                maxTransfersPerDay: 10,
+                                requirePeerReview: false,
+                                peerReviewCount: 0,
+                                autoQualityCheck: true,
+                            },
+                            decisionEngine: {
+                                votingGovernance: {
+                                    minVotes: new BN(1),
+                                    voteDuration: new BN(86400),
+                                    quorumPercentage: 50,
+                                },
+                            },
+                        });
+                        createdCircleId = circleId;
+                        break;
+                    } catch (error) {
+                        lastError = error instanceof Error ? error : new Error(t('errors.genericFailure'));
+                        const message = String(lastError.message || '').toLowerCase();
+                        const isCollision =
+                            message.includes('already in use')
+                            || message.includes('already exists')
+                            || message.includes('account in use');
+                        if (!isCollision) {
+                            throw lastError;
+                        }
+                    }
+                }
+
+                if (!tx) {
+                    throw lastError || new Error(t('errors.circleIdAllocationFailed'));
+                }
+
+                if (createdCircleId === null) {
+                    throw new Error(t('errors.circleIdMissing'));
+                }
+
+                const targetFlags = encodeCircleFlags(targetKind, targetMode, targetMinCrystals);
+                const needFlagUpdate =
+                    targetKind !== 'main' ||
+                    targetMode !== 'knowledge' ||
+                    targetMinCrystals > 0;
+
+                let flagsUpdateTx: string | null = null;
+                if (needFlagUpdate) {
+                    const circlesModule = activeSdk.circles as typeof activeSdk.circles & {
+                        updateCircleFlags: (circleId: number, flags: BN) => Promise<string>;
+                    };
+                    flagsUpdateTx = await circlesModule.updateCircleFlags(createdCircleId, targetFlags);
+                }
+
+                let forkAnchorTx: string | null = null;
+                if (options.forkAnchor) {
+                    try {
+                        forkAnchorTx = await (activeSdk.circles as any).anchorCircleFork({
+                            sourceCircleId: options.forkAnchor.sourceCircleId,
+                            targetCircleId: createdCircleId,
+                            forkDeclarationDigest: options.forkAnchor.forkDeclarationDigest,
+                        });
+                    } catch (anchorError) {
+                        console.warn('[useCreateCircle] anchor fork failed', anchorError);
+                        setError((prev) => appendCreateCircleNotice(prev, t('errors.forkAnchorSyncFailed')));
+                    }
+                }
+
+                const signaturesToTrack = [tx, flagsUpdateTx, forkAnchorTx].filter(
+                    (sig): sig is string => typeof sig === 'string' && sig.length > 0,
                 );
+                const signatureSlots = await Promise.all(
+                    signaturesToTrack.map((sig) => waitForSignatureSlot(activeSdk.connection, sig)),
+                );
+                const resolvedSlots = signatureSlots.filter(
+                    (slot): slot is number => typeof slot === 'number' && slot > 0,
+                );
+                e2eSignatureSlot = resolvedSlots.length > 0 ? Math.max(...resolvedSlots) : null;
+
+                setTxSignature(tx);
+
+                setSyncing(true);
+                const targetIndexedSlot = e2eSignatureSlot;
+
+                if (targetIndexedSlot !== null) {
+                    const indexWait = await waitForIndexedSlot(targetIndexedSlot);
+                    if (!indexWait.ok) {
+                        setError(t('errors.indexerLagging'));
+                    }
+                } else {
+                    setError(t('errors.signatureSlotMissing'));
+                }
+
+                const circleVisible = await waitForCircleReadModelVisibility({
+                    circleId: createdCircleId,
+                });
+                setIndexed(circleVisible);
+                if (!circleVisible) {
+                    setError((prev) => appendCreateCircleNotice(prev, t('errors.readModelLagging')));
+                    return {
+                        txSignature: tx,
+                        circleId: createdCircleId,
+                    };
+                }
+
+                const syncPostCreateCircleSettings = async (): Promise<void> => {
+                    if (
+                        typeof options.description === 'string'
+                        && options.description.trim().length > 0
+                    ) {
+                        try {
+                            if (!publicKey || !signMessage) {
+                                throw new Error('wallet_sign_message_unavailable');
+                            }
+                            await syncCircleMetadataWithRetry({
+                                circleId: createdCircleId,
+                                description: options.description,
+                                actorPubkey: publicKey.toBase58(),
+                                signMessage,
+                            });
+                        } catch (metadataError) {
+                            console.warn('[useCreateCircle] sync circle metadata failed', metadataError);
+                            setError((prev) => appendCreateCircleNotice(prev, t('errors.metadataSyncFailed')));
+                        }
+                    }
+
+                    if (
+                        options.ghostSettings
+                        && Object.keys(options.ghostSettings).length > 0
+                    ) {
+                        try {
+                            if (!publicKey || !signMessage) {
+                                throw new Error('wallet_sign_message_unavailable');
+                            }
+                            await syncCircleGhostSettingsWithRetry({
+                                circleId: createdCircleId,
+                                settings: options.ghostSettings,
+                                actorPubkey: publicKey.toBase58(),
+                                signMessage,
+                                creationTxSignature: tx,
+                            });
+                        } catch (ghostError) {
+                            console.warn('[useCreateCircle] save ghost settings failed', ghostError);
+                            setError((prev) => appendCreateCircleNotice(prev, t('errors.ghostSettingsSyncFailed')));
+                        }
+                    }
+
+                    try {
+                        if (!publicKey || !signMessage) {
+                            throw new Error('wallet_sign_message_unavailable');
+                        }
+                        if (options.genesisMode) {
+                            await syncCircleGenesisModeWithRetry({
+                                circleId: createdCircleId,
+                                genesisMode: options.genesisMode,
+                                actorPubkey: publicKey.toBase58(),
+                                signMessage,
+                            });
+                        } else {
+                            await syncCircleGenesisModeWithRetry({
+                                circleId: createdCircleId,
+                                genesisMode: 'BLANK',
+                                actorPubkey: publicKey.toBase58(),
+                                signMessage,
+                            });
+                        }
+                    } catch (genesisError) {
+                        console.warn('[useCreateCircle] sync genesis mode failed', genesisError);
+                        setError((prev) => appendCreateCircleNotice(prev, t('errors.genesisModeSyncFailed')));
+                    }
+
+                    if (options.genesisMode === 'SEEDED' && Array.isArray(options.seededSources) && options.seededSources.length > 0) {
+                        try {
+                            await syncSeededSourcesWithRetry({
+                                circleId: createdCircleId,
+                                seededSources: options.seededSources,
+                            });
+                        } catch (seededError) {
+                            console.warn('[useCreateCircle] sync seeded sources failed', seededError);
+                            setError((prev) => appendCreateCircleNotice(prev, t('errors.seededSourcesSyncFailed')));
+                        }
+                    }
+
+                    try {
+                        if (!publicKey || !signMessage) {
+                            throw new Error('wallet_sign_message_unavailable');
+                        }
+                        const effectiveAccessType =
+                            options.accessType
+                            || (options.minCrystals && options.minCrystals > 0 ? 'crystal' : 'free');
+                        await syncCircleJoinPolicyWithRetry({
+                            circleId: createdCircleId,
+                            accessType: effectiveAccessType,
+                            actorPubkey: publicKey.toBase58(),
+                            signMessage,
+                        });
+                    } catch (policyError) {
+                        console.warn('[useCreateCircle] sync join policy failed', policyError);
+                        setError((prev) => appendCreateCircleNotice(prev, t('errors.joinPolicySyncFailed')));
+                    }
+
+                    if (options.draftLifecycleTemplate) {
+                        try {
+                            if (!publicKey || !signMessage) {
+                                throw new Error('wallet_sign_message_unavailable');
+                            }
+                            await syncCircleDraftLifecycleTemplateWithRetry({
+                                circleId: createdCircleId,
+                                template: options.draftLifecycleTemplate,
+                                actorPubkey: publicKey.toBase58(),
+                                signMessage,
+                            });
+                        } catch (policyError) {
+                            console.warn('[useCreateCircle] sync draft lifecycle template failed', policyError);
+                            setError((prev) => appendCreateCircleNotice(prev, t('errors.draftLifecycleSyncFailed')));
+                        }
+                    }
+
+                    if (options.draftWorkflowPolicy) {
+                        try {
+                            if (!publicKey || !signMessage) {
+                                throw new Error('wallet_sign_message_unavailable');
+                            }
+                            await syncCircleDraftWorkflowPolicyWithRetry({
+                                circleId: createdCircleId,
+                                policy: options.draftWorkflowPolicy,
+                                actorPubkey: publicKey.toBase58(),
+                                signMessage,
+                            });
+                        } catch (policyError) {
+                            console.warn('[useCreateCircle] sync draft workflow policy failed', policyError);
+                            setError((prev) => appendCreateCircleNotice(prev, t('errors.workflowPolicySyncFailed')));
+                        }
+                    }
+                };
+
+                const postCreateSyncResult = await settleCreateCirclePostCreateSync(
+                    syncPostCreateCircleSettings,
+                    { timeoutMs: getCreateCirclePostCreateSyncTimeoutMs() },
+                );
+
+                if (postCreateSyncResult.status === 'timeout') {
+                    console.warn('[useCreateCircle] post-create settings sync timed out');
+                    setError((prev) => appendCreateCircleNotice(prev, t('errors.postCreateSyncPending')));
+                } else if (postCreateSyncResult.status === 'failed') {
+                    console.warn('[useCreateCircle] post-create settings sync failed', postCreateSyncResult.error);
+                    setError((prev) => appendCreateCircleNotice(prev, t('errors.postCreateSyncFailed')));
+                }
+
                 return {
                     txSignature: tx,
                     circleId: createdCircleId,
                 };
+            } catch (err: unknown) {
+                const msg = normalizeCreateCircleError(err, t);
+                setError(msg);
+                console.error('[useCreateCircle]', err);
+                return null;
+            } finally {
+                setSyncing(false);
+                setLoading(false);
             }
+        })();
 
-            const syncPostCreateCircleSettings = async (): Promise<void> => {
-                if (
-                    typeof options.description === 'string'
-                    && options.description.trim().length > 0
-                ) {
-                    try {
-                        if (!publicKey || !signMessage) {
-                            throw new Error('wallet_sign_message_unavailable');
-                        }
-                        await syncCircleMetadataWithRetry({
-                            circleId: createdCircleId,
-                            description: options.description,
-                            actorPubkey: publicKey.toBase58(),
-                            signMessage,
-                        });
-                    } catch (metadataError) {
-                        console.warn('[useCreateCircle] sync circle metadata failed', metadataError);
-                        setError((prev) =>
-                            prev
-                                ? `${prev} ${t('errors.metadataSyncFailedSuffix')}`
-                                : t('errors.metadataSyncFailed'),
-                        );
-                    }
-                }
-
-                if (
-                    options.ghostSettings
-                    && Object.keys(options.ghostSettings).length > 0
-                ) {
-                    try {
-                        if (!publicKey || !signMessage) {
-                            throw new Error('wallet_sign_message_unavailable');
-                        }
-                        await syncCircleGhostSettingsWithRetry({
-                            circleId: createdCircleId,
-                            settings: options.ghostSettings,
-                            actorPubkey: publicKey.toBase58(),
-                            signMessage,
-                            creationTxSignature: tx,
-                        });
-                    } catch (ghostError) {
-                        console.warn('[useCreateCircle] save ghost settings failed', ghostError);
-                        setError((prev) =>
-                            prev
-                                ? `${prev} AI配置保存失败，可在圈层设置页重试。`
-                                : '圈层已创建，但 AI 配置保存失败，可在圈层设置页重试。',
-                        );
-                    }
-                }
-
-                try {
-                    if (!publicKey || !signMessage) {
-                        throw new Error('wallet_sign_message_unavailable');
-                    }
-                    if (options.genesisMode) {
-                        await syncCircleGenesisModeWithRetry({
-                            circleId: createdCircleId,
-                            genesisMode: options.genesisMode,
-                            actorPubkey: publicKey.toBase58(),
-                            signMessage,
-                        });
-                    } else {
-                        await syncCircleGenesisModeWithRetry({
-                            circleId: createdCircleId,
-                            genesisMode: 'BLANK',
-                            actorPubkey: publicKey.toBase58(),
-                            signMessage,
-                        });
-                    }
-                } catch (genesisError) {
-                    console.warn('[useCreateCircle] sync genesis mode failed', genesisError);
-                    setError((prev) =>
-                        prev
-                            ? `${prev} 内容起点保存失败，可在圈层设置页重试。`
-                            : '圈层已创建，但内容起点保存失败，可在圈层设置页重试。',
-                    );
-                }
-
-                if (options.genesisMode === 'SEEDED' && Array.isArray(options.seededSources) && options.seededSources.length > 0) {
-                    try {
-                        await syncSeededSourcesWithRetry({
-                            circleId: createdCircleId,
-                            seededSources: options.seededSources,
-                        });
-                    } catch (seededError) {
-                        console.warn('[useCreateCircle] sync seeded sources failed', seededError);
-                        setError((prev) =>
-                            prev
-                                ? `${prev} Seeded 源文件导入失败，可稍后重试。`
-                                : '圈层已创建，但 Seeded 源文件导入失败，可稍后重试。',
-                        );
-                    }
-                }
-
-                try {
-                    if (!publicKey || !signMessage) {
-                        throw new Error('wallet_sign_message_unavailable');
-                    }
-                    const effectiveAccessType =
-                        options.accessType
-                        || (options.minCrystals && options.minCrystals > 0 ? 'crystal' : 'free');
-                    await syncCircleJoinPolicyWithRetry({
-                        circleId: createdCircleId,
-                        accessType: effectiveAccessType,
-                        actorPubkey: publicKey.toBase58(),
-                        signMessage,
-                    });
-                } catch (policyError) {
-                    console.warn('[useCreateCircle] sync join policy failed', policyError);
-                    setError((prev) =>
-                        prev
-                            ? `${prev} 准入策略同步失败，可在圈层设置页重试。`
-                            : '圈层已创建，但准入策略同步失败，可在圈层设置页重试。',
-                    );
-                }
-
-                if (options.draftLifecycleTemplate) {
-                    try {
-                        if (!publicKey || !signMessage) {
-                            throw new Error('wallet_sign_message_unavailable');
-                        }
-                        await syncCircleDraftLifecycleTemplateWithRetry({
-                            circleId: createdCircleId,
-                            template: options.draftLifecycleTemplate,
-                            actorPubkey: publicKey.toBase58(),
-                            signMessage,
-                        });
-                    } catch (policyError) {
-                        console.warn('[useCreateCircle] sync draft lifecycle template failed', policyError);
-                        setError((prev) =>
-                            prev
-                                ? `${prev} 草稿流程设置保存失败，可在圈层设置页重试。`
-                                : '圈层已创建，但草稿流程设置保存失败，可在圈层设置页重试。',
-                        );
-                    }
-                }
-
-                if (options.draftWorkflowPolicy) {
-                    try {
-                        if (!publicKey || !signMessage) {
-                            throw new Error('wallet_sign_message_unavailable');
-                        }
-                        await syncCircleDraftWorkflowPolicyWithRetry({
-                            circleId: createdCircleId,
-                            policy: options.draftWorkflowPolicy,
-                            actorPubkey: publicKey.toBase58(),
-                            signMessage,
-                        });
-                    } catch (policyError) {
-                        console.warn('[useCreateCircle] sync draft workflow policy failed', policyError);
-                        setError((prev) =>
-                            prev
-                                ? `${prev} 问题单与阶段权限保存失败，可在圈层设置页重试。`
-                                : '圈层已创建，但问题单与阶段权限保存失败，可在圈层设置页重试。',
-                        );
-                    }
-                }
-            };
-
-            const postCreateSyncResult = await settleCreateCirclePostCreateSync(
-                syncPostCreateCircleSettings,
-                { timeoutMs: getCreateCirclePostCreateSyncTimeoutMs() },
-            );
-
-            if (postCreateSyncResult.status === 'timeout') {
-                console.warn('[useCreateCircle] post-create settings sync timed out');
-                setError((prev) =>
-                    prev
-                        ? `${prev} 后续配置仍在保存中；圈层已创建，可稍后在圈层设置页重试。`
-                        : '圈层已创建，后续配置仍在保存中；可稍后在圈层设置页重试。',
-                );
-            } else if (postCreateSyncResult.status === 'failed') {
-                console.warn('[useCreateCircle] post-create settings sync failed', postCreateSyncResult.error);
-                setError((prev) =>
-                    prev
-                        ? `${prev} 后续配置保存失败，可稍后在圈层设置页重试。`
-                        : '圈层已创建，但后续配置保存失败，可稍后在圈层设置页重试。',
-                );
-            }
-
-            return {
-                txSignature: tx,
-                circleId: createdCircleId,
-            };
-        } catch (err: unknown) {
-            const msg = normalizeCreateCircleError(err);
-            setError(msg);
-            console.error('[useCreateCircle]', err);
-            return null;
-        } finally {
-            setSyncing(false);
-            setLoading(false);
-        }
+        inFlightRef.current = run.finally(() => {
+            inFlightRef.current = null;
+        });
+        return inFlightRef.current;
     }, [sdk, publicKey, signMessage, t]);
 
     return { createCircle, loading, syncing, indexed, error, txSignature };

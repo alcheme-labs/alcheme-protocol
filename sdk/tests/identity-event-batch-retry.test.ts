@@ -4,6 +4,8 @@ import path from "node:path";
 import { describe, it } from "@jest/globals";
 import {
   IdentityModule,
+  isAlreadyProcessedTransactionError,
+  sendTransactionWithAlreadyProcessedRecovery,
   isEventBatchSeedConflictError,
   withEventBatchSeedRetry,
 } from "../src/modules/identity";
@@ -66,12 +68,75 @@ describe("identity event batch retry", () => {
     assert.equal(attempts, 1);
   });
 
+  it("detects already-processed transaction errors", () => {
+    const duplicate = new Error(
+      "Transaction simulation failed: This transaction has already been processed.",
+    );
+    const unrelated = new Error("Transaction simulation failed: Blockhash not found.");
+
+    assert.equal(isAlreadyProcessedTransactionError(duplicate), true);
+    assert.equal(isAlreadyProcessedTransactionError(unrelated), false);
+  });
+
+  it("treats already-processed sends as success once the signature confirms", async () => {
+    const calls: string[] = [];
+    const fakeProvider = {
+      publicKey: "provider-public-key",
+      opts: {
+        preflightCommitment: "processed",
+        commitment: "confirmed",
+      },
+      connection: {
+        async getLatestBlockhash() {
+          calls.push("getLatestBlockhash");
+          return {
+            blockhash: "blockhash-123",
+            lastValidBlockHeight: 88,
+          };
+        },
+        async sendRawTransaction(_raw: Uint8Array, options: Record<string, unknown>) {
+          calls.push(`sendRawTransaction:${String(options.maxRetries)}`);
+          throw new Error("Transaction simulation failed: This transaction has already been processed.");
+        },
+        async confirmTransaction(strategy: Record<string, unknown>) {
+          calls.push(`confirmTransaction:${String(strategy.signature)}`);
+          return { value: { err: null } };
+        },
+      },
+      wallet: {
+        async signTransaction(transaction: any) {
+          transaction.signature = Uint8Array.from([1, 2, 3, 4]);
+          transaction.serialize = () => Uint8Array.from([9, 9, 9]);
+          return transaction;
+        },
+      },
+    };
+
+    const signature = await sendTransactionWithAlreadyProcessedRecovery(
+      fakeProvider,
+      async () => ({
+        feePayer: null,
+        recentBlockhash: null,
+        signature: null,
+        serialize: () => Uint8Array.from([]),
+      }),
+    );
+
+    assert.equal(signature.length > 0, true);
+    assert.deepEqual(calls, [
+      "getLatestBlockhash",
+      "sendRawTransaction:0",
+      `confirmTransaction:${signature}`,
+    ]);
+  });
+
   it("routes identity event writes through the retry wrapper", () => {
     const source = read(identityModulePath);
 
     assert.match(source, /async registerIdentity[\s\S]*withResolvedEventAccountsRetry/);
     assert.match(source, /async updateIdentity[\s\S]*withResolvedEventAccountsRetry/);
     assert.match(source, /async addVerificationAttribute[\s\S]*withResolvedEventAccountsRetry/);
+    assert.match(source, /sendTransactionWithAlreadyProcessedRecovery/);
   });
 
   it("keeps updateIdentity payload normalization in the built sdk artifact", () => {
@@ -108,6 +173,30 @@ describe("identity event batch retry", () => {
         },
         provider: {
           publicKey: "provider-public-key",
+          opts: {
+            preflightCommitment: "processed",
+            commitment: "confirmed",
+          },
+          connection: {
+            async getLatestBlockhash() {
+              return {
+                blockhash: "blockhash-456",
+                lastValidBlockHeight: 77,
+              };
+            },
+            async sendRawTransaction() {
+              return "signature";
+            },
+            async confirmTransaction() {
+              return { value: { err: null } };
+            },
+          },
+          wallet: {
+            async signTransaction(transaction: any) {
+              transaction.signature = Uint8Array.from([4, 3, 2, 1]);
+              return transaction;
+            },
+          },
         },
         withResolvedEventAccountsRetry: async (
           operation: (accounts: {
@@ -126,7 +215,12 @@ describe("identity event batch retry", () => {
               capturedUpdates = updates;
               return {
                 accounts: () => ({
-                  rpc: async () => "signature",
+                  transaction: async () => ({
+                    feePayer: null,
+                    recentBlockhash: null,
+                    signature: null,
+                    serialize: () => Uint8Array.from([]),
+                  }),
                 }),
               };
             },
@@ -143,7 +237,7 @@ describe("identity event batch retry", () => {
         },
       );
 
-      assert.equal(signature, "signature");
+      assert.equal(signature, "6wxj2");
       assert.deepEqual(capturedUpdates, {
         displayName: "Alchemist",
         bio: "Refines protocol state.",

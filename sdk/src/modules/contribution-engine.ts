@@ -1,6 +1,7 @@
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import { Program } from "@coral-xyz/anchor";
 import { BaseModule } from "./base";
+import { sendTransactionWithAlreadyProcessedRecovery } from "../utils/transactions";
 import * as idl from "../idl/contribution_engine.json";
 import { Idl } from "@coral-xyz/anchor";
 
@@ -81,15 +82,17 @@ export class ContributionEngineModule extends BaseModule<ContributionEngineIdl> 
     const configPda = this.findConfigPda();
     const ledgerPda = this.findLedgerPda(crystalId);
 
-    return (this.program.methods as any)
-      .createLedger(crystalId)
-      .accounts({
-        config: configPda,
-        ledger: ledgerPda,
-        authority,
-        systemProgram: SystemProgram.programId,
-      })
-      .rpc();
+    return sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
+      (this.program.methods as any)
+        .createLedger(crystalId)
+        .accounts({
+          config: configPda,
+          ledger: ledgerPda,
+          authority,
+          systemProgram: SystemProgram.programId,
+        })
+        .transaction()
+    );
   }
 
   async recordContribution(
@@ -105,17 +108,19 @@ export class ContributionEngineModule extends BaseModule<ContributionEngineIdl> 
     const ledgerPda = this.findLedgerPda(crystalId);
     const entryPda = this.findEntryPda(crystalId, contributor);
 
-    return (this.program.methods as any)
-      .recordContribution(role, weight)
-      .accounts({
-        config: configPda,
-        ledger: ledgerPda,
-        entry: entryPda,
-        contributor,
-        authority,
-        systemProgram: SystemProgram.programId,
-      })
-      .rpc();
+    return sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
+      (this.program.methods as any)
+        .recordContribution(role, weight)
+        .accounts({
+          config: configPda,
+          ledger: ledgerPda,
+          entry: entryPda,
+          contributor,
+          authority,
+          systemProgram: SystemProgram.programId,
+        })
+        .transaction()
+    );
   }
 
   async addReference(
@@ -129,17 +134,19 @@ export class ContributionEngineModule extends BaseModule<ContributionEngineIdl> 
     const configPda = this.findConfigPda();
     const referencePda = this.findReferencePda(sourceId, targetId);
 
-    return (this.program.methods as any)
-      .addReference(refType)
-      .accounts({
-        config: configPda,
-        reference: referencePda,
-        sourceContent: sourceId,
-        targetContent: targetId,
-        authority,
-        systemProgram: SystemProgram.programId,
-      })
-      .rpc();
+    return sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
+      (this.program.methods as any)
+        .addReference(refType)
+        .accounts({
+          config: configPda,
+          reference: referencePda,
+          sourceContent: sourceId,
+          targetContent: targetId,
+          authority,
+          systemProgram: SystemProgram.programId,
+        })
+        .transaction()
+    );
   }
 
   async closeLedger(crystalId: PublicKey) {
@@ -149,13 +156,15 @@ export class ContributionEngineModule extends BaseModule<ContributionEngineIdl> 
     const configPda = this.findConfigPda();
     const ledgerPda = this.findLedgerPda(crystalId);
 
-    return (this.program.methods as any)
-      .closeLedger()
-      .accounts({
-        config: configPda,
-        ledger: ledgerPda,
-        admin,
-      })
-      .rpc();
+    return sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
+      (this.program.methods as any)
+        .closeLedger()
+        .accounts({
+          config: configPda,
+          ledger: ledgerPda,
+          admin,
+        })
+        .transaction()
+    );
   }
 }

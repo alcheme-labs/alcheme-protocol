@@ -12,7 +12,7 @@ test('normalizes missing on-chain identity account errors into recovery guidance
   assert.equal(isMissingOnchainIdentityUpdateError(new Error(raw)), true);
   assert.equal(
     normalizeProfileUpdateError(new Error(raw)),
-    '当前钱包还没有可编辑的链上身份，请先创建身份或刷新登录态后再试。',
+    'This wallet does not have an editable on-chain identity yet. Create one or refresh your session and try again.',
   );
 });
 

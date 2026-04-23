@@ -2961,8 +2961,36 @@
   },
   "CreateCircleFlow": {
     "errors": {
+      "walletNotConnected": "Conecta tu billetera antes de crear un círculo.",
+      "userRejected": "Cancelaste la firma en la billetera, así que el círculo no se creó.",
+      "insufficientFunds": "La billetera no tiene suficiente SOL para pagar la comisión on-chain.",
+      "constraintSeeds": "La configuración del programa de círculos no coincide con esta red (falló la validación de la PDA). Revisa el RPC y el Program ID.",
+      "circleManagerMissing": "El gestor de círculos todavía no está inicializado. Pide a un administrador que ejecute initialize primero.",
+      "simulationFailed": "La simulación de la transacción falló. Asegúrate de que la red de la billetera coincide con el RPC actual y verifica que los programas de círculos estén desplegados e inicializados correctamente.",
+      "accountNotReady": "La cuenta de esta billetera no existe o aún no tiene fondos. Envía una pequeña cantidad de SOL e inténtalo de nuevo.",
+      "genericFailure": "No pudimos crear el círculo ahora mismo. Inténtalo de nuevo.",
+      "parentCircleOutOfRange": "El valor de parentCircle está fuera del rango on-chain u8 (0-255).",
+      "walletSignerMissing": "La billetera no está lista para firmar esta transacción.",
+      "payerAccountMissing": "La cuenta de la billetera actual {wallet} no existe on-chain o aún no tiene fondos.",
+      "circleProgramMissing": "El programa de círculos no está desplegado en el RPC actual ({rpc}). Revisa NEXT_PUBLIC_SOLANA_RPC_URL y NEXT_PUBLIC_CIRCLES_PROGRAM_ID.",
+      "circleManagerMissingDetailed": "El gestor de círculos todavía no está inicializado ({pda}). Pide a un administrador que ejecute circles.initialize() primero.",
+      "eventProgramMissing": "El programa de eventos no está desplegado en el RPC actual ({rpc}). Revisa NEXT_PUBLIC_EVENT_PROGRAM_ID.",
+      "eventEmitterMissing": "El emisor de eventos todavía no está inicializado ({pda}). Ejecuta initialize_event_emitter primero.",
+      "circleIdAllocationFailed": "La creación del círculo falló porque no se pudo asignar un circle_id disponible.",
+      "circleIdMissing": "La creación del círculo falló porque no se resolvió el nuevo circle_id.",
+      "forkAnchorSyncFailed": "El círculo se creó, pero el ancla de fork aún no se pudo escribir. Puedes reintentarlo más tarde.",
+      "indexerLagging": "La transacción ya está on-chain, pero el indexador todavía se está poniendo al día. Vuelve a actualizar dentro de un momento.",
+      "signatureSlotMissing": "La transacción se envió, pero todavía no pudimos determinar su slot de confirmación.",
+      "readModelLagging": "El círculo se creó, pero todavía no aparece en el modelo de lectura de la lista de círculos. Vuelve a actualizar dentro de un momento.",
       "metadataSyncFailed": "El círculo se creó, pero no se pudo guardar la descripción. Puedes reintentarlo desde la página de ajustes del círculo.",
-      "metadataSyncFailedSuffix": "No se pudo guardar la descripción del círculo. Puedes reintentarlo desde la página de ajustes del círculo."
+      "ghostSettingsSyncFailed": "El círculo se creó, pero no se pudo guardar la configuración de IA. Puedes reintentarlo desde la página de ajustes del círculo.",
+      "genesisModeSyncFailed": "El círculo se creó, pero no se pudo guardar el modo de génesis. Puedes reintentarlo desde la página de ajustes del círculo.",
+      "seededSourcesSyncFailed": "El círculo se creó, pero los archivos Seeded todavía no se pudieron importar. Puedes reintentarlo más tarde.",
+      "joinPolicySyncFailed": "El círculo se creó, pero no se pudo guardar la política de acceso. Puedes reintentarlo desde la página de ajustes del círculo.",
+      "draftLifecycleSyncFailed": "El círculo se creó, pero no se pudo guardar la configuración del ciclo de vida del borrador. Puedes reintentarlo desde la página de ajustes del círculo.",
+      "workflowPolicySyncFailed": "El círculo se creó, pero no se pudieron guardar los permisos del flujo de trabajo. Puedes reintentarlo desde la página de ajustes del círculo.",
+      "postCreateSyncPending": "El círculo se creó, pero la configuración posterior todavía se está guardando. Puedes reintentarlo desde la página de ajustes del círculo más tarde.",
+      "postCreateSyncFailed": "El círculo se creó, pero no se pudo guardar la configuración posterior. Puedes reintentarlo desde la página de ajustes del círculo más tarde."
     }
   }
 }

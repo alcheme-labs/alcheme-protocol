@@ -9,6 +9,7 @@ import { FactoryModule } from "./modules/factory";
 import { MessagingModule } from "./modules/messaging";
 import { CirclesModule } from "./modules/circles";
 import { ContributionEngineModule } from "./modules/contribution-engine";
+import { installAlreadyProcessedSendAndConfirmRecovery } from "./utils/transactions";
 
 export interface AlchemeConfig {
   connection: Connection;
@@ -51,6 +52,7 @@ export class Alcheme {
       wallet,
       AnchorProvider.defaultOptions()
     );
+    installAlreadyProcessedSendAndConfirmRecovery(this.provider);
 
     const programIds = {
       identity: new PublicKey(config.programIds.identity),
