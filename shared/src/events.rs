@@ -369,6 +369,16 @@ pub enum ProtocolEvent {
         registered_by: Pubkey,
         timestamp: i64,
     },
+    MembershipAttestorRegistered {
+        attestor: Pubkey,
+        registered_by: Pubkey,
+        timestamp: i64,
+    },
+    MembershipAttestorRevoked {
+        attestor: Pubkey,
+        revoked_by: Pubkey,
+        timestamp: i64,
+    },
     
     // 消息相关事件
     ConversationCreated {

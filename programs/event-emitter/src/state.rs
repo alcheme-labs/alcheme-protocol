@@ -208,6 +208,8 @@ impl EventEmitterUtils {
             ProtocolEvent::KnowledgeSubmitted { timestamp, .. } |
             ProtocolEvent::ContributorsUpdated { timestamp, .. } |
             ProtocolEvent::ProofAttestorRegistered { timestamp, .. } |
+            ProtocolEvent::MembershipAttestorRegistered { timestamp, .. } |
+            ProtocolEvent::MembershipAttestorRevoked { timestamp, .. } |
             ProtocolEvent::TokensEarned { timestamp, .. } |
             ProtocolEvent::TokensSpent { timestamp, .. } |
             ProtocolEvent::FollowAction { timestamp, .. } |
@@ -265,7 +267,9 @@ impl EventEmitterUtils {
             ProtocolEvent::KnowledgeSubmitted { .. } |
             ProtocolEvent::ContributorsUpdated { .. } |
             ProtocolEvent::ContributorProofBound { .. } |
-            ProtocolEvent::ProofAttestorRegistered { .. } => EventType::Knowledge,
+            ProtocolEvent::ProofAttestorRegistered { .. } |
+            ProtocolEvent::MembershipAttestorRegistered { .. } |
+            ProtocolEvent::MembershipAttestorRevoked { .. } => EventType::Knowledge,
             
             ProtocolEvent::TokensEarned { .. } |
             ProtocolEvent::TokensSpent { .. } |
@@ -290,6 +294,8 @@ impl EventEmitterUtils {
             ProtocolEvent::CircleMembershipChanged { actor, .. } => Some(*actor),
             ProtocolEvent::ContributorProofBound { bound_by, .. } => Some(*bound_by),
             ProtocolEvent::ProofAttestorRegistered { registered_by, .. } => Some(*registered_by),
+            ProtocolEvent::MembershipAttestorRegistered { registered_by, .. } => Some(*registered_by),
+            ProtocolEvent::MembershipAttestorRevoked { revoked_by, .. } => Some(*revoked_by),
             _ => None,
         }
     }

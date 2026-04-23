@@ -1287,6 +1287,14 @@ async fn register_membership_attestor_adds_attestor_for_circle_manager_admin() {
     assert!(updated_registry
         .attestors
         .contains(&new_attestor.pubkey()));
+
+    let updated_event_emitter = context
+        .banks_client
+        .get_account(event_emitter.pubkey())
+        .await
+        .expect("event emitter lookup should succeed")
+        .expect("event emitter should exist");
+    assert_eq!(read_mock_event_sequence(&updated_event_emitter.data), 1);
 }
 
 #[tokio::test]
@@ -1382,6 +1390,14 @@ async fn revoke_membership_attestor_removes_registered_attestor() {
     assert!(!updated_registry
         .attestors
         .contains(&registered_attestor.pubkey()));
+
+    let updated_event_emitter = context
+        .banks_client
+        .get_account(event_emitter.pubkey())
+        .await
+        .expect("event emitter lookup should succeed")
+        .expect("event emitter should exist");
+    assert_eq!(read_mock_event_sequence(&updated_event_emitter.data), 1);
 }
 
 #[tokio::test]
@@ -1614,6 +1630,14 @@ fn mock_event_emitter_account(owner: Pubkey, event_sequence: u64) -> Account {
         executable: false,
         rent_epoch: 0,
     }
+}
+
+fn read_mock_event_sequence(data: &[u8]) -> u64 {
+    let mut sequence_bytes = [0u8; 8];
+    sequence_bytes.copy_from_slice(
+        &data[EVENT_EMITTER_SEQUENCE_OFFSET..EVENT_EMITTER_SEQUENCE_OFFSET + 8],
+    );
+    u64::from_le_bytes(sequence_bytes)
 }
 
 fn system_account(lamports: u64) -> Account {

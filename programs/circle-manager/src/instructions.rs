@@ -1309,6 +1309,20 @@ pub fn register_membership_attestor(
         AlchemeError::Unauthorized
     );
     registry.register_attestor(attestor)?;
+
+    CpiHelper::emit_event_simple(
+        &ctx.accounts.event_program,
+        &mut ctx.accounts.event_emitter,
+        &mut ctx.accounts.event_batch,
+        &ctx.accounts.admin.to_account_info(),
+        &ctx.accounts.system_program.to_account_info(),
+        &crate::ID,
+        ProtocolEvent::MembershipAttestorRegistered {
+            attestor,
+            registered_by: ctx.accounts.admin.key(),
+            timestamp: Clock::get()?.unix_timestamp,
+        },
+    )?;
     Ok(())
 }
 
@@ -1348,6 +1362,20 @@ pub fn revoke_membership_attestor(
         AlchemeError::Unauthorized
     );
     registry.revoke_attestor(&attestor)?;
+
+    CpiHelper::emit_event_simple(
+        &ctx.accounts.event_program,
+        &mut ctx.accounts.event_emitter,
+        &mut ctx.accounts.event_batch,
+        &ctx.accounts.admin.to_account_info(),
+        &ctx.accounts.system_program.to_account_info(),
+        &crate::ID,
+        ProtocolEvent::MembershipAttestorRevoked {
+            attestor,
+            revoked_by: ctx.accounts.admin.key(),
+            timestamp: Clock::get()?.unix_timestamp,
+        },
+    )?;
     Ok(())
 }
 

@@ -52,6 +52,8 @@ task_plan.md
 # Local draft docs. Copy files out of docs/draft/ when they are ready to publish.
 docs/draft/
 docs/draft/**
+docs/plans/
+docs/plans/**
 
 # Internal-only materials kept out of the first public repo cut
 runbooks/

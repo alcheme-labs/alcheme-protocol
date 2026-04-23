@@ -66,7 +66,7 @@ function loadEventProgram(provider) {
   return new Program(idl, provider);
 }
 
-async function deriveContext(args) {
+async function deriveBaseContext(args) {
   const wallet = loadWallet(args.wallet);
   const provider = new AnchorProvider(
     new Connection(args.rpc, "confirmed"),
@@ -74,7 +74,6 @@ async function deriveContext(args) {
     { commitment: "confirmed", preflightCommitment: "confirmed" },
   );
   const program = loadProgram(args.programId, provider);
-  const eventProgram = loadEventProgram(provider);
   const [circleManager] = PublicKey.findProgramAddressSync(
     [Buffer.from("circle_manager")],
     program.programId,
@@ -83,6 +82,18 @@ async function deriveContext(args) {
     [Buffer.from("membership_attestor_registry")],
     program.programId,
   );
+
+  return {
+    provider,
+    program,
+    circleManager,
+    membershipAttestorRegistry,
+  };
+}
+
+async function deriveEventContext(args) {
+  const base = await deriveBaseContext(args);
+  const eventProgram = loadEventProgram(base.provider);
   const [eventEmitter] = PublicKey.findProgramAddressSync(
     [Buffer.from("event_emitter")],
     eventProgram.programId,
@@ -99,18 +110,15 @@ async function deriveContext(args) {
   );
 
   return {
-    provider,
-    program,
+    ...base,
     eventProgram,
-    circleManager,
-    membershipAttestorRegistry,
     eventEmitter,
     eventBatch,
   };
 }
 
 async function showRegistry(args) {
-  const { program, membershipAttestorRegistry } = await deriveContext(args);
+  const { program, membershipAttestorRegistry } = await deriveBaseContext(args);
   const account = await program.account.membershipAttestorRegistry.fetchNullable(membershipAttestorRegistry);
   if (!account) {
     console.log(JSON.stringify({
@@ -132,7 +140,7 @@ async function showRegistry(args) {
 }
 
 async function initializeRegistry(args) {
-  const { program, circleManager, membershipAttestorRegistry, provider } = await deriveContext(args);
+  const { program, circleManager, membershipAttestorRegistry, provider } = await deriveBaseContext(args);
   const signature = await program.methods
     .initializeMembershipAttestorRegistry()
     .accounts({
@@ -161,7 +169,7 @@ async function registerAttestor(args, mode) {
     provider,
     eventEmitter,
     eventBatch,
-  } = await deriveContext(args);
+  } = await deriveEventContext(args);
   const attestor = new PublicKey(args.attestor);
 
   const method = mode === "register"
