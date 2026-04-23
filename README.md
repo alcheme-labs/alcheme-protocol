@@ -2,6 +2,8 @@
 
 [简体中文](README.zh-CN.md)
 
+[Official Website](https://www.alcheme.site/)
+
 Alcheme is an open-source Solana-native social and knowledge protocol that is trying to preserve discussion, turn it into structured knowledge, and make contribution more traceable.
 
 It is trying to build a structure where valuable discussion does not disappear into feed logic, where knowledge can gradually become a path, and where contribution can remain visible instead of being flattened into a final result.
