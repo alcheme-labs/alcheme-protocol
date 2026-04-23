@@ -48,10 +48,11 @@ findings.md
 progress.md
 task_plan.md
 
+# Local draft docs. Copy files out of docs/draft/ when they are ready to publish.
+docs/draft/
+docs/draft/**
+
 # Internal-only materials kept out of the first public repo cut
-docs/*
-!docs/schemas/
-!docs/schemas/**
 runbooks/
 deploy/demo/
 CHANGELOG.md

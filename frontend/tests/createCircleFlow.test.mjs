@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   getCreateCircleSignerUnavailableError,
+  settleCreateCirclePostCreateSync,
   waitForCircleReadModelVisibility,
 } from '../src/lib/circles/createCircleFlow.ts';
 
@@ -75,9 +76,34 @@ test('waitForCircleReadModelVisibility returns false when the circle never appea
   assert.ok(attempts >= 1);
 });
 
+test('settleCreateCirclePostCreateSync returns timeout when post-create signing never resolves', async () => {
+  const startedAt = Date.now();
+  const result = await settleCreateCirclePostCreateSync(
+    () => new Promise(() => {}),
+    { timeoutMs: 5 },
+  );
+
+  assert.deepEqual(result, { status: 'timeout' });
+  assert.ok(Date.now() - startedAt < 100);
+});
+
+test('settleCreateCirclePostCreateSync reports post-create sync failures before timeout', async () => {
+  const expected = new Error('settings failed');
+  const result = await settleCreateCirclePostCreateSync(
+    async () => {
+      throw expected;
+    },
+    { timeoutMs: 100 },
+  );
+
+  assert.equal(result.status, 'failed');
+  assert.equal(result.error, expected);
+});
+
 test('useCreateCircle gates partial creation on message signing and waits for circle read-model visibility', () => {
   const source = read(hookPath);
 
   assert.match(source, /getCreateCircleSignerUnavailableError/);
+  assert.match(source, /settleCreateCirclePostCreateSync/);
   assert.match(source, /waitForCircleReadModelVisibility/);
 });

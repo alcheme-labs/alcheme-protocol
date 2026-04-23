@@ -28,6 +28,7 @@ import {
 } from '@/lib/circles/policyProfile';
 import {
     getCreateCircleSignerUnavailableError,
+    settleCreateCirclePostCreateSync,
     waitForCircleReadModelVisibility,
 } from '@/lib/circles/createCircleFlow';
 import { useI18n } from '@/i18n/useI18n';
@@ -134,6 +135,14 @@ function encodeCircleFlags(
 
 function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function getCreateCirclePostCreateSyncTimeoutMs(): number {
+    const configuredTimeoutMs = Number(process.env.NEXT_PUBLIC_CREATE_CIRCLE_POST_SYNC_TIMEOUT_MS);
+    if (Number.isFinite(configuredTimeoutMs) && configuredTimeoutMs > 0) {
+        return Math.floor(configuredTimeoutMs);
+    }
+    return 20_000;
 }
 
 async function syncCircleGhostSettingsWithRetry(input: {
@@ -651,161 +660,184 @@ export function useCreateCircle(): UseCreateCircleReturn {
                 };
             }
 
-            if (
-                typeof options.description === 'string'
-                && options.description.trim().length > 0
-            ) {
+            const syncPostCreateCircleSettings = async (): Promise<void> => {
+                if (
+                    typeof options.description === 'string'
+                    && options.description.trim().length > 0
+                ) {
+                    try {
+                        if (!publicKey || !signMessage) {
+                            throw new Error('wallet_sign_message_unavailable');
+                        }
+                        await syncCircleMetadataWithRetry({
+                            circleId: createdCircleId,
+                            description: options.description,
+                            actorPubkey: publicKey.toBase58(),
+                            signMessage,
+                        });
+                    } catch (metadataError) {
+                        console.warn('[useCreateCircle] sync circle metadata failed', metadataError);
+                        setError((prev) =>
+                            prev
+                                ? `${prev} ${t('errors.metadataSyncFailedSuffix')}`
+                                : t('errors.metadataSyncFailed'),
+                        );
+                    }
+                }
+
+                if (
+                    options.ghostSettings
+                    && Object.keys(options.ghostSettings).length > 0
+                ) {
+                    try {
+                        if (!publicKey || !signMessage) {
+                            throw new Error('wallet_sign_message_unavailable');
+                        }
+                        await syncCircleGhostSettingsWithRetry({
+                            circleId: createdCircleId,
+                            settings: options.ghostSettings,
+                            actorPubkey: publicKey.toBase58(),
+                            signMessage,
+                            creationTxSignature: tx,
+                        });
+                    } catch (ghostError) {
+                        console.warn('[useCreateCircle] save ghost settings failed', ghostError);
+                        setError((prev) =>
+                            prev
+                                ? `${prev} AI配置保存失败，可在圈层设置页重试。`
+                                : '圈层已创建，但 AI 配置保存失败，可在圈层设置页重试。',
+                        );
+                    }
+                }
+
                 try {
                     if (!publicKey || !signMessage) {
                         throw new Error('wallet_sign_message_unavailable');
                     }
-                    await syncCircleMetadataWithRetry({
-                        circleId: createdCircleId,
-                        description: options.description,
-                        actorPubkey: publicKey.toBase58(),
-                        signMessage,
-                    });
-                } catch (metadataError) {
-                    console.warn('[useCreateCircle] sync circle metadata failed', metadataError);
+                    if (options.genesisMode) {
+                        await syncCircleGenesisModeWithRetry({
+                            circleId: createdCircleId,
+                            genesisMode: options.genesisMode,
+                            actorPubkey: publicKey.toBase58(),
+                            signMessage,
+                        });
+                    } else {
+                        await syncCircleGenesisModeWithRetry({
+                            circleId: createdCircleId,
+                            genesisMode: 'BLANK',
+                            actorPubkey: publicKey.toBase58(),
+                            signMessage,
+                        });
+                    }
+                } catch (genesisError) {
+                    console.warn('[useCreateCircle] sync genesis mode failed', genesisError);
                     setError((prev) =>
                         prev
-                            ? `${prev} ${t('errors.metadataSyncFailedSuffix')}`
-                            : t('errors.metadataSyncFailed'),
+                            ? `${prev} 内容起点保存失败，可在圈层设置页重试。`
+                            : '圈层已创建，但内容起点保存失败，可在圈层设置页重试。',
                     );
                 }
-            }
 
-            if (
-                options.ghostSettings
-                && Object.keys(options.ghostSettings).length > 0
-            ) {
+                if (options.genesisMode === 'SEEDED' && Array.isArray(options.seededSources) && options.seededSources.length > 0) {
+                    try {
+                        await syncSeededSourcesWithRetry({
+                            circleId: createdCircleId,
+                            seededSources: options.seededSources,
+                        });
+                    } catch (seededError) {
+                        console.warn('[useCreateCircle] sync seeded sources failed', seededError);
+                        setError((prev) =>
+                            prev
+                                ? `${prev} Seeded 源文件导入失败，可稍后重试。`
+                                : '圈层已创建，但 Seeded 源文件导入失败，可稍后重试。',
+                        );
+                    }
+                }
+
                 try {
                     if (!publicKey || !signMessage) {
                         throw new Error('wallet_sign_message_unavailable');
                     }
-                    await syncCircleGhostSettingsWithRetry({
+                    const effectiveAccessType =
+                        options.accessType
+                        || (options.minCrystals && options.minCrystals > 0 ? 'crystal' : 'free');
+                    await syncCircleJoinPolicyWithRetry({
                         circleId: createdCircleId,
-                        settings: options.ghostSettings,
-                        actorPubkey: publicKey.toBase58(),
-                        signMessage,
-                        creationTxSignature: tx,
-                    });
-                } catch (ghostError) {
-                    console.warn('[useCreateCircle] save ghost settings failed', ghostError);
-                    setError((prev) =>
-                        prev
-                            ? `${prev} AI配置保存失败，可在圈层设置页重试。`
-                            : '圈层已创建，但 AI 配置保存失败，可在圈层设置页重试。',
-                    );
-                }
-            }
-
-            try {
-                if (!publicKey || !signMessage) {
-                    throw new Error('wallet_sign_message_unavailable');
-                }
-                if (options.genesisMode) {
-                    await syncCircleGenesisModeWithRetry({
-                        circleId: createdCircleId,
-                        genesisMode: options.genesisMode,
-                        actorPubkey: publicKey.toBase58(),
-                        signMessage,
-                    });
-                } else {
-                    await syncCircleGenesisModeWithRetry({
-                        circleId: createdCircleId,
-                        genesisMode: 'BLANK',
-                        actorPubkey: publicKey.toBase58(),
-                        signMessage,
-                    });
-                }
-            } catch (genesisError) {
-                console.warn('[useCreateCircle] sync genesis mode failed', genesisError);
-                setError((prev) =>
-                    prev
-                        ? `${prev} 内容起点保存失败，可在圈层设置页重试。`
-                        : '圈层已创建，但内容起点保存失败，可在圈层设置页重试。',
-                );
-            }
-
-            if (options.genesisMode === 'SEEDED' && Array.isArray(options.seededSources) && options.seededSources.length > 0) {
-                try {
-                    await syncSeededSourcesWithRetry({
-                        circleId: createdCircleId,
-                        seededSources: options.seededSources,
-                    });
-                } catch (seededError) {
-                    console.warn('[useCreateCircle] sync seeded sources failed', seededError);
-                    setError((prev) =>
-                        prev
-                            ? `${prev} Seeded 源文件导入失败，可稍后重试。`
-                            : '圈层已创建，但 Seeded 源文件导入失败，可稍后重试。',
-                    );
-                }
-            }
-
-            try {
-                if (!publicKey || !signMessage) {
-                    throw new Error('wallet_sign_message_unavailable');
-                }
-                const effectiveAccessType =
-                    options.accessType
-                    || (options.minCrystals && options.minCrystals > 0 ? 'crystal' : 'free');
-                await syncCircleJoinPolicyWithRetry({
-                    circleId: createdCircleId,
-                    accessType: effectiveAccessType,
-                    actorPubkey: publicKey.toBase58(),
-                    signMessage,
-                });
-            } catch (policyError) {
-                console.warn('[useCreateCircle] sync join policy failed', policyError);
-                setError((prev) =>
-                    prev
-                        ? `${prev} 准入策略同步失败，可在圈层设置页重试。`
-                        : '圈层已创建，但准入策略同步失败，可在圈层设置页重试。',
-                );
-            }
-
-            if (options.draftLifecycleTemplate) {
-                try {
-                    if (!publicKey || !signMessage) {
-                        throw new Error('wallet_sign_message_unavailable');
-                    }
-                    await syncCircleDraftLifecycleTemplateWithRetry({
-                        circleId: createdCircleId,
-                        template: options.draftLifecycleTemplate,
+                        accessType: effectiveAccessType,
                         actorPubkey: publicKey.toBase58(),
                         signMessage,
                     });
                 } catch (policyError) {
-                    console.warn('[useCreateCircle] sync draft lifecycle template failed', policyError);
+                    console.warn('[useCreateCircle] sync join policy failed', policyError);
                     setError((prev) =>
                         prev
-                            ? `${prev} 草稿流程设置保存失败，可在圈层设置页重试。`
-                            : '圈层已创建，但草稿流程设置保存失败，可在圈层设置页重试。',
+                            ? `${prev} 准入策略同步失败，可在圈层设置页重试。`
+                            : '圈层已创建，但准入策略同步失败，可在圈层设置页重试。',
                     );
                 }
-            }
 
-            if (options.draftWorkflowPolicy) {
-                try {
-                    if (!publicKey || !signMessage) {
-                        throw new Error('wallet_sign_message_unavailable');
+                if (options.draftLifecycleTemplate) {
+                    try {
+                        if (!publicKey || !signMessage) {
+                            throw new Error('wallet_sign_message_unavailable');
+                        }
+                        await syncCircleDraftLifecycleTemplateWithRetry({
+                            circleId: createdCircleId,
+                            template: options.draftLifecycleTemplate,
+                            actorPubkey: publicKey.toBase58(),
+                            signMessage,
+                        });
+                    } catch (policyError) {
+                        console.warn('[useCreateCircle] sync draft lifecycle template failed', policyError);
+                        setError((prev) =>
+                            prev
+                                ? `${prev} 草稿流程设置保存失败，可在圈层设置页重试。`
+                                : '圈层已创建，但草稿流程设置保存失败，可在圈层设置页重试。',
+                        );
                     }
-                    await syncCircleDraftWorkflowPolicyWithRetry({
-                        circleId: createdCircleId,
-                        policy: options.draftWorkflowPolicy,
-                        actorPubkey: publicKey.toBase58(),
-                        signMessage,
-                    });
-                } catch (policyError) {
-                    console.warn('[useCreateCircle] sync draft workflow policy failed', policyError);
-                    setError((prev) =>
-                        prev
-                            ? `${prev} 问题单与阶段权限保存失败，可在圈层设置页重试。`
-                            : '圈层已创建，但问题单与阶段权限保存失败，可在圈层设置页重试。',
-                    );
                 }
+
+                if (options.draftWorkflowPolicy) {
+                    try {
+                        if (!publicKey || !signMessage) {
+                            throw new Error('wallet_sign_message_unavailable');
+                        }
+                        await syncCircleDraftWorkflowPolicyWithRetry({
+                            circleId: createdCircleId,
+                            policy: options.draftWorkflowPolicy,
+                            actorPubkey: publicKey.toBase58(),
+                            signMessage,
+                        });
+                    } catch (policyError) {
+                        console.warn('[useCreateCircle] sync draft workflow policy failed', policyError);
+                        setError((prev) =>
+                            prev
+                                ? `${prev} 问题单与阶段权限保存失败，可在圈层设置页重试。`
+                                : '圈层已创建，但问题单与阶段权限保存失败，可在圈层设置页重试。',
+                        );
+                    }
+                }
+            };
+
+            const postCreateSyncResult = await settleCreateCirclePostCreateSync(
+                syncPostCreateCircleSettings,
+                { timeoutMs: getCreateCirclePostCreateSyncTimeoutMs() },
+            );
+
+            if (postCreateSyncResult.status === 'timeout') {
+                console.warn('[useCreateCircle] post-create settings sync timed out');
+                setError((prev) =>
+                    prev
+                        ? `${prev} 后续配置仍在保存中；圈层已创建，可稍后在圈层设置页重试。`
+                        : '圈层已创建，后续配置仍在保存中；可稍后在圈层设置页重试。',
+                );
+            } else if (postCreateSyncResult.status === 'failed') {
+                console.warn('[useCreateCircle] post-create settings sync failed', postCreateSyncResult.error);
+                setError((prev) =>
+                    prev
+                        ? `${prev} 后续配置保存失败，可稍后在圈层设置页重试。`
+                        : '圈层已创建，但后续配置保存失败，可稍后在圈层设置页重试。',
+                );
             }
 
             return {
@@ -821,7 +853,7 @@ export function useCreateCircle(): UseCreateCircleReturn {
             setSyncing(false);
             setLoading(false);
         }
-    }, [sdk, publicKey, signMessage]);
+    }, [sdk, publicKey, signMessage, t]);
 
     return { createCircle, loading, syncing, indexed, error, txSignature };
 }
