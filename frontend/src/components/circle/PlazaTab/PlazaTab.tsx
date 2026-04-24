@@ -25,6 +25,7 @@ import {
 import { HIGHLIGHT_MESSAGE } from '@/lib/apollo/queries';
 import {
     createDiscussionSession,
+    createDraftFromCandidate,
     fetchDiscussionMessages,
     fetchDiscussionMessagesByEnvelopeIds,
     getDiscussionProtocolBaseUrl,
@@ -217,6 +218,7 @@ function PlazaTab({
     const [showForwardPicker, setShowForwardPicker] = useState(false);
     const [forwardingMessageId, setForwardingMessageId] = useState<number | null>(null);
     const [discussionStatus, setDiscussionStatus] = useState<string | null>(null);
+    const [creatingCandidateDraftId, setCreatingCandidateDraftId] = useState<string | null>(null);
     const [composerLabels, setComposerLabels] = useState<AuthorAnnotationKind[]>([]);
     const [activeContentFilters, setActiveContentFilters] = useState<AuthorAnnotationKind[]>([]);
     const [focusedEnvelopeId, setFocusedEnvelopeId] = useState<string | null>(focusEnvelopeId || null);
@@ -1258,7 +1260,49 @@ function PlazaTab({
             candidateId: notice.candidateId.slice(0, 8),
             proposalHint,
         }));
-    }, [viewerIdentity]);
+    }, [t, viewerIdentity]);
+
+    const handleCandidateCreateDraft = useCallback(async (notice: DraftCandidateInlineNotice) => {
+        if (creatingCandidateDraftId) return;
+        setCreatingCandidateDraftId(notice.candidateId);
+        setDiscussionError(null);
+        try {
+            const response = await createDraftFromCandidate({
+                circleId: discussionCircleId,
+                candidateId: notice.candidateId,
+            });
+            const draftPostId = response.result.draftPostId;
+            setDiscussionStatus(
+                response.result.created
+                    ? t('candidate.createSucceeded', { candidateId: notice.candidateId.slice(0, 8) })
+                    : t('candidate.createExistingDraft', { candidateId: notice.candidateId.slice(0, 8) }),
+            );
+            void onDraftsChanged?.();
+            onOpenCrucible?.(draftPostId);
+        } catch (error) {
+            const code = typeof (error as { code?: unknown })?.code === 'string'
+                ? (error as { code: string }).code
+                : '';
+            const candidateId = notice.candidateId.slice(0, 8);
+            if (code === 'candidate_generation_forbidden' || code === 'authentication_required') {
+                setDiscussionStatus(t('candidate.createDenied', { candidateId }));
+            } else if (code === 'draft_candidate_not_ready') {
+                setDiscussionStatus(t('candidate.createNotReady', { candidateId }));
+            } else if (code === 'draft_candidate_missing_sources') {
+                setDiscussionStatus(t('candidate.createMissingSources', { candidateId }));
+            } else {
+                setDiscussionError(error instanceof Error ? error.message : t('errors.sendFailed'));
+            }
+        } finally {
+            setCreatingCandidateDraftId((current) => (current === notice.candidateId ? null : current));
+        }
+    }, [
+        creatingCandidateDraftId,
+        discussionCircleId,
+        onDraftsChanged,
+        onOpenCrucible,
+        t,
+    ]);
 
     const EMOJI_LIST = [
         '😀', '😂', '🤔', '👍', '🔥', '💡', '✨', '🎯',
@@ -1430,6 +1474,8 @@ function PlazaTab({
                                                         void onDraftsChanged?.();
                                                         onOpenCrucible?.(targetPostId);
                                                     }}
+                                                    onCreateDraft={handleCandidateCreateDraft}
+                                                    createDraftBusy={creatingCandidateDraftId === candidateNoticeForRender.candidateId}
                                                     onViewSource={() => {
                                                         if (!candidateNoticeForRender.sourceMessageIds.length) return;
                                                         const sourceEnvelopeId = candidateNoticeForRender.sourceMessageIds[0] ?? null;

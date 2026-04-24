@@ -22,6 +22,10 @@ const plazaTabSource = readFileSync(
     new URL('../src/components/circle/PlazaTab/PlazaTab.tsx', import.meta.url),
     'utf8',
 );
+const discussionApiSource = readFileSync(
+    new URL('../src/lib/discussion/api.ts', import.meta.url),
+    'utf8',
+);
 const pageStyles = readFileSync(
     new URL('../src/app/(main)/circles/[id]/page.module.css', import.meta.url),
     'utf8',
@@ -102,4 +106,14 @@ test('Embedded system candidate notice uses reduced visual weight', () => {
     assert.match(cardStyles, /\.cardEmbeddedRoot \.footerNote\s*\{[\s\S]*font-size:\s*9px;/);
     assert.match(pageStyles, /\.msgRowSystem \.msgAuthor\s*\{[\s\S]*font-size:\s*10px;/);
     assert.match(pageStyles, /\.msgRowSystem \.msgTime\s*\{[\s\S]*font-size:\s*10px;/);
+});
+
+test('Plaza candidate notices wire the manual create draft action', () => {
+    assert.match(discussionApiSource, /export async function createDraftFromCandidate/);
+    assert.match(discussionApiSource, /\/api\/v1\/discussion\/circles\/\$\{input\.circleId\}\/candidates\/\$\{encodeURIComponent\(input\.candidateId\)\}\/create-draft/);
+    assert.match(plazaTabSource, /createDraftFromCandidate/);
+    assert.match(plazaTabSource, /const \[creatingCandidateDraftId, setCreatingCandidateDraftId\] = useState<string \| null>\(null\);/);
+    assert.match(plazaTabSource, /const handleCandidateCreateDraft = useCallback/);
+    assert.match(plazaTabSource, /onCreateDraft=\{handleCandidateCreateDraft\}/);
+    assert.match(plazaTabSource, /createDraftBusy=\{creatingCandidateDraftId === candidateNoticeForRender\.candidateId\}/);
 });

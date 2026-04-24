@@ -141,6 +141,16 @@ export interface DraftCrystallizationBindingResponse {
     knowledgeHeatScore: number;
 }
 
+export interface DraftCandidateCreateDraftResponse {
+    ok: boolean;
+    result: {
+        candidateId: string;
+        draftPostId: number;
+        created: boolean;
+        ghostDraftGenerationId: number | null;
+    };
+}
+
 export type DraftDiscussionState = 'open' | 'proposed' | 'accepted' | 'rejected' | 'applied' | 'withdrawn';
 export type DraftDiscussionTargetType = 'paragraph' | 'structure' | 'document';
 export type DraftDiscussionResolution = 'accepted' | 'rejected';
@@ -607,6 +617,23 @@ export async function submitDraftCrystallizationBinding(input: {
                 issuedSignature: input.issuedSignature,
                 proofPackage: input.proofPackage,
             }),
+        },
+    );
+}
+
+export async function createDraftFromCandidate(input: {
+    circleId: number;
+    candidateId: string;
+}): Promise<DraftCandidateCreateDraftResponse> {
+    const baseUrl = await getNodeBaseUrl('discussion_runtime');
+    return fetchDiscussionJson<DraftCandidateCreateDraftResponse>(
+        `${baseUrl}/api/v1/discussion/circles/${input.circleId}/candidates/${encodeURIComponent(input.candidateId)}/create-draft`,
+        {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
         },
     );
 }
