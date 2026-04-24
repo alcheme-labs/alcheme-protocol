@@ -38,6 +38,7 @@ function createJoinPrismaMock(input?: {
         circleType?: 'Open' | 'Closed' | 'Secret';
         minCrystals?: number;
         creatorId?: number;
+        lifecycleStatus?: 'Active' | 'Archived';
     };
     membership?: any;
     invite?: any;
@@ -59,6 +60,7 @@ function createJoinPrismaMock(input?: {
                     circleType: input?.circle?.circleType ?? 'Open',
                     minCrystals: input?.circle?.minCrystals ?? 0,
                     creatorId: input?.circle?.creatorId ?? 42,
+                    lifecycleStatus: input?.circle?.lifecycleStatus ?? 'Active',
                 };
             }),
             findMany: jest.fn(async () => []),
@@ -336,6 +338,32 @@ describe('membership admission bridge routes', () => {
         });
         expect((prisma.circleMember.create as any)).not.toHaveBeenCalled();
         expect((prisma.circleMember.update as any)).not.toHaveBeenCalled();
+        expect(next).not.toHaveBeenCalled();
+    });
+
+    test('POST /circles/:id/join rejects archived circles before grant issuance', async () => {
+        const prisma = createJoinPrismaMock({
+            circle: {
+                lifecycleStatus: 'Archived',
+            },
+        });
+        const router = membershipRouter(prisma as any, { publish: jest.fn(async () => 1) } as any);
+        const handler = getRouteHandler(router, '/circles/:id/join', 'post');
+
+        const req = {
+            params: { id: '7' },
+            userId: 88,
+            body: {},
+        } as any;
+        const res = createMockResponse();
+        const next = jest.fn();
+
+        await handler(req, res as any, next);
+
+        expect(res.statusCode).toBe(409);
+        expect(res.payload).toMatchObject({
+            error: 'circle_archived',
+        });
         expect(next).not.toHaveBeenCalled();
     });
 

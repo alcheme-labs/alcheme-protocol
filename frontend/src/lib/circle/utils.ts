@@ -37,6 +37,7 @@ export interface CircleJoinCopy {
         inviteRequired: string;
         insufficientCrystals: string;
         banned: string;
+        archived: string;
         requestStateChanged: string;
         membershipBridgeUnavailable: string;
         fallback: string;
@@ -69,6 +70,7 @@ const DEFAULT_JOIN_COPY: CircleJoinCopy = {
         inviteRequired: 'This circle is invite-only. Ask an admin for an invite.',
         insufficientCrystals: 'You do not have enough crystals to join yet.',
         banned: 'Your access to this circle is currently restricted.',
+        archived: 'This circle is archived and cannot accept new joins.',
         requestStateChanged: 'That request state changed. Refresh and try again.',
         membershipBridgeUnavailable: 'Your identity was created, but the circle join finalization is temporarily unavailable. Please try joining again.',
         fallback: 'Could not join the circle. Please try again.',
@@ -102,6 +104,7 @@ export function createCircleJoinCopy(t: CircleUiTranslator): CircleJoinCopy {
             inviteRequired: t('join.errors.inviteRequired'),
             insufficientCrystals: t('join.errors.insufficientCrystals'),
             banned: t('join.errors.banned'),
+            archived: t('join.errors.archived'),
             requestStateChanged: t('join.errors.requestStateChanged'),
             membershipBridgeUnavailable: t('join.errors.membershipBridgeUnavailable'),
             fallback: t('join.errors.fallback'),
@@ -212,6 +215,7 @@ export function normalizeJoinActionError(raw: unknown, copy: CircleJoinCopy = DE
     if (message.includes('invite_required')) return copy.errors.inviteRequired;
     if (message.includes('insufficient_crystals')) return copy.errors.insufficientCrystals;
     if (message.includes('membership_banned')) return copy.errors.banned;
+    if (message.includes('circle_archived')) return copy.errors.archived;
     if (message.includes('join_request_not_pending')) return copy.errors.requestStateChanged;
     if (
         message.includes('missing_membership_bridge_issuer_key_id')

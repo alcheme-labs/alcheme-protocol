@@ -96,6 +96,10 @@ export const CIRCLE_FIELDS = gql`
     name
     description
     avatarUri
+    lifecycleStatus
+    archivedAt
+    archivedByPubkey
+    archiveReason
     circleType
     level
     knowledgeCount

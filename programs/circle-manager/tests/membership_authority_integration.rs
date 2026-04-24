@@ -1,14 +1,10 @@
-use alcheme_shared::{CircleMemberRole, CircleMemberStatus};
+use alcheme_shared::{CircleLifecycleStatus, CircleMemberRole, CircleMemberStatus};
 use anchor_lang::{
     solana_program::{
-        account_info::AccountInfo,
-        entrypoint::ProgramResult,
-        program_error::ProgramError,
+        account_info::AccountInfo, entrypoint::ProgramResult, program_error::ProgramError,
         system_program,
     },
-    AccountDeserialize,
-    AccountSerialize,
-    AnchorSerialize,
+    AccountDeserialize, AccountSerialize, AnchorSerialize,
 };
 use circle_manager::{Circle, CircleMemberAccount, DecisionEngine, KnowledgeGovernance};
 use solana_program_test::{processor, BanksClientError, ProgramTest};
@@ -16,9 +12,9 @@ use solana_sdk::{
     account::Account,
     ed25519_instruction,
     instruction::{AccountMeta, Instruction, InstructionError},
-    sysvar::instructions as instructions_sysvar,
     pubkey::Pubkey,
     signature::{Keypair, Signer},
+    sysvar::instructions as instructions_sysvar,
     transaction::{Transaction, TransactionError},
 };
 use std::str::FromStr;
@@ -87,11 +83,16 @@ async fn update_circle_member_role_changes_role_without_deactivating_membership(
             created_at: 0,
             bump: circle_bump,
             flags: 0,
+            status: CircleLifecycleStatus::Active,
         })),
     );
 
     let (circle_member_pda, circle_member_bump) = Pubkey::find_program_address(
-        &[b"circle_member", circle_pda.as_ref(), member.pubkey().as_ref()],
+        &[
+            b"circle_member",
+            circle_pda.as_ref(),
+            member.pubkey().as_ref(),
+        ],
         &program_id,
     );
     program_test.add_account(
@@ -213,11 +214,16 @@ async fn update_circle_member_role_rejects_non_owner_curator_authority() {
             created_at: 0,
             bump: circle_bump,
             flags: 0,
+            status: CircleLifecycleStatus::Active,
         })),
     );
 
     let (circle_member_pda, circle_member_bump) = Pubkey::find_program_address(
-        &[b"circle_member", circle_pda.as_ref(), member.pubkey().as_ref()],
+        &[
+            b"circle_member",
+            circle_pda.as_ref(),
+            member.pubkey().as_ref(),
+        ],
         &program_id,
     );
     program_test.add_account(
@@ -328,11 +334,16 @@ async fn update_circle_member_role_rejects_protected_target_role() {
             created_at: 0,
             bump: circle_bump,
             flags: 0,
+            status: CircleLifecycleStatus::Active,
         })),
     );
 
     let (circle_member_pda, circle_member_bump) = Pubkey::find_program_address(
-        &[b"circle_member", circle_pda.as_ref(), member.pubkey().as_ref()],
+        &[
+            b"circle_member",
+            circle_pda.as_ref(),
+            member.pubkey().as_ref(),
+        ],
         &program_id,
     );
     program_test.add_account(
@@ -443,11 +454,16 @@ async fn update_circle_member_role_rejects_inactive_target_membership() {
             created_at: 0,
             bump: circle_bump,
             flags: 0,
+            status: CircleLifecycleStatus::Active,
         })),
     );
 
     let (circle_member_pda, circle_member_bump) = Pubkey::find_program_address(
-        &[b"circle_member", circle_pda.as_ref(), member.pubkey().as_ref()],
+        &[
+            b"circle_member",
+            circle_pda.as_ref(),
+            member.pubkey().as_ref(),
+        ],
         &program_id,
     );
     program_test.add_account(
@@ -558,11 +574,16 @@ async fn remove_circle_member_deactivates_member_with_owner_authority() {
             created_at: 0,
             bump: circle_bump,
             flags: 0,
+            status: CircleLifecycleStatus::Active,
         })),
     );
 
     let (circle_member_pda, circle_member_bump) = Pubkey::find_program_address(
-        &[b"circle_member", circle_pda.as_ref(), member.pubkey().as_ref()],
+        &[
+            b"circle_member",
+            circle_pda.as_ref(),
+            member.pubkey().as_ref(),
+        ],
         &program_id,
     );
     program_test.add_account(
@@ -676,11 +697,16 @@ async fn remove_circle_member_rejects_protected_target_role() {
             created_at: 0,
             bump: circle_bump,
             flags: 0,
+            status: CircleLifecycleStatus::Active,
         })),
     );
 
     let (circle_member_pda, circle_member_bump) = Pubkey::find_program_address(
-        &[b"circle_member", circle_pda.as_ref(), member.pubkey().as_ref()],
+        &[
+            b"circle_member",
+            circle_pda.as_ref(),
+            member.pubkey().as_ref(),
+        ],
         &program_id,
     );
     program_test.add_account(
@@ -785,11 +811,16 @@ async fn remove_circle_member_rejects_inactive_target_membership() {
             created_at: 0,
             bump: circle_bump,
             flags: 0,
+            status: CircleLifecycleStatus::Active,
         })),
     );
 
     let (circle_member_pda, circle_member_bump) = Pubkey::find_program_address(
-        &[b"circle_member", circle_pda.as_ref(), member.pubkey().as_ref()],
+        &[
+            b"circle_member",
+            circle_pda.as_ref(),
+            member.pubkey().as_ref(),
+        ],
         &program_id,
     );
     program_test.add_account(
@@ -908,11 +939,16 @@ async fn claim_circle_membership_initializes_first_time_member_from_bridge_grant
             created_at: 0,
             bump: circle_bump,
             flags: 0,
+            status: CircleLifecycleStatus::Active,
         })),
     );
 
     let (circle_member_pda, _) = Pubkey::find_program_address(
-        &[b"circle_member", circle_pda.as_ref(), member.pubkey().as_ref()],
+        &[
+            b"circle_member",
+            circle_pda.as_ref(),
+            member.pubkey().as_ref(),
+        ],
         &program_id,
     );
 
@@ -1002,7 +1038,10 @@ async fn claim_circle_membership_accepts_registered_non_admin_attestor() {
     let event_batch = Keypair::new();
 
     program_test.add_account(member.pubkey(), system_account(20_000_000_000));
-    program_test.add_account(circle_manager_admin.pubkey(), system_account(20_000_000_000));
+    program_test.add_account(
+        circle_manager_admin.pubkey(),
+        system_account(20_000_000_000),
+    );
     program_test.add_account(registered_attestor.pubkey(), system_account(20_000_000_000));
     program_test.add_account(
         event_emitter.pubkey(),
@@ -1064,11 +1103,16 @@ async fn claim_circle_membership_accepts_registered_non_admin_attestor() {
             created_at: 0,
             bump: circle_bump,
             flags: 0,
+            status: CircleLifecycleStatus::Active,
         })),
     );
 
     let (circle_member_pda, _) = Pubkey::find_program_address(
-        &[b"circle_member", circle_pda.as_ref(), member.pubkey().as_ref()],
+        &[
+            b"circle_member",
+            circle_pda.as_ref(),
+            member.pubkey().as_ref(),
+        ],
         &program_id,
     );
 
@@ -1082,7 +1126,9 @@ async fn claim_circle_membership_accepts_registered_non_admin_attestor() {
         expires_at: 1_800_000_000,
     };
     let admission_digest = build_membership_admission_digest(&admission);
-    let signed = *registered_attestor.sign_message(&admission_digest).as_array();
+    let signed = *registered_attestor
+        .sign_message(&admission_digest)
+        .as_array();
     let verify_ix = ed25519_instruction::new_ed25519_instruction_with_signature(
         &admission_digest,
         &signed,
@@ -1147,7 +1193,10 @@ async fn initialize_membership_attestor_registry_rejects_non_circle_manager_admi
 
     let circle_manager_admin = Keypair::new();
     let attacker = Keypair::new();
-    program_test.add_account(circle_manager_admin.pubkey(), system_account(20_000_000_000));
+    program_test.add_account(
+        circle_manager_admin.pubkey(),
+        system_account(20_000_000_000),
+    );
     program_test.add_account(attacker.pubkey(), system_account(20_000_000_000));
 
     let (circle_manager_pda, circle_manager_bump) =
@@ -1284,9 +1333,7 @@ async fn register_membership_attestor_adds_attestor_for_circle_manager_admin() {
         .expect("membership attestor registry should exist");
     let updated_registry: circle_manager::MembershipAttestorRegistry =
         deserialize_anchor_account(&updated_account.data);
-    assert!(updated_registry
-        .attestors
-        .contains(&new_attestor.pubkey()));
+    assert!(updated_registry.attestors.contains(&new_attestor.pubkey()));
 
     let updated_event_emitter = context
         .banks_client
@@ -1487,9 +1534,7 @@ async fn register_membership_attestor_rejects_duplicate_registration() {
 fn membership_instruction_discriminator(name: &str) -> Vec<u8> {
     use anchor_lang::solana_program::hash::hash;
 
-    hash(format!("global:{name}").as_bytes())
-        .to_bytes()[..8]
-        .to_vec()
+    hash(format!("global:{name}").as_bytes()).to_bytes()[..8].to_vec()
 }
 
 fn account_discriminator(name: &str) -> [u8; 8] {
@@ -1563,17 +1608,14 @@ fn process_mock_event_emitter_instruction<'a, 'b, 'c, 'd>(
     accounts: &'b [AccountInfo<'c>],
     _instruction_data: &'d [u8],
 ) -> ProgramResult {
-    let event_emitter = accounts
-        .first()
-        .ok_or(ProgramError::NotEnoughAccountKeys)?;
+    let event_emitter = accounts.first().ok_or(ProgramError::NotEnoughAccountKeys)?;
     let mut data = event_emitter.try_borrow_mut_data()?;
     if data.len() < EVENT_EMITTER_MIN_DATA_SIZE {
         return Err(ProgramError::InvalidAccountData);
     }
     let mut sequence_bytes = [0u8; 8];
-    sequence_bytes.copy_from_slice(
-        &data[EVENT_EMITTER_SEQUENCE_OFFSET..EVENT_EMITTER_SEQUENCE_OFFSET + 8],
-    );
+    sequence_bytes
+        .copy_from_slice(&data[EVENT_EMITTER_SEQUENCE_OFFSET..EVENT_EMITTER_SEQUENCE_OFFSET + 8]);
     let next_sequence = u64::from_le_bytes(sequence_bytes).saturating_add(1);
     data[EVENT_EMITTER_SEQUENCE_OFFSET..EVENT_EMITTER_SEQUENCE_OFFSET + 8]
         .copy_from_slice(&next_sequence.to_le_bytes());
@@ -1634,9 +1676,8 @@ fn mock_event_emitter_account(owner: Pubkey, event_sequence: u64) -> Account {
 
 fn read_mock_event_sequence(data: &[u8]) -> u64 {
     let mut sequence_bytes = [0u8; 8];
-    sequence_bytes.copy_from_slice(
-        &data[EVENT_EMITTER_SEQUENCE_OFFSET..EVENT_EMITTER_SEQUENCE_OFFSET + 8],
-    );
+    sequence_bytes
+        .copy_from_slice(&data[EVENT_EMITTER_SEQUENCE_OFFSET..EVENT_EMITTER_SEQUENCE_OFFSET + 8]);
     u64::from_le_bytes(sequence_bytes)
 }
 

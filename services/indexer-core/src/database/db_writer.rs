@@ -1513,6 +1513,67 @@ impl DbWriter {
         Ok(())
     }
 
+    /// Archive a circle in the read model while preserving its historical records.
+    ///
+    /// This mirrors the on-chain lifecycle state; it is not a hard delete and does not
+    /// remove the circle or its related history from storage.
+    pub async fn archive_circle(
+        &self,
+        circle_id: i32,
+        archived_by_pubkey: &str,
+        reason: Option<&str>,
+        timestamp: i64,
+    ) -> Result<()> {
+        sqlx::query(
+            r#"
+            UPDATE circles
+            SET lifecycle_status = 'Archived'::"CircleLifecycleStatus",
+                archived_at = to_timestamp($2::double precision),
+                archived_by_pubkey = $3,
+                archive_reason = $4,
+                updated_at = NOW()
+            WHERE id = $1
+            "#,
+        )
+        .bind(circle_id)
+        .bind(timestamp as f64)
+        .bind(archived_by_pubkey)
+        .bind(reason)
+        .execute(&self.pool)
+        .await
+        .context("Failed to archive circle projection")?;
+
+        self.invalidate(&format!("circle:{}", circle_id)).await;
+        Ok(())
+    }
+
+    /// Restore a circle to the active lifecycle state in the read model.
+    pub async fn restore_circle(
+        &self,
+        circle_id: i32,
+        timestamp: i64,
+    ) -> Result<()> {
+        sqlx::query(
+            r#"
+            UPDATE circles
+            SET lifecycle_status = 'Active'::"CircleLifecycleStatus",
+                archived_at = NULL,
+                archived_by_pubkey = NULL,
+                archive_reason = NULL,
+                updated_at = NOW()
+            WHERE id = $1
+            "#,
+        )
+        .bind(circle_id)
+        .execute(&self.pool)
+        .await
+        .context("Failed to restore circle projection")?;
+
+        self.invalidate(&format!("circle:{}", circle_id)).await;
+        let _ = timestamp;
+        Ok(())
+    }
+
     /// 更新圈层 flags（kind/mode/min_crystals）
     pub async fn update_circle_flags(
         &self,

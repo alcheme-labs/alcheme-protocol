@@ -1,15 +1,12 @@
 use alcheme_cpi::{AuthorizedCaller, CpiPermission, ExtensionRegistry};
+use alcheme_shared::CircleLifecycleStatus;
+use anchor_lang::solana_program::{
+    account_info::AccountInfo, entrypoint::ProgramResult, system_program,
+};
 use anchor_lang::{AccountSerialize, AnchorSerialize, InstructionData, ToAccountMetas};
-use anchor_lang::solana_program::{account_info::AccountInfo, entrypoint::ProgramResult, system_program};
 use circle_manager::{
-    accounts as circle_accounts,
-    instruction as circle_instructions,
-    Circle,
-    CircleManager,
-    DecisionEngine,
-    Knowledge,
-    KnowledgeBinding,
-    KnowledgeGovernance,
+    accounts as circle_accounts, instruction as circle_instructions, Circle, CircleManager,
+    DecisionEngine, Knowledge, KnowledgeBinding, KnowledgeGovernance,
 };
 use solana_program_test::{processor, BanksClientError, ProgramTest};
 use solana_sdk::{
@@ -24,6 +21,7 @@ use std::str::FromStr;
 // AlchemeError::InvalidOperation is declared as 6000, and Anchor applies its
 // custom-error offset at runtime, surfacing it as 12000.
 const INVALID_OPERATION_ERROR_CODE: u32 = 12000;
+const CIRCLE_ARCHIVED_ERROR_CODE: u32 = 12014;
 
 #[test]
 fn knowledge_binding_state_carries_the_frozen_minimum_anchor_contract() {
@@ -44,8 +42,7 @@ fn knowledge_binding_state_carries_the_frozen_minimum_anchor_contract() {
 
     assert_eq!(binding.knowledge, knowledge);
     assert_eq!(
-        binding.source_anchor_id,
-        [0x11; 32],
+        binding.source_anchor_id, [0x11; 32],
         "source_anchor_id remains the on-chain provenance path equivalent",
     );
     assert_eq!(binding.proof_package_hash, [0x22; 32]);
@@ -109,6 +106,7 @@ async fn submit_knowledge_rejects_non_curator_author() {
         created_at: 0,
         bump: circle_bump,
         flags: 0,
+        status: CircleLifecycleStatus::Active,
     };
     program_test.add_account(
         circle_pda,
@@ -199,6 +197,7 @@ async fn update_contributors_rejects_cross_circle_knowledge_mutation() {
         created_at: 0,
         bump: circle_one_bump,
         flags: 0,
+        status: CircleLifecycleStatus::Active,
     };
     program_test.add_account(
         circle_one_pda,
@@ -220,6 +219,7 @@ async fn update_contributors_rejects_cross_circle_knowledge_mutation() {
         created_at: 0,
         bump: circle_two_bump,
         flags: 0,
+        status: CircleLifecycleStatus::Active,
     };
     program_test.add_account(
         circle_two_pda,
@@ -230,10 +230,8 @@ async fn update_contributors_rejects_cross_circle_knowledge_mutation() {
         &[b"knowledge", circle_one_pda.as_ref(), &0u64.to_le_bytes()],
         &program_id,
     );
-    let (knowledge_binding_pda, knowledge_binding_bump) = Pubkey::find_program_address(
-        &[b"knowledge_binding", knowledge_pda.as_ref()],
-        &program_id,
-    );
+    let (knowledge_binding_pda, knowledge_binding_bump) =
+        Pubkey::find_program_address(&[b"knowledge_binding", knowledge_pda.as_ref()], &program_id);
     let proof_package_hash = [0x45; 32];
     let contributors_root = [0x46; 32];
     let knowledge = Knowledge {
@@ -312,6 +310,109 @@ async fn update_contributors_rejects_cross_circle_knowledge_mutation() {
 }
 
 #[tokio::test]
+async fn cpi_promote_knowledge_rejects_archived_circle() {
+    let program_id = circle_manager::id();
+    let mut program_test = ProgramTest::new(
+        "circle_manager",
+        program_id,
+        processor!(process_instruction),
+    );
+
+    let authority = Keypair::new();
+    let caller_program = Keypair::new();
+    let extension_registry = Keypair::new();
+
+    program_test.add_account(authority.pubkey(), system_account(10_000_000_000));
+    program_test.add_account(caller_program.pubkey(), system_account(1_000_000_000));
+    program_test.add_account(
+        extension_registry.pubkey(),
+        extension_registry_account(caller_program.pubkey()),
+    );
+
+    let circle_id = 3u8;
+    let (circle_pda, circle_bump) =
+        Pubkey::find_program_address(&[b"circle", &[circle_id]], &program_id);
+    program_test.add_account(
+        circle_pda,
+        program_owned_account(serialize_anchor_account(&Circle {
+            circle_id,
+            name: "archived-cpi".to_string(),
+            level: 1,
+            parent_circle: None,
+            child_circles: vec![],
+            curators: vec![authority.pubkey()],
+            knowledge_count: 1,
+            knowledge_governance: default_governance(),
+            decision_engine: DecisionEngine::AdminOnly {
+                admin: authority.pubkey(),
+            },
+            created_at: 0,
+            bump: circle_bump,
+            flags: 0,
+            status: CircleLifecycleStatus::Archived,
+        })),
+    );
+
+    let (knowledge_pda, knowledge_bump) = Pubkey::find_program_address(
+        &[b"knowledge", circle_pda.as_ref(), &0u64.to_le_bytes()],
+        &program_id,
+    );
+    program_test.add_account(
+        knowledge_pda,
+        program_owned_account(serialize_anchor_account(&Knowledge {
+            knowledge_id: [0x88; 32],
+            circle_id,
+            ipfs_cid: "bafybeiarchivedcpi".to_string(),
+            content_hash: [0x89; 32],
+            title: "Archived CPI".to_string(),
+            description: "archived circles reject extension promotion".to_string(),
+            author: authority.pubkey(),
+            quality_score: 0.5,
+            source_circle: None,
+            created_at: 0,
+            view_count: 0,
+            citation_count: 0,
+            bump: knowledge_bump,
+            flags: 1,
+            contributors_root: [0; 32],
+            contributors_count: 0,
+        })),
+    );
+
+    let context = program_test.start_with_context().await;
+    let instruction = Instruction {
+        program_id,
+        accounts: circle_accounts::CpiPromoteKnowledge {
+            knowledge: knowledge_pda,
+            circle: circle_pda,
+            caller_program: caller_program.pubkey(),
+            extension_registry: extension_registry.pubkey(),
+            authority: authority.pubkey(),
+        }
+        .to_account_metas(None),
+        data: circle_instructions::CpiPromoteKnowledge {
+            quality_delta: 0.25,
+            reason: "archived cpi".to_string(),
+        }
+        .data(),
+    };
+
+    let tx = Transaction::new_signed_with_payer(
+        &[instruction],
+        Some(&context.payer.pubkey()),
+        &[&context.payer, &authority],
+        context.last_blockhash,
+    );
+
+    let error = context
+        .banks_client
+        .process_transaction(tx)
+        .await
+        .expect_err("archived circle should reject extension promotion");
+    assert_custom_code(error, CIRCLE_ARCHIVED_ERROR_CODE);
+}
+
+#[tokio::test]
 async fn cpi_promote_knowledge_rejects_cross_circle_knowledge_mutation() {
     let program_id = circle_manager::id();
     let mut program_test = ProgramTest::new(
@@ -353,6 +454,7 @@ async fn cpi_promote_knowledge_rejects_cross_circle_knowledge_mutation() {
         created_at: 0,
         bump: circle_one_bump,
         flags: 0,
+        status: CircleLifecycleStatus::Active,
     };
     program_test.add_account(
         circle_one_pda,
@@ -374,6 +476,7 @@ async fn cpi_promote_knowledge_rejects_cross_circle_knowledge_mutation() {
         created_at: 0,
         bump: circle_two_bump,
         flags: 0,
+        status: CircleLifecycleStatus::Active,
     };
     program_test.add_account(
         circle_two_pda,
@@ -441,17 +544,21 @@ async fn cpi_promote_knowledge_rejects_cross_circle_knowledge_mutation() {
 }
 
 fn assert_invalid_operation(error: BanksClientError) {
+    assert_custom_code(error, INVALID_OPERATION_ERROR_CODE);
+}
+
+fn assert_custom_code(error: BanksClientError, expected_code: u32) {
     match error {
         BanksClientError::TransactionError(TransactionError::InstructionError(
             _,
             InstructionError::Custom(code),
         )) => {
             assert_eq!(
-                code, INVALID_OPERATION_ERROR_CODE,
-                "expected InvalidOperation(12000 runtime code), got {code}",
+                code, expected_code,
+                "expected custom code {expected_code}, got {code}",
             );
         }
-        other => panic!("expected custom InvalidOperation error, got {other:?}"),
+        other => panic!("expected custom error code {expected_code}, got {other:?}"),
     }
 }
 

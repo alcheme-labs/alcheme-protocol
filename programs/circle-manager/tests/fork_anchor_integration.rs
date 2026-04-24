@@ -1,13 +1,10 @@
+use alcheme_shared::CircleLifecycleStatus;
 use anchor_lang::solana_program::{account_info::AccountInfo, entrypoint::ProgramResult};
 use anchor_lang::system_program;
 use anchor_lang::{AccountDeserialize, AccountSerialize, InstructionData, ToAccountMetas};
 use circle_manager::{
-    accounts as circle_accounts,
-    instruction as circle_instructions,
-    Circle,
-    CircleForkAnchor,
-    DecisionEngine,
-    KnowledgeGovernance,
+    accounts as circle_accounts, instruction as circle_instructions, Circle, CircleForkAnchor,
+    DecisionEngine, KnowledgeGovernance,
 };
 use solana_program_test::{processor, ProgramTest};
 use solana_sdk::{
@@ -71,6 +68,7 @@ async fn anchor_circle_fork_persists_sidecar_for_existing_target_circle() {
             created_at: 0,
             bump: source_bump,
             flags: 0,
+            status: CircleLifecycleStatus::Active,
         })),
     );
     program_test.add_account(
@@ -90,6 +88,7 @@ async fn anchor_circle_fork_persists_sidecar_for_existing_target_circle() {
             created_at: 0,
             bump: target_bump,
             flags: 0,
+            status: CircleLifecycleStatus::Active,
         })),
     );
 

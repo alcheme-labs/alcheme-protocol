@@ -195,6 +195,10 @@ model Circle {
   kind               String    @default("main") @db.VarChar(16)    // "main" | "auxiliary"
   mode               String    @default("knowledge") @db.VarChar(16) // "knowledge" | "social"
   minCrystals        Int       @default(0) @map("min_crystals")     // bits 2-17 of flags
+  lifecycleStatus    CircleLifecycleStatus @default(Active) @map("lifecycle_status")
+  archivedAt         DateTime? @map("archived_at")
+  archivedByPubkey   String?   @map("archived_by_pubkey") @db.VarChar(44)
+  archiveReason      String?   @map("archive_reason")
   
   onChainAddress     String    @unique @map("on_chain_address") @db.VarChar(44)
   lastSyncedSlot     BigInt    @map("last_synced_slot")
@@ -224,12 +228,18 @@ model Circle {
   
   @@index([creatorId])
   @@index([circleType])
+  @@index([lifecycleStatus])
   @@index([level])
   @@index([parentCircleId])
   @@index([createdAt(sort: Desc)])
   @@index([membersCount(sort: Desc)])
   @@index([onChainAddress])
   @@map("circles")
+}
+
+enum CircleLifecycleStatus {
+  Active
+  Archived
 }
 
 model SeededSourceNode {

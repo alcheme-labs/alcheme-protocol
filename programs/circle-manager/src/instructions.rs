@@ -1,9 +1,10 @@
+use crate::state::*;
+use alcheme_cpi::{is_authorized_for_cpi_with_registry, CpiHelper};
+use alcheme_shared::*;
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::ed25519_program;
 use anchor_lang::solana_program::sysvar::instructions as sysvar_instructions;
-use alcheme_shared::*;
-use alcheme_cpi::{is_authorized_for_cpi_with_registry, CpiHelper};
-use crate::state::*;
+use anchor_lang::system_program::{transfer, Transfer};
 
 const KNOWLEDGE_BINDING_SEED: &[u8] = b"knowledge_binding";
 const PROOF_ATTESTOR_REGISTRY_SEED: &[u8] = b"proof_attestor_registry";
@@ -22,10 +23,10 @@ pub struct Initialize<'info> {
         bump
     )]
     pub circle_manager: Account<'info, CircleManager>,
-    
+
     #[account(mut)]
     pub admin: Signer<'info>,
-    
+
     pub system_program: Program<'info, System>,
 }
 
@@ -48,10 +49,10 @@ pub struct CreateCircle<'info> {
         bump
     )]
     pub circle: Account<'info, Circle>,
-    
+
     #[account(mut)]
     pub circle_manager: Account<'info, CircleManager>,
-    
+
     #[account(mut)]
     pub creator: Signer<'info>,
 
@@ -65,7 +66,7 @@ pub struct CreateCircle<'info> {
     /// CHECK: Event Batch account
     #[account(mut)]
     pub event_batch: AccountInfo<'info>,
-    
+
     pub system_program: Program<'info, System>,
 }
 
@@ -80,7 +81,7 @@ pub fn create_circle(
 ) -> Result<()> {
     let circle = &mut ctx.accounts.circle;
     let manager = &mut ctx.accounts.circle_manager;
-    
+
     circle.initialize(
         circle_id,
         name,
@@ -91,7 +92,7 @@ pub fn create_circle(
         ctx.accounts.creator.key(),
         ctx.bumps.circle,
     )?;
-    
+
     manager.total_circles += 1;
 
     let event = ProtocolEvent::CircleCreated {
@@ -113,7 +114,7 @@ pub fn create_circle(
         &crate::ID,
         event,
     )?;
-    
+
     Ok(())
 }
 
@@ -153,6 +154,8 @@ pub fn anchor_circle_fork(
     target_circle_id: u8,
     fork_declaration_digest: [u8; 32],
 ) -> Result<()> {
+    require_circle_active(&ctx.accounts.source_circle)?;
+    require_circle_active(&ctx.accounts.target_circle)?;
     require!(
         ctx.accounts.source_circle.circle_id == source_circle_id,
         AlchemeError::InvalidOperation
@@ -166,7 +169,9 @@ pub fn anchor_circle_fork(
         AlchemeError::InvalidOperation
     );
     require!(
-        ctx.accounts.target_circle.is_curator(&ctx.accounts.authority.key()),
+        ctx.accounts
+            .target_circle
+            .is_curator(&ctx.accounts.authority.key()),
         AlchemeError::InvalidOperation
     );
 
@@ -186,25 +191,25 @@ pub fn anchor_circle_fork(
 pub struct AddCurator<'info> {
     #[account(mut)]
     pub circle: Account<'info, Circle>,
-    
-    /// CHECK: 权限通过AccessController验证
+
+    /// CHECK: Permission is validated through AccessController.
+    /// CN: 权限通过 AccessController 验证。
     pub access_controller: AccountInfo<'info>,
-    
+
     pub authority: Signer<'info>,
 }
 
-pub fn add_curator(
-    ctx: Context<AddCurator>,
-    curator: Pubkey,
-) -> Result<()> {
+pub fn add_curator(ctx: Context<AddCurator>, curator: Pubkey) -> Result<()> {
     let circle = &mut ctx.accounts.circle;
-    
-    // 只有现有策展人才能添加新策展人
+    require_circle_active(circle)?;
+
+    // SAFETY: Only an existing curator may add another curator.
+    // CN: 只有现有策展人才能添加新策展人。
     require!(
         circle.is_curator(&ctx.accounts.authority.key()),
         AlchemeError::InvalidOperation
     );
-    
+
     circle.add_curator(curator)?;
     Ok(())
 }
@@ -226,7 +231,8 @@ pub struct AddCircleMember<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
-    /// CHECK: 目标成员钱包地址，仅用于成员事实 key
+    /// CHECK: Target member wallet address, used only as the membership fact key.
+    /// CN: 目标成员钱包地址，仅用于成员事实 key。
     pub member: UncheckedAccount<'info>,
 
     /// CHECK: Event Emitter program
@@ -243,11 +249,9 @@ pub struct AddCircleMember<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn add_circle_member(
-    ctx: Context<AddCircleMember>,
-    role: CircleMemberRole,
-) -> Result<()> {
+pub fn add_circle_member(ctx: Context<AddCircleMember>, role: CircleMemberRole) -> Result<()> {
     let circle = &ctx.accounts.circle;
+    require_circle_active(circle)?;
     require!(
         circle.is_curator(&ctx.accounts.authority.key()),
         AlchemeError::InvalidOperation
@@ -294,7 +298,8 @@ pub struct RemoveCircleMember<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
-    /// CHECK: 目标成员钱包地址，仅用于成员事实 key
+    /// CHECK: Target member wallet address, used only as the membership fact key.
+    /// CN: 目标成员钱包地址，仅用于成员事实 key。
     pub member: UncheckedAccount<'info>,
 
     /// CHECK: Event Emitter program
@@ -313,15 +318,51 @@ pub struct RemoveCircleMember<'info> {
 
 fn require_circle_owner(circle: &Circle, authority: &Pubkey) -> Result<()> {
     require!(
-        circle.curators.first().map(|owner| owner == authority).unwrap_or(false),
+        circle
+            .curators
+            .first()
+            .map(|owner| owner == authority)
+            .unwrap_or(false),
         AlchemeError::InvalidOperation
     );
     Ok(())
 }
 
+/// SAFETY: Lifecycle writes are centralized behind the minimal lifecycle manager permission model.
+/// CN: 圈层生命周期写操作统一收口在最小权限模型里。
+///
+/// INVARIANT: The first curator is the circle owner, and `circle_manager.admin` is the global override.
+/// CN: 第一位 curator 视为圈层 owner；`circle_manager.admin` 是全局兜底 override。
+///
+/// CONTEXT: Future curator-scoped permissions, governance roles, or DAO votes should replace this helper without changing the lifecycle state model.
+/// CN: 后续接入 curator 细分权限、governance role 或 DAO 投票时，应替换这个 helper，而不是改生命周期状态模型。
+fn require_circle_lifecycle_manager(
+    circle_manager: &CircleManager,
+    circle: &Circle,
+    authority: &Pubkey,
+) -> Result<()> {
+    if &circle_manager.admin == authority {
+        return Ok(());
+    }
+    require_circle_owner(circle, authority)
+}
+
+/// INVARIANT: Archived circles are readable but reject new writes that continue using the circle.
+/// CN: 已归档圈层可读，但会拒绝继续使用该圈层的新写入。
+///
+/// SAFETY: `leave_circle` intentionally bypasses this guard so existing members can exit.
+/// CN: `leave_circle` 刻意不走该限制，保证已加入成员仍可主动退出。
+fn require_circle_active(circle: &Circle) -> Result<()> {
+    require!(!circle.is_archived(), AlchemeError::CircleArchived);
+    Ok(())
+}
+
 fn require_mutable_membership_target(circle_member: &CircleMemberAccount) -> Result<()> {
     require!(
-        !matches!(circle_member.role, CircleMemberRole::Owner | CircleMemberRole::Admin),
+        !matches!(
+            circle_member.role,
+            CircleMemberRole::Owner | CircleMemberRole::Admin
+        ),
         AlchemeError::InvalidOperation
     );
     Ok(())
@@ -335,10 +376,9 @@ fn require_active_membership_target(circle_member: &CircleMemberAccount) -> Resu
     Ok(())
 }
 
-pub fn remove_circle_member(
-    ctx: Context<RemoveCircleMember>,
-) -> Result<()> {
+pub fn remove_circle_member(ctx: Context<RemoveCircleMember>) -> Result<()> {
     let circle = &ctx.accounts.circle;
+    require_circle_active(circle)?;
     require_circle_owner(circle, &ctx.accounts.authority.key())?;
 
     let circle_member = &mut ctx.accounts.circle_member;
@@ -379,7 +419,8 @@ pub struct UpdateCircleMemberRole<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
-    /// CHECK: 目标成员钱包地址，仅用于成员事实 key
+    /// CHECK: Target member wallet address, used only as the membership fact key.
+    /// CN: 目标成员钱包地址，仅用于成员事实 key。
     pub member: UncheckedAccount<'info>,
 
     /// CHECK: Event Emitter program
@@ -401,6 +442,7 @@ pub fn update_circle_member_role(
     role: CircleMemberRole,
 ) -> Result<()> {
     let circle = &ctx.accounts.circle;
+    require_circle_active(circle)?;
     require_circle_owner(circle, &ctx.accounts.authority.key())?;
     require!(
         matches!(role, CircleMemberRole::Member | CircleMemberRole::Moderator),
@@ -473,9 +515,13 @@ fn verify_ed25519_membership_admission(
     let current_index = sysvar_instructions::load_current_index_checked(instructions_sysvar)
         .map_err(|_| error!(AlchemeError::ValidationFailed))? as usize;
     require!(current_index > 0, AlchemeError::ValidationFailed);
-    let verify_ix = sysvar_instructions::load_instruction_at_checked(current_index - 1, instructions_sysvar)
-        .map_err(|_| error!(AlchemeError::ValidationFailed))?;
-    require!(verify_ix.program_id == ed25519_program::id(), AlchemeError::ValidationFailed);
+    let verify_ix =
+        sysvar_instructions::load_instruction_at_checked(current_index - 1, instructions_sysvar)
+            .map_err(|_| error!(AlchemeError::ValidationFailed))?;
+    require!(
+        verify_ix.program_id == ed25519_program::id(),
+        AlchemeError::ValidationFailed
+    );
 
     let data = verify_ix.data;
     require!(data.len() >= 16, AlchemeError::ValidationFailed);
@@ -489,21 +535,42 @@ fn verify_ed25519_membership_admission(
     let message_size = u16::from_le_bytes([data[12], data[13]]) as usize;
     let message_ix_index = u16::from_le_bytes([data[14], data[15]]);
 
-    require!(signature_ix_index == u16::MAX, AlchemeError::ValidationFailed);
+    require!(
+        signature_ix_index == u16::MAX,
+        AlchemeError::ValidationFailed
+    );
     require!(pubkey_ix_index == u16::MAX, AlchemeError::ValidationFailed);
     require!(message_ix_index == u16::MAX, AlchemeError::ValidationFailed);
     require!(message_size == 32, AlchemeError::ValidationFailed);
-    require!(signature_offset + 64 <= data.len(), AlchemeError::ValidationFailed);
-    require!(pubkey_offset + 32 <= data.len(), AlchemeError::ValidationFailed);
-    require!(message_offset + message_size <= data.len(), AlchemeError::ValidationFailed);
+    require!(
+        signature_offset + 64 <= data.len(),
+        AlchemeError::ValidationFailed
+    );
+    require!(
+        pubkey_offset + 32 <= data.len(),
+        AlchemeError::ValidationFailed
+    );
+    require!(
+        message_offset + message_size <= data.len(),
+        AlchemeError::ValidationFailed
+    );
 
     let signature_slice = &data[signature_offset..signature_offset + 64];
     let pubkey_slice = &data[pubkey_offset..pubkey_offset + 32];
     let message_slice = &data[message_offset..message_offset + message_size];
 
-    require!(signature_slice == issued_signature.as_ref(), AlchemeError::ValidationFailed);
-    require!(pubkey_slice == issuer_key_id.as_ref(), AlchemeError::ValidationFailed);
-    require!(message_slice == expected_message.as_ref(), AlchemeError::ValidationFailed);
+    require!(
+        signature_slice == issued_signature.as_ref(),
+        AlchemeError::ValidationFailed
+    );
+    require!(
+        pubkey_slice == issuer_key_id.as_ref(),
+        AlchemeError::ValidationFailed
+    );
+    require!(
+        message_slice == expected_message.as_ref(),
+        AlchemeError::ValidationFailed
+    );
 
     Ok(())
 }
@@ -554,6 +621,7 @@ pub fn claim_circle_membership<'info>(
     issuer_key_id: Pubkey,
     issued_signature: [u8; 64],
 ) -> Result<()> {
+    require_circle_active(&ctx.accounts.circle)?;
     let issuer_authorized = if issuer_key_id == ctx.accounts.circle_manager.admin {
         true
     } else {
@@ -576,10 +644,7 @@ pub fn claim_circle_membership<'info>(
         }
     };
 
-    require!(
-        issuer_authorized,
-        AlchemeError::Unauthorized
-    );
+    require!(issuer_authorized, AlchemeError::Unauthorized);
     require!(
         admission.circle_id == ctx.accounts.circle.circle_id,
         AlchemeError::InvalidOperation
@@ -659,9 +724,8 @@ pub struct JoinCircle<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn join_circle(
-    ctx: Context<JoinCircle>,
-) -> Result<()> {
+pub fn join_circle(ctx: Context<JoinCircle>) -> Result<()> {
+    require_circle_active(&ctx.accounts.circle)?;
     let circle_member = &mut ctx.accounts.circle_member;
     circle_member.activate()?;
 
@@ -712,9 +776,7 @@ pub struct LeaveCircle<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn leave_circle(
-    ctx: Context<LeaveCircle>,
-) -> Result<()> {
+pub fn leave_circle(ctx: Context<LeaveCircle>) -> Result<()> {
     let circle_member = &mut ctx.accounts.circle_member;
     circle_member.deactivate()?;
 
@@ -769,6 +831,27 @@ fn emit_circle_membership_event<'info>(
     Ok(())
 }
 
+fn emit_circle_lifecycle_event<'info>(
+    event_program: &AccountInfo<'info>,
+    event_emitter: &mut AccountInfo<'info>,
+    event_batch: &mut AccountInfo<'info>,
+    authority: &AccountInfo<'info>,
+    system_program: &AccountInfo<'info>,
+    event: ProtocolEvent,
+) -> Result<()> {
+    CpiHelper::emit_event_simple(
+        event_program,
+        event_emitter,
+        event_batch,
+        authority,
+        system_program,
+        &crate::ID,
+        event,
+    )?;
+
+    Ok(())
+}
+
 // ==================== Submit Knowledge ====================
 
 #[derive(Accounts)]
@@ -781,13 +864,13 @@ pub struct SubmitKnowledge<'info> {
         bump
     )]
     pub knowledge: Account<'info, Knowledge>,
-    
+
     #[account(mut)]
     pub circle: Account<'info, Circle>,
-    
+
     #[account(mut)]
     pub circle_manager: Account<'info, CircleManager>,
-    
+
     #[account(mut)]
     pub author: Signer<'info>,
 
@@ -801,7 +884,7 @@ pub struct SubmitKnowledge<'info> {
     /// CHECK: Event Batch account
     #[account(mut)]
     pub event_batch: AccountInfo<'info>,
-    
+
     pub system_program: Program<'info, System>,
 }
 
@@ -815,18 +898,25 @@ pub fn submit_knowledge(
     let knowledge = &mut ctx.accounts.knowledge;
     let circle = &mut ctx.accounts.circle;
     let manager = &mut ctx.accounts.circle_manager;
-    
-    // 合约硬约束：仅允许圈层策展人提交知识
+    require_circle_active(circle)?;
+
+    // SAFETY: Only circle curators may submit knowledge.
+    // CN: 仅允许圈层策展人提交知识。
     require!(
         circle.is_curator(&ctx.accounts.author.key()),
         AlchemeError::InvalidOperation
     );
-    
+
     use anchor_lang::solana_program::hash::hash;
     let knowledge_id = hash(
-        &[ipfs_cid.as_bytes(), &Clock::get()?.unix_timestamp.to_le_bytes()].concat()
-    ).to_bytes();
-    
+        &[
+            ipfs_cid.as_bytes(),
+            &Clock::get()?.unix_timestamp.to_le_bytes(),
+        ]
+        .concat(),
+    )
+    .to_bytes();
+
     knowledge.initialize(
         knowledge_id,
         circle.circle_id,
@@ -837,7 +927,7 @@ pub fn submit_knowledge(
         ctx.accounts.author.key(),
         ctx.bumps.knowledge,
     )?;
-    
+
     circle.knowledge_count += 1;
     manager.total_knowledge += 1;
 
@@ -860,7 +950,7 @@ pub fn submit_knowledge(
         &crate::ID,
         event,
     )?;
-    
+
     Ok(())
 }
 
@@ -876,16 +966,16 @@ pub struct ProposeTransfer<'info> {
         bump
     )]
     pub proposal: Account<'info, TransferProposal>,
-    
+
     #[account()]
     pub knowledge: Account<'info, Knowledge>,
-    
+
     #[account(mut)]
     pub circle: Account<'info, Circle>,
-    
+
     #[account(mut)]
     pub proposer: Signer<'info>,
-    
+
     pub system_program: Program<'info, System>,
 }
 
@@ -898,21 +988,24 @@ pub fn propose_transfer(
     let proposal = &mut ctx.accounts.proposal;
     let circle = &ctx.accounts.circle;
     let knowledge = &ctx.accounts.knowledge;
-    
-    // 只有策展人可以提议传递
+    require_circle_active(circle)?;
+
+    // SAFETY: Only curators may propose knowledge transfers.
+    // CN: 只有策展人可以提议传递。
     require!(
         circle.is_curator(&ctx.accounts.proposer.key()),
         AlchemeError::InvalidOperation
     );
-    
-    // 检查知识质量是否达标
+
+    // SAFETY: Knowledge must meet the circle quality threshold before transfer.
+    // CN: 知识质量必须达到圈层阈值后才能传递。
     require!(
         knowledge.quality_score >= circle.knowledge_governance.min_quality_score,
         AlchemeError::InvalidOperation
     );
-    
+
     let proposal_id = Clock::get()?.unix_timestamp as u64;
-    
+
     proposal.initialize(
         proposal_id,
         knowledge_id,
@@ -923,7 +1016,7 @@ pub fn propose_transfer(
         circle.decision_engine.clone(),
         ctx.bumps.proposal,
     )?;
-    
+
     Ok(())
 }
 
@@ -933,25 +1026,25 @@ pub fn propose_transfer(
 pub struct Vote<'info> {
     #[account(mut)]
     pub proposal: Account<'info, TransferProposal>,
-    
+
     #[account()]
     pub circle: Account<'info, Circle>,
-    
+
     pub voter: Signer<'info>,
 }
 
-pub fn vote(
-    ctx: Context<Vote>,
-    vote_for: bool,
-) -> Result<()> {
+pub fn vote(ctx: Context<Vote>, vote_for: bool) -> Result<()> {
+    require_circle_active(&ctx.accounts.circle)?;
     let proposal = &mut ctx.accounts.proposal;
-    
-    // 投票权限由AccessController管理（不在Circle内部）
-    // 简化实现：假设调用前已验证
-    
+
+    // SAFETY: Voting permission is owned by AccessController, not Circle.
+    // CN: 投票权限由 AccessController 管理，不写入 Circle。
+    // CONTEXT: This instruction assumes the caller has completed permission checks upstream.
+    // CN: 该指令假设调用前已完成权限校验。
+
     proposal.add_vote(ctx.accounts.voter.key(), vote_for)?;
     proposal.check_voting_result()?;
-    
+
     Ok(())
 }
 
@@ -961,10 +1054,10 @@ pub fn vote(
 pub struct SubmitAIEvaluation<'info> {
     #[account(mut)]
     pub proposal: Account<'info, TransferProposal>,
-    
+
     #[account()]
     pub circle: Account<'info, Circle>,
-    
+
     pub ai_oracle: Signer<'info>,
 }
 
@@ -974,9 +1067,14 @@ pub fn submit_ai_evaluation(
 ) -> Result<()> {
     let proposal = &mut ctx.accounts.proposal;
     let circle = &ctx.accounts.circle;
-    
+    require_circle_active(circle)?;
+
     match &circle.decision_engine {
-        DecisionEngine::AIAssisted { ai_oracle, confidence_required, .. } => {
+        DecisionEngine::AIAssisted {
+            ai_oracle,
+            confidence_required,
+            ..
+        } => {
             require!(
                 ctx.accounts.ai_oracle.key() == *ai_oracle,
                 AlchemeError::InvalidOperation
@@ -985,11 +1083,11 @@ pub fn submit_ai_evaluation(
                 evaluation.confidence >= *confidence_required,
                 AlchemeError::InvalidOperation
             );
-        },
-        DecisionEngine::FullyAutonomous { .. } => {},
+        }
+        DecisionEngine::FullyAutonomous { .. } => {}
         _ => return Err(AlchemeError::InvalidOperation.into()),
     }
-    
+
     proposal.set_ai_evaluation(evaluation)?;
     Ok(())
 }
@@ -1000,10 +1098,10 @@ pub fn submit_ai_evaluation(
 pub struct ExecuteTransfer<'info> {
     #[account(mut)]
     pub proposal: Account<'info, TransferProposal>,
-    
+
     #[account()]
     pub from_circle: Account<'info, Circle>,
-    
+
     #[account(
         init,
         payer = executor,
@@ -1012,19 +1110,19 @@ pub struct ExecuteTransfer<'info> {
         bump
     )]
     pub transferred_knowledge: Account<'info, Knowledge>,
-    
+
     #[account(mut)]
     pub to_circle: Account<'info, Circle>,
-    
+
     #[account()]
     pub original_knowledge: Account<'info, Knowledge>,
-    
+
     #[account(mut)]
     pub circle_manager: Account<'info, CircleManager>,
-    
+
     #[account(mut)]
     pub executor: Signer<'info>,
-    
+
     pub system_program: Program<'info, System>,
 }
 
@@ -1034,12 +1132,14 @@ pub fn execute_transfer(ctx: Context<ExecuteTransfer>) -> Result<()> {
     let transferred = &mut ctx.accounts.transferred_knowledge;
     let to_circle = &mut ctx.accounts.to_circle;
     let manager = &mut ctx.accounts.circle_manager;
-    
+    require_circle_active(&ctx.accounts.from_circle)?;
+    require_circle_active(to_circle)?;
+
     require!(
         proposal.status == ProposalStatus::Approved,
         AlchemeError::InvalidOperation
     );
-    
+
     transferred.initialize(
         original.knowledge_id,
         to_circle.circle_id,
@@ -1050,17 +1150,18 @@ pub fn execute_transfer(ctx: Context<ExecuteTransfer>) -> Result<()> {
         original.author,
         ctx.bumps.transferred_knowledge,
     )?;
-    
+
     transferred.source_circle = Some(proposal.from_circle);
-    transferred.quality_score = proposal.ai_evaluation
+    transferred.quality_score = proposal
+        .ai_evaluation
         .as_ref()
         .map(|e| e.quality_score)
         .unwrap_or(original.quality_score);
-    
+
     to_circle.knowledge_count += 1;
     manager.total_transfers += 1;
     proposal.status = ProposalStatus::Executed;
-    
+
     Ok(())
 }
 
@@ -1070,7 +1171,7 @@ pub fn execute_transfer(ctx: Context<ExecuteTransfer>) -> Result<()> {
 pub struct UpdateDecisionEngine<'info> {
     #[account(mut)]
     pub circle: Account<'info, Circle>,
-    
+
     pub authority: Signer<'info>,
 }
 
@@ -1079,13 +1180,15 @@ pub fn update_decision_engine(
     new_engine: DecisionEngine,
 ) -> Result<()> {
     let circle = &mut ctx.accounts.circle;
-    
-    // 只有策展人可以更新决策引擎
+    require_circle_active(circle)?;
+
+    // SAFETY: Only curators may update the decision engine.
+    // CN: 只有策展人可以更新决策引擎。
     require!(
         circle.is_curator(&ctx.accounts.authority.key()),
         AlchemeError::InvalidOperation
     );
-    
+
     circle.decision_engine = new_engine;
     Ok(())
 }
@@ -1096,7 +1199,7 @@ pub fn update_decision_engine(
 pub struct UpdateCircleFlags<'info> {
     #[account(mut)]
     pub circle: Account<'info, Circle>,
-    
+
     #[account(mut)]
     pub authority: Signer<'info>,
 
@@ -1114,20 +1217,20 @@ pub struct UpdateCircleFlags<'info> {
     pub system_program: Program<'info, System>,
 }
 
-/// 更新圈层 flags 位字段（kind/mode/min_crystals 等）
-pub fn update_circle_flags(
-    ctx: Context<UpdateCircleFlags>,
-    flags: u64,
-) -> Result<()> {
+/// Update the circle flags bit field.
+/// CN: 更新圈层 flags 位字段，包括 kind、mode、min_crystals 等。
+pub fn update_circle_flags(ctx: Context<UpdateCircleFlags>, flags: u64) -> Result<()> {
     let circle = &mut ctx.accounts.circle;
     let old_flags = circle.flags;
-    
-    // 只有策展人可以更新 flags
+    require_circle_active(circle)?;
+
+    // SAFETY: Only curators may update circle flags.
+    // CN: 只有策展人可以更新 flags。
     require!(
         circle.is_curator(&ctx.accounts.authority.key()),
         AlchemeError::InvalidOperation
     );
-    
+
     circle.flags = flags;
 
     let event = ProtocolEvent::CircleFlagsUpdated {
@@ -1146,6 +1249,249 @@ pub fn update_circle_flags(
         &ctx.accounts.system_program.to_account_info(),
         &crate::ID,
         event,
+    )?;
+
+    Ok(())
+}
+
+// ==================== Archive / Restore Circle ====================
+
+#[derive(AnchorSerialize, AnchorDeserialize)]
+struct LegacyCircleForLifecycleMigration {
+    pub circle_id: u8,
+    pub name: String,
+    pub level: u8,
+    pub parent_circle: Option<u8>,
+    pub child_circles: Vec<u8>,
+    pub curators: Vec<Pubkey>,
+    pub knowledge_count: u64,
+    pub knowledge_governance: KnowledgeGovernance,
+    pub decision_engine: DecisionEngine,
+    pub created_at: i64,
+    pub bump: u8,
+    pub flags: u64,
+}
+
+impl LegacyCircleForLifecycleMigration {
+    fn into_current(self, status: CircleLifecycleStatus) -> Circle {
+        Circle {
+            circle_id: self.circle_id,
+            name: self.name,
+            level: self.level,
+            parent_circle: self.parent_circle,
+            child_circles: self.child_circles,
+            curators: self.curators,
+            knowledge_count: self.knowledge_count,
+            knowledge_governance: self.knowledge_governance,
+            decision_engine: self.decision_engine,
+            created_at: self.created_at,
+            bump: self.bump,
+            flags: self.flags,
+            status,
+        }
+    }
+}
+
+#[derive(Accounts)]
+#[instruction(circle_id: u8)]
+pub struct MigrateCircleLifecycle<'info> {
+    /// CHECK: MIGRATION: Legacy Circle accounts may be one byte smaller than `Circle::SPACE`.
+    /// CN: 生命周期状态字段追加前创建的旧 Circle 账户可能比当前 `Circle::SPACE` 少 1 字节。
+    ///
+    /// SAFETY: The instruction validates owner, discriminator, PDA seeds, and serialized payload manually.
+    /// CN: 该指令会手动校验 owner、discriminator、PDA seeds 和序列化数据。
+    #[account(
+        mut,
+        seeds = [b"circle", circle_id.to_le_bytes().as_ref()],
+        bump
+    )]
+    pub circle: UncheckedAccount<'info>,
+
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
+}
+
+/// MIGRATION: One-time compatibility migration for Circle accounts created before lifecycle status was appended.
+/// CN: 为生命周期状态字段追加前创建的 Circle 账户提供一次性兼容迁移。
+///
+/// INVARIANT: This migration is a semantic no-op; it may allocate space but must not archive or restore the circle.
+/// CN: 迁移不改变业务状态；它只显式补齐账户空间，不执行归档或恢复。
+pub fn migrate_circle_lifecycle(
+    ctx: Context<MigrateCircleLifecycle>,
+    _circle_id: u8,
+) -> Result<()> {
+    let circle_info = ctx.accounts.circle.to_account_info();
+    require!(
+        circle_info.owner == &crate::ID,
+        AlchemeError::InvalidOperation
+    );
+
+    let current_len = circle_info.data_len();
+    require!(
+        current_len == Circle::SPACE || current_len + 1 == Circle::SPACE,
+        AlchemeError::InvalidOperation
+    );
+
+    let current_circle = {
+        let data = circle_info.try_borrow_data()?;
+        require!(data.len() >= 8, AlchemeError::InvalidOperation);
+        require!(
+            &data[..8] == Circle::DISCRIMINATOR,
+            AlchemeError::InvalidOperation
+        );
+
+        let mut current_reader = &data[..];
+        match Circle::try_deserialize(&mut current_reader) {
+            Ok(circle) => circle,
+            Err(_) if current_len + 1 == Circle::SPACE => {
+                let mut legacy_reader = &data[8..];
+                LegacyCircleForLifecycleMigration::deserialize(&mut legacy_reader)
+                    .map_err(|_| error!(AlchemeError::InvalidOperation))?
+                    .into_current(CircleLifecycleStatus::Active)
+            }
+            Err(_) => return Err(AlchemeError::InvalidOperation.into()),
+        }
+    };
+
+    if current_len < Circle::SPACE {
+        let rent = Rent::get()?;
+        let required_lamports = rent.minimum_balance(Circle::SPACE);
+        let current_lamports = circle_info.lamports();
+        if current_lamports < required_lamports {
+            transfer(
+                CpiContext::new(
+                    ctx.accounts.system_program.to_account_info(),
+                    Transfer {
+                        from: ctx.accounts.payer.to_account_info(),
+                        to: circle_info.clone(),
+                    },
+                ),
+                required_lamports - current_lamports,
+            )?;
+        }
+        circle_info.resize(Circle::SPACE)?;
+    }
+
+    let mut serialized = Vec::with_capacity(Circle::SPACE);
+    current_circle.try_serialize(&mut serialized)?;
+    require!(
+        serialized.len() <= Circle::SPACE,
+        AlchemeError::InvalidOperation
+    );
+
+    let mut data = circle_info.try_borrow_mut_data()?;
+    data.fill(0);
+    data[..serialized.len()].copy_from_slice(&serialized);
+
+    Ok(())
+}
+
+#[derive(Accounts)]
+pub struct ArchiveCircle<'info> {
+    #[account(
+        seeds = [b"circle_manager"],
+        bump = circle_manager.bump
+    )]
+    pub circle_manager: Account<'info, CircleManager>,
+
+    #[account(mut)]
+    pub circle: Account<'info, Circle>,
+
+    #[account(mut)]
+    pub authority: Signer<'info>,
+
+    /// CHECK: Event Emitter program
+    pub event_program: AccountInfo<'info>,
+
+    /// CHECK: Event Emitter account
+    #[account(mut)]
+    pub event_emitter: AccountInfo<'info>,
+
+    /// CHECK: Event Batch account
+    #[account(mut)]
+    pub event_batch: AccountInfo<'info>,
+
+    pub system_program: Program<'info, System>,
+}
+
+pub fn archive_circle(ctx: Context<ArchiveCircle>, reason: String) -> Result<()> {
+    let circle_manager = &ctx.accounts.circle_manager;
+    let circle = &mut ctx.accounts.circle;
+    require_circle_lifecycle_manager(circle_manager, circle, &ctx.accounts.authority.key())?;
+
+    let previous_status = circle.status;
+    circle.archive()?;
+
+    emit_circle_lifecycle_event(
+        &ctx.accounts.event_program,
+        &mut ctx.accounts.event_emitter,
+        &mut ctx.accounts.event_batch,
+        &ctx.accounts.authority.to_account_info(),
+        &ctx.accounts.system_program.to_account_info(),
+        ProtocolEvent::CircleArchived {
+            circle_id: circle.circle_id,
+            previous_status,
+            new_status: circle.status,
+            actor: ctx.accounts.authority.key(),
+            reason: Some(reason),
+            timestamp: Clock::get()?.unix_timestamp,
+        },
+    )?;
+
+    Ok(())
+}
+
+#[derive(Accounts)]
+pub struct RestoreCircle<'info> {
+    #[account(
+        seeds = [b"circle_manager"],
+        bump = circle_manager.bump
+    )]
+    pub circle_manager: Account<'info, CircleManager>,
+
+    #[account(mut)]
+    pub circle: Account<'info, Circle>,
+
+    #[account(mut)]
+    pub authority: Signer<'info>,
+
+    /// CHECK: Event Emitter program
+    pub event_program: AccountInfo<'info>,
+
+    /// CHECK: Event Emitter account
+    #[account(mut)]
+    pub event_emitter: AccountInfo<'info>,
+
+    /// CHECK: Event Batch account
+    #[account(mut)]
+    pub event_batch: AccountInfo<'info>,
+
+    pub system_program: Program<'info, System>,
+}
+
+pub fn restore_circle(ctx: Context<RestoreCircle>) -> Result<()> {
+    let circle_manager = &ctx.accounts.circle_manager;
+    let circle = &mut ctx.accounts.circle;
+    require_circle_lifecycle_manager(circle_manager, circle, &ctx.accounts.authority.key())?;
+
+    let previous_status = circle.status;
+    circle.restore()?;
+
+    emit_circle_lifecycle_event(
+        &ctx.accounts.event_program,
+        &mut ctx.accounts.event_emitter,
+        &mut ctx.accounts.event_batch,
+        &ctx.accounts.authority.to_account_info(),
+        &ctx.accounts.system_program.to_account_info(),
+        ProtocolEvent::CircleRestored {
+            circle_id: circle.circle_id,
+            previous_status,
+            new_status: circle.status,
+            actor: ctx.accounts.authority.key(),
+            timestamp: Clock::get()?.unix_timestamp,
+        },
     )?;
 
     Ok(())
@@ -1213,9 +1559,10 @@ pub struct InitializeMembershipAttestorRegistry<'info> {
 pub fn initialize_membership_attestor_registry(
     ctx: Context<InitializeMembershipAttestorRegistry>,
 ) -> Result<()> {
-    ctx.accounts
-        .membership_attestor_registry
-        .initialize(ctx.bumps.membership_attestor_registry, ctx.accounts.admin.key())?;
+    ctx.accounts.membership_attestor_registry.initialize(
+        ctx.bumps.membership_attestor_registry,
+        ctx.accounts.admin.key(),
+    )?;
     Ok(())
 }
 
@@ -1408,9 +1755,13 @@ fn verify_ed25519_binding_proof(
     let current_index = sysvar_instructions::load_current_index_checked(instructions_sysvar)
         .map_err(|_| error!(AlchemeError::ValidationFailed))? as usize;
     require!(current_index > 0, AlchemeError::ValidationFailed);
-    let verify_ix = sysvar_instructions::load_instruction_at_checked(current_index - 1, instructions_sysvar)
-        .map_err(|_| error!(AlchemeError::ValidationFailed))?;
-    require!(verify_ix.program_id == ed25519_program::id(), AlchemeError::ValidationFailed);
+    let verify_ix =
+        sysvar_instructions::load_instruction_at_checked(current_index - 1, instructions_sysvar)
+            .map_err(|_| error!(AlchemeError::ValidationFailed))?;
+    require!(
+        verify_ix.program_id == ed25519_program::id(),
+        AlchemeError::ValidationFailed
+    );
 
     let data = verify_ix.data;
     require!(data.len() >= 16, AlchemeError::ValidationFailed);
@@ -1424,13 +1775,25 @@ fn verify_ed25519_binding_proof(
     let message_size = u16::from_le_bytes([data[12], data[13]]) as usize;
     let message_ix_index = u16::from_le_bytes([data[14], data[15]]);
 
-    require!(signature_ix_index == u16::MAX, AlchemeError::ValidationFailed);
+    require!(
+        signature_ix_index == u16::MAX,
+        AlchemeError::ValidationFailed
+    );
     require!(pubkey_ix_index == u16::MAX, AlchemeError::ValidationFailed);
     require!(message_ix_index == u16::MAX, AlchemeError::ValidationFailed);
     require!(message_size == 32, AlchemeError::ValidationFailed);
-    require!(signature_offset + 64 <= data.len(), AlchemeError::ValidationFailed);
-    require!(pubkey_offset + 32 <= data.len(), AlchemeError::ValidationFailed);
-    require!(message_offset + message_size <= data.len(), AlchemeError::ValidationFailed);
+    require!(
+        signature_offset + 64 <= data.len(),
+        AlchemeError::ValidationFailed
+    );
+    require!(
+        pubkey_offset + 32 <= data.len(),
+        AlchemeError::ValidationFailed
+    );
+    require!(
+        message_offset + message_size <= data.len(),
+        AlchemeError::ValidationFailed
+    );
 
     let signature_slice = &data[signature_offset..signature_offset + 64];
     let pubkey_slice = &data[pubkey_offset..pubkey_offset + 32];
@@ -1487,7 +1850,12 @@ fn verify_binding_context(
         binding_version,
         generated_at,
     );
-    verify_ed25519_binding_proof(instructions_sysvar, issuer_key_id, expected, issued_signature)?;
+    verify_ed25519_binding_proof(
+        instructions_sysvar,
+        issuer_key_id,
+        expected,
+        issued_signature,
+    )?;
     Ok(())
 }
 
@@ -1548,6 +1916,7 @@ pub fn bind_contributor_proof(
     issuer_key_id: Pubkey,
     issued_signature: [u8; 64],
 ) -> Result<()> {
+    require_circle_active(&ctx.accounts.circle)?;
     verify_binding_context(
         &ctx.accounts.circle,
         &ctx.accounts.knowledge,
@@ -1655,6 +2024,7 @@ pub fn bind_and_update_contributors(
     issuer_key_id: Pubkey,
     issued_signature: [u8; 64],
 ) -> Result<()> {
+    require_circle_active(&ctx.accounts.circle)?;
     verify_binding_context(
         &ctx.accounts.circle,
         &ctx.accounts.knowledge,
@@ -1762,7 +2132,8 @@ pub struct UpdateContributors<'info> {
     pub system_program: Program<'info, System>,
 }
 
-/// 兼容路径：已绑定前提下更新贡献者 Root
+/// Compatibility path: update contributor root after proof binding already exists.
+/// CN: 兼容路径：在已完成 proof 绑定的前提下更新贡献者 Root。
 pub fn update_contributors(
     ctx: Context<UpdateContributors>,
     proof_package_hash: [u8; 32],
@@ -1770,6 +2141,7 @@ pub fn update_contributors(
     contributors_count: u16,
 ) -> Result<()> {
     let circle = &ctx.accounts.circle;
+    require_circle_active(circle)?;
     let knowledge = &mut ctx.accounts.knowledge;
     let knowledge_binding = &ctx.accounts.knowledge_binding;
 
@@ -1816,10 +2188,13 @@ pub fn update_contributors(
     Ok(())
 }
 
-// ==================== Extension CPI 接口 ====================
+// ==================== Extension CPI interface ====================
 
-/// 通过扩展程序提升知识评分（需要 CircleExtend 权限）
-/// 用于 contribution-engine 等扩展根据贡献质量提升知识分数
+/// Extension CPI: promote knowledge quality score with `CircleExtend` permission.
+/// CN: 扩展程序 CPI：需要 `CircleExtend` 权限才能提升知识评分。
+///
+/// CONTEXT: Used by extensions such as contribution-engine after evaluating contribution quality.
+/// CN: contribution-engine 等扩展会在评估贡献质量后调用该入口。
 #[derive(Accounts)]
 pub struct CpiPromoteKnowledge<'info> {
     #[account(mut)]
@@ -1828,7 +2203,8 @@ pub struct CpiPromoteKnowledge<'info> {
     #[account()]
     pub circle: Account<'info, Circle>,
 
-    /// CHECK: 调用的扩展程序 ID
+    /// CHECK: Caller extension program ID.
+    /// CN: 调用的扩展程序 ID。
     pub caller_program: AccountInfo<'info>,
 
     /// CHECK: ExtensionRegistry PDA
@@ -1842,7 +2218,8 @@ pub fn cpi_promote_knowledge(
     quality_delta: f64,
     reason: String,
 ) -> Result<()> {
-    // 通过 ExtensionRegistry 验证调用者权限
+    // SAFETY: Verify extension caller permission through ExtensionRegistry.
+    // CN: 通过 ExtensionRegistry 验证扩展调用者权限。
     alcheme_cpi::require_cpi_permission_with_registry!(
         &ctx.accounts.caller_program.key(),
         alcheme_cpi::CpiPermission::CircleExtend,
@@ -1850,19 +2227,26 @@ pub fn cpi_promote_knowledge(
     );
 
     let circle = &ctx.accounts.circle;
+    require_circle_active(circle)?;
     let knowledge = &mut ctx.accounts.knowledge;
     require!(
         knowledge.circle_id == circle.circle_id,
         AlchemeError::InvalidOperation
     );
 
-    // 安全地更新质量分数（限制在 0.0 - 100.0 范围）
+    // SAFETY: Clamp quality score into [0.0, 100.0].
+    // CN: 将质量分数限制在 0.0 到 100.0 范围内。
     let new_score = (knowledge.quality_score + quality_delta).clamp(0.0, 100.0);
     knowledge.quality_score = new_score;
 
-    msg!("Extension 知识评分提升: knowledge={:?}, new_score={}, delta={}, caller={}, reason={}",
-         knowledge.knowledge_id, new_score, quality_delta,
-         ctx.accounts.caller_program.key(), reason);
+    msg!(
+        "Extension knowledge score promoted: knowledge={:?}, new_score={}, delta={}, caller={}, reason={}",
+        knowledge.knowledge_id,
+        new_score,
+        quality_delta,
+        ctx.accounts.caller_program.key(),
+        reason
+    );
 
     Ok(())
 }

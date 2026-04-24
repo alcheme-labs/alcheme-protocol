@@ -1,21 +1,12 @@
-use anchor_lang::{AccountDeserialize, AccountSerialize, InstructionData, ToAccountMetas};
+use alcheme_shared::CircleLifecycleStatus;
 use anchor_lang::solana_program::{
-    account_info::AccountInfo,
-    entrypoint::ProgramResult,
-    program_error::ProgramError,
-    system_program,
-    sysvar::instructions as instructions_sysvar,
+    account_info::AccountInfo, entrypoint::ProgramResult, program_error::ProgramError,
+    system_program, sysvar::instructions as instructions_sysvar,
 };
+use anchor_lang::{AccountDeserialize, AccountSerialize, InstructionData, ToAccountMetas};
 use circle_manager::{
-    accounts as circle_accounts,
-    instruction as circle_instructions,
-    Circle,
-    CircleManager,
-    DecisionEngine,
-    Knowledge,
-    KnowledgeBinding,
-    KnowledgeGovernance,
-    ProofAttestorRegistry,
+    accounts as circle_accounts, instruction as circle_instructions, Circle, CircleManager,
+    DecisionEngine, Knowledge, KnowledgeBinding, KnowledgeGovernance, ProofAttestorRegistry,
 };
 use solana_program_test::{processor, BanksClientError, ProgramTest};
 use solana_sdk::{
@@ -31,6 +22,7 @@ use std::str::FromStr;
 
 // AlchemeError runtime custom codes (Anchor adds +6000 offset).
 const UNAUTHORIZED_ERROR_CODE: u32 = 12001;
+const CIRCLE_ARCHIVED_ERROR_CODE: u32 = 12014;
 const VALIDATION_FAILED_ERROR_CODE: u32 = 12300;
 const EVENT_EMITTER_PROGRAM_ID: &str = "uhPvVgDANHaUzUq2rYEVXJ9vGEBjWjNZ1E6gQJqdBUC";
 const EVENT_EMITTER_SEQUENCE_OFFSET: usize = 8 + 1 + 32 + 8;
@@ -47,7 +39,10 @@ async fn initialize_proof_attestor_registry_rejects_non_circle_manager_admin() {
 
     let circle_manager_admin = Keypair::new();
     let attacker = Keypair::new();
-    program_test.add_account(circle_manager_admin.pubkey(), system_account(20_000_000_000));
+    program_test.add_account(
+        circle_manager_admin.pubkey(),
+        system_account(20_000_000_000),
+    );
     program_test.add_account(attacker.pubkey(), system_account(20_000_000_000));
 
     let (circle_manager_pda, circle_manager_bump) =
@@ -64,7 +59,8 @@ async fn initialize_proof_attestor_registry_rejects_non_circle_manager_admin() {
         })),
     );
 
-    let (registry_pda, _) = Pubkey::find_program_address(&[b"proof_attestor_registry"], &program_id);
+    let (registry_pda, _) =
+        Pubkey::find_program_address(&[b"proof_attestor_registry"], &program_id);
     let context = program_test.start_with_context().await;
     let instruction = Instruction {
         program_id,
@@ -134,6 +130,7 @@ async fn bind_and_update_rejects_unregistered_attestor() {
             created_at: 0,
             bump: circle_bump,
             flags: 0,
+            status: CircleLifecycleStatus::Active,
         })),
     );
 
@@ -281,6 +278,7 @@ async fn bind_and_update_succeeds_with_registered_attestor_and_valid_signature()
             created_at: 0,
             bump: circle_bump,
             flags: 0,
+            status: CircleLifecycleStatus::Active,
         })),
     );
 
@@ -396,7 +394,11 @@ async fn bind_and_update_succeeds_with_registered_attestor_and_valid_signature()
     let knowledge = deserialize_anchor_account::<Knowledge>(&knowledge_account.data);
     assert_eq!(knowledge.contributors_root, contributors_root);
     assert_eq!(knowledge.contributors_count, contributors_count);
-    assert_eq!(knowledge.version(), 2, "version should bump once after update");
+    assert_eq!(
+        knowledge.version(),
+        2,
+        "version should bump once after update"
+    );
 
     let binding_account = context
         .banks_client
@@ -407,8 +409,7 @@ async fn bind_and_update_succeeds_with_registered_attestor_and_valid_signature()
     let binding = deserialize_anchor_account::<KnowledgeBinding>(&binding_account.data);
     assert_eq!(binding.knowledge, knowledge_pda);
     assert_eq!(
-        knowledge.knowledge_id,
-        [0x41; 32],
+        knowledge.knowledge_id, [0x41; 32],
         "knowledge account must continue exposing the frozen knowledge_id field",
     );
     assert_eq!(binding.source_anchor_id, source_anchor_id);
@@ -419,8 +420,7 @@ async fn bind_and_update_succeeds_with_registered_attestor_and_valid_signature()
     assert_eq!(binding.generated_at, generated_at);
     assert_eq!(binding.bound_by, authority.pubkey());
     assert_eq!(
-        binding.source_anchor_id,
-        source_anchor_id,
+        binding.source_anchor_id, source_anchor_id,
         "source_anchor_id is the on-chain provenance path equivalent for the bound draft source",
     );
 }
@@ -466,6 +466,7 @@ async fn bind_and_update_rejects_signature_digest_mismatch() {
             created_at: 0,
             bump: circle_bump,
             flags: 0,
+            status: CircleLifecycleStatus::Active,
         })),
     );
 
@@ -576,6 +577,132 @@ async fn bind_and_update_rejects_signature_digest_mismatch() {
 }
 
 #[tokio::test]
+async fn update_contributors_rejects_archived_circle() {
+    let program_id = circle_manager::id();
+    let mut program_test = ProgramTest::new(
+        "circle_manager",
+        program_id,
+        processor!(process_instruction),
+    );
+
+    let authority = Keypair::new();
+    let event_program = Keypair::new();
+    let event_emitter = Keypair::new();
+    let event_batch = Keypair::new();
+
+    program_test.add_account(authority.pubkey(), system_account(20_000_000_000));
+    program_test.add_account(event_program.pubkey(), system_account(1_000_000_000));
+    program_test.add_account(event_emitter.pubkey(), system_account(1_000_000_000));
+    program_test.add_account(event_batch.pubkey(), system_account(1_000_000_000));
+
+    let circle_id = 10u8;
+    let (circle_pda, circle_bump) =
+        Pubkey::find_program_address(&[b"circle", &[circle_id]], &program_id);
+    program_test.add_account(
+        circle_pda,
+        program_owned_account(serialize_anchor_account(&Circle {
+            circle_id,
+            name: "archived-contributors".to_string(),
+            level: 1,
+            parent_circle: None,
+            child_circles: vec![],
+            curators: vec![authority.pubkey()],
+            knowledge_count: 1,
+            knowledge_governance: default_governance(),
+            decision_engine: DecisionEngine::AdminOnly {
+                admin: authority.pubkey(),
+            },
+            created_at: 0,
+            bump: circle_bump,
+            flags: 0,
+            status: CircleLifecycleStatus::Archived,
+        })),
+    );
+
+    let (knowledge_pda, knowledge_bump) = Pubkey::find_program_address(
+        &[b"knowledge", circle_pda.as_ref(), &0u64.to_le_bytes()],
+        &program_id,
+    );
+    program_test.add_account(
+        knowledge_pda,
+        program_owned_account(serialize_anchor_account(&Knowledge {
+            knowledge_id: [0x81; 32],
+            circle_id,
+            ipfs_cid: "bafybeiarchivedcontributors".to_string(),
+            content_hash: [0x82; 32],
+            title: "archived contributors".to_string(),
+            description: "archived circles reject contributor updates".to_string(),
+            author: authority.pubkey(),
+            quality_score: 1.0,
+            source_circle: None,
+            created_at: 0,
+            view_count: 0,
+            citation_count: 0,
+            bump: knowledge_bump,
+            flags: 1,
+            contributors_root: [0; 32],
+            contributors_count: 0,
+        })),
+    );
+
+    let (knowledge_binding_pda, binding_bump) =
+        Pubkey::find_program_address(&[b"knowledge_binding", knowledge_pda.as_ref()], &program_id);
+    let proof_package_hash = [0x83; 32];
+    let contributors_root = [0x84; 32];
+    program_test.add_account(
+        knowledge_binding_pda,
+        program_owned_account(serialize_anchor_account(&KnowledgeBinding {
+            knowledge: knowledge_pda,
+            source_anchor_id: [0x85; 32],
+            proof_package_hash,
+            contributors_root,
+            contributors_count: 2,
+            binding_version: 1,
+            generated_at: 1_762_366_800,
+            bound_at: 1_762_366_900,
+            bound_by: authority.pubkey(),
+            bump: binding_bump,
+        })),
+    );
+
+    let context = program_test.start_with_context().await;
+    let instruction = Instruction {
+        program_id,
+        accounts: circle_accounts::UpdateContributors {
+            knowledge: knowledge_pda,
+            circle: circle_pda,
+            knowledge_binding: knowledge_binding_pda,
+            authority: authority.pubkey(),
+            event_program: event_program.pubkey(),
+            event_emitter: event_emitter.pubkey(),
+            event_batch: event_batch.pubkey(),
+            system_program: system_program::ID,
+        }
+        .to_account_metas(None),
+        data: circle_instructions::UpdateContributors {
+            proof_package_hash,
+            contributors_root,
+            contributors_count: 2,
+        }
+        .data(),
+    };
+
+    let tx = Transaction::new_signed_with_payer(
+        &[instruction],
+        Some(&context.payer.pubkey()),
+        &[&context.payer, &authority],
+        context.last_blockhash,
+    );
+
+    let error = context
+        .banks_client
+        .process_transaction(tx)
+        .await
+        .expect_err("archived circle should reject contributor updates");
+    assert_custom_code(error, CIRCLE_ARCHIVED_ERROR_CODE);
+}
+
+#[tokio::test]
 async fn update_contributors_rejects_authority_when_not_bound_by() {
     let program_id = circle_manager::id();
     let mut program_test = ProgramTest::new(
@@ -615,6 +742,7 @@ async fn update_contributors_rejects_authority_when_not_bound_by() {
             created_at: 0,
             bump: circle_bump,
             flags: 0,
+            status: CircleLifecycleStatus::Active,
         })),
     );
 
@@ -707,7 +835,10 @@ fn assert_custom_code(error: BanksClientError, expected_code: u32) {
             _,
             InstructionError::Custom(code),
         )) => {
-            assert_eq!(code, expected_code, "expected custom code {expected_code}, got {code}");
+            assert_eq!(
+                code, expected_code,
+                "expected custom code {expected_code}, got {code}"
+            );
         }
         other => panic!("expected custom error code {expected_code}, got {other:?}"),
     }
@@ -747,17 +878,14 @@ fn process_mock_event_emitter_instruction<'a, 'b, 'c, 'd>(
     accounts: &'b [AccountInfo<'c>],
     _instruction_data: &'d [u8],
 ) -> ProgramResult {
-    let event_emitter = accounts
-        .first()
-        .ok_or(ProgramError::NotEnoughAccountKeys)?;
+    let event_emitter = accounts.first().ok_or(ProgramError::NotEnoughAccountKeys)?;
     let mut data = event_emitter.try_borrow_mut_data()?;
     if data.len() < EVENT_EMITTER_MIN_DATA_SIZE {
         return Err(ProgramError::InvalidAccountData);
     }
     let mut sequence_bytes = [0u8; 8];
-    sequence_bytes.copy_from_slice(
-        &data[EVENT_EMITTER_SEQUENCE_OFFSET..EVENT_EMITTER_SEQUENCE_OFFSET + 8],
-    );
+    sequence_bytes
+        .copy_from_slice(&data[EVENT_EMITTER_SEQUENCE_OFFSET..EVENT_EMITTER_SEQUENCE_OFFSET + 8]);
     let next_sequence = u64::from_le_bytes(sequence_bytes).saturating_add(1);
     data[EVENT_EMITTER_SEQUENCE_OFFSET..EVENT_EMITTER_SEQUENCE_OFFSET + 8]
         .copy_from_slice(&next_sequence.to_le_bytes());

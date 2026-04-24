@@ -681,10 +681,17 @@
         "inviteRequired": "Este círculo es solo por invitación. Pide acceso a un administrador.",
         "insufficientCrystals": "Todavía no tienes suficientes cristales para entrar.",
         "banned": "Tu acceso a este círculo está restringido por ahora.",
+        "archived": "Este círculo está archivado y ya no acepta nuevas incorporaciones.",
         "requestStateChanged": "El estado de la solicitud cambió. Actualiza la página e inténtalo otra vez.",
         "membershipBridgeUnavailable": "La identidad ya se creó, pero la finalización para entrar al círculo no está disponible por ahora. Vuelve a intentar unirte.",
         "fallback": "No se pudo unir al círculo. Inténtalo de nuevo."
       }
+    },
+    "archived": {
+      "badge": "Archivado",
+      "notice": "Este círculo está archivado. Su historial sigue visible, pero las nuevas incorporaciones y otras acciones de escritura están desactivadas.",
+      "noticeWithReason": "Este círculo está archivado. Su historial sigue visible, pero las nuevas incorporaciones y otras acciones de escritura están desactivadas. Motivo: {reason}",
+      "meta": "Archivado {date}"
     },
     "levels": {
       "Visitor": "Visitante",

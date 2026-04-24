@@ -205,6 +205,8 @@ impl EventEmitterUtils {
             ProtocolEvent::CircleCreated { timestamp, .. } |
             ProtocolEvent::CircleMembershipChanged { timestamp, .. } |
             ProtocolEvent::CircleFlagsUpdated { timestamp, .. } |
+            ProtocolEvent::CircleArchived { timestamp, .. } |
+            ProtocolEvent::CircleRestored { timestamp, .. } |
             ProtocolEvent::KnowledgeSubmitted { timestamp, .. } |
             ProtocolEvent::ContributorsUpdated { timestamp, .. } |
             ProtocolEvent::ProofAttestorRegistered { timestamp, .. } |
@@ -262,7 +264,9 @@ impl EventEmitterUtils {
 
             ProtocolEvent::CircleCreated { .. } |
             ProtocolEvent::CircleMembershipChanged { .. } |
-            ProtocolEvent::CircleFlagsUpdated { .. } => EventType::Circle,
+            ProtocolEvent::CircleFlagsUpdated { .. } |
+            ProtocolEvent::CircleArchived { .. } |
+            ProtocolEvent::CircleRestored { .. } => EventType::Circle,
 
             ProtocolEvent::KnowledgeSubmitted { .. } |
             ProtocolEvent::ContributorsUpdated { .. } |
@@ -292,6 +296,8 @@ impl EventEmitterUtils {
             ProtocolEvent::TokensSpent { identity_id, .. } => Some(*identity_id),
             ProtocolEvent::SocialStatsUpdated { identity_id, .. } => Some(*identity_id),
             ProtocolEvent::CircleMembershipChanged { actor, .. } => Some(*actor),
+            ProtocolEvent::CircleArchived { actor, .. } => Some(*actor),
+            ProtocolEvent::CircleRestored { actor, .. } => Some(*actor),
             ProtocolEvent::ContributorProofBound { bound_by, .. } => Some(*bound_by),
             ProtocolEvent::ProofAttestorRegistered { registered_by, .. } => Some(*registered_by),
             ProtocolEvent::MembershipAttestorRegistered { registered_by, .. } => Some(*registered_by),

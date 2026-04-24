@@ -1,8 +1,8 @@
-use anchor_lang::prelude::*;
 use alcheme_shared::{
-    types::*, errors::*, constants::*, utils::*, validation::*,
-    events::*, access::*, content::*, factory::*
+    access::*, constants::*, content::*, errors::*, events::*, factory::*, types::*, utils::*,
+    validation::*,
 };
+use anchor_lang::prelude::*;
 
 pub mod instructions;
 pub mod state;
@@ -16,12 +16,14 @@ declare_id!("GZswb1rGbZfoiapkvatDuMZrptVAX2p1pEVDSrMuyLqQ");
 pub mod circle_manager {
     use super::*;
 
-    /// 初始化圈层管理器
+    /// Initialize the circle manager.
+    /// CN: 初始化圈层管理器。
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
         instructions::initialize(ctx)
     }
 
-    /// 创建圈层
+    /// Create a circle.
+    /// CN: 创建圈层。
     pub fn create_circle(
         ctx: Context<CreateCircle>,
         circle_id: u8,
@@ -31,7 +33,15 @@ pub mod circle_manager {
         knowledge_governance: KnowledgeGovernance,
         decision_engine: DecisionEngine,
     ) -> Result<()> {
-        instructions::create_circle(ctx, circle_id, name, level, parent_circle, knowledge_governance, decision_engine)
+        instructions::create_circle(
+            ctx,
+            circle_id,
+            name,
+            level,
+            parent_circle,
+            knowledge_governance,
+            decision_engine,
+        )
     }
 
     pub fn anchor_circle_fork(
@@ -48,36 +58,25 @@ pub mod circle_manager {
         )
     }
 
-    /// 添加策展人（通过AccessController验证）
-    pub fn add_curator(
-        ctx: Context<AddCurator>,
-        curator: Pubkey,
-    ) -> Result<()> {
+    /// Add a curator after AccessController validation.
+    /// CN: 通过 AccessController 验证后添加策展人。
+    pub fn add_curator(ctx: Context<AddCurator>, curator: Pubkey) -> Result<()> {
         instructions::add_curator(ctx, curator)
     }
 
-    pub fn join_circle(
-        ctx: Context<JoinCircle>,
-    ) -> Result<()> {
+    pub fn join_circle(ctx: Context<JoinCircle>) -> Result<()> {
         instructions::join_circle(ctx)
     }
 
-    pub fn leave_circle(
-        ctx: Context<LeaveCircle>,
-    ) -> Result<()> {
+    pub fn leave_circle(ctx: Context<LeaveCircle>) -> Result<()> {
         instructions::leave_circle(ctx)
     }
 
-    pub fn add_circle_member(
-        ctx: Context<AddCircleMember>,
-        role: CircleMemberRole,
-    ) -> Result<()> {
+    pub fn add_circle_member(ctx: Context<AddCircleMember>, role: CircleMemberRole) -> Result<()> {
         instructions::add_circle_member(ctx, role)
     }
 
-    pub fn remove_circle_member(
-        ctx: Context<RemoveCircleMember>,
-    ) -> Result<()> {
+    pub fn remove_circle_member(ctx: Context<RemoveCircleMember>) -> Result<()> {
         instructions::remove_circle_member(ctx)
     }
 
@@ -97,7 +96,8 @@ pub mod circle_manager {
         instructions::claim_circle_membership(ctx, admission, issuer_key_id, issued_signature)
     }
 
-    /// 提交知识到圈层（curator-only）
+    /// Submit knowledge to a circle.
+    /// CN: 向圈层提交知识，仅 curator 可调用。
     pub fn submit_knowledge(
         ctx: Context<SubmitKnowledge>,
         ipfs_cid: String,
@@ -108,7 +108,8 @@ pub mod circle_manager {
         instructions::submit_knowledge(ctx, ipfs_cid, content_hash, title, description)
     }
 
-    /// 提议知识传递
+    /// Propose a knowledge transfer.
+    /// CN: 提议知识传递。
     pub fn propose_transfer(
         ctx: Context<ProposeTransfer>,
         knowledge_id: [u8; 32],
@@ -118,15 +119,14 @@ pub mod circle_manager {
         instructions::propose_transfer(ctx, knowledge_id, to_circles, transfer_type)
     }
 
-    /// 投票
-    pub fn vote(
-        ctx: Context<Vote>,
-        vote_for: bool,
-    ) -> Result<()> {
+    /// Vote on a transfer proposal.
+    /// CN: 对传递提案投票。
+    pub fn vote(ctx: Context<Vote>, vote_for: bool) -> Result<()> {
         instructions::vote(ctx, vote_for)
     }
 
-    /// AI提交评估
+    /// Submit an AI evaluation.
+    /// CN: 提交 AI 评估。
     pub fn submit_ai_evaluation(
         ctx: Context<SubmitAIEvaluation>,
         evaluation: AIEvaluation,
@@ -134,14 +134,14 @@ pub mod circle_manager {
         instructions::submit_ai_evaluation(ctx, evaluation)
     }
 
-    /// 执行已批准的传递
-    pub fn execute_transfer(
-        ctx: Context<ExecuteTransfer>,
-    ) -> Result<()> {
+    /// Execute an approved transfer.
+    /// CN: 执行已批准的传递。
+    pub fn execute_transfer(ctx: Context<ExecuteTransfer>) -> Result<()> {
         instructions::execute_transfer(ctx)
     }
 
-    /// 更新决策引擎
+    /// Update the decision engine.
+    /// CN: 更新决策引擎。
     pub fn update_decision_engine(
         ctx: Context<UpdateDecisionEngine>,
         new_engine: DecisionEngine,
@@ -149,22 +149,43 @@ pub mod circle_manager {
         instructions::update_decision_engine(ctx, new_engine)
     }
 
-    /// 更新圈层 flags 位字段（kind/mode/min_crystals 等）
-    pub fn update_circle_flags(
-        ctx: Context<UpdateCircleFlags>,
-        flags: u64,
-    ) -> Result<()> {
+    /// Update the circle flags bit field.
+    /// CN: 更新圈层 flags 位字段，包括 kind、mode、min_crystals 等。
+    pub fn update_circle_flags(ctx: Context<UpdateCircleFlags>, flags: u64) -> Result<()> {
         instructions::update_circle_flags(ctx, flags)
     }
 
-    /// 初始化贡献证明签发者注册表
+    /// Archive a circle. History remains readable, but new writes are rejected.
+    /// CN: 归档圈层。归档后历史仍可读取，但新的写操作会被拒绝。
+    pub fn archive_circle(ctx: Context<ArchiveCircle>, reason: String) -> Result<()> {
+        instructions::archive_circle(ctx, reason)
+    }
+
+    /// Restore an archived circle so normal writes are accepted again.
+    /// CN: 恢复已归档圈层，使其重新接受正常写操作。
+    pub fn restore_circle(ctx: Context<RestoreCircle>) -> Result<()> {
+        instructions::restore_circle(ctx)
+    }
+
+    /// Migrate a legacy Circle account so lifecycle status has explicit account space.
+    /// CN: 迁移旧 Circle 账户，使 lifecycle status 字段拥有显式账户空间。
+    pub fn migrate_circle_lifecycle(
+        ctx: Context<MigrateCircleLifecycle>,
+        circle_id: u8,
+    ) -> Result<()> {
+        instructions::migrate_circle_lifecycle(ctx, circle_id)
+    }
+
+    /// Initialize the proof attestor registry.
+    /// CN: 初始化贡献证明签发者注册表。
     pub fn initialize_proof_attestor_registry(
         ctx: Context<InitializeProofAttestorRegistry>,
     ) -> Result<()> {
         instructions::initialize_proof_attestor_registry(ctx)
     }
 
-    /// 注册贡献证明签发者（admin-only）
+    /// Register a proof attestor.
+    /// CN: 注册贡献证明签发者，仅 admin 可调用。
     pub fn register_proof_attestor(
         ctx: Context<RegisterProofAttestor>,
         attestor: Pubkey,
@@ -172,14 +193,16 @@ pub mod circle_manager {
         instructions::register_proof_attestor(ctx, attestor)
     }
 
-    /// 初始化成员准入签发者注册表
+    /// Initialize the membership attestor registry.
+    /// CN: 初始化成员准入签发者注册表。
     pub fn initialize_membership_attestor_registry(
         ctx: Context<InitializeMembershipAttestorRegistry>,
     ) -> Result<()> {
         instructions::initialize_membership_attestor_registry(ctx)
     }
 
-    /// 注册成员准入签发者（admin-only）
+    /// Register a membership attestor.
+    /// CN: 注册成员准入签发者，仅 admin 可调用。
     pub fn register_membership_attestor(
         ctx: Context<RegisterMembershipAttestor>,
         attestor: Pubkey,
@@ -187,7 +210,8 @@ pub mod circle_manager {
         instructions::register_membership_attestor(ctx, attestor)
     }
 
-    /// 撤销成员准入签发者（admin-only）
+    /// Revoke a membership attestor.
+    /// CN: 撤销成员准入签发者，仅 admin 可调用。
     pub fn revoke_membership_attestor(
         ctx: Context<RevokeMembershipAttestor>,
         attestor: Pubkey,
@@ -195,7 +219,8 @@ pub mod circle_manager {
         instructions::revoke_membership_attestor(ctx, attestor)
     }
 
-    /// 绑定贡献证明（创建 KnowledgeBinding PDA）
+    /// Bind a contributor proof by creating the KnowledgeBinding PDA.
+    /// CN: 绑定贡献证明，并创建 KnowledgeBinding PDA。
     pub fn bind_contributor_proof(
         ctx: Context<BindContributorProof>,
         source_anchor_id: [u8; 32],
@@ -220,7 +245,8 @@ pub mod circle_manager {
         )
     }
 
-    /// 严格主路径：原子执行 proof 绑定与 contributors 更新
+    /// Bind the proof and update contributors atomically.
+    /// CN: 严格主路径：原子执行 proof 绑定与 contributors 更新。
     pub fn bind_and_update_contributors(
         ctx: Context<BindAndUpdateContributors>,
         source_anchor_id: [u8; 32],
@@ -245,7 +271,8 @@ pub mod circle_manager {
         )
     }
 
-    /// 兼容路径：在已绑定前提下更新 contributors
+    /// Compatibility path: update contributors after proof binding already exists.
+    /// CN: 兼容路径：在已完成 proof 绑定的前提下更新 contributors。
     pub fn update_contributors(
         ctx: Context<UpdateContributors>,
         proof_package_hash: [u8; 32],
@@ -260,9 +287,10 @@ pub mod circle_manager {
         )
     }
 
-    // ==================== Extension CPI 接口 ====================
+    // ==================== Extension CPI interface ====================
 
-    /// 通过扩展程序提升知识评分（需要 CircleExtend 权限 + circle/knowledge 关系一致）
+    /// Extension CPI: promote knowledge quality score with `CircleExtend` permission.
+    /// CN: 扩展程序 CPI：需要 `CircleExtend` 权限，且 circle/knowledge 关系必须一致。
     pub fn cpi_promote_knowledge(
         ctx: Context<CpiPromoteKnowledge>,
         quality_delta: f64,

@@ -616,10 +616,14 @@ export function membershipRouter(prisma: PrismaClient, redis: Redis): Router {
                     circleType: true,
                     minCrystals: true,
                     creatorId: true,
+                    lifecycleStatus: true,
                 },
             });
             if (!circle) {
                 return res.status(404).json({ error: 'circle_not_found' });
+            }
+            if (circle.lifecycleStatus === 'Archived') {
+                return res.status(409).json({ error: 'circle_archived' });
             }
 
             const actor = await prisma.user.findUnique({

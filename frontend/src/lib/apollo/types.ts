@@ -116,12 +116,17 @@ export interface GQLPublicFlowItem {
 }
 
 export type IdentityLevel = 'Visitor' | 'Initiate' | 'Member' | 'Elder';
+export type GQLCircleLifecycleStatus = 'Active' | 'Archived';
 
 export interface GQLCircle {
     id: number;
     name: string;
     description: string | null;
     avatarUri: string | null;
+    lifecycleStatus: GQLCircleLifecycleStatus;
+    archivedAt: string | null;
+    archivedByPubkey: string | null;
+    archiveReason: string | null;
     circleType: 'Open' | 'Closed' | 'Secret';
     level: number;
     knowledgeCount: number;

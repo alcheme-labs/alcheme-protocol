@@ -325,6 +325,21 @@ pub enum ProtocolEvent {
         updated_by: Pubkey,
         timestamp: i64,
     },
+    CircleArchived {
+        circle_id: u8,
+        previous_status: CircleLifecycleStatus,
+        new_status: CircleLifecycleStatus,
+        actor: Pubkey,
+        reason: Option<String>,
+        timestamp: i64,
+    },
+    CircleRestored {
+        circle_id: u8,
+        previous_status: CircleLifecycleStatus,
+        new_status: CircleLifecycleStatus,
+        actor: Pubkey,
+        timestamp: i64,
+    },
     CircleMembershipChanged {
         circle_id: u8,
         member: Pubkey,
@@ -610,6 +625,13 @@ pub enum CircleMemberStatus {
     Inactive,
 }
 
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub enum CircleLifecycleStatus {
+    #[default]
+    Active,
+    Archived,
+}
+
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub enum CircleMembershipAction {
     Joined,
@@ -884,6 +906,8 @@ impl EventSubscription {
 
             ProtocolEvent::CircleCreated { .. } |
             ProtocolEvent::CircleFlagsUpdated { .. } |
+            ProtocolEvent::CircleArchived { .. } |
+            ProtocolEvent::CircleRestored { .. } |
             ProtocolEvent::CircleMembershipChanged { .. } => EventType::Circle,
 
             ProtocolEvent::KnowledgeSubmitted { .. } |
@@ -935,6 +959,8 @@ impl EventSubscription {
             ProtocolEvent::ProgramUpgraded { timestamp, .. } |
             ProtocolEvent::CircleCreated { timestamp, .. } |
             ProtocolEvent::CircleFlagsUpdated { timestamp, .. } |
+            ProtocolEvent::CircleArchived { timestamp, .. } |
+            ProtocolEvent::CircleRestored { timestamp, .. } |
             ProtocolEvent::CircleMembershipChanged { timestamp, .. } |
             ProtocolEvent::KnowledgeSubmitted { timestamp, .. } |
             ProtocolEvent::ContributorsUpdated { timestamp, .. } => *timestamp,
@@ -956,6 +982,8 @@ impl EventSubscription {
             ProtocolEvent::ContentInteraction { actor, .. } => Some(*actor),
             ProtocolEvent::CircleCreated { creator, .. } => Some(*creator),
             ProtocolEvent::CircleFlagsUpdated { updated_by, .. } => Some(*updated_by),
+            ProtocolEvent::CircleArchived { actor, .. } => Some(*actor),
+            ProtocolEvent::CircleRestored { actor, .. } => Some(*actor),
             ProtocolEvent::CircleMembershipChanged { actor, .. } => Some(*actor),
             ProtocolEvent::KnowledgeSubmitted { author, .. } => Some(*author),
             ProtocolEvent::ContributorsUpdated { updated_by, .. } => Some(*updated_by),

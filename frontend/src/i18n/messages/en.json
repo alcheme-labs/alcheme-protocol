@@ -681,10 +681,17 @@
         "inviteRequired": "This circle is invite-only. Ask an admin for access.",
         "insufficientCrystals": "You do not have enough crystals to join yet.",
         "banned": "Your access to this circle is currently restricted.",
+        "archived": "This circle is archived and cannot accept new joins.",
         "requestStateChanged": "That request state changed. Refresh and try again.",
         "membershipBridgeUnavailable": "Your identity was created, but the circle join finalization is temporarily unavailable. Please try joining again.",
         "fallback": "Could not join the circle. Please try again."
       }
+    },
+    "archived": {
+      "badge": "Archived",
+      "notice": "This circle is archived. It remains readable, but new joins and other write actions are disabled.",
+      "noticeWithReason": "This circle is archived. It remains readable, but new joins and other write actions are disabled. Reason: {reason}",
+      "meta": "Archived {date}"
     },
     "levels": {
       "Visitor": "Visitor",

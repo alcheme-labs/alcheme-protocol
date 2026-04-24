@@ -153,7 +153,9 @@ function ComposePageInner() {
     const [validationError, setValidationError] = useState<string | null>(null);
 
     const { data: circlesData } = useQuery<MyCirclesResponse>(GET_MY_CIRCLES);
-    const circles = circlesData?.myCircles ?? [];
+    // SAFETY: Compose is a write flow, so archived circles are filtered out.
+    // CN: 发布页属于写入流程，因此过滤已归档圈层。
+    const circles = (circlesData?.myCircles ?? []).filter((circle) => circle.lifecycleStatus !== 'Archived');
     const hasCircleChoices = circles.length > 0;
     const circleTargets = useMemo(() => buildCircleTargets(circles), [circles]);
     const circleTargetGroups = useMemo(() => groupCircleTargets(circleTargets), [circleTargets]);

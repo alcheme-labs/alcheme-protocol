@@ -569,6 +569,35 @@ impl EventParser {
                     .await?;
             }
 
+            ProtocolEvent::CircleArchived {
+                circle_id,
+                actor,
+                reason,
+                timestamp,
+                ..
+            } => {
+                info!("🗃️ Circle archived: id={}", circle_id);
+                self.db_writer
+                    .archive_circle(
+                        circle_id as i32,
+                        &actor.to_string(),
+                        reason.as_deref(),
+                        timestamp,
+                    )
+                    .await?;
+            }
+
+            ProtocolEvent::CircleRestored {
+                circle_id,
+                timestamp,
+                ..
+            } => {
+                info!("♻️ Circle restored: id={}", circle_id);
+                self.db_writer
+                    .restore_circle(circle_id as i32, timestamp)
+                    .await?;
+            }
+
             ProtocolEvent::CircleMembershipChanged {
                 circle_id,
                 member,

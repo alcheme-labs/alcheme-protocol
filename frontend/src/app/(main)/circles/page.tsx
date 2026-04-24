@@ -57,7 +57,7 @@ export default function CirclesPage() {
     const loading = isSearching ? searchLoading : allLoading;
     const displayCircles: GQLCircle[] = Array.from(new Map((
         isSearching ? (searchCircleData?.searchCircles ?? []) : (allData?.allCircles ?? [])
-    ).filter(isRootMainCircle).map((circle) => [circle.id, circle] as const)).values());
+    ).filter((circle) => isRootMainCircle(circle) && circle.lifecycleStatus !== 'Archived').map((circle) => [circle.id, circle] as const)).values());
 
     const hasSearchResults = searchPostData?.searchPosts && searchPostData.searchPosts.length > 0;
     const relatedResultsHint = hasSearchResults

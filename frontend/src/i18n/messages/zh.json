@@ -681,10 +681,17 @@
         "inviteRequired": "当前圈层采用邀请制，请联系管理员获取邀请。",
         "insufficientCrystals": "你现在的晶体数还不够加入。",
         "banned": "你当前被限制进入这个圈层。",
+        "archived": "该圈层已归档，暂时不接受新的加入。",
         "requestStateChanged": "请求状态已经变化，请刷新后重试。",
         "membershipBridgeUnavailable": "身份已经创建成功，但加入圈层的最终确认暂时不可用。请直接重试加入。",
         "fallback": "加入圈层失败，请稍后重试。"
       }
+    },
+    "archived": {
+      "badge": "已归档",
+      "notice": "该圈层已归档。历史内容仍可阅读，但新的加入和其他写入操作已停用。",
+      "noticeWithReason": "该圈层已归档。历史内容仍可阅读，但新的加入和其他写入操作已停用。原因：{reason}",
+      "meta": "归档于 {date}"
     },
     "levels": {
       "Visitor": "游客",

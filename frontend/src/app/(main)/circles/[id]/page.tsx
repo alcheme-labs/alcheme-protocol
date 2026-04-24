@@ -447,7 +447,7 @@ export default function CircleDetailPage() {
     const mappedSubCircles: SubCircle[] = useMemo(() => {
         if (data?.circle) {
             const root = data.circle;
-            const descendants = data.circleDescendants || [];
+            const descendants = (data.circleDescendants || []).filter((circle) => circle.lifecycleStatus !== 'Archived');
             const res: SubCircle[] = [];
             const knownCircleIds = new Set<number>([root.id, ...descendants.map((c) => c.id)]);
 
@@ -1506,6 +1506,15 @@ export default function CircleDetailPage() {
     const activeDiscussionCircleData = useMemo(() => {
         return circleById.get(activeDiscussionCircleId) || null;
     }, [circleById, activeDiscussionCircleId]);
+    const activeCircleArchived = activeDiscussionCircleData?.lifecycleStatus === 'Archived';
+    const activeCircleArchivedReason = normalizeIdentityCopy(activeDiscussionCircleData?.archiveReason || '');
+    const activeCircleArchivedAt = activeDiscussionCircleData?.archivedAt || null;
+    const archivedCircleNotice = useMemo(() => {
+        if (activeCircleArchivedReason) {
+            return circleDetailT('archived.noticeWithReason', { reason: activeCircleArchivedReason });
+        }
+        return circleDetailT('archived.notice');
+    }, [activeCircleArchivedReason, circleDetailT]);
     const activeDiscussionMembers = (activeDiscussionCircleData?.members || []) as Array<{
         user: {
             id: number;
@@ -2258,7 +2267,24 @@ export default function CircleDetailPage() {
                         </div>
                     )}
                     {/* ── Membership Join Banner ── */}
-                    {(!activeCircleMembershipSnapshot || activeCircleMembershipSnapshot.joinState !== 'joined') && (
+                    {activeCircleArchived && (
+                        <div className={styles.joinBanner}>
+                            <div className={styles.joinBannerMain}>
+                                <span className={styles.joinBannerHint}>
+                                    {archivedCircleNotice}
+                                </span>
+                                <span className={styles.joinBannerActionDisabled}>
+                                    {circleDetailT('archived.badge')}
+                                </span>
+                            </div>
+                            {activeCircleArchivedAt && (
+                                <div className={styles.archivedBannerMeta}>
+                                    {circleDetailT('archived.meta', { date: formatRelativeTime(activeCircleArchivedAt) })}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    {!activeCircleArchived && (!activeCircleMembershipSnapshot || activeCircleMembershipSnapshot.joinState !== 'joined') && (
                         <div className={styles.joinBanner}>
                             <div className={styles.joinBannerMain}>
                                 <span className={styles.joinBannerHint}>

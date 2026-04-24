@@ -95,6 +95,12 @@
     line-height: 1.5;
 }
 
+.archivedBannerMeta {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--color-text-tertiary);
+}
+
 .identityTransitionBanner {
     display: flex;
     flex-direction: column;

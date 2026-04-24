@@ -64,7 +64,10 @@
           "signer": true
         },
         {
-          "name": "member"
+          "name": "member",
+          "docs": [
+            "CN: 目标成员钱包地址，仅用于成员事实 key。"
+          ]
         },
         {
           "name": "event_program"
@@ -96,7 +99,8 @@
     {
       "name": "add_curator",
       "docs": [
-        "添加策展人（通过AccessController验证）"
+        "Add a curator after AccessController validation.",
+        "CN: 通过 AccessController 验证后添加策展人。"
       ],
       "discriminator": [
         242,
@@ -114,7 +118,10 @@
           "writable": true
         },
         {
-          "name": "access_controller"
+          "name": "access_controller",
+          "docs": [
+            "CN: 权限通过 AccessController 验证。"
+          ]
         },
         {
           "name": "authority",
@@ -182,9 +189,85 @@
       ]
     },
     {
+      "name": "archive_circle",
+      "docs": [
+        "Archive a circle. History remains readable, but new writes are rejected.",
+        "CN: 归档圈层。归档后历史仍可读取，但新的写操作会被拒绝。"
+      ],
+      "discriminator": [
+        252,
+        9,
+        55,
+        129,
+        172,
+        68,
+        30,
+        40
+      ],
+      "accounts": [
+        {
+          "name": "circle_manager",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  105,
+                  114,
+                  99,
+                  108,
+                  101,
+                  95,
+                  109,
+                  97,
+                  110,
+                  97,
+                  103,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "circle",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "reason",
+          "type": "string"
+        }
+      ]
+    },
+    {
       "name": "bind_and_update_contributors",
       "docs": [
-        "严格主路径：原子执行 proof 绑定与 contributors 更新"
+        "Bind the proof and update contributors atomically.",
+        "CN: 严格主路径：原子执行 proof 绑定与 contributors 更新。"
       ],
       "discriminator": [
         151,
@@ -356,7 +439,8 @@
     {
       "name": "bind_contributor_proof",
       "docs": [
-        "绑定贡献证明（创建 KnowledgeBinding PDA）"
+        "Bind a contributor proof by creating the KnowledgeBinding PDA.",
+        "CN: 绑定贡献证明，并创建 KnowledgeBinding PDA。"
       ],
       "discriminator": [
         237,
@@ -653,7 +737,8 @@
     {
       "name": "cpi_promote_knowledge",
       "docs": [
-        "通过扩展程序提升知识评分（需要 CircleExtend 权限 + circle/knowledge 关系一致）"
+        "Extension CPI: promote knowledge quality score with `CircleExtend` permission.",
+        "CN: 扩展程序 CPI：需要 `CircleExtend` 权限，且 circle/knowledge 关系必须一致。"
       ],
       "discriminator": [
         30,
@@ -674,7 +759,10 @@
           "name": "circle"
         },
         {
-          "name": "caller_program"
+          "name": "caller_program",
+          "docs": [
+            "CN: 调用的扩展程序 ID。"
+          ]
         },
         {
           "name": "extension_registry"
@@ -698,7 +786,8 @@
     {
       "name": "create_circle",
       "docs": [
-        "创建圈层"
+        "Create a circle.",
+        "CN: 创建圈层。"
       ],
       "discriminator": [
         186,
@@ -799,7 +888,8 @@
     {
       "name": "execute_transfer",
       "docs": [
-        "执行已批准的传递"
+        "Execute an approved transfer.",
+        "CN: 执行已批准的传递。"
       ],
       "discriminator": [
         233,
@@ -876,7 +966,8 @@
     {
       "name": "initialize",
       "docs": [
-        "初始化圈层管理器"
+        "Initialize the circle manager.",
+        "CN: 初始化圈层管理器。"
       ],
       "discriminator": [
         175,
@@ -931,7 +1022,8 @@
     {
       "name": "initialize_membership_attestor_registry",
       "docs": [
-        "初始化成员准入签发者注册表"
+        "Initialize the membership attestor registry.",
+        "CN: 初始化成员准入签发者注册表。"
       ],
       "discriminator": [
         15,
@@ -1026,7 +1118,8 @@
     {
       "name": "initialize_proof_attestor_registry",
       "docs": [
-        "初始化贡献证明签发者注册表"
+        "Initialize the proof attestor registry.",
+        "CN: 初始化贡献证明签发者注册表。"
       ],
       "discriminator": [
         113,
@@ -1260,9 +1353,73 @@
       "args": []
     },
     {
+      "name": "migrate_circle_lifecycle",
+      "docs": [
+        "Migrate a legacy Circle account so lifecycle status has explicit account space.",
+        "CN: 迁移旧 Circle 账户，使 lifecycle status 字段拥有显式账户空间。"
+      ],
+      "discriminator": [
+        191,
+        65,
+        228,
+        180,
+        119,
+        110,
+        18,
+        20
+      ],
+      "accounts": [
+        {
+          "name": "circle",
+          "docs": [
+            "CN: 生命周期状态字段追加前创建的旧 Circle 账户可能比当前 `Circle::SPACE` 少 1 字节。",
+            "",
+            "SAFETY: The instruction validates owner, discriminator, PDA seeds, and serialized payload manually.",
+            "CN: 该指令会手动校验 owner、discriminator、PDA seeds 和序列化数据。"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  105,
+                  114,
+                  99,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "circle_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "circle_id",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "propose_transfer",
       "docs": [
-        "提议知识传递"
+        "Propose a knowledge transfer.",
+        "CN: 提议知识传递。"
       ],
       "discriminator": [
         140,
@@ -1349,7 +1506,8 @@
     {
       "name": "register_membership_attestor",
       "docs": [
-        "注册成员准入签发者（admin-only）"
+        "Register a membership attestor.",
+        "CN: 注册成员准入签发者，仅 admin 可调用。"
       ],
       "discriminator": [
         150,
@@ -1434,7 +1592,8 @@
     {
       "name": "register_proof_attestor",
       "docs": [
-        "注册贡献证明签发者（admin-only）"
+        "Register a proof attestor.",
+        "CN: 注册贡献证明签发者，仅 admin 可调用。"
       ],
       "discriminator": [
         32,
@@ -1567,7 +1726,80 @@
           "signer": true
         },
         {
-          "name": "member"
+          "name": "member",
+          "docs": [
+            "CN: 目标成员钱包地址，仅用于成员事实 key。"
+          ]
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "restore_circle",
+      "docs": [
+        "Restore an archived circle so normal writes are accepted again.",
+        "CN: 恢复已归档圈层，使其重新接受正常写操作。"
+      ],
+      "discriminator": [
+        248,
+        254,
+        106,
+        89,
+        172,
+        103,
+        51,
+        45
+      ],
+      "accounts": [
+        {
+          "name": "circle_manager",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  105,
+                  114,
+                  99,
+                  108,
+                  101,
+                  95,
+                  109,
+                  97,
+                  110,
+                  97,
+                  103,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "circle",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
         },
         {
           "name": "event_program"
@@ -1590,7 +1822,8 @@
     {
       "name": "revoke_membership_attestor",
       "docs": [
-        "撤销成员准入签发者（admin-only）"
+        "Revoke a membership attestor.",
+        "CN: 撤销成员准入签发者，仅 admin 可调用。"
       ],
       "discriminator": [
         129,
@@ -1675,7 +1908,8 @@
     {
       "name": "submit_ai_evaluation",
       "docs": [
-        "AI提交评估"
+        "Submit an AI evaluation.",
+        "CN: 提交 AI 评估。"
       ],
       "discriminator": [
         242,
@@ -1714,7 +1948,8 @@
     {
       "name": "submit_knowledge",
       "docs": [
-        "提交知识到圈层（curator-only）"
+        "Submit knowledge to a circle.",
+        "CN: 向圈层提交知识，仅 curator 可调用。"
       ],
       "discriminator": [
         196,
@@ -1814,7 +2049,8 @@
     {
       "name": "update_circle_flags",
       "docs": [
-        "更新圈层 flags 位字段（kind/mode/min_crystals 等）"
+        "Update the circle flags bit field.",
+        "CN: 更新圈层 flags 位字段，包括 kind、mode、min_crystals 等。"
       ],
       "discriminator": [
         203,
@@ -1915,7 +2151,10 @@
           "signer": true
         },
         {
-          "name": "member"
+          "name": "member",
+          "docs": [
+            "CN: 目标成员钱包地址，仅用于成员事实 key。"
+          ]
         },
         {
           "name": "event_program"
@@ -1947,7 +2186,8 @@
     {
       "name": "update_contributors",
       "docs": [
-        "兼容路径：在已绑定前提下更新 contributors"
+        "Compatibility path: update contributors after proof binding already exists.",
+        "CN: 兼容路径：在已完成 proof 绑定的前提下更新 contributors。"
       ],
       "discriminator": [
         30,
@@ -2049,7 +2289,8 @@
     {
       "name": "update_decision_engine",
       "docs": [
-        "更新决策引擎"
+        "Update the decision engine.",
+        "CN: 更新决策引擎。"
       ],
       "discriminator": [
         63,
@@ -2085,7 +2326,8 @@
     {
       "name": "vote",
       "docs": [
-        "投票"
+        "Vote on a transfer proposal.",
+        "CN: 对传递提案投票。"
       ],
       "discriminator": [
         227,
@@ -2241,7 +2483,8 @@
     {
       "name": "AIEvaluation",
       "docs": [
-        "AI评估"
+        "AI evaluation.",
+        "CN: AI 评估。"
       ],
       "type": {
         "kind": "struct",
@@ -2308,7 +2551,8 @@
     {
       "name": "Circle",
       "docs": [
-        "圈层（专注知识治理）"
+        "Circle focused on knowledge governance.",
+        "CN: 专注知识治理的圈层。"
       ],
       "type": {
         "kind": "struct",
@@ -2372,7 +2616,8 @@
           {
             "name": "flags",
             "docs": [
-              "通用位标志字段，用于存储可扩展的圈层属性",
+              "Extensible circle flags.",
+              "CN: 用于存储可扩展圈层属性的通用位标志。",
               "┌─────────┬─────────┬──────────────┬──────────────────┐",
               "│ bit 0   │ bit 1   │ bit 2-17     │ bit 18-63        │",
               "│ kind    │ mode    │ min_crystals │ reserved         │",
@@ -2381,6 +2626,24 @@
               "└─────────┴─────────┴──────────────┴──────────────────┘"
             ],
             "type": "u64"
+          },
+          {
+            "name": "status",
+            "docs": [
+              "Lifecycle status for the circle.",
+              "CN: 圈层生命周期状态。",
+              "",
+              "INVARIANT: `Archived` is not a hard delete; historical members, knowledge, and events remain readable.",
+              "CN: `Archived` 不是硬删除；历史成员、知识和事件仍然保留并可读取。",
+              "",
+              "MIGRATION: Legacy accounts created before this field must run `migrate_circle_lifecycle` to make the new account space explicit.",
+              "CN: 字段追加前创建的旧账户需要执行 `migrate_circle_lifecycle`，把账户空间显式扩到当前 `Circle::SPACE`。"
+            ],
+            "type": {
+              "defined": {
+                "name": "CircleLifecycleStatus"
+              }
+            }
           }
         ]
       }
@@ -2388,7 +2651,8 @@
     {
       "name": "CircleForkAnchor",
       "docs": [
-        "Fork 轻锚点 sidecar（避免把 live parent 依赖灌回 Circle 主账户）"
+        "Fork lightweight anchor sidecar.",
+        "CN: Fork 轻锚点 sidecar，避免把 live parent 依赖灌回 Circle 主账户。"
       ],
       "type": {
         "kind": "struct",
@@ -2422,9 +2686,24 @@
       }
     },
     {
+      "name": "CircleLifecycleStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Archived"
+          }
+        ]
+      }
+    },
+    {
       "name": "CircleManager",
       "docs": [
-        "圈层管理器"
+        "Circle manager.",
+        "CN: 圈层管理器。"
       ],
       "type": {
         "kind": "struct",
@@ -2598,7 +2877,8 @@
     {
       "name": "DecisionEngine",
       "docs": [
-        "决策引擎"
+        "Decision engine.",
+        "CN: 决策引擎。"
       ],
       "type": {
         "kind": "enum",
@@ -2687,7 +2967,8 @@
     {
       "name": "Knowledge",
       "docs": [
-        "知识条目"
+        "Knowledge entry.",
+        "CN: 知识条目。"
       ],
       "type": {
         "kind": "struct",
@@ -2763,7 +3044,8 @@
           {
             "name": "flags",
             "docs": [
-              "通用位标志字段",
+              "Extensible knowledge flags.",
+              "CN: 知识条目的通用位标志字段。",
               "┌──────────────┬──────────────────────────────────────┐",
               "│ bit 0-15     │ bit 16-63                            │",
               "│ version (u16)│ reserved                             │",
@@ -2797,7 +3079,8 @@
     {
       "name": "KnowledgeBinding",
       "docs": [
-        "知识贡献证明绑定（Knowledge 1:1 sidecar）"
+        "Knowledge contributor proof binding.",
+        "CN: 知识贡献证明绑定，Knowledge 1:1 sidecar。"
       ],
       "type": {
         "kind": "struct",
@@ -2863,7 +3146,8 @@
     {
       "name": "KnowledgeGovernance",
       "docs": [
-        "知识治理配置（专注知识管理）"
+        "Knowledge governance configuration.",
+        "CN: 专注知识管理的知识治理配置。"
       ],
       "type": {
         "kind": "struct",
@@ -2902,7 +3186,8 @@
     {
       "name": "MembershipAttestorRegistry",
       "docs": [
-        "成员准入签发者注册表（admin 管理）"
+        "Membership attestor registry managed by admin.",
+        "CN: 由 admin 管理的成员准入签发者注册表。"
       ],
       "type": {
         "kind": "struct",
@@ -2935,7 +3220,8 @@
     {
       "name": "ProofAttestorRegistry",
       "docs": [
-        "贡献证明签发者注册表（admin 管理）"
+        "Proof attestor registry managed by admin.",
+        "CN: 由 admin 管理的贡献证明签发者注册表。"
       ],
       "type": {
         "kind": "struct",
@@ -2968,7 +3254,8 @@
     {
       "name": "ProposalStatus",
       "docs": [
-        "提案状态"
+        "Proposal status.",
+        "CN: 提案状态。"
       ],
       "type": {
         "kind": "enum",
@@ -2997,7 +3284,8 @@
     {
       "name": "TransferProposal",
       "docs": [
-        "传递提案"
+        "Transfer proposal.",
+        "CN: 传递提案。"
       ],
       "type": {
         "kind": "struct",
@@ -3095,7 +3383,8 @@
     {
       "name": "TransferType",
       "docs": [
-        "传递类型"
+        "Transfer type.",
+        "CN: 传递类型。"
       ],
       "type": {
         "kind": "enum",

@@ -1,7 +1,8 @@
-use anchor_lang::prelude::*;
 use alcheme_shared::*;
+use anchor_lang::prelude::*;
 
-/// 圈层管理器
+/// Circle manager.
+/// CN: 圈层管理器。
 #[account]
 pub struct CircleManager {
     pub bump: u8,
@@ -12,7 +13,8 @@ pub struct CircleManager {
     pub total_transfers: u64,
 }
 
-/// 圈层（专注知识治理）
+/// Circle focused on knowledge governance.
+/// CN: 专注知识治理的圈层。
 #[account]
 pub struct Circle {
     pub circle_id: u8,
@@ -20,13 +22,14 @@ pub struct Circle {
     pub level: u8,
     pub parent_circle: Option<u8>,
     pub child_circles: Vec<u8>,
-    pub curators: Vec<Pubkey>,              // 策展人（知识管理者）
+    pub curators: Vec<Pubkey>, // Curators for knowledge governance. CN: 知识管理者。
     pub knowledge_count: u64,
-    pub knowledge_governance: KnowledgeGovernance,  // 知识治理配置
-    pub decision_engine: DecisionEngine,    // 决策引擎（AI/投票）
+    pub knowledge_governance: KnowledgeGovernance, // Knowledge governance config. CN: 知识治理配置。
+    pub decision_engine: DecisionEngine,           // Decision engine config. CN: AI/投票等决策引擎。
     pub created_at: i64,
     pub bump: u8,
-    /// 通用位标志字段，用于存储可扩展的圈层属性
+    /// Extensible circle flags.
+    /// CN: 用于存储可扩展圈层属性的通用位标志。
     /// ┌─────────┬─────────┬──────────────┬──────────────────┐
     /// │ bit 0   │ bit 1   │ bit 2-17     │ bit 18-63        │
     /// │ kind    │ mode    │ min_crystals │ reserved         │
@@ -34,9 +37,19 @@ pub struct Circle {
     /// │ 1=aux   │ 1=social│              │                  │
     /// └─────────┴─────────┴──────────────┴──────────────────┘
     pub flags: u64,
+    /// Lifecycle status for the circle.
+    /// CN: 圈层生命周期状态。
+    ///
+    /// INVARIANT: `Archived` is not a hard delete; historical members, knowledge, and events remain readable.
+    /// CN: `Archived` 不是硬删除；历史成员、知识和事件仍然保留并可读取。
+    ///
+    /// MIGRATION: Legacy accounts created before this field must run `migrate_circle_lifecycle` to make the new account space explicit.
+    /// CN: 字段追加前创建的旧账户需要执行 `migrate_circle_lifecycle`，把账户空间显式扩到当前 `Circle::SPACE`。
+    pub status: CircleLifecycleStatus,
 }
 
-/// Fork 轻锚点 sidecar（避免把 live parent 依赖灌回 Circle 主账户）
+/// Fork lightweight anchor sidecar.
+/// CN: Fork 轻锚点 sidecar，避免把 live parent 依赖灌回 Circle 主账户。
 #[account]
 pub struct CircleForkAnchor {
     pub source_circle_id: u8,
@@ -57,7 +70,8 @@ pub struct CircleMemberAccount {
     pub bump: u8,
 }
 
-/// 知识条目
+/// Knowledge entry.
+/// CN: 知识条目。
 #[account]
 pub struct Knowledge {
     pub knowledge_id: [u8; 32],
@@ -75,7 +89,8 @@ pub struct Knowledge {
     pub view_count: u64,
     pub citation_count: u64,
     pub bump: u8,
-    /// 通用位标志字段
+    /// Extensible knowledge flags.
+    /// CN: 知识条目的通用位标志字段。
     /// ┌──────────────┬──────────────────────────────────────┐
     /// │ bit 0-15     │ bit 16-63                            │
     /// │ version (u16)│ reserved                             │
@@ -88,7 +103,8 @@ pub struct Knowledge {
     pub contributors_count: u16,
 }
 
-/// 知识贡献证明绑定（Knowledge 1:1 sidecar）
+/// Knowledge contributor proof binding.
+/// CN: 知识贡献证明绑定，Knowledge 1:1 sidecar。
 #[account]
 pub struct KnowledgeBinding {
     pub knowledge: Pubkey,
@@ -103,7 +119,8 @@ pub struct KnowledgeBinding {
     pub bump: u8,
 }
 
-/// 贡献证明签发者注册表（admin 管理）
+/// Proof attestor registry managed by admin.
+/// CN: 由 admin 管理的贡献证明签发者注册表。
 #[account]
 pub struct ProofAttestorRegistry {
     pub bump: u8,
@@ -113,7 +130,8 @@ pub struct ProofAttestorRegistry {
     pub last_updated: i64,
 }
 
-/// 成员准入签发者注册表（admin 管理）
+/// Membership attestor registry managed by admin.
+/// CN: 由 admin 管理的成员准入签发者注册表。
 #[account]
 pub struct MembershipAttestorRegistry {
     pub bump: u8,
@@ -123,7 +141,8 @@ pub struct MembershipAttestorRegistry {
     pub last_updated: i64,
 }
 
-/// 传递提案
+/// Transfer proposal.
+/// CN: 传递提案。
 #[account]
 pub struct TransferProposal {
     pub proposal_id: u64,
@@ -143,29 +162,49 @@ pub struct TransferProposal {
     pub bump: u8,
 }
 
-/// 知识治理配置（专注知识管理）
+/// Knowledge governance configuration.
+/// CN: 专注知识管理的知识治理配置。
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub struct KnowledgeGovernance {
-    pub min_quality_score: f64,         // 最低质量分数
-    pub min_curator_reputation: u64,    // 策展人最低声誉
-    pub transfer_cooldown: i64,         // 传递冷却期（秒）
-    pub max_transfers_per_day: u32,     // 每日最大传递数
-    pub require_peer_review: bool,      // 是否需要同行评审
-    pub peer_review_count: u8,          // 需要评审人数
-    pub auto_quality_check: bool,       // 自动质量检查
+    pub min_quality_score: f64,      // Minimum quality score. CN: 最低质量分数。
+    pub min_curator_reputation: u64, // Minimum curator reputation. CN: 策展人最低声誉。
+    pub transfer_cooldown: i64,      // Transfer cooldown in seconds. CN: 传递冷却期，单位秒。
+    pub max_transfers_per_day: u32,  // Maximum transfers per day. CN: 每日最大传递数。
+    pub require_peer_review: bool,   // Whether peer review is required. CN: 是否需要同行评审。
+    pub peer_review_count: u8,       // Required peer review count. CN: 需要评审人数。
+    pub auto_quality_check: bool,    // Whether automatic quality checks are enabled. CN: 是否启用自动质量检查。
 }
 
-/// 决策引擎
+/// Decision engine.
+/// CN: 决策引擎。
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub enum DecisionEngine {
-    AdminOnly { admin: Pubkey },
-    VotingGovernance { min_votes: u64, vote_duration: i64, quorum_percentage: u8 },
-    DaoGovernance { dao_program: Pubkey, proposal_threshold: u64 },
-    AIAssisted { ai_oracle: Pubkey, human_veto_threshold: u64, confidence_required: f64 },
-    FullyAutonomous { ai_model_hash: [u8; 32], mcp_endpoint: String, fallback_to_dao: bool },
+    AdminOnly {
+        admin: Pubkey,
+    },
+    VotingGovernance {
+        min_votes: u64,
+        vote_duration: i64,
+        quorum_percentage: u8,
+    },
+    DaoGovernance {
+        dao_program: Pubkey,
+        proposal_threshold: u64,
+    },
+    AIAssisted {
+        ai_oracle: Pubkey,
+        human_veto_threshold: u64,
+        confidence_required: f64,
+    },
+    FullyAutonomous {
+        ai_model_hash: [u8; 32],
+        mcp_endpoint: String,
+        fallback_to_dao: bool,
+    },
 }
 
-/// 传递类型
+/// Transfer type.
+/// CN: 传递类型。
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub enum TransferType {
     Upward,
@@ -173,7 +212,8 @@ pub enum TransferType {
     Horizontal,
 }
 
-/// 提案状态
+/// Proposal status.
+/// CN: 提案状态。
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub enum ProposalStatus {
     Pending,
@@ -184,7 +224,8 @@ pub enum ProposalStatus {
     Executed,
 }
 
-/// AI评估
+/// AI evaluation.
+/// CN: AI 评估。
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub struct AIEvaluation {
     pub quality_score: f64,
@@ -205,29 +246,26 @@ pub enum AIRecommendation {
     NeedHumanReview,
 }
 
-
-// 空间计算
+// Account space calculations.
+// CN: 账户空间计算。
 impl CircleManager {
     pub const SPACE: usize = 8 + 1 + 32 + 8 + 8 + 8 + 8;
 }
 
 impl Circle {
-    pub const SPACE: usize = 
-        8 + 1 + 4 + 64 + 1 + 1 + 4 + 10 + 
-        4 + 20 * 32 + 8 + 120 + 200 + 8 + 1
-        + 8;  // flags
+    pub const SPACE: usize =
+        8 + 1 + 4 + 64 + 1 + 1 + 4 + 10 + 4 + 20 * 32 + 8 + 120 + 200 + 8 + 1 + 8 + 1; // flags + lifecycle status
 }
 
 impl CircleMemberAccount {
-    pub const SPACE: usize =
-        8 +  // discriminator
+    pub const SPACE: usize = 8 +  // discriminator
         1 +  // circle_id
         32 + // member
         1 +  // status
         1 +  // role
         8 +  // joined_at
         8 +  // updated_at
-        1;   // bump
+        1; // bump
 
     pub fn initialize(
         &mut self,
@@ -267,13 +305,12 @@ impl CircleMemberAccount {
 }
 
 impl CircleForkAnchor {
-    pub const SPACE: usize =
-        8 +  // discriminator
+    pub const SPACE: usize = 8 +  // discriminator
         1 +  // source_circle_id
         1 +  // target_circle_id
         32 + // fork_declaration_digest
         8 +  // created_at
-        1;   // bump
+        1; // bump
 
     pub fn initialize(
         &mut self,
@@ -292,18 +329,16 @@ impl CircleForkAnchor {
 }
 
 impl Knowledge {
-    pub const SPACE: usize = 
-        8 + 32 + 1 + 4 + 256 + 4 + 128 + 4 + 256 + 32 +
+    pub const SPACE: usize = 8 + 32 + 1 + 4 + 256 + 4 + 128 + 4 + 256 + 32 +
         8 + 1 + 8 + 8 + 8 + 1
         + 32   // content_hash
         + 8    // flags
         + 32   // contributors_root
-        + 2;   // contributors_count
+        + 2; // contributors_count
 }
 
 impl KnowledgeBinding {
-    pub const SPACE: usize =
-        8 +  // discriminator
+    pub const SPACE: usize = 8 +  // discriminator
         32 + // knowledge
         32 + // source_anchor_id
         32 + // proof_package_hash
@@ -313,7 +348,7 @@ impl KnowledgeBinding {
         8 +  // generated_at
         8 +  // bound_at
         32 + // bound_by
-        1;   // bump
+        1; // bump
 
     pub fn initialize(
         &mut self,
@@ -343,13 +378,12 @@ impl KnowledgeBinding {
 
 impl ProofAttestorRegistry {
     pub const MAX_ATTESTORS: usize = 32;
-    pub const SPACE: usize =
-        8 +  // discriminator
+    pub const SPACE: usize = 8 +  // discriminator
         1 +  // bump
         32 + // admin
         4 + (32 * Self::MAX_ATTESTORS) + // attestors vec
         8 +  // created_at
-        8;   // last_updated
+        8; // last_updated
 
     pub fn initialize(&mut self, bump: u8, admin: Pubkey) -> Result<()> {
         let now = Clock::get()?.unix_timestamp;
@@ -382,13 +416,12 @@ impl ProofAttestorRegistry {
 
 impl MembershipAttestorRegistry {
     pub const MAX_ATTESTORS: usize = 32;
-    pub const SPACE: usize =
-        8 +  // discriminator
+    pub const SPACE: usize = 8 +  // discriminator
         1 +  // bump
         32 + // admin
         4 + (32 * Self::MAX_ATTESTORS) + // attestors vec
         8 +  // created_at
-        8;   // last_updated
+        8; // last_updated
 
     pub fn initialize(&mut self, bump: u8, admin: Pubkey) -> Result<()> {
         let now = Clock::get()?.unix_timestamp;
@@ -431,9 +464,8 @@ impl MembershipAttestorRegistry {
 }
 
 impl TransferProposal {
-    pub const SPACE: usize = 
-        8 + 8 + 32 + 1 + 4 + 10 + 1 + 32 + 1 + 200 +
-        8 + 8 + 4 + 100 * 32 + 400 + 8 + 9 + 1;
+    pub const SPACE: usize =
+        8 + 8 + 32 + 1 + 4 + 10 + 1 + 32 + 1 + 200 + 8 + 8 + 4 + 100 * 32 + 400 + 8 + 9 + 1;
 }
 
 impl CircleManager {
@@ -471,7 +503,8 @@ impl Circle {
         self.decision_engine = decision_engine;
         self.created_at = Clock::get()?.unix_timestamp;
         self.bump = bump;
-        self.flags = 0; // 默认: kind=main(0), mode=knowledge(0), min_crystals=0
+        self.flags = 0; // Default: kind=main(0), mode=knowledge(0), min_crystals=0. CN: 默认值。
+        self.status = CircleLifecycleStatus::Active;
         Ok(())
     }
 
@@ -487,12 +520,12 @@ impl Circle {
     pub fn is_curator(&self, user: &Pubkey) -> bool {
         self.curators.contains(user)
     }
-    
+
     pub fn can_curate_knowledge(&self, user: &Pubkey, user_reputation: u64) -> bool {
         self.is_curator(user) && user_reputation >= self.knowledge_governance.min_curator_reputation
     }
 
-    // ==================== flags 位操作 helpers ====================
+    // ==================== flag bit helpers ====================
 
     /// kind: 0=main, 1=auxiliary
     pub fn kind(&self) -> u8 {
@@ -516,6 +549,24 @@ impl Circle {
     }
     pub fn set_min_crystals(&mut self, v: u16) {
         self.flags = (self.flags & !(0xFFFF << 2)) | ((v as u64) << 2);
+    }
+
+    /// INVARIANT: Archiving disables the circle without physically deleting accounts or history.
+    /// CN: 归档仅表示圈层停用，不会物理删除账户或历史数据。
+    pub fn is_archived(&self) -> bool {
+        self.status == CircleLifecycleStatus::Archived
+    }
+
+    pub fn archive(&mut self) -> Result<()> {
+        require!(!self.is_archived(), AlchemeError::CircleAlreadyArchived);
+        self.status = CircleLifecycleStatus::Archived;
+        Ok(())
+    }
+
+    pub fn restore(&mut self) -> Result<()> {
+        require!(self.is_archived(), AlchemeError::CircleNotArchived);
+        self.status = CircleLifecycleStatus::Active;
+        Ok(())
     }
 }
 
@@ -544,13 +595,13 @@ impl Knowledge {
         self.view_count = 0;
         self.citation_count = 0;
         self.bump = bump;
-        self.flags = 1;  // version = 1 (初始版本)
+        self.flags = 1; // version = 1. CN: 初始版本。
         self.contributors_root = [0u8; 32];
         self.contributors_count = 0;
         Ok(())
     }
 
-    // ==================== flags 位操作 helpers ====================
+    // ==================== flag bit helpers ====================
 
     /// version: bits 0-15 (u16)
     pub fn version(&self) -> u16 {
@@ -585,28 +636,31 @@ impl TransferProposal {
         self.voters = Vec::new();
         self.ai_evaluation = None;
         self.created_at = Clock::get()?.unix_timestamp;
-        
+
         self.status = match decision_engine {
             DecisionEngine::AIAssisted { .. } | DecisionEngine::FullyAutonomous { .. } => {
                 ProposalStatus::AIProcessing
-            },
+            }
             _ => ProposalStatus::Pending,
         };
-        
+
         self.deadline = match decision_engine {
             DecisionEngine::VotingGovernance { vote_duration, .. } => {
                 Some(self.created_at + vote_duration)
-            },
+            }
             _ => None,
         };
-        
+
         self.bump = bump;
         Ok(())
     }
 
     pub fn add_vote(&mut self, voter: Pubkey, vote_for: bool) -> Result<()> {
-        require!(!self.voters.contains(&voter), AlchemeError::InvalidOperation);
-        
+        require!(
+            !self.voters.contains(&voter),
+            AlchemeError::InvalidOperation
+        );
+
         if vote_for {
             self.votes_for += 1;
         } else {
@@ -617,7 +671,12 @@ impl TransferProposal {
     }
 
     pub fn check_voting_result(&mut self) -> Result<()> {
-        if let DecisionEngine::VotingGovernance { min_votes, quorum_percentage, .. } = &self.decision_engine {
+        if let DecisionEngine::VotingGovernance {
+            min_votes,
+            quorum_percentage,
+            ..
+        } = &self.decision_engine
+        {
             let total = self.votes_for + self.votes_against;
             if total >= *min_votes {
                 let approval_rate = (self.votes_for * 100) / total;
@@ -633,7 +692,7 @@ impl TransferProposal {
 
     pub fn set_ai_evaluation(&mut self, evaluation: AIEvaluation) -> Result<()> {
         self.ai_evaluation = Some(evaluation.clone());
-        
+
         self.status = match evaluation.recommendation {
             AIRecommendation::NeedHumanReview => ProposalStatus::HumanReview,
             AIRecommendation::ApproveUpward | AIRecommendation::ApproveDownward => {
@@ -642,7 +701,7 @@ impl TransferProposal {
                 } else {
                     ProposalStatus::HumanReview
                 }
-            },
+            }
             AIRecommendation::Reject => ProposalStatus::Rejected,
         };
         Ok(())
@@ -654,7 +713,7 @@ impl Default for KnowledgeGovernance {
         Self {
             min_quality_score: 0.7,
             min_curator_reputation: 60,
-            transfer_cooldown: 24 * 3600,       // 24小时
+            transfer_cooldown: 24 * 3600, // 24 hours. CN: 24 小时。
             max_transfers_per_day: 10,
             require_peer_review: false,
             peer_review_count: 2,
@@ -664,12 +723,11 @@ impl Default for KnowledgeGovernance {
 }
 
 impl KnowledgeGovernance {
-    pub const SPACE: usize = 
-        8 +  // min_quality_score
+    pub const SPACE: usize = 8 +  // min_quality_score
         8 +  // min_curator_reputation
         8 +  // transfer_cooldown
         4 +  // max_transfers_per_day
         1 +  // require_peer_review
         1 +  // peer_review_count
-        1;   // auto_quality_check
+        1; // auto_quality_check
 }

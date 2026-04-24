@@ -8,6 +8,7 @@ import { Idl } from "@coral-xyz/anchor";
 import { sha256 } from "js-sha256";
 
 export type CircleManagerIdl = Idl;
+export type CircleLifecycleStatus = "Active" | "Archived";
 
 // 类型定义
 export type TransferType = "Upward" | "Downward" | "Horizontal";
@@ -215,6 +216,69 @@ export class CirclesModule extends BaseModule<CircleManagerIdl> {
           eventProgram: eventAccounts.eventProgram,
           eventEmitter: eventAccounts.eventEmitter,
           eventBatch: eventAccounts.eventBatch,
+          systemProgram: SystemProgram.programId,
+        })
+        .transaction()
+    );
+  }
+
+  async archiveCircle(circleId: number, reason = ""): Promise<string> {
+    const circlePDA = this.findCirclePda(circleId);
+    const [circleManagerPda] = PublicKey.findProgramAddressSync(
+      [Buffer.from("circle_manager")],
+      this.programId,
+    );
+    const eventAccounts = await this.resolveEventAccounts();
+
+    return sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
+      (this.program.methods as any)
+        .archiveCircle(reason)
+        .accounts({
+          circleManager: circleManagerPda,
+          circle: circlePDA,
+          authority: this.provider.publicKey,
+          eventProgram: eventAccounts.eventProgram,
+          eventEmitter: eventAccounts.eventEmitter,
+          eventBatch: eventAccounts.eventBatch,
+          systemProgram: SystemProgram.programId,
+        })
+        .transaction()
+    );
+  }
+
+  async restoreCircle(circleId: number): Promise<string> {
+    const circlePDA = this.findCirclePda(circleId);
+    const [circleManagerPda] = PublicKey.findProgramAddressSync(
+      [Buffer.from("circle_manager")],
+      this.programId,
+    );
+    const eventAccounts = await this.resolveEventAccounts();
+
+    return sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
+      (this.program.methods as any)
+        .restoreCircle()
+        .accounts({
+          circleManager: circleManagerPda,
+          circle: circlePDA,
+          authority: this.provider.publicKey,
+          eventProgram: eventAccounts.eventProgram,
+          eventEmitter: eventAccounts.eventEmitter,
+          eventBatch: eventAccounts.eventBatch,
+          systemProgram: SystemProgram.programId,
+        })
+        .transaction()
+    );
+  }
+
+  async migrateCircleLifecycle(circleId: number): Promise<string> {
+    const circlePDA = this.findCirclePda(circleId);
+
+    return sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
+      (this.program.methods as any)
+        .migrateCircleLifecycle(circleId)
+        .accounts({
+          circle: circlePDA,
+          payer: this.provider.publicKey,
           systemProgram: SystemProgram.programId,
         })
         .transaction()

@@ -32,6 +32,12 @@ pub enum AlchemeError {
     SignerRequired = 6012,
     #[msg("无效的账户数据")]
     InvalidAccountData = 6013,
+    #[msg("Circle is archived")]
+    CircleArchived = 6014,
+    #[msg("Circle is already archived")]
+    CircleAlreadyArchived = 6015,
+    #[msg("Circle is not archived")]
+    CircleNotArchived = 6016,
 
     // 身份相关错误 (6100-6199)
     #[msg("无效的用户名长度")]

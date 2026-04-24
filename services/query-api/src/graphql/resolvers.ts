@@ -622,7 +622,10 @@ export const resolvers = {
 
             while (frontier.length > 0) {
                 const children = await prisma.circle.findMany({
-                    where: { parentCircleId: { in: frontier } },
+                    where: {
+                        parentCircleId: { in: frontier },
+                        lifecycleStatus: 'Active',
+                    },
                     orderBy: { createdAt: 'desc' },
                     include: { creator: true },
                 });
@@ -699,6 +702,9 @@ export const resolvers = {
             { prisma }: Context,
         ) => {
             const circles = await prisma.circle.findMany({
+                where: {
+                    lifecycleStatus: 'Active',
+                },
                 take: limit,
                 skip: offset,
                 orderBy: { createdAt: 'desc' },
@@ -714,6 +720,7 @@ export const resolvers = {
         ) => {
             const circles = await prisma.circle.findMany({
                 where: {
+                    lifecycleStatus: 'Active',
                     OR: [
                         { name: { contains: query, mode: 'insensitive' } },
                         { description: { contains: query, mode: 'insensitive' } },
@@ -755,7 +762,10 @@ export const resolvers = {
         ) => {
             if (!userId) return [];
             const memberships = await prisma.circleMember.findMany({
-                where: { userId, status: 'Active' },
+                where: {
+                    userId,
+                    status: 'Active',
+                },
                 include: { circle: true },
             });
             return attachProjectedCircleSettings(prisma, memberships.map(m => m.circle) as any);

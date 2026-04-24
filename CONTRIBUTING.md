@@ -8,6 +8,7 @@ This repository is being opened in phases. The code is public, but the first pub
 
 - Check whether an issue or pull request already covers the same change.
 - Prefer a short design note or draft PR for non-trivial changes before large implementation work.
+- Follow `docs/COMMENT_STYLE.md` for source comments and durable protocol context.
 - Never commit secrets, private keys, local `.env` files, generated `.next*` output, or deployment artifacts.
 
 ## Prerequisites

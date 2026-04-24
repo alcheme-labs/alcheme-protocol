@@ -137,6 +137,10 @@ export const typeDefs = gql`
     kind: String!
     mode: String!
     minCrystals: Int!
+    lifecycleStatus: CircleLifecycleStatus!
+    archivedAt: DateTime
+    archivedByPubkey: String
+    archiveReason: String
     parentCircleId: Int
     stats: CircleStats!
     parentCircle: Circle
@@ -150,6 +154,11 @@ export const typeDefs = gql`
     Open
     Closed
     Secret
+  }
+
+  enum CircleLifecycleStatus {
+    Active
+    Archived
   }
 
   type CircleStats {

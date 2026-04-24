@@ -681,10 +681,17 @@
         "inviteRequired": "Ce cercle fonctionne uniquement sur invitation. Demandez l’accès à un administrateur.",
         "insufficientCrystals": "Vous n’avez pas encore assez de cristaux pour rejoindre ce cercle.",
         "banned": "Votre accès à ce cercle est actuellement restreint.",
+        "archived": "Ce cercle est archivé et n’accepte plus de nouvelles adhésions.",
         "requestStateChanged": "L’état de cette demande a changé. Actualisez puis réessayez.",
         "membershipBridgeUnavailable": "Votre identité a bien été créée, mais la finalisation de l’adhésion au cercle est temporairement indisponible. Réessayez simplement de rejoindre le cercle.",
         "fallback": "Impossible de rejoindre le cercle pour le moment. Réessayez."
       }
+    },
+    "archived": {
+      "badge": "Archivé",
+      "notice": "Ce cercle est archivé. Son historique reste consultable, mais les nouvelles adhésions et autres actions d’écriture sont désactivées.",
+      "noticeWithReason": "Ce cercle est archivé. Son historique reste consultable, mais les nouvelles adhésions et autres actions d’écriture sont désactivées. Motif : {reason}",
+      "meta": "Archivé {date}"
     },
     "levels": {
       "Visitor": "Visiteur",
