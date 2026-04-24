@@ -42,7 +42,7 @@ pub fn initialize_identity_registry(
         settings,
     )?;
     
-    msg!("身份注册表初始化成功: {}", registry_name);
+    msg!("Identity registry initialized: {}", registry_name);
     Ok(())
 }
 
@@ -145,7 +145,7 @@ pub fn register_identity(
         event,
     )?;
     
-    msg!("身份注册成功: {} -> {}", handle, user_identity.key());
+    msg!("Identity registered: {} -> {}", handle, user_identity.key());
     Ok(())
 }
 
@@ -212,7 +212,7 @@ pub fn update_identity(
         )?;
     }
     
-    msg!("身份信息更新成功: {}", user_identity.key());
+    msg!("Identity profile updated: {}", user_identity.key());
     Ok(())
 }
 
@@ -306,7 +306,7 @@ pub fn add_verification_attribute(
         event,
     )?;
     
-    msg!("验证属性添加成功: {} for {}", 
+    msg!("Verification attribute added: {} for {}",
          attribute.attribute_type, user_identity.key());
     Ok(())
 }
@@ -346,7 +346,7 @@ pub fn update_reputation(
     user_identity.update_reputation(reputation_delta, trust_delta)?;
     user_identity.update_last_active()?;
     
-    msg!("声誉更新成功: {} (reason: {})", user_identity.key(), reason);
+    msg!("Reputation updated: {} (reason: {})", user_identity.key(), reason);
     Ok(())
 }
 
@@ -534,7 +534,7 @@ pub fn update_social_stats(
     user_identity.update_social_stats(follower_delta, following_delta)?;
     user_identity.update_last_active()?;
     
-    msg!("社交统计更新成功: {}", user_identity.key());
+    msg!("Social stats updated: {}", user_identity.key());
     Ok(())
 }
 
@@ -557,7 +557,7 @@ pub fn update_economic_stats(
     user_identity.update_economic_stats(tokens_earned_delta, tokens_spent_delta)?;
     user_identity.update_last_active()?;
     
-    msg!("经济统计更新成功: {}", user_identity.key());
+    msg!("Economic stats updated: {}", user_identity.key());
     Ok(())
 }
 
@@ -581,7 +581,7 @@ pub fn update_content_stats(
     user_identity.update_content_stats(content_created_delta, interactions_delta, quality_score_update)?;
     user_identity.update_last_active()?;
     
-    msg!("内容统计更新成功: {}", user_identity.key());
+    msg!("Content stats updated: {}", user_identity.key());
     Ok(())
 }
 
@@ -622,7 +622,7 @@ pub fn update_reputation_by_extension(
     user_identity.update_reputation(reputation_delta, trust_delta)?;
     user_identity.update_last_active()?;
 
-    msg!("Extension 声誉更新成功: {} (reason: {}, caller: {})",
+    msg!("Extension reputation updated: {} (reason: {}, caller: {})",
          user_identity.key(), reason, ctx.accounts.caller_program.key());
     Ok(())
 }

@@ -68,6 +68,11 @@ impl ExtensionParserRegistry {
 /// Contribution Engine 日志解析器（基于 msg! 文本）
 struct ContributionEngineLogParser;
 
+const LEDGER_CREATED_MARKER: &str = "Contribution ledger created: crystal_id=";
+const CONTRIBUTION_RECORDED_MARKER: &str = "Contribution recorded:";
+const REFERENCE_ADDED_MARKER: &str = "Reference added:";
+const REPUTATION_SETTLED_MARKER: &str = "Reputation settlement completed: crystal_id=";
+
 impl ExtensionLogParser for ContributionEngineLogParser {
     fn parser_name(&self) -> &'static str {
         "contribution-engine"
@@ -77,14 +82,14 @@ impl ExtensionLogParser for ContributionEngineLogParser {
         let mut events = Vec::new();
 
         for log in logs {
-            if let Some(crystal_id) = extract_field(log, "贡献账本已创建: crystal_id=") {
+            if let Some(crystal_id) = extract_field(log, LEDGER_CREATED_MARKER) {
                 events.push(ParsedExtensionEvent::ContributionEngine(
                     ContributionEngineEvent::LedgerCreated { crystal_id },
                 ));
                 continue;
             }
 
-            if log.contains("贡献已记录:") {
+            if log.contains(CONTRIBUTION_RECORDED_MARKER) {
                 let crystal_id =
                     extract_field(log, "crystal=").unwrap_or_else(|| "unknown".to_string());
                 let contributor =
@@ -101,7 +106,7 @@ impl ExtensionLogParser for ContributionEngineLogParser {
                 continue;
             }
 
-            if log.contains("引用已添加:") {
+            if log.contains(REFERENCE_ADDED_MARKER) {
                 let source_id = extract_arrow_left(log).unwrap_or_else(|| "unknown".to_string());
                 let target_id = extract_arrow_right(log).unwrap_or_else(|| "unknown".to_string());
                 let reference_type =
@@ -117,7 +122,7 @@ impl ExtensionLogParser for ContributionEngineLogParser {
                 continue;
             }
 
-            if let Some(crystal_id) = extract_field(log, "声誉结算完成: crystal_id=") {
+            if let Some(crystal_id) = extract_field(log, REPUTATION_SETTLED_MARKER) {
                 events.push(ParsedExtensionEvent::ContributionEngine(
                     ContributionEngineEvent::ReputationSettled { crystal_id },
                 ));
@@ -146,13 +151,17 @@ fn extract_field(log: &str, marker: &str) -> Option<String> {
 }
 
 fn extract_arrow_left(log: &str) -> Option<String> {
-    let payload = log.split("引用已添加:").nth(1)?.trim();
+    let payload = extract_after(log, REFERENCE_ADDED_MARKER)?;
     let source = payload.split("->").next()?.trim();
     if source.is_empty() {
         None
     } else {
         Some(source.to_string())
     }
+}
+
+fn extract_after<'a>(log: &'a str, marker: &str) -> Option<&'a str> {
+    log.split(marker).nth(1).map(str::trim)
 }
 
 fn extract_arrow_right(log: &str) -> Option<String> {
@@ -167,15 +176,13 @@ fn extract_arrow_right(log: &str) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        ContributionEngineEvent, ExtensionLogParser, ExtensionParserRegistry, ParsedExtensionEvent,
-    };
+    use super::{ContributionEngineEvent, ExtensionParserRegistry, ParsedExtensionEvent};
 
     #[test]
     fn parses_reference_added_log_into_contribution_engine_event() {
         let registry = ExtensionParserRegistry::default();
         let logs = vec![
-            "Program log: 引用已添加: Source111 -> Target222 type=Citation".to_string(),
+            "Program log: Reference added: Source111 -> Target222 type=Citation".to_string(),
         ];
 
         let events = registry.parse_logs(&logs);

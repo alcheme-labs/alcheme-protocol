@@ -4,7 +4,7 @@
     "name": "content_manager",
     "version": "0.1.0",
     "spec": "0.1.0",
-    "description": "Content Manager Program for SocialHub Protocol"
+    "description": "Content Manager Program for Alcheme Protocol"
   },
   "docs": [
     "Content Manager Program - 内容管理器程序"
@@ -93,59 +93,6 @@
         {
           "name": "content_id",
           "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "enter_draft_crystallization_v2",
-      "docs": [
-        "锚定草稿进入结晶里程碑（v2 事件锚点）"
-      ],
-      "discriminator": [
-        92,
-        212,
-        147,
-        210,
-        46,
-        24,
-        57,
-        164
-      ],
-      "accounts": [
-        {
-          "name": "actor",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "event_program"
-        },
-        {
-          "name": "event_emitter_account",
-          "writable": true
-        },
-        {
-          "name": "event_batch",
-          "writable": true
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "draft_post_id",
-          "type": "u64"
-        },
-        {
-          "name": "policy_profile_digest",
-          "type": {
-            "array": [
-              "u8",
-              32
-            ]
-          }
         }
       ]
     },
@@ -2290,6 +2237,59 @@
       ]
     },
     {
+      "name": "enter_draft_crystallization_v2",
+      "docs": [
+        "锚定草稿进入结晶里程碑（v2 事件锚点）"
+      ],
+      "discriminator": [
+        92,
+        212,
+        147,
+        210,
+        46,
+        24,
+        57,
+        164
+      ],
+      "accounts": [
+        {
+          "name": "actor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter_account",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "draft_post_id",
+          "type": "u64"
+        },
+        {
+          "name": "policy_profile_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "get_content_info",
       "docs": [
         "获取内容信息 (CPI)"
@@ -3626,6 +3626,11 @@
       "code": 6016,
       "name": "V2AudienceRefMustBeZero",
       "msg": "v2 non-circle audience must not carry audience_ref"
+    },
+    {
+      "code": 6017,
+      "name": "DraftLifecycleAnchorPostIdInvalid",
+      "msg": "draft lifecycle anchor post_id must be greater than 0"
     }
   ],
   "types": [

@@ -28,7 +28,7 @@ pub fn settle_reputation(
     let reputation_delta = entry.weight * authority_score;
 
     msg!(
-        "声誉结算: contributor={}, role={:?}, weight={}, authority={}, delta={}",
+        "Reputation settlement: contributor={}, role={:?}, weight={}, authority={}, delta={}",
         entry.contributor,
         entry.role,
         entry.weight,
@@ -65,7 +65,7 @@ pub fn settle_reputation(
     ledger.reputation_settled = true;
     ledger.last_updated = Clock::get()?.unix_timestamp;
 
-    msg!("声誉结算完成: crystal_id={}", ledger.crystal_id);
+    msg!("Reputation settlement completed: crystal_id={}", ledger.crystal_id);
     Ok(())
 }
 

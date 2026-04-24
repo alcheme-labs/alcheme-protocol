@@ -142,6 +142,17 @@
         {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
         }
       ],
       "args": [
@@ -263,34 +274,30 @@
       "accounts": [
         {
           "name": "message",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  101,
-                  115,
-                  115,
-                  97,
-                  103,
-                  101
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "message_id"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "conversation"
         },
         {
           "name": "reader",
+          "writable": true,
           "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
         }
       ],
       "args": [
@@ -350,7 +357,23 @@
         },
         {
           "name": "sender",
+          "writable": true,
           "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
         }
       ],
       "args": [
@@ -421,6 +444,17 @@
         {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
         }
       ],
       "args": [
@@ -516,6 +550,17 @@
         {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
         }
       ],
       "args": [

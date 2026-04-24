@@ -4,33 +4,33 @@ use anchor_lang::prelude::*;
 #[error_code]
 pub enum AlchemeError {
     // 通用错误 (6000-6099)
-    #[msg("无效的操作")]
+    #[msg("Invalid operation")]
     InvalidOperation = 6000,
-    #[msg("权限不足")]
+    #[msg("Unauthorized")]
     Unauthorized = 6001,
-    #[msg("账户未找到")]
+    #[msg("Account not found")]
     AccountNotFound = 6002,
-    #[msg("无效的账户所有者")]
+    #[msg("Invalid account owner")]
     InvalidAccountOwner = 6003,
-    #[msg("缺少必需的签名")]
+    #[msg("Missing required signature")]
     MissingSignature = 6004,
-    #[msg("账户未租金豁免")]
+    #[msg("Account is not rent exempt")]
     NotRentExempt = 6005,
-    #[msg("数据序列化失败")]
+    #[msg("Data serialization failed")]
     SerializationError = 6006,
-    #[msg("数据反序列化失败")]
+    #[msg("Data deserialization failed")]
     DeserializationError = 6007,
-    #[msg("数学运算溢出")]
+    #[msg("Math overflow")]
     MathOverflow = 6008,
-    #[msg("无效的时间戳")]
+    #[msg("Invalid timestamp")]
     InvalidTimestamp = 6009,
-    #[msg("未授权的 CPI 调用")]
+    #[msg("Unauthorized CPI call")]
     UnauthorizedCpiCall = 6010,
-    #[msg("无效的程序ID")]
+    #[msg("Invalid program ID")]
     InvalidProgramId = 6011,
-    #[msg("需要签名者")]
+    #[msg("Signer required")]
     SignerRequired = 6012,
-    #[msg("无效的账户数据")]
+    #[msg("Invalid account data")]
     InvalidAccountData = 6013,
     #[msg("Circle is archived")]
     CircleArchived = 6014,
@@ -40,137 +40,137 @@ pub enum AlchemeError {
     CircleNotArchived = 6016,
 
     // 身份相关错误 (6100-6199)
-    #[msg("无效的用户名长度")]
+    #[msg("Invalid handle length")]
     InvalidHandleLength = 6100,
-    #[msg("用户名包含无效字符")]
+    #[msg("Handle contains invalid characters")]
     InvalidHandleCharacters = 6101,
-    #[msg("用户名已存在")]
+    #[msg("Handle already exists")]
     HandleAlreadyExists = 6102,
-    #[msg("身份未找到")]
+    #[msg("Identity not found")]
     IdentityNotFound = 6103,
-    #[msg("身份已存在")]
+    #[msg("Identity already exists")]
     IdentityAlreadyExists = 6104,
-    #[msg("无效的身份配置")]
+    #[msg("Invalid identity config")]
     InvalidIdentityConfig = 6105,
-    #[msg("身份验证失败")]
+    #[msg("Identity verification failed")]
     IdentityVerificationFailed = 6106,
-    #[msg("档案数据过大")]
+    #[msg("Profile data too large")]
     ProfileDataTooLarge = 6107,
-    #[msg("无效的验证等级")]
+    #[msg("Invalid verification level")]
     InvalidVerificationLevel = 6108,
-    #[msg("声誉分数无效")]
+    #[msg("Invalid reputation score")]
     InvalidReputationScore = 6109,
 
     // 内容相关错误 (6200-6299)
-    #[msg("内容未找到")]
+    #[msg("Content not found")]
     ContentNotFound = 6200,
-    #[msg("内容已存在")]
+    #[msg("Content already exists")]
     ContentAlreadyExists = 6201,
-    #[msg("文本内容过长")]
+    #[msg("Text content too long")]
     TextTooLong = 6202,
-    #[msg("无效的内容类型")]
+    #[msg("Invalid content type")]
     InvalidContentType = 6203,
-    #[msg("媒体附件过大")]
+    #[msg("Media attachment too large")]
     MediaAttachmentTooLarge = 6204,
-    #[msg("缺少媒体附件")]
+    #[msg("Missing media attachment")]
     MissingMediaAttachment = 6205,
-    #[msg("无效的存储策略")]
+    #[msg("Invalid storage strategy")]
     InvalidStorageStrategy = 6206,
-    #[msg("存储费用不足")]
+    #[msg("Insufficient storage fee")]
     InsufficientStorageFee = 6207,
-    #[msg("内容已过期")]
+    #[msg("Content expired")]
     ContentExpired = 6208,
-    #[msg("内容被审核")]
+    #[msg("Content moderated")]
     ContentModerated = 6209,
-    #[msg("v1 写入路径已禁用，请改用 v2")]
+    #[msg("v1 write path is disabled; use v2")]
     V1WritePathDisabled = 6210,
 
     // 验证相关错误 (6300-6399)
-    #[msg("验证失败")]
+    #[msg("Validation failed")]
     ValidationFailed = 6300,
-    #[msg("验证器未找到")]
+    #[msg("Validator not found")]
     ValidatorNotFound = 6301,
-    #[msg("验证器已禁用")]
+    #[msg("Validator disabled")]
     ValidatorDisabled = 6302,
-    #[msg("无效的验证上下文")]
+    #[msg("Invalid validation context")]
     InvalidValidationContext = 6303,
-    #[msg("验证超时")]
+    #[msg("Validation timeout")]
     ValidationTimeout = 6304,
-    #[msg("验证器配置无效")]
+    #[msg("Invalid validator config")]
     InvalidValidatorConfig = 6305,
-    #[msg("验证结果无效")]
+    #[msg("Invalid validation result")]
     InvalidValidationResult = 6306,
-    #[msg("验证器权限不足")]
+    #[msg("Validator unauthorized")]
     ValidatorUnauthorized = 6307,
-    #[msg("验证器类型不匹配")]
+    #[msg("Validator type mismatch")]
     ValidatorTypeMismatch = 6308,
-    #[msg("验证规则冲突")]
+    #[msg("Validation rule conflict")]
     ValidationRuleConflict = 6309,
 
     // 访问控制错误 (6400-6499)
-    #[msg("权限被拒绝")]
+    #[msg("Permission denied")]
     PermissionDenied = 6400,
-    #[msg("访问规则未找到")]
+    #[msg("Access rule not found")]
     AccessRuleNotFound = 6401,
-    #[msg("无效的权限类型")]
+    #[msg("Invalid permission type")]
     InvalidPermission = 6402,
-    #[msg("无效的访问级别")]
+    #[msg("Invalid access level")]
     InvalidAccessLevel = 6403,
-    #[msg("权限规则冲突")]
+    #[msg("Permission rule conflict")]
     PermissionRuleConflict = 6404,
-    #[msg("关系类型无效")]
+    #[msg("Invalid relationship type")]
     InvalidRelationshipType = 6405,
-    #[msg("权限模板未找到")]
+    #[msg("Permission template not found")]
     PermissionTemplateNotFound = 6406,
-    #[msg("访问控制器未初始化")]
+    #[msg("Access controller not initialized")]
     AccessControllerNotInitialized = 6407,
-    #[msg("权限检查超时")]
+    #[msg("Permission check timeout")]
     PermissionCheckTimeout = 6408,
-    #[msg("批量权限检查失败")]
+    #[msg("Batch permission check failed")]
     BatchPermissionCheckFailed = 6409,
 
     // 事件系统错误 (6500-6599)
-    #[msg("事件发射失败")]
+    #[msg("Event emission failed")]
     EventEmissionFailed = 6500,
-    #[msg("无效的事件类型")]
+    #[msg("Invalid event type")]
     InvalidEventType = 6501,
-    #[msg("事件数据过大")]
+    #[msg("Event data too large")]
     EventDataTooLarge = 6502,
-    #[msg("事件订阅失败")]
+    #[msg("Event subscription failed")]
     EventSubscriptionFailed = 6503,
-    #[msg("事件查询失败")]
+    #[msg("Event query failed")]
     EventQueryFailed = 6504,
-    #[msg("事件批次已满")]
+    #[msg("Event batch is full")]
     EventBatchFull = 6505,
-    #[msg("事件归档失败")]
+    #[msg("Event archive failed")]
     EventArchiveFailed = 6506,
-    #[msg("无效的事件过滤器")]
+    #[msg("Invalid event filter")]
     InvalidEventFilter = 6507,
-    #[msg("事件存储策略无效")]
+    #[msg("Invalid event storage strategy")]
     InvalidEventStorageStrategy = 6508,
-    #[msg("事件订阅已存在")]
+    #[msg("Event subscription already exists")]
     EventSubscriptionAlreadyExists = 6509,
 
     // 工厂和部署错误 (6600-6699)
-    #[msg("注册表部署失败")]
+    #[msg("Registry deployment failed")]
     RegistryDeploymentFailed = 6600,
-    #[msg("无效的注册表配置")]
+    #[msg("Invalid registry config")]
     InvalidRegistryConfig = 6601,
-    #[msg("注册表已存在")]
+    #[msg("Registry already exists")]
     RegistryAlreadyExists = 6602,
-    #[msg("注册表升级失败")]
+    #[msg("Registry upgrade failed")]
     RegistryUpgradeFailed = 6603,
-    #[msg("无效的程序版本")]
+    #[msg("Invalid program version")]
     InvalidProgramVersion = 6604,
-    #[msg("部署权限不足")]
+    #[msg("Insufficient deployment permission")]
     InsufficientDeploymentPermission = 6605,
-    #[msg("工厂未初始化")]
+    #[msg("Factory not initialized")]
     FactoryNotInitialized = 6606,
-    #[msg("无效的部署参数")]
+    #[msg("Invalid deployment params")]
     InvalidDeploymentParams = 6607,
-    #[msg("注册表类型不匹配")]
+    #[msg("Registry type mismatch")]
     RegistryTypeMismatch = 6608,
-    #[msg("部署配额已用完")]
+    #[msg("Deployment quota exceeded")]
     DeploymentQuotaExceeded = 6609,
 }
 

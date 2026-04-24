@@ -4,7 +4,7 @@
     "name": "identity_registry",
     "version": "0.1.0",
     "spec": "0.1.0",
-    "description": "Identity Registry Program for SocialHub Protocol"
+    "description": "Identity Registry Program for Alcheme Protocol"
   },
   "docs": [
     "Identity Registry Program - 身份注册表程序"

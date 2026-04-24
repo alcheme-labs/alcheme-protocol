@@ -23,7 +23,7 @@ pub fn initialize_engine(
     config.total_ledgers = 0;
     config.total_references = 0;
 
-    msg!("Contribution Engine 初始化完成");
+    msg!("Contribution Engine initialized");
     Ok(())
 }
 
@@ -58,7 +58,7 @@ pub fn update_config(
 
     config.last_updated = clock.unix_timestamp;
 
-    msg!("Contribution Engine 配置已更新");
+    msg!("Contribution Engine config updated");
     Ok(())
 }
 

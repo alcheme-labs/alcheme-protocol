@@ -48,7 +48,7 @@ pub fn initialize_event_emitter(
         retention_policy,
     )?;
     
-    msg!("事件发射器初始化成功");
+    msg!("Event emitter initialized");
     Ok(())
 }
 
@@ -81,7 +81,7 @@ pub fn update_event_emitter_config(
     
     event_emitter.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("事件发射器配置更新成功");
+    msg!("Event emitter config updated");
     Ok(())
 }
 
@@ -163,7 +163,7 @@ pub fn emit_event(
         .ok_or(AlchemeError::EventEmissionFailed)?;
     log_protocol_event(&logged_event)?;
 
-    msg!("事件发射成功: sequence {}, batch {}", event_sequence, event_batch.batch_id);
+    msg!("Event emitted: sequence {}, batch {}", event_sequence, event_batch.batch_id);
     Ok(event_sequence)
 }
 
@@ -245,7 +245,7 @@ pub fn batch_emit_events(
         event_sequences.push(sequence);
     }
     
-    msg!("批量事件发射成功: {} 个事件", event_sequences.len());
+    msg!("Batch event emission completed: {} events", event_sequences.len());
     Ok(event_sequences)
 }
 
@@ -321,7 +321,7 @@ pub fn emit_identity_event(
         .ok_or(AlchemeError::EventEmissionFailed)?;
     log_protocol_event(&logged_event)?;
     
-    msg!("身份事件发射成功");
+    msg!("Identity event emitted");
     Ok(())
 }
 
@@ -395,7 +395,7 @@ pub fn emit_content_event(
         .ok_or(AlchemeError::EventEmissionFailed)?;
     log_protocol_event(&logged_event)?;
     
-    msg!("内容事件发射成功");
+    msg!("Content event emitted");
     Ok(())
 }
 
@@ -431,7 +431,7 @@ pub fn emit_content_anchor_v2_light(
     let event_sequence = event_emitter.emit_event(event.clone())?;
     log_protocol_event(&event)?;
 
-    msg!("v2 内容锚点轻量发射成功: sequence {}", event_sequence);
+    msg!("v2 content anchor event emitted: sequence {}", event_sequence);
     Ok(event_sequence)
 }
 
@@ -505,7 +505,7 @@ pub fn emit_access_event(
         .ok_or(AlchemeError::EventEmissionFailed)?;
     log_protocol_event(&logged_event)?;
     
-    msg!("权限事件发射成功");
+    msg!("Permission event emitted");
     Ok(())
 }
 
@@ -530,7 +530,7 @@ pub fn query_events(
     
     let matching_events = Vec::new();
     
-    msg!("事件查询完成: 找到 {} 个匹配事件", matching_events.len());
+    msg!("Event query completed: found {} matching events", matching_events.len());
     Ok(matching_events)
 }
 
@@ -584,7 +584,7 @@ pub fn get_user_event_history(
     // 简化实现：返回空结果
     let user_events = Vec::new();
     
-    msg!("用户事件历史查询完成: {} 个事件", user_events.len());
+    msg!("User event history query completed: {} events", user_events.len());
     Ok(user_events)
 }
 
@@ -639,7 +639,7 @@ pub fn subscribe_to_events(
     // 更新发射器统计
     event_emitter.add_subscription()?;
     
-    msg!("事件订阅创建成功: {}", ctx.accounts.subscriber.key());
+    msg!("Event subscription created: {}", ctx.accounts.subscriber.key());
     Ok(())
 }
 
@@ -675,7 +675,7 @@ pub fn update_subscription(
         event_subscription.delivery_config = delivery_config;
     }
     
-    msg!("事件订阅更新成功: {}", ctx.accounts.subscriber.key());
+    msg!("Event subscription updated: {}", ctx.accounts.subscriber.key());
     Ok(())
 }
 
@@ -704,7 +704,7 @@ pub fn unsubscribe_from_events(
     // 更新发射器统计
     event_emitter.remove_subscription()?;
     
-    msg!("事件订阅取消成功: {}", ctx.accounts.subscriber.key());
+    msg!("Event subscription cancelled: {}", ctx.accounts.subscriber.key());
     Ok(())
 }
 
@@ -727,9 +727,9 @@ pub fn toggle_subscription(
     let event_subscription = &mut ctx.accounts.event_subscription;
     event_subscription.active = active;
     
-    msg!("订阅状态切换成功: {} -> {}", 
-         ctx.accounts.subscriber.key(), 
-         if active { "活跃" } else { "暂停" });
+    msg!("Subscription status toggled: {} -> {}",
+         ctx.accounts.subscriber.key(),
+         if active { "active" } else { "paused" });
     Ok(())
 }
 
@@ -766,7 +766,7 @@ pub fn archive_event_batch(
     // 标记为已归档
     event_batch.mark_archived(arweave_tx_id)?;
     
-    msg!("事件批次归档成功: batch {}", batch_id);
+    msg!("Event batch archived: batch {}", batch_id);
     Ok(())
 }
 
@@ -789,7 +789,7 @@ pub fn cleanup_expired_events(
     // 简化实现：返回0
     let cleaned_count = 0u64;
     
-    msg!("过期事件清理完成: {} 个事件被清理", cleaned_count);
+    msg!("Expired event cleanup completed: {} events cleaned", cleaned_count);
     Ok(cleaned_count)
 }
 

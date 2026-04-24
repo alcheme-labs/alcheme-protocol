@@ -32,7 +32,7 @@ pub fn initialize_access_controller(
     
     access_controller.initialize(bump, ctx.accounts.admin.key())?;
     
-    msg!("访问控制器初始化成功");
+    msg!("Access controller initialized");
     Ok(())
 }
 
@@ -65,7 +65,7 @@ pub fn update_controller_config(
     
     access_controller.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("访问控制器配置更新成功");
+    msg!("Access controller config updated");
     Ok(())
 }
 
@@ -138,7 +138,7 @@ pub fn process_set_access_rules(
     
     access_controller.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("访问规则设置成功: {} for {} -> {:?}", 
+    msg!("Access rule set: {} for {} -> {:?}",
          access_rule.rule_id, user, permission);
     Ok(())
 }
@@ -175,7 +175,7 @@ pub fn batch_set_permissions(
         )?;
     }
     
-    msg!("批量权限设置成功: {} 个规则", rules_len);
+    msg!("Batch permission set completed: {} rules", rules_len);
     Ok(())
 }
 
@@ -211,7 +211,7 @@ pub fn remove_access_rule(
     
     access_controller.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("访问规则删除成功: {} for {}", rule_id, user);
+    msg!("Access rule removed: {} for {}", rule_id, user);
     Ok(())
 }
 
@@ -250,7 +250,7 @@ pub fn update_rule_status(
     
     access_controller.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("规则状态更新成功: {} -> {}", rule_id, enabled);
+    msg!("Rule status updated: {} -> {}", rule_id, enabled);
     Ok(())
 }
 
@@ -297,7 +297,7 @@ pub fn check_permission(
         )?;
     }
     
-    msg!("权限检查完成: {} -> {} = {}", requester, target, has_permission);
+    msg!("Permission check completed: {} -> {} = {}", requester, target, has_permission);
     Ok(has_permission)
 }
 
@@ -346,7 +346,7 @@ pub fn batch_check_permissions(
         results.push(result);
     }
     
-    msg!("批量权限检查完成: {} 个请求", results.len());
+    msg!("Batch permission check completed: {} requests", results.len());
     Ok(results)
 }
 
@@ -377,7 +377,7 @@ pub fn get_user_permissions(
     // 2. 评估关系映射
     // 3. 应用条件规则
     
-    msg!("用户权限查询完成: {} 个权限", permissions.len());
+    msg!("User permission query completed: {} permissions", permissions.len());
     Ok(permissions)
 }
 
@@ -414,7 +414,7 @@ pub fn verify_access_token(
     // 检查令牌是否包含所需权限
     let has_permission = token.permissions.contains(&permission);
     
-    msg!("访问令牌验证完成: {} = {}", token.token_id, has_permission);
+    msg!("Access token verified: {} = {}", token.token_id, has_permission);
     Ok(has_permission)
 }
 
@@ -453,7 +453,7 @@ pub fn create_permission_template(
     access_controller.permission_templates.push(template.clone());
     access_controller.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("权限模板创建成功: {}", template.template_id);
+    msg!("Permission template created: {}", template.template_id);
     Ok(())
 }
 
@@ -490,7 +490,7 @@ pub fn update_permission_template(
     
     access_controller.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("权限模板更新成功: {}", template_id);
+    msg!("Permission template updated: {}", template_id);
     Ok(())
 }
 
@@ -526,7 +526,7 @@ pub fn apply_permission_template(
     
     access_controller.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("权限模板应用成功: {} for {}", template_id, user);
+    msg!("Permission template applied: {} for {}", template_id, user);
     Ok(())
 }
 
@@ -615,7 +615,7 @@ pub fn process_manage_relationship_mapping(
     
     access_controller.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("关系映射管理成功: {} <-> {} = {:?}", 
+    msg!("Relationship mapping managed: {} <-> {} = {:?}",
          user1, user2, relationship_type);
     Ok(())
 }
@@ -660,7 +660,7 @@ pub fn batch_update_relationship_permissions(
         )?;
     }
     
-    msg!("批量关系权限更新成功");
+    msg!("Batch relationship permissions updated");
     Ok(())
 }
 
@@ -865,7 +865,7 @@ pub fn set_audit_config(
     access_controller.audit_settings = audit_settings;
     access_controller.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("审计配置更新成功: enabled = {}", audit_enabled);
+    msg!("Audit config updated: enabled = {}", audit_enabled);
     Ok(())
 }
 
@@ -922,6 +922,6 @@ pub fn get_audit_logs(
     
     let audit_logs = Vec::new();
     
-    msg!("审计日志查询完成: {} 条记录", audit_logs.len());
+    msg!("Audit log query completed: {} records", audit_logs.len());
     Ok(audit_logs)
 }

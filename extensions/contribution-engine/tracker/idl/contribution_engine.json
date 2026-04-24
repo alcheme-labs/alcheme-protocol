@@ -897,97 +897,97 @@
     {
       "code": 13000,
       "name": "LedgerAlreadyExists",
-      "msg": "贡献账本已存在"
+      "msg": "Contribution ledger already exists"
     },
     {
       "code": 13001,
       "name": "LedgerNotFound",
-      "msg": "贡献账本未找到"
+      "msg": "Contribution ledger not found"
     },
     {
       "code": 13002,
       "name": "LedgerClosed",
-      "msg": "账本已关闭，不可修改"
+      "msg": "Ledger is closed and cannot be modified"
     },
     {
       "code": 13003,
       "name": "LedgerNotClosed",
-      "msg": "账本尚未关闭，无法结算"
+      "msg": "Ledger is not closed and cannot be settled"
     },
     {
       "code": 13010,
       "name": "ContributionExists",
-      "msg": "贡献记录已存在"
+      "msg": "Contribution record already exists"
     },
     {
       "code": 13011,
       "name": "ContributionNotFound",
-      "msg": "贡献记录未找到"
+      "msg": "Contribution record not found"
     },
     {
       "code": 13012,
       "name": "InvalidRole",
-      "msg": "无效的贡献角色"
+      "msg": "Invalid contribution role"
     },
     {
       "code": 13013,
       "name": "InvalidWeight",
-      "msg": "权重超出有效范围 (0.0 ~ 1.0)"
+      "msg": "Weight out of range (0.0 to 1.0)"
     },
     {
       "code": 13014,
       "name": "MaxEntriesExceeded",
-      "msg": "超过每个 Crystal 的最大贡献条目数"
+      "msg": "Maximum contribution entries per Crystal exceeded"
     },
     {
       "code": 13020,
       "name": "ReferenceExists",
-      "msg": "引用关系已存在"
+      "msg": "Reference already exists"
     },
     {
       "code": 13021,
       "name": "ReferenceNotFound",
-      "msg": "引用关系未找到"
+      "msg": "Reference not found"
     },
     {
       "code": 13022,
       "name": "InvalidReferenceType",
-      "msg": "无效的引用类型"
+      "msg": "Invalid reference type"
     },
     {
       "code": 13023,
       "name": "SelfReferenceNotAllowed",
-      "msg": "不允许自引用"
+      "msg": "Self-reference is not allowed"
     },
     {
       "code": 13030,
       "name": "Unauthorized",
-      "msg": "未授权操作"
+      "msg": "Unauthorized operation"
     },
     {
       "code": 13031,
       "name": "EngineNotInitialized",
-      "msg": "引擎未初始化"
+      "msg": "Engine not initialized"
     },
     {
       "code": 13032,
       "name": "InvalidConfig",
-      "msg": "无效的配置参数"
+      "msg": "Invalid config"
     },
     {
       "code": 13040,
       "name": "WeightOverflow",
-      "msg": "角色权重总和超过 1.0"
+      "msg": "Role weights exceed 1.0"
     },
     {
       "code": 13041,
       "name": "SettlementFailed",
-      "msg": "声誉结算失败"
+      "msg": "Reputation settlement failed"
     },
     {
       "code": 13042,
       "name": "AlreadySettled",
-      "msg": "该账本声誉已结算"
+      "msg": "Ledger reputation already settled"
     }
   ],
   "types": [

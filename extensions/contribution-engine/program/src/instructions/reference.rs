@@ -34,7 +34,7 @@ pub fn add_reference(
     config.total_references += 1;
 
     msg!(
-        "引用已添加: {} -> {} (type={:?}, weight={})",
+        "Reference added: {} -> {} (type={:?}, weight={})",
         source_id,
         target_id,
         reference.ref_type,

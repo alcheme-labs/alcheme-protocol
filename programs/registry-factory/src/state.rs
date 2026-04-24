@@ -86,31 +86,31 @@ impl FactoryManager {
             DeployerExperience::Beginner => {
                 recommendations.push(DeploymentRecommendation {
                     recommendation_type: RecommendationType::Template,
-                    title: "使用预设模板".to_string(),
-                    description: "建议使用标准模板进行部署，降低配置错误风险".to_string(),
+                    title: "Use a preset template".to_string(),
+                    description: "Use a standard template to reduce configuration risk".to_string(),
                     priority: RecommendationPriority::High,
                 });
                 
                 recommendations.push(DeploymentRecommendation {
                     recommendation_type: RecommendationType::Configuration,
-                    title: "启用自动升级".to_string(),
-                    description: "启用自动升级功能，确保注册表保持最新版本".to_string(),
+                    title: "Enable automatic upgrades".to_string(),
+                    description: "Enable automatic upgrades to keep the registry up to date".to_string(),
                     priority: RecommendationPriority::Medium,
                 });
             },
             DeployerExperience::Intermediate => {
                 recommendations.push(DeploymentRecommendation {
                     recommendation_type: RecommendationType::Optimization,
-                    title: "优化配置参数".to_string(),
-                    description: "基于预期用户量优化注册表配置参数".to_string(),
+                    title: "Optimize configuration parameters".to_string(),
+                    description: "Optimize registry configuration for the expected user volume".to_string(),
                     priority: RecommendationPriority::Medium,
                 });
             },
             DeployerExperience::Expert => {
                 recommendations.push(DeploymentRecommendation {
                     recommendation_type: RecommendationType::CustomFeature,
-                    title: "考虑自定义功能".to_string(),
-                    description: "可以启用高级功能和自定义配置".to_string(),
+                    title: "Consider custom features".to_string(),
+                    description: "Advanced features and custom configuration can be enabled".to_string(),
                     priority: RecommendationPriority::Low,
                 });
             },
@@ -121,16 +121,16 @@ impl FactoryManager {
             RegistryType::Content => {
                 recommendations.push(DeploymentRecommendation {
                     recommendation_type: RecommendationType::Integration,
-                    title: "集成存储策略".to_string(),
-                    description: "配置 Arweave 和 IPFS 存储策略以优化成本".to_string(),
+                    title: "Integrate storage strategy".to_string(),
+                    description: "Configure Arweave and IPFS storage policies to optimize cost".to_string(),
                     priority: RecommendationPriority::High,
                 });
             },
             RegistryType::Access => {
                 recommendations.push(DeploymentRecommendation {
                     recommendation_type: RecommendationType::Security,
-                    title: "配置审计日志".to_string(),
-                    description: "启用详细的审计日志以满足合规要求".to_string(),
+                    title: "Configure audit logs".to_string(),
+                    description: "Enable detailed audit logs to meet compliance requirements".to_string(),
                     priority: RecommendationPriority::High,
                 });
             },
@@ -155,7 +155,7 @@ impl FactoryManager {
         checks.push(PrerequisiteCheck {
             check_type: "deployment_fee".to_string(),
             passed: true, // 简化实现
-            message: format!("部署费用: {} lamports", factory_config.deployment_fee),
+            message: format!("Deployment fee: {} lamports", factory_config.deployment_fee),
         });
         
         // 检查注册表类型支持
@@ -167,9 +167,9 @@ impl FactoryManager {
             check_type: "registry_type_support".to_string(),
             passed: type_supported,
             message: if type_supported {
-                "注册表类型受支持".to_string()
+                "Registry type is supported".to_string()
             } else {
-                "注册表类型不受支持".to_string()
+                "Registry type is not supported".to_string()
             },
         });
         
@@ -184,9 +184,9 @@ impl FactoryManager {
             check_type: "config_validation".to_string(),
             passed: config_valid,
             message: if config_valid {
-                "配置验证通过".to_string()
+                "Configuration validation passed".to_string()
             } else {
-                "配置验证失败".to_string()
+                "Configuration validation failed".to_string()
             },
         });
         
@@ -331,18 +331,18 @@ impl VersionManagerUtils {
     /// 获取升级前置条件
     fn get_upgrade_prerequisites(upgrade_path: &UpgradePath) -> Vec<String> {
         let mut prerequisites = vec![
-            "备份当前配置".to_string(),
-            "验证系统健康状态".to_string(),
+            "Back up the current configuration".to_string(),
+            "Verify system health".to_string(),
         ];
         
         match upgrade_path.risk_level {
             UpgradeRisk::High | UpgradeRisk::Critical => {
-                prerequisites.push("创建完整备份".to_string());
-                prerequisites.push("准备回滚计划".to_string());
-                prerequisites.push("通知相关用户".to_string());
+                prerequisites.push("Create a full backup".to_string());
+                prerequisites.push("Prepare a rollback plan".to_string());
+                prerequisites.push("Notify affected users".to_string());
             },
             UpgradeRisk::Medium => {
-                prerequisites.push("测试升级流程".to_string());
+                prerequisites.push("Test the upgrade flow".to_string());
             },
             UpgradeRisk::Low => {
                 // 低风险升级无需额外前置条件
@@ -458,7 +458,7 @@ impl RegistryHealthChecker {
             } else { 
                 HealthStatus::Warning 
             },
-            message: format!("注册表状态: {:?}", deployed_registry.status),
+            message: format!("Registry status: {:?}", deployed_registry.status),
             last_checked: Clock::get().unwrap().unix_timestamp,
         });
         
@@ -476,7 +476,7 @@ impl RegistryHealthChecker {
         checks.push(HealthCheck {
             check_name: "version_freshness".to_string(),
             status: version_check,
-            message: format!("部署时间: {} 天前", deployment_age_days),
+            message: format!("Deployed {} days ago", deployment_age_days),
             last_checked: current_time,
         });
         
@@ -496,9 +496,9 @@ impl RegistryHealthChecker {
                 HealthStatus::Critical 
             },
             message: if config_valid {
-                "配置有效".to_string()
+                "Configuration is valid".to_string()
             } else {
-                "配置无效".to_string()
+                "Configuration is invalid".to_string()
             },
             last_checked: current_time,
         });
@@ -690,8 +690,8 @@ impl ConfigTemplateGenerator {
     pub fn generate_standard_template(registry_type: &RegistryType) -> DeploymentTemplate {
         let (template_name, description, default_config) = match registry_type {
             RegistryType::Identity => (
-                "标准身份注册表".to_string(),
-                "适用于大多数身份管理场景的标准配置".to_string(),
+                "Standard identity registry".to_string(),
+                "Standard configuration for most identity management scenarios".to_string(),
                 RegistryConfig {
                     registry_name: "identity_registry".to_string(),
                     max_entries: 100000,
@@ -713,8 +713,8 @@ impl ConfigTemplateGenerator {
                 },
             ),
             RegistryType::Content => (
-                "标准内容管理器".to_string(),
-                "支持多种内容类型的标准内容管理配置".to_string(),
+                "Standard content manager".to_string(),
+                "Standard content management configuration supporting multiple content types".to_string(),
                 RegistryConfig {
                     registry_name: "content_manager".to_string(),
                     max_entries: 1000000,
@@ -742,8 +742,8 @@ impl ConfigTemplateGenerator {
                 },
             ),
             RegistryType::Access => (
-                "标准访问控制器".to_string(),
-                "提供细粒度权限控制的标准配置".to_string(),
+                "Standard access controller".to_string(),
+                "Standard configuration with fine-grained permission controls".to_string(),
                 RegistryConfig {
                     registry_name: "access_controller".to_string(),
                     max_entries: 500000,
@@ -765,8 +765,8 @@ impl ConfigTemplateGenerator {
                 },
             ),
             RegistryType::Event => (
-                "标准事件发射器".to_string(),
-                "高性能事件处理的标准配置".to_string(),
+                "Standard event emitter".to_string(),
+                "Standard configuration for high-performance event processing".to_string(),
                 RegistryConfig {
                     registry_name: "event_emitter".to_string(),
                     max_entries: 10000000,
@@ -788,8 +788,8 @@ impl ConfigTemplateGenerator {
                 },
             ),
             RegistryType::Circle => (
-                "标准圈层管理器".to_string(),
-                "支持圈层治理和层级管理的标准配置".to_string(),
+                "Standard circle manager".to_string(),
+                "Standard configuration supporting circle governance and hierarchy management".to_string(),
                 RegistryConfig {
                     registry_name: "circle_manager".to_string(),
                     max_entries: 300000,
@@ -811,8 +811,8 @@ impl ConfigTemplateGenerator {
                 },
             ),
             RegistryType::Messaging => (
-                "标准消息管理器".to_string(),
-                "支持私信和群组消息的标准配置".to_string(),
+                "Standard messaging manager".to_string(),
+                "Standard configuration supporting direct and group messages".to_string(),
                 RegistryConfig {
                     registry_name: "messaging_manager".to_string(),
                     max_entries: 5000000,
@@ -840,8 +840,8 @@ impl ConfigTemplateGenerator {
                 },
             ),
             RegistryType::Custom(name) => (
-                format!("自定义注册表 - {}", name),
-                "自定义配置的注册表模板".to_string(),
+                format!("Custom registry - {}", name),
+                "Registry template with custom configuration".to_string(),
                 RegistryConfig {
                     registry_name: format!("custom_{}", name),
                     max_entries: 50000,

@@ -23,7 +23,7 @@ pub fn create_ledger(
 
     config.total_ledgers += 1;
 
-    msg!("贡献账本已创建: crystal_id={}", crystal_id);
+    msg!("Contribution ledger created: crystal_id={}", crystal_id);
     Ok(())
 }
 
@@ -39,7 +39,7 @@ pub fn close_ledger(
     ledger.last_updated = Clock::get()?.unix_timestamp;
 
     msg!(
-        "贡献账本已关闭: crystal_id={}, 贡献者={}人, 总权重={}",
+        "Contribution ledger closed: crystal_id={}, contributors={}, total_weight={}",
         ledger.crystal_id,
         ledger.total_contributors,
         ledger.total_weight

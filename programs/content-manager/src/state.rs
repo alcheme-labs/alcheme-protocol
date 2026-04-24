@@ -525,13 +525,13 @@ impl ContentRecommendationEngine {
     /// 生成推荐原因
     fn generate_recommendation_reason(content: &alcheme_shared::content::ContentPost, score: f64) -> String {
         if score > 0.8 {
-            "高质量内容，符合您的兴趣".to_string()
+            "High-quality content matching your interests".to_string()
         } else if score > 0.6 {
-            "基于您的偏好推荐".to_string()
+            "Recommended based on your preferences".to_string()
         } else if score > 0.4 {
-            "相关内容推荐".to_string()
+            "Related content recommendation".to_string()
         } else {
-            "可能感兴趣的内容".to_string()
+            "Content you may be interested in".to_string()
         }
     }
 }
@@ -601,14 +601,14 @@ impl ContentStatusManager {
     /// 获取状态描述
     pub fn get_status_description(status: &ContentStatus) -> &'static str {
         match status {
-            ContentStatus::Draft => "草稿",
-            ContentStatus::Published => "已发布",
-            ContentStatus::Archived => "已归档",
-            ContentStatus::Deleted => "已删除",
-            ContentStatus::Moderated => "审核中",
-            ContentStatus::Suspended => "已暂停",
-            ContentStatus::Flagged => "已标记",
-            ContentStatus::UnderReview => "审核中",
+            ContentStatus::Draft => "Draft",
+            ContentStatus::Published => "Published",
+            ContentStatus::Archived => "Archived",
+            ContentStatus::Deleted => "Deleted",
+            ContentStatus::Moderated => "Moderated",
+            ContentStatus::Suspended => "Suspended",
+            ContentStatus::Flagged => "Flagged",
+            ContentStatus::UnderReview => "Under review",
         }
     }
 }

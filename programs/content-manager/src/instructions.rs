@@ -45,7 +45,7 @@ pub fn initialize_content_manager(
         moderation_config,
     )?;
     
-    msg!("内容管理器初始化成功");
+    msg!("Content manager initialized");
     Ok(())
 }
 
@@ -83,7 +83,7 @@ pub fn update_manager_config(
     
     content_manager.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("内容管理器配置更新成功");
+    msg!("Content manager config updated");
     Ok(())
 }
 
@@ -282,7 +282,7 @@ pub fn create_content(
         content_created_event,
     )?;
     
-    msg!("内容创建成功: {} by {}", content_id, ctx.accounts.author.key());
+    msg!("Content created: {} by {}", content_id, ctx.accounts.author.key());
     Ok(())
 }
 
@@ -1205,7 +1205,7 @@ fn apply_v2_lifecycle_transition<'info>(
     )?;
 
     msg!(
-        "v2 内容状态更新成功: {} -> {:?} by {}",
+        "v2 content status updated: {} -> {:?} by {}",
         content_id,
         new_status,
         ctx.accounts.author.key()
@@ -1306,7 +1306,7 @@ pub fn create_content_v2_with_audience(
         status,
     )?;
 
-    msg!("v2 内容锚点创建成功: {} by {}", content_id, ctx.accounts.author.key());
+    msg!("v2 content anchor created: {} by {}", content_id, ctx.accounts.author.key());
     Ok(())
 }
 
@@ -1400,7 +1400,7 @@ pub fn create_reply_v2(
     )?;
 
     msg!(
-        "v2 回复锚点创建成功: {} -> {} by {}",
+        "v2 reply anchor created: {} -> {} by {}",
         content_id,
         parent_content,
         ctx.accounts.author.key()
@@ -1497,7 +1497,7 @@ pub fn create_repost_v2(
     )?;
 
     msg!(
-        "v2 转发锚点创建成功: {} -> {} by {}",
+        "v2 repost anchor created: {} -> {} by {}",
         content_id,
         original_content,
         ctx.accounts.author.key()
@@ -1594,7 +1594,7 @@ pub fn create_quote_v2(
     )?;
 
     msg!(
-        "v2 引用锚点创建成功: {} -> {} by {}",
+        "v2 quote anchor created: {} -> {} by {}",
         content_id,
         quoted_content,
         ctx.accounts.author.key()
@@ -1666,7 +1666,7 @@ pub fn create_reply_v2_by_id(
     )?;
 
     msg!(
-        "v2 回复锚点创建成功(by_id): {} -> {} by {}",
+        "v2 reply anchor created by id: {} -> {} by {}",
         content_id,
         parent_content_id,
         ctx.accounts.author.key()
@@ -1738,7 +1738,7 @@ pub fn create_repost_v2_by_id(
     )?;
 
     msg!(
-        "v2 转发锚点创建成功(by_id): {} -> {} by {}",
+        "v2 repost anchor created by id: {} -> {} by {}",
         content_id,
         original_content_id,
         ctx.accounts.author.key()
@@ -1810,7 +1810,7 @@ pub fn create_quote_v2_by_id(
     )?;
 
     msg!(
-        "v2 引用锚点创建成功(by_id): {} -> {} by {}",
+        "v2 quote anchor created by id: {} -> {} by {}",
         content_id,
         quoted_content_id,
         ctx.accounts.author.key()
@@ -2005,7 +2005,7 @@ pub fn update_content_anchor_v2(
     )?;
 
     msg!(
-        "v2 内容锚点更新成功: {} version {} by {}",
+        "v2 content anchor updated: {} version {} by {}",
         content_id,
         content_version,
         ctx.accounts.author.key()
@@ -2069,7 +2069,7 @@ pub fn update_content(
         event,
     )?;
     
-    msg!("内容更新成功: {}", content_post.content_id);
+    msg!("Content updated: {}", content_post.content_id);
     Ok(())
 }
 
@@ -2149,7 +2149,7 @@ pub fn delete_content(
         event,
     )?;
     
-    msg!("内容删除成功: {} (类型: {:?})", content_post.content_id, deletion_type);
+    msg!("Content deleted: {} (type: {:?})", content_post.content_id, deletion_type);
     Ok(())
 }
 
@@ -2280,7 +2280,7 @@ pub fn create_reply(
     // 更新管理器统计
     ctx.accounts.content_manager.create_content()?;
     
-    msg!("回复创建成功: {} -> {}", content_id, parent_content);
+    msg!("Reply created: {} -> {}", content_id, parent_content);
     Ok(())
 }
 
@@ -2399,7 +2399,7 @@ pub fn create_quote(
     // 更新管理器统计
     ctx.accounts.content_manager.create_content()?;
     
-    msg!("引用创建成功: {} -> {}", content_id, quoted_content);
+    msg!("Quote created: {} -> {}", content_id, quoted_content);
     Ok(())
 }
 
@@ -2524,7 +2524,7 @@ pub fn create_repost(
     // 更新管理器统计
     ctx.accounts.content_manager.create_content()?;
     
-    msg!("转发创建成功: {} -> {}", content_id, original_content);
+    msg!("Repost created: {} -> {}", content_id, original_content);
     Ok(())
 }
 
@@ -2589,7 +2589,7 @@ pub fn interact_with_content(
         event,
     )?;
     
-    msg!("内容互动记录成功: {:?} on {}", interaction_type, content_stats.content_id);
+    msg!("Content interaction recorded: {:?} on {}", interaction_type, content_stats.content_id);
     Ok(())
 }
 
@@ -2622,7 +2622,7 @@ pub fn batch_update_interactions(
     // 重新计算所有评分
     content_stats.recalculate_engagement_score()?;
     
-    msg!("批量互动更新成功: {} 个互动", interactions_len);
+    msg!("Batch interaction update completed: {} interactions", interactions_len);
     Ok(())
 }
 
@@ -2661,7 +2661,7 @@ pub fn update_content_scores(
     
     content_stats.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("内容评分更新成功: {}", content_stats.content_id);
+    msg!("Content score updated: {}", content_stats.content_id);
     Ok(())
 }
 
@@ -2693,7 +2693,7 @@ pub fn update_content_status(
     content_post.last_updated = Clock::get()?.unix_timestamp;
     
     let reason_msg = reason.unwrap_or_else(|| "No reason provided".to_string());
-    msg!("内容状态更新: {} -> {:?} (原因: {})", 
+    msg!("Content status updated: {} -> {:?} (reason: {})",
          content_post.content_id, new_status, reason_msg);
     
     Ok(())
@@ -2723,7 +2723,7 @@ pub fn set_content_visibility(
     content_post.visibility_settings = visibility_settings;
     content_post.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("内容可见性设置成功: {}", content_post.content_id);
+    msg!("Content visibility configured: {}", content_post.content_id);
     Ok(())
 }
 
@@ -2755,7 +2755,7 @@ pub fn set_content_monetization(
     
     content_post.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("内容变现设置成功: {}", content_post.content_id);
+    msg!("Content monetization configured: {}", content_post.content_id);
     Ok(())
 }
 
@@ -2913,7 +2913,7 @@ pub fn search_content(
     
     let results = Vec::new();
     
-    msg!("内容搜索完成: {} 个结果", results.len());
+    msg!("Content search completed: {} results", results.len());
     Ok(results)
 }
 
@@ -2933,7 +2933,7 @@ pub fn get_recommended_content(
     
     let recommendations = Vec::new();
     
-    msg!("内容推荐生成完成: {} 个推荐", recommendations.len());
+    msg!("Content recommendations generated: {} recommendations", recommendations.len());
     Ok(recommendations)
 }
 
@@ -2954,7 +2954,7 @@ pub fn get_trending_content(
     
     let trending_content = Vec::new();
     
-    msg!("趋势内容查询完成: {} 个内容", trending_content.len());
+    msg!("Trending content query completed: {} items", trending_content.len());
     Ok(trending_content)
 }
 
@@ -3017,7 +3017,7 @@ pub fn update_storage_info(
     
     ctx.accounts.content_post.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("存储信息更新成功: {}", content_storage.content_id);
+    msg!("Storage info updated: {}", content_storage.content_id);
     Ok(())
 }
 
@@ -3066,7 +3066,7 @@ pub fn migrate_storage_strategy(
     ctx.accounts.content_post.primary_storage_uri = new_primary_uri;
     ctx.accounts.content_post.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("存储策略迁移开始: {}", content_storage.content_id);
+    msg!("Storage policy migration started: {}", content_storage.content_id);
     Ok(())
 }
 
@@ -3108,7 +3108,7 @@ pub fn cpi_update_content_status(
     content_post.last_updated = Clock::get()?.unix_timestamp;
 
     let reason_msg = reason.unwrap_or_else(|| "Extension update".to_string());
-    msg!("Extension 内容状态更新: {} -> {:?} (caller: {}, reason: {})",
+    msg!("Extension content status updated: {} -> {:?} (caller: {}, reason: {})",
          content_post.content_id, new_status,
          ctx.accounts.caller_program.key(), reason_msg);
 
@@ -3151,7 +3151,7 @@ pub fn cpi_add_content_reference(
     content_stats.last_updated = Clock::get()?.unix_timestamp;
     content_stats.update_sequence += 1;
 
-    msg!("Extension 内容引用添加: content={}, ref_type={}, ref_id={}, caller={}",
+    msg!("Extension content reference added: content={}, ref_type={}, ref_id={}, caller={}",
          ctx.accounts.content_post.content_id, reference_type,
          reference_id, ctx.accounts.caller_program.key());
 

@@ -4,7 +4,7 @@
     "name": "event_emitter",
     "version": "0.1.0",
     "spec": "0.1.0",
-    "description": "Event Emitter Program for SocialHub Protocol"
+    "description": "Event Emitter Program for Alcheme Protocol"
   },
   "docs": [
     "Event Emitter Program - 全局事件系统"
@@ -1162,6 +1162,20 @@
       }
     },
     {
+      "name": "CircleLifecycleStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Archived"
+          }
+        ]
+      }
+    },
+    {
       "name": "CircleMemberRole",
       "type": {
         "kind": "enum",
@@ -1211,6 +1225,9 @@
           },
           {
             "name": "Removed"
+          },
+          {
+            "name": "RoleChanged"
           }
         ]
       }
@@ -1486,6 +1503,23 @@
           {
             "name": "average_delivery_time",
             "type": "f64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DraftLifecycleMilestoneAction",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "EnteredCrystallization"
+          },
+          {
+            "name": "Archived"
+          },
+          {
+            "name": "Restored"
           }
         ]
       }
@@ -2987,6 +3021,40 @@
             ]
           },
           {
+            "name": "DraftLifecycleMilestoneV2",
+            "fields": [
+              {
+                "name": "draft_post_id",
+                "type": "u64"
+              },
+              {
+                "name": "action",
+                "type": {
+                  "defined": {
+                    "name": "DraftLifecycleMilestoneAction"
+                  }
+                }
+              },
+              {
+                "name": "actor",
+                "type": "pubkey"
+              },
+              {
+                "name": "policy_profile_digest",
+                "type": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
             "name": "CircleCreated",
             "fields": [
               {
@@ -3038,6 +3106,78 @@
               },
               {
                 "name": "updated_by",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "CircleArchived",
+            "fields": [
+              {
+                "name": "circle_id",
+                "type": "u8"
+              },
+              {
+                "name": "previous_status",
+                "type": {
+                  "defined": {
+                    "name": "CircleLifecycleStatus"
+                  }
+                }
+              },
+              {
+                "name": "new_status",
+                "type": {
+                  "defined": {
+                    "name": "CircleLifecycleStatus"
+                  }
+                }
+              },
+              {
+                "name": "actor",
+                "type": "pubkey"
+              },
+              {
+                "name": "reason",
+                "type": {
+                  "option": "string"
+                }
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "CircleRestored",
+            "fields": [
+              {
+                "name": "circle_id",
+                "type": "u8"
+              },
+              {
+                "name": "previous_status",
+                "type": {
+                  "defined": {
+                    "name": "CircleLifecycleStatus"
+                  }
+                }
+              },
+              {
+                "name": "new_status",
+                "type": {
+                  "defined": {
+                    "name": "CircleLifecycleStatus"
+                  }
+                }
+              },
+              {
+                "name": "actor",
                 "type": "pubkey"
               },
               {
@@ -3243,6 +3383,40 @@
               },
               {
                 "name": "registered_by",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "MembershipAttestorRegistered",
+            "fields": [
+              {
+                "name": "attestor",
+                "type": "pubkey"
+              },
+              {
+                "name": "registered_by",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "MembershipAttestorRevoked",
+            "fields": [
+              {
+                "name": "attestor",
+                "type": "pubkey"
+              },
+              {
+                "name": "revoked_by",
                 "type": "pubkey"
               },
               {

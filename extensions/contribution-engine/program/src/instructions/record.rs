@@ -43,7 +43,7 @@ pub fn record_contribution(
     ledger.last_updated = clock.unix_timestamp;
 
     msg!(
-        "贡献已记录: crystal={}, contributor={}, role={:?}, weight={}",
+        "Contribution recorded: crystal={}, contributor={}, role={:?}, weight={}",
         ledger.crystal_id,
         ctx.accounts.contributor.key(),
         entry.role,
@@ -75,7 +75,7 @@ pub fn update_contribution_score(
     entry.weight = new_weight;
 
     msg!(
-        "贡献分数已更新: contributor={}, new_weight={}",
+        "Contribution score updated: contributor={}, new_weight={}",
         entry.contributor,
         new_weight
     );

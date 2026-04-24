@@ -579,22 +579,22 @@ impl DeploymentRiskAssessor {
     fn generate_mitigation_strategies(risk_level: &DeploymentRisk) -> Vec<String> {
         match risk_level {
             DeploymentRisk::Critical => vec![
-                "使用测试环境进行完整验证".to_string(),
-                "准备详细的回滚计划".to_string(),
-                "安排专家审查配置".to_string(),
-                "分阶段部署，逐步放量".to_string(),
+                "Use a test environment for full validation".to_string(),
+                "Prepare a detailed rollback plan".to_string(),
+                "Schedule expert configuration review".to_string(),
+                "Deploy in phases with gradual rollout".to_string(),
             ],
             DeploymentRisk::High => vec![
-                "使用标准化模板".to_string(),
-                "启用详细监控".to_string(),
-                "准备备份方案".to_string(),
+                "Use standardized templates".to_string(),
+                "Enable detailed monitoring".to_string(),
+                "Prepare a backup plan".to_string(),
             ],
             DeploymentRisk::Medium => vec![
-                "验证配置参数".to_string(),
-                "启用基础监控".to_string(),
+                "Validate configuration parameters".to_string(),
+                "Enable basic monitoring".to_string(),
             ],
             DeploymentRisk::Low => vec![
-                "使用标准部署流程".to_string(),
+                "Use the standard deployment flow".to_string(),
             ],
         }
     }
@@ -603,18 +603,18 @@ impl DeploymentRiskAssessor {
     fn generate_recommended_actions(risk_level: &DeploymentRisk) -> Vec<String> {
         match risk_level {
             DeploymentRisk::Critical => vec![
-                "考虑延迟部署，先解决风险因素".to_string(),
-                "咨询技术专家".to_string(),
+                "Consider delaying deployment until risk factors are resolved".to_string(),
+                "Consult technical experts".to_string(),
             ],
             DeploymentRisk::High => vec![
-                "仔细审查配置".to_string(),
-                "准备应急预案".to_string(),
+                "Review the configuration carefully".to_string(),
+                "Prepare an incident response plan".to_string(),
             ],
             DeploymentRisk::Medium => vec![
-                "使用推荐配置".to_string(),
+                "Use the recommended configuration".to_string(),
             ],
             DeploymentRisk::Low => vec![
-                "可以正常部署".to_string(),
+                "Deployment can proceed normally".to_string(),
             ],
         }
     }

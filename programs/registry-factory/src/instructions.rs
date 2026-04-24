@@ -36,7 +36,7 @@ pub fn initialize_registry_factory(
     
     registry_factory.initialize(bump, ctx.accounts.admin.key(), factory_config)?;
     
-    msg!("注册表工厂初始化成功");
+    msg!("Registry factory initialized");
     Ok(())
 }
 
@@ -64,7 +64,7 @@ pub fn update_factory_config(
     registry_factory.factory_config = new_config;
     registry_factory.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("工厂配置更新成功");
+    msg!("Factory config updated");
     Ok(())
 }
 
@@ -100,7 +100,7 @@ pub fn create_deployment_template(
     // 添加模板
     registry_factory.add_deployment_template(template.clone())?;
     
-    msg!("部署模板创建成功: {}", template.template_id);
+    msg!("Deployment template created: {}", template.template_id);
     Ok(())
 }
 
@@ -137,7 +137,7 @@ pub fn update_deployment_template(
     
     registry_factory.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("部署模板更新成功: {}", template_id);
+    msg!("Deployment template updated: {}", template_id);
     Ok(())
 }
 
@@ -176,7 +176,7 @@ pub fn delete_deployment_template(
     
     registry_factory.last_updated = Clock::get()?.unix_timestamp;
     
-    msg!("部署模板删除成功: {}", template_id);
+    msg!("Deployment template deleted: {}", template_id);
     Ok(())
 }
 
@@ -264,7 +264,7 @@ pub fn deploy_identity_registry(
     // 发射部署事件 (通过 CPI 调用 Event Emitter)
     // 简化实现：在实际项目中会调用 event_emitter::cpi::emit_event
     
-    msg!("身份注册表部署成功: {} by {}", registry_name, deployer);
+    msg!("Identity registry deployed: {} by {}", registry_name, deployer);
     Ok(())
 }
 
@@ -341,7 +341,7 @@ pub fn deploy_content_manager(
     // 更新工厂统计
     registry_factory.deploy_registry(RegistryType::Content)?;
     
-    msg!("内容管理器部署成功: {} by {}", manager_name, deployer);
+    msg!("Content manager deployed: {} by {}", manager_name, deployer);
     Ok(())
 }
 
@@ -418,7 +418,7 @@ pub fn deploy_access_controller(
     // 更新工厂统计
     registry_factory.deploy_registry(RegistryType::Access)?;
     
-    msg!("访问控制器部署成功: {} by {}", controller_name, deployer);
+    msg!("Access controller deployed: {} by {}", controller_name, deployer);
     Ok(())
 }
 
@@ -495,7 +495,7 @@ pub fn deploy_event_emitter(
     // 更新工厂统计
     registry_factory.deploy_registry(RegistryType::Event)?;
     
-    msg!("事件发射器部署成功: {} by {}", emitter_name, deployer);
+    msg!("Event emitter deployed: {} by {}", emitter_name, deployer);
     Ok(())
 }
 
@@ -572,7 +572,7 @@ pub fn deploy_circle_manager(
     // 更新工厂统计
     registry_factory.deploy_registry(RegistryType::Circle)?;
     
-    msg!("圈层管理器部署成功: {} by {}", manager_name, deployer);
+    msg!("Circle manager deployed: {} by {}", manager_name, deployer);
     Ok(())
 }
 
@@ -649,7 +649,7 @@ pub fn deploy_messaging_manager(
     // 更新工厂统计
     registry_factory.deploy_registry(RegistryType::Messaging)?;
     
-    msg!("消息管理器部署成功: {} by {}", manager_name, deployer);
+    msg!("Messaging manager deployed: {} by {}", manager_name, deployer);
     Ok(())
 }
 
@@ -697,7 +697,7 @@ pub fn upgrade_registry(
         UpgradeMethod::Manual,
     )?;
     
-    msg!("注册表升级成功: {} -> {}", registry_id, new_version);
+    msg!("Registry upgraded: {} -> {}", registry_id, new_version);
     Ok(())
 }
 
@@ -737,7 +737,7 @@ pub fn pause_registry(
     
     deployed_registry.update_status(RegistryStatus::Paused)?;
     
-    msg!("注册表暂停成功: {} (原因: {})", registry_id, reason);
+    msg!("Registry paused: {} (reason: {})", registry_id, reason);
     Ok(())
 }
 
@@ -776,7 +776,7 @@ pub fn resume_registry(
     
     deployed_registry.update_status(RegistryStatus::Active)?;
     
-    msg!("注册表恢复成功: {}", registry_id);
+    msg!("Registry resumed: {}", registry_id);
     Ok(())
 }
 
@@ -814,7 +814,7 @@ pub fn deprecate_registry(
     deployed_registry.update_status(RegistryStatus::Deprecated)?;
     registry_factory.deactivate_registry()?;
     
-    msg!("注册表弃用成功: {} (原因: {}, 迁移路径: {})", 
+    msg!("Registry deprecated: {} (reason: {}, migration path: {})",
          registry_id, deprecation_reason, migration_path);
     Ok(())
 }
@@ -898,7 +898,7 @@ pub fn list_deployed_registries(
     
     let registries = Vec::new();
     
-    msg!("注册表列表查询完成: {} 个注册表", registries.len());
+    msg!("Registry list query completed: {} registries", registries.len());
     Ok(registries)
 }
 
@@ -972,7 +972,7 @@ pub fn check_upgrade_availability(
         .cloned()
         .collect();
     
-    msg!("升级路径查询完成: {} 个可用升级", available_upgrades.len());
+    msg!("Upgrade path query completed: {} available upgrades", available_upgrades.len());
     Ok(available_upgrades)
 }
 
@@ -1018,7 +1018,7 @@ pub fn initialize_extension_registry(
         last_updated: now,
     };
 
-    msg!("扩展注册表初始化成功, max_extensions={}", max_extensions);
+    msg!("Extension registry initialized, max_extensions={}", max_extensions);
     Ok(())
 }
 
@@ -1046,7 +1046,7 @@ pub fn register_extension(
     let registry = &mut ctx.accounts.extension_registry;
     registry.inner.register_extension(program_id, permissions)?;
 
-    msg!("扩展程序注册成功: {}", program_id);
+    msg!("Extension registered: {}", program_id);
     Ok(())
 }
 
@@ -1073,7 +1073,7 @@ pub fn remove_extension(
     let registry = &mut ctx.accounts.extension_registry;
     registry.inner.remove_extension(&program_id)?;
 
-    msg!("扩展程序移除成功: {}", program_id);
+    msg!("Extension removed: {}", program_id);
     Ok(())
 }
 
@@ -1101,6 +1101,6 @@ pub fn update_extension_permissions(
     let registry = &mut ctx.accounts.extension_registry;
     registry.inner.update_extension_permissions(&program_id, new_permissions)?;
 
-    msg!("扩展程序权限更新成功: {}", program_id);
+    msg!("Extension permissions updated: {}", program_id);
     Ok(())
 }
