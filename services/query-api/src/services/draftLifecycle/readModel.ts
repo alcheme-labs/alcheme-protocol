@@ -46,6 +46,16 @@ interface AcceptedCandidateNoticeRow {
     createdAt: Date;
 }
 
+interface AcceptedCandidateAttemptRow {
+    candidateId: string;
+    draftPostId: number;
+    sourceMessageIds: unknown;
+    sourceSemanticFacets: unknown;
+    sourceAuthorAnnotations: unknown;
+    lastProposalId: string | null;
+    acceptedAt: Date;
+}
+
 interface DraftPostRow {
     id: number;
     authorId: number;
@@ -588,6 +598,43 @@ export async function loadAcceptedCandidateHandoffForDraftPost(
         if (!parsed || parsed.draftPostId !== draftPostId) continue;
         const acceptedAt = normalizeAcceptedCandidateSeedAt(
             row.createdAt,
+            draftPost?.createdAt ?? null,
+        );
+        return {
+            ...parsed,
+            acceptedAt: acceptedAt.toISOString(),
+        };
+    }
+
+    const attemptRows = await prisma.$queryRaw<AcceptedCandidateAttemptRow[]>(Prisma.sql`
+        SELECT
+            candidate_id AS "candidateId",
+            draft_post_id AS "draftPostId",
+            source_message_ids AS "sourceMessageIds",
+            source_semantic_facets AS "sourceSemanticFacets",
+            source_author_annotations AS "sourceAuthorAnnotations",
+            last_proposal_id AS "lastProposalId",
+            updated_at AS "acceptedAt"
+        FROM draft_candidate_generation_attempts
+        WHERE draft_post_id = ${draftPostId}
+          AND status = 'succeeded'
+        ORDER BY updated_at DESC
+        LIMIT 1
+    `);
+
+    for (const row of attemptRows) {
+        const parsed = parseAcceptedCandidateHandoffMetadata({
+            state: 'accepted',
+            candidateId: row.candidateId,
+            draftPostId: row.draftPostId,
+            sourceMessageIds: row.sourceMessageIds,
+            sourceSemanticFacets: row.sourceSemanticFacets,
+            sourceAuthorAnnotations: row.sourceAuthorAnnotations,
+            lastProposalId: row.lastProposalId,
+        });
+        if (!parsed || parsed.draftPostId !== draftPostId) continue;
+        const acceptedAt = normalizeAcceptedCandidateSeedAt(
+            row.acceptedAt,
             draftPost?.createdAt ?? null,
         );
         return {

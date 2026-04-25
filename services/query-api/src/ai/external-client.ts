@@ -1,7 +1,7 @@
 import { serviceConfig } from '../config/services';
 
 export interface ExternalAiTextRequest {
-    task: 'scoring' | 'ghost-draft' | 'discussion-summary' | 'discussion-trigger';
+    task: 'scoring' | 'ghost-draft' | 'discussion-initial-draft' | 'discussion-summary' | 'discussion-trigger';
     model: string;
     systemPrompt?: string | null;
     userPrompt: string;

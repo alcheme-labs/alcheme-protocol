@@ -1,14 +1,28 @@
 import crypto from 'node:crypto';
 import { Prisma, type PrismaClient } from '@prisma/client';
 
-import { generateGhostDraft } from '../../ai/ghost-draft';
-import { createDraftVersionSnapshot } from '../draftLifecycle/versionSnapshots';
+import {
+    DiscussionInitialDraftError,
+    generateInitialDiscussionDraft,
+} from '../../ai/discussion-initial-draft';
+import { createDraftAnchorBatch } from '../draftAnchor';
+import {
+    createDraftVersionSnapshot,
+    updateDraftVersionSnapshotSourceEvidence,
+} from '../draftLifecycle/versionSnapshots';
 import { requireCircleManagerRole } from '../membership/checks';
+import { buildDiscussionRoomKey } from '../offchainDiscussion';
 import {
     DISCUSSION_SEMANTIC_FACETS,
     type AuthorAnnotationKind,
     type SemanticFacet,
 } from './analysis/types';
+import {
+    claimDraftCandidateGenerationAttempt,
+    computeDraftCandidateSourceDigest,
+    markDraftCandidateGenerationFailed,
+    markDraftCandidateGenerationSucceeded,
+} from './candidateGenerationAttempts';
 import { publishDraftCandidateSystemNotices } from './systemNoticeProducer';
 
 type PrismaLike = PrismaClient | Prisma.TransactionClient;
@@ -19,6 +33,7 @@ interface CandidateNoticeRow {
 
 type CandidateState =
     | 'open'
+    | 'pending'
     | 'proposal_active'
     | 'accepted'
     | 'generation_failed'
@@ -33,6 +48,7 @@ interface DraftCandidateNoticeRecord {
     sourceMessageIds: string[];
     sourceSemanticFacets: SemanticFacet[];
     sourceAuthorAnnotations: AuthorAnnotationKind[];
+    lastProposalId: string | null;
     draftPostId: number | null;
 }
 
@@ -59,19 +75,26 @@ export interface AcceptDraftCandidateInput {
 }
 
 export interface AcceptDraftCandidateResult {
+    status: 'created' | 'existing' | 'pending' | 'generation_failed';
     candidateId: string;
-    draftPostId: number;
+    draftPostId?: number;
     created: boolean;
-    ghostDraftGenerationId: number | null;
+    ghostDraftGenerationId?: number | null;
+    attemptId?: number;
+    claimedUntil?: Date;
+    canRetry?: boolean;
+    draftGenerationError?: string;
 }
 
 type CreatedDraftTransactionResult =
     | {
+        status: 'existing';
         candidateId: string;
         draftPostId: number;
         created: false;
     }
     | {
+        status: 'created';
         candidateId: string;
         draftPostId: number;
         created: true;
@@ -90,6 +113,7 @@ function normalizeState(value: unknown): CandidateState | null {
     const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
     if (
         normalized === 'open'
+        || normalized === 'pending'
         || normalized === 'proposal_active'
         || normalized === 'accepted'
         || normalized === 'generation_failed'
@@ -146,6 +170,9 @@ function parseCandidateNotice(metadata: unknown): DraftCandidateNoticeRecord | n
             metadata.sourceSemanticFacets ?? metadata.sourceDiscussionLabels,
         ),
         sourceAuthorAnnotations: normalizeAuthorAnnotations(metadata.sourceAuthorAnnotations),
+        lastProposalId: typeof metadata.lastProposalId === 'string' && metadata.lastProposalId.trim()
+            ? metadata.lastProposalId.trim()
+            : null,
         draftPostId: normalizePositiveInt(metadata.draftPostId),
     };
 }
@@ -183,17 +210,6 @@ async function loadPersistedCandidateAcceptance(
         },
     });
     return row ? { draftPostId: row.draftPostId } : null;
-}
-
-function buildCandidateSeedDraftText(input: {
-    circleName: string;
-    summary: string | null;
-}): string {
-    const lines = [input.circleName.trim()];
-    if (input.summary) {
-        lines.push('', input.summary.trim());
-    }
-    return lines.filter((line, index, array) => !(line === '' && array[index - 1] === '')).join('\n');
 }
 
 async function createCandidateSeedDraft(
@@ -270,70 +286,192 @@ export async function acceptDraftCandidateIntoDraft(
         });
     }
 
+    const existingAcceptance = await loadPersistedCandidateAcceptance(prisma, {
+        circleId: input.circleId,
+        candidateId: input.candidateId,
+    });
+    if (existingAcceptance) {
+        return {
+            status: 'existing',
+            candidateId: input.candidateId,
+            draftPostId: existingAcceptance.draftPostId,
+            created: false,
+            ghostDraftGenerationId: null,
+        };
+    }
+
+    const circle = await prisma.circle.findUnique({
+        where: { id: input.circleId },
+        select: { id: true, name: true, description: true, creatorId: true },
+    });
+    if (!circle) {
+        throw new DraftCandidateAcceptanceError({
+            statusCode: 404,
+            code: 'circle_not_found',
+            message: 'circle not found',
+        });
+    }
+
+    const notice = await loadLatestCandidateNotice(prisma, {
+        circleId: input.circleId,
+        candidateId: input.candidateId,
+    });
+    if (!notice) {
+        throw new DraftCandidateAcceptanceError({
+            statusCode: 404,
+            code: 'draft_candidate_not_found',
+            message: 'draft candidate not found',
+        });
+    }
+
+    if (notice.state === 'accepted' && notice.draftPostId) {
+        return {
+            status: 'existing',
+            candidateId: notice.candidateId,
+            draftPostId: notice.draftPostId,
+            created: false,
+            ghostDraftGenerationId: null,
+        };
+    }
+
+    if (notice.state !== 'open' && notice.state !== 'pending' && notice.state !== 'generation_failed') {
+        throw new DraftCandidateAcceptanceError({
+            statusCode: 409,
+            code: 'draft_candidate_not_ready',
+            message: `draft candidate is in state ${notice.state}`,
+        });
+    }
+
+    if (notice.sourceMessageIds.length === 0) {
+        throw new DraftCandidateAcceptanceError({
+            statusCode: 409,
+            code: 'draft_candidate_missing_sources',
+            message: 'draft candidate has no source messages',
+        });
+    }
+
+    const sourceMessagesDigest = computeDraftCandidateSourceDigest(notice.sourceMessageIds);
+    const claim = await claimDraftCandidateGenerationAttempt(prisma, {
+        circleId: input.circleId,
+        candidateId: notice.candidateId,
+        sourceMessagesDigest,
+        sourceMessageIds: notice.sourceMessageIds,
+        sourceSemanticFacets: notice.sourceSemanticFacets,
+        sourceAuthorAnnotations: notice.sourceAuthorAnnotations,
+        lastProposalId: notice.lastProposalId,
+        summaryMethod: null,
+        attemptedByUserId: userId,
+    });
+
+    if (claim.status === 'succeeded') {
+        return {
+            status: 'existing',
+            candidateId: notice.candidateId,
+            draftPostId: claim.draftPostId,
+            created: false,
+            ghostDraftGenerationId: null,
+        };
+    }
+
+    if (claim.status === 'pending') {
+        try {
+            await publishDraftCandidateSystemNotices(prisma, {
+                circleId: input.circleId,
+                summary: notice.summary || '',
+                sourceMessageIds: notice.sourceMessageIds,
+                sourceSemanticFacets: notice.sourceSemanticFacets,
+                sourceAuthorAnnotations: notice.sourceAuthorAnnotations,
+                draftPostId: null,
+                triggerReason: 'manual_candidate_acceptance_pending',
+                candidateStateOverride: 'pending',
+                draftGenerationStatus: 'pending',
+            });
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            console.warn(`candidate acceptance: failed to publish pending notice (${message})`);
+        }
+        return {
+            status: 'pending',
+            candidateId: notice.candidateId,
+            attemptId: claim.attemptId,
+            claimedUntil: claim.claimedUntil,
+            created: false,
+        };
+    }
+
+    const initialDraft = await generateInitialDiscussionDraft(prisma, {
+        circleId: input.circleId,
+        circleName: circle.name,
+        circleDescription: circle.description,
+        sourceMessageIds: notice.sourceMessageIds,
+    }).catch((error) => {
+        if (error instanceof DraftCandidateAcceptanceError) throw error;
+        if (error instanceof DiscussionInitialDraftError) {
+            return {
+                error,
+            };
+        }
+        return {
+            error: new DiscussionInitialDraftError({
+                code: 'initial_draft_generation_failed',
+                message: error instanceof Error ? error.message : String(error || ''),
+            }),
+        };
+    });
+
+    if ('error' in initialDraft) {
+        const generationError = initialDraft.error;
+        await markDraftCandidateGenerationFailed(prisma, {
+            attemptId: claim.attemptId,
+            claimToken: claim.claimToken,
+            draftGenerationError: generationError.code,
+            draftGenerationDiagnostics: {
+                ...generationError.diagnostics,
+                message: generationError.message,
+            },
+        });
+        try {
+            await publishDraftCandidateSystemNotices(prisma, {
+                circleId: input.circleId,
+                summary: notice.summary || '',
+                sourceMessageIds: notice.sourceMessageIds,
+                sourceSemanticFacets: notice.sourceSemanticFacets,
+                sourceAuthorAnnotations: notice.sourceAuthorAnnotations,
+                draftPostId: null,
+                triggerReason: 'manual_candidate_acceptance_failed',
+                candidateStateOverride: 'generation_failed',
+                draftGenerationError: generationError.code,
+            });
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            console.warn(`candidate acceptance: failed to publish generation_failed notice (${message})`);
+        }
+        return {
+            status: 'generation_failed',
+            candidateId: notice.candidateId,
+            canRetry: generationError.retryable,
+            draftGenerationError: generationError.code,
+            created: false,
+        };
+    }
+
     const createdDraft = await prisma.$transaction<CreatedDraftTransactionResult>(async (tx) => {
         await acquireCandidateAcceptanceLock(tx, {
             circleId: input.circleId,
             candidateId: input.candidateId,
         });
 
-        const existingAcceptance = await loadPersistedCandidateAcceptance(tx, {
+        const existingAfterLock = await loadPersistedCandidateAcceptance(tx, {
             circleId: input.circleId,
             candidateId: input.candidateId,
         });
-        if (existingAcceptance) {
+        if (existingAfterLock) {
             return {
+                status: 'existing',
                 candidateId: input.candidateId,
-                draftPostId: existingAcceptance.draftPostId,
+                draftPostId: existingAfterLock.draftPostId,
                 created: false,
             };
-        }
-
-        const circle = await tx.circle.findUnique({
-            where: { id: input.circleId },
-            select: { id: true, name: true, creatorId: true },
-        });
-        if (!circle) {
-            throw new DraftCandidateAcceptanceError({
-                statusCode: 404,
-                code: 'circle_not_found',
-                message: 'circle not found',
-            });
-        }
-
-        const notice = await loadLatestCandidateNotice(tx, {
-            circleId: input.circleId,
-            candidateId: input.candidateId,
-        });
-        if (!notice) {
-            throw new DraftCandidateAcceptanceError({
-                statusCode: 404,
-                code: 'draft_candidate_not_found',
-                message: 'draft candidate not found',
-            });
-        }
-
-        if (notice.state === 'accepted' && notice.draftPostId) {
-            return {
-                candidateId: notice.candidateId,
-                draftPostId: notice.draftPostId,
-                created: false,
-            };
-        }
-
-        if (notice.state !== 'open') {
-            throw new DraftCandidateAcceptanceError({
-                statusCode: 409,
-                code: 'draft_candidate_not_ready',
-                message: `draft candidate is in state ${notice.state}`,
-            });
-        }
-
-        if (notice.sourceMessageIds.length === 0) {
-            throw new DraftCandidateAcceptanceError({
-                statusCode: 409,
-                code: 'draft_candidate_missing_sources',
-                message: 'draft candidate has no source messages',
-            });
         }
 
         const contentId = `candidate-draft:${input.circleId}:${Date.now()}:${crypto.randomBytes(6).toString('hex')}`;
@@ -342,10 +480,7 @@ export async function acceptDraftCandidateIntoDraft(
             contentId,
             authorId: circle.creatorId,
             circleId: input.circleId,
-            text: buildCandidateSeedDraftText({
-                circleName: circle.name,
-                summary: notice.summary,
-            }),
+            text: initialDraft.draftText,
             onChainAddress,
         });
 
@@ -358,7 +493,30 @@ export async function acceptDraftCandidateIntoDraft(
             },
         });
 
+        const successRecorded = await markDraftCandidateGenerationSucceeded(tx, {
+            attemptId: claim.attemptId,
+            claimToken: claim.claimToken,
+            draftPostId: draftPost.id,
+            draftGenerationMethod: 'llm',
+            draftGenerationDiagnostics: {
+                sourceDigest: initialDraft.sourceDigest,
+                providerMode: initialDraft.generationMetadata.providerMode,
+                model: initialDraft.generationMetadata.model,
+                promptAsset: initialDraft.generationMetadata.promptAsset,
+                promptVersion: initialDraft.generationMetadata.promptVersion,
+                rawFinishReason: initialDraft.rawFinishReason,
+            },
+        });
+        if (!successRecorded) {
+            throw new DraftCandidateAcceptanceError({
+                statusCode: 409,
+                code: 'draft_candidate_generation_claim_lost',
+                message: 'draft candidate generation claim was lost before the draft could be committed',
+            });
+        }
+
         return {
+            status: 'created',
             candidateId: notice.candidateId,
             draftPostId: draftPost.id,
             created: true,
@@ -370,18 +528,45 @@ export async function acceptDraftCandidateIntoDraft(
         };
     });
 
-    let ghostDraftGenerationId: number | null = null;
     if (createdDraft.created) {
         try {
-            const generation = await generateGhostDraft(
+            const anchor = await createDraftAnchorBatch({
                 prisma,
-                createdDraft.draftPostId,
-                createdDraft.creatorId,
-            );
-            ghostDraftGenerationId = Number(generation.generationId ?? 0) || null;
+                circleId: input.circleId,
+                draftPostId: createdDraft.draftPostId,
+                roomKey: buildDiscussionRoomKey(input.circleId),
+                triggerReason: 'manual_candidate_acceptance',
+                summaryText: createdDraft.summary || initialDraft.title,
+                summaryMethod: 'llm',
+                messages: initialDraft.sourceMessages.map((message) => ({
+                    envelopeId: message.envelopeId,
+                    payloadHash: message.payloadHash,
+                    lamport: message.lamport,
+                    senderPubkey: message.senderPubkey,
+                    createdAt: message.createdAt,
+                    semanticScore: message.semanticScore,
+                    relevanceMethod: message.relevanceMethod || 'rule',
+                })),
+            });
+
+            await updateDraftVersionSnapshotSourceEvidence(prisma, {
+                draftPostId: createdDraft.draftPostId,
+                draftVersion: 1,
+                sourceSummaryHash: anchor.summaryHash,
+                sourceMessagesDigest: anchor.messagesDigest,
+            });
+
+            if (anchor.txSignature) {
+                await prisma.post.update({
+                    where: { id: createdDraft.draftPostId },
+                    data: {
+                        storageUri: `solana://tx/${anchor.txSignature}`,
+                    },
+                });
+            }
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
-            console.warn(`candidate acceptance: ghost draft generation failed (${message})`);
+            console.warn(`candidate acceptance: failed to anchor source evidence (${message})`);
         }
 
         try {
@@ -401,9 +586,10 @@ export async function acceptDraftCandidateIntoDraft(
     }
 
     return {
+        status: createdDraft.status,
         candidateId: createdDraft.candidateId,
         draftPostId: createdDraft.draftPostId,
         created: createdDraft.created,
-        ghostDraftGenerationId: createdDraft.created ? ghostDraftGenerationId : null,
+        ghostDraftGenerationId: null,
     };
 }

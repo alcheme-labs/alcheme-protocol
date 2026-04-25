@@ -337,6 +337,45 @@ describe('draftLifecycle read model', () => {
         expect(prisma.$queryRaw).toHaveBeenCalledTimes(1);
     });
 
+    test('recovers accepted handoff from succeeded generation attempt when the accepted notice is missing', async () => {
+        const prisma = {
+            post: {
+                findUnique: jest.fn(async () => makePost()),
+            },
+            $queryRaw: jest.fn(async (query: any) => {
+                const sql = String(query?.strings?.join(' ') || '');
+                if (sql.includes('circle_discussion_messages')) {
+                    return [];
+                }
+                if (sql.includes('draft_candidate_generation_attempts')) {
+                    return [{
+                        candidateId: 'cand_attempt',
+                        draftPostId: 42,
+                        sourceMessageIds: ['env_c', 'env_a', 'env_c'],
+                        sourceSemanticFacets: ['proposal', 'fact', 'invalid'],
+                        sourceAuthorAnnotations: ['explanation', 'unknown'],
+                        lastProposalId: 'gov_attempt',
+                        acceptedAt: new Date('2026-03-16T09:56:00.000Z'),
+                    }];
+                }
+                return [];
+            }),
+        } as any;
+
+        const handoff = await loadAcceptedCandidateHandoffForDraftPost(prisma, 42);
+
+        expect(handoff).toEqual({
+            candidateId: 'cand_attempt',
+            draftPostId: 42,
+            sourceMessageIds: ['env_c', 'env_a'],
+            sourceSemanticFacets: ['fact', 'proposal'],
+            sourceAuthorAnnotations: ['explanation'],
+            lastProposalId: 'gov_attempt',
+            acceptedAt: '2026-03-16T09:56:00.000Z',
+        });
+        expect(prisma.$queryRaw).toHaveBeenCalledTimes(2);
+    });
+
     test('uses the draft post creation time when accepted notice timestamps are clearly skewed', async () => {
         const prisma = {
             post: {

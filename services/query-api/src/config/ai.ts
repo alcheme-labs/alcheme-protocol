@@ -22,6 +22,7 @@ export interface AiRuntimeConfig {
 export interface AiModelConfig {
     scoring: string;
     ghostDraft: string;
+    discussionInitialDraft: string;
     discussionSummary: string;
     discussionTrigger: string;
     embedding: string;
@@ -77,6 +78,7 @@ export function loadAiModelConfig(env: NodeJS.ProcessEnv = process.env): AiModel
     return {
         scoring: env.SCORING_MODEL || 'qwen2.5:7b',
         ghostDraft: env.GHOST_DRAFT_MODEL || 'llama3.1:8b',
+        discussionInitialDraft: env.DISCUSSION_INITIAL_DRAFT_MODEL || env.GHOST_DRAFT_MODEL || 'llama3.1:8b',
         discussionSummary: env.DISCUSSION_SUMMARY_MODEL || 'qwen2.5:7b',
         discussionTrigger: env.DISCUSSION_TRIGGER_MODEL || env.SCORING_MODEL || 'qwen2.5:7b',
         embedding: env.EMBEDDING_MODEL || env.DISCUSSION_EMBEDDING_MODEL || 'nomic-embed-text',

@@ -1820,6 +1820,11 @@
         "title": "Esta discusión fue identificada como un borrador candidato",
         "hint": "El candidato está listo. Las personas gestoras del círculo pueden revisar la discusión de origen y crear un borrador formal."
       },
+      "pending": {
+        "label": "Generando",
+        "title": "La generación del borrador está en curso",
+        "hint": "El borrador formal se está generando. El enlace aparecerá cuando termine."
+      },
       "proposal_active": {
         "label": "Propuesta activa",
         "title": "La propuesta para generar el borrador sigue en curso",
@@ -1986,6 +1991,8 @@
       "createDenied": "La candidatura {candidateId} necesita que una persona gestora del círculo cree el borrador formal.",
       "createSucceeded": "La candidatura {candidateId} ya es un borrador formal.",
       "createExistingDraft": "La candidatura {candidateId} ya tiene un borrador formal.",
+      "createPending": "La candidatura {candidateId} ya está generando un borrador formal.",
+      "createFailed": "La candidatura {candidateId} no pudo generar un borrador: {error}.",
       "createNotReady": "La candidatura {candidateId} todavía no está lista para generar un borrador formal.",
       "createMissingSources": "La candidatura {candidateId} no tiene mensajes de origen, así que todavía no se puede crear un borrador.",
       "cancelDenied": "La candidatura {candidateId} no se puede cancelar con la política actual.",

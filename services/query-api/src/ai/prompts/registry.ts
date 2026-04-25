@@ -5,6 +5,7 @@ export type PromptTemplateId =
     | 'discussion-relevance'
     | 'discussion-semantic-facets'
     | 'discussion-trigger-judge'
+    | 'discussion-initial-draft'
     | 'discussion-summary'
     | 'ghost-draft-comment';
 
@@ -41,6 +42,11 @@ const TEMPLATE_DEFS: Record<PromptTemplateId, PromptTemplateDef> = {
     'discussion-summary': {
         systemFile: 'discussion-summary.system.md',
         schemaFile: 'schemas/discussion-summary.schema.json',
+        version: 'v1',
+    },
+    'discussion-initial-draft': {
+        systemFile: 'discussion-initial-draft.system.md',
+        schemaFile: 'schemas/discussion-initial-draft.schema.json',
         version: 'v1',
     },
     'ghost-draft-comment': {

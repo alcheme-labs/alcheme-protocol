@@ -2,6 +2,10 @@ import crypto from 'crypto';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { Redis } from 'ioredis';
 import { summarizeDiscussionThread } from './discussion-summary';
+import {
+    DiscussionInitialDraftError,
+    generateInitialDiscussionDraft,
+} from './discussion-initial-draft';
 import { judgeDiscussionTrigger } from './discussion-intelligence/trigger-judge';
 import {
     computeFocusStats,
@@ -336,20 +340,6 @@ async function writeGhostRunAudit(prisma: PrismaClient, input: GhostRunAuditInpu
         const message = error instanceof Error ? error.message : String(error);
         console.warn(`discussion draft trigger: failed to write ghost run audit (${message})`);
     }
-}
-
-export function buildDraftText(input: {
-    circleName: string;
-    summary: string;
-    messageCount: number;
-    focusedRatio: number;
-    questionCount: number;
-}): string {
-    return [
-        input.circleName,
-        '',
-        input.summary,
-    ].join('\n');
 }
 
 export function buildDraftOpportunityNotification(input: {
@@ -926,16 +916,86 @@ export async function maybeTriggerGhostDraftFromDiscussion(input: {
             return { triggered: true, reason: triggerDecision.reasonCode || 'notified' };
         }
 
+        const sourceMessageIds = messages.map((row) => row.envelopeId);
+        const sourceSemanticFacets = collectSourceSemanticFacets(messages);
+        const sourceAuthorAnnotations = collectSourceAuthorAnnotations(messages);
+        const initialDraft = await generateInitialDiscussionDraft(input.prisma, {
+            circleId: input.circleId,
+            circleName: circle.name,
+            circleDescription: circle.description,
+            sourceMessageIds,
+        }).catch(async (error) => {
+            const generationError = error instanceof DiscussionInitialDraftError
+                ? error
+                : new DiscussionInitialDraftError({
+                    code: 'initial_draft_generation_failed',
+                    message: error instanceof Error ? error.message : String(error || ''),
+                });
+            try {
+                await publishDraftCandidateSystemNotices(
+                    input.prisma,
+                    {
+                        circleId: input.circleId,
+                        summary: summary.summary,
+                        sourceMessageIds,
+                        sourceSemanticFacets,
+                        sourceAuthorAnnotations,
+                        draftPostId: null,
+                        triggerReason: triggerDecision.reasonCode || 'auto_draft_generation_failed',
+                        candidateStateOverride: 'generation_failed',
+                        draftGenerationError: generationError.code,
+                    },
+                    input.redis,
+                );
+            } catch (noticeError) {
+                const message = noticeError instanceof Error ? noticeError.message : String(noticeError);
+                console.warn(`discussion draft trigger: failed to publish generation_failed candidate notice (${message})`);
+            }
+
+            await input.redis.setex(
+                cooldownKey,
+                triggerConfig.cooldownSec,
+                JSON.stringify({
+                    reason: generationError.code,
+                    generatedAt: new Date().toISOString(),
+                    method: summary.method,
+                }),
+            );
+
+            await writeGhostRunAudit(input.prisma, {
+                ...auditBase,
+                status: 'error',
+                reason: generationError.code,
+                messageCount: messages.length,
+                focusedCount,
+                focusedRatio,
+                questionCount,
+                summaryMethod: summary.method,
+                summaryPreview: truncateSummaryPreview(summary.summary),
+                metadata: {
+                    ...windowMetadata,
+                    mode: effectiveGhostSettings.draftTriggerMode,
+                    summaryUseLLM: effectiveGhostSettings.triggerSummaryUseLLM,
+                    participantCount,
+                    spamRatio,
+                    topicHeat,
+                    judge: triggerDecision,
+                    generatedAt: summary.generatedAt.toISOString(),
+                    error: generationError.message,
+                    diagnostics: generationError.diagnostics,
+                },
+            });
+
+            return null;
+        });
+        if (!initialDraft) {
+            return { triggered: false, reason: 'initial_draft_generation_failed' };
+        }
+
         const nonce = crypto.randomBytes(8).toString('hex');
         const contentId = `ai-draft:${input.circleId}:${Date.now()}:${nonce}`;
         const onChainAddress = `offchain_ai_${crypto.randomBytes(16).toString('hex')}`.slice(0, 44);
-        const text = buildDraftText({
-            circleName: circle.name,
-            summary: summary.summary,
-            messageCount: summary.messageCount,
-            focusedRatio,
-            questionCount,
-        });
+        const text = initialDraft.draftText;
 
         const draftPost = await createTriggeredDraftPostWithInitialSnapshot(input.prisma, {
             contentId,
@@ -1013,14 +1073,6 @@ export async function maybeTriggerGhostDraftFromDiscussion(input: {
             }),
         );
 
-        try {
-            const { generateGhostDraft } = await import('./ghost-draft');
-            await generateGhostDraft(input.prisma, draftPost.id, circle.creatorId);
-        } catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
-            console.warn(`discussion draft trigger: failed to generate ghost comment (${message})`);
-        }
-
         await writeGhostRunAudit(input.prisma, {
             ...auditBase,
             status: 'triggered',
@@ -1040,16 +1092,15 @@ export async function maybeTriggerGhostDraftFromDiscussion(input: {
                 spamRatio,
                 topicHeat,
                 judge: triggerDecision,
-                generateComment: true,
+                generateComment: false,
                 generatedAt: summary.generatedAt.toISOString(),
                 summaryMessageCount: summary.messageCount,
+                draftGenerationMethod: 'llm',
+                draftGeneration: initialDraft.generationMetadata,
                 draftAnchor: draftAnchorMeta,
             },
         });
 
-        const sourceMessageIds = messages.map((row) => row.envelopeId);
-        const sourceSemanticFacets = collectSourceSemanticFacets(messages);
-        const sourceAuthorAnnotations = collectSourceAuthorAnnotations(messages);
         try {
             await publishDraftCandidateSystemNotices(
                 input.prisma,
@@ -1061,6 +1112,9 @@ export async function maybeTriggerGhostDraftFromDiscussion(input: {
                     sourceAuthorAnnotations,
                     draftPostId: draftPost.id,
                     triggerReason: triggerDecision.reasonCode || 'created',
+                    draftGenerationStatus: 'succeeded',
+                    draftGenerationMethod: 'llm',
+                    draftGenerationSourceDigest: initialDraft.sourceDigest,
                 },
                 input.redis,
             );

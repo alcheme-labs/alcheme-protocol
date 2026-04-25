@@ -50,10 +50,11 @@ describe('discussion candidate route', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         (acceptDraftCandidateIntoDraftMock as any).mockResolvedValue({
+            status: 'created',
             candidateId: 'cand_001',
             draftPostId: 88,
             created: true,
-            ghostDraftGenerationId: 301,
+            ghostDraftGenerationId: null,
         });
     });
 
@@ -79,9 +80,43 @@ describe('discussion candidate route', () => {
             ok: true,
             result: {
                 candidateId: 'cand_001',
+                status: 'created',
                 draftPostId: 88,
                 created: true,
-                ghostDraftGenerationId: 301,
+                ghostDraftGenerationId: null,
+            },
+        });
+        expect(next).not.toHaveBeenCalled();
+    });
+
+    test('returns a pending create-draft union without requiring a draft post id', async () => {
+        (acceptDraftCandidateIntoDraftMock as any).mockResolvedValue({
+            status: 'pending',
+            candidateId: 'cand_001',
+            attemptId: 501,
+            claimedUntil: new Date('2026-04-24T01:00:00.000Z'),
+            created: false,
+        });
+        const prisma = {} as any;
+        const router = discussionRouter(prisma, {} as any);
+        const handler = getRouteHandler(router, '/circles/:circleId/candidates/:candidateId/create-draft', 'post');
+        const res = createMockResponse();
+        const next = jest.fn();
+
+        await handler({
+            params: { circleId: '7', candidateId: 'cand_001' },
+            userId: 19,
+        } as any, res as any, next);
+
+        expect(res.statusCode).toBe(200);
+        expect(res.payload).toEqual({
+            ok: true,
+            result: {
+                status: 'pending',
+                candidateId: 'cand_001',
+                attemptId: 501,
+                claimedUntil: new Date('2026-04-24T01:00:00.000Z'),
+                created: false,
             },
         });
         expect(next).not.toHaveBeenCalled();

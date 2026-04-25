@@ -9,6 +9,7 @@ jest.mock('../../governance/read-models', () => ({
 
 import {
     buildDraftCandidateId,
+    buildNoticeEventKey,
     publishDraftCandidateSystemNotices,
     resolveCandidateStateForNotice,
 } from '../systemNoticeProducer';
@@ -49,6 +50,45 @@ describe('systemNoticeProducer', () => {
             governanceState: 'generation_failed',
             draftPostId: null,
         })).toBe('generation_failed');
+    });
+
+    test('notice event key separates distinct draft generation failures for the same candidate', () => {
+        const first = buildNoticeEventKey({
+            kind: 'draft_candidate_notice',
+            candidateId: 'cand_001',
+            state: 'generation_failed',
+            draftPostId: null,
+            proposalId: null,
+            executionError: null,
+            draftGenerationStatus: 'generation_failed',
+            draftGenerationError: 'initial_draft_generation_failed',
+            draftGenerationSourceDigest: 'a'.repeat(64),
+        });
+        const second = buildNoticeEventKey({
+            kind: 'draft_candidate_notice',
+            candidateId: 'cand_001',
+            state: 'generation_failed',
+            draftPostId: null,
+            proposalId: null,
+            executionError: null,
+            draftGenerationStatus: 'generation_failed',
+            draftGenerationError: 'initial_draft_generation_unparseable',
+            draftGenerationSourceDigest: 'a'.repeat(64),
+        });
+        const third = buildNoticeEventKey({
+            kind: 'draft_candidate_notice',
+            candidateId: 'cand_001',
+            state: 'generation_failed',
+            draftPostId: null,
+            proposalId: null,
+            executionError: null,
+            draftGenerationStatus: 'generation_failed',
+            draftGenerationError: 'initial_draft_generation_failed',
+            draftGenerationSourceDigest: 'b'.repeat(64),
+        });
+
+        expect(first).not.toBe(second);
+        expect(first).not.toBe(third);
     });
 
     test('publishes realtime event when a candidate notice row is inserted', async () => {

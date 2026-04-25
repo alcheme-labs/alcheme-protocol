@@ -219,6 +219,7 @@ function PlazaTab({
     const [forwardingMessageId, setForwardingMessageId] = useState<number | null>(null);
     const [discussionStatus, setDiscussionStatus] = useState<string | null>(null);
     const [creatingCandidateDraftId, setCreatingCandidateDraftId] = useState<string | null>(null);
+    const [pendingCandidateDraftIds, setPendingCandidateDraftIds] = useState<Set<string>>(new Set());
     const [composerLabels, setComposerLabels] = useState<AuthorAnnotationKind[]>([]);
     const [activeContentFilters, setActiveContentFilters] = useState<AuthorAnnotationKind[]>([]);
     const [focusedEnvelopeId, setFocusedEnvelopeId] = useState<string | null>(focusEnvelopeId || null);
@@ -1221,6 +1222,74 @@ function PlazaTab({
         walletPubkey,
     ]);
 
+    const handleCandidateCreateDraft = useCallback(async (notice: DraftCandidateInlineNotice) => {
+        if (creatingCandidateDraftId) return;
+        setCreatingCandidateDraftId(notice.candidateId);
+        setDiscussionError(null);
+        try {
+            const response = await createDraftFromCandidate({
+                circleId: discussionCircleId,
+                candidateId: notice.candidateId,
+            });
+            const candidateId = notice.candidateId.slice(0, 8);
+            if (response.result.status === 'pending') {
+                setPendingCandidateDraftIds((prev) => new Set(prev).add(notice.candidateId));
+                setDiscussionStatus(t('candidate.createPending', { candidateId }));
+                return;
+            }
+            setPendingCandidateDraftIds((prev) => {
+                if (!prev.has(notice.candidateId)) return prev;
+                const next = new Set(prev);
+                next.delete(notice.candidateId);
+                return next;
+            });
+            if (response.result.status === 'generation_failed') {
+                setDiscussionStatus(t('candidate.createFailed', {
+                    candidateId,
+                    error: response.result.draftGenerationError,
+                }));
+                return;
+            }
+            if (response.result.status === 'created' || response.result.status === 'existing') {
+                setDiscussionStatus(
+                    response.result.status === 'created'
+                        ? t('candidate.createSucceeded', { candidateId })
+                        : t('candidate.createExistingDraft', { candidateId }),
+                );
+                void onDraftsChanged?.();
+                onOpenCrucible?.(response.result.draftPostId);
+            }
+        } catch (error) {
+            const code = typeof (error as { code?: unknown })?.code === 'string'
+                ? (error as { code: string }).code
+                : '';
+            const candidateId = notice.candidateId.slice(0, 8);
+            if (code === 'candidate_generation_forbidden' || code === 'authentication_required') {
+                setDiscussionStatus(t('candidate.createDenied', { candidateId }));
+            } else if (code === 'draft_candidate_not_ready') {
+                setDiscussionStatus(t('candidate.createNotReady', { candidateId }));
+            } else if (code === 'draft_candidate_missing_sources') {
+                setDiscussionStatus(t('candidate.createMissingSources', { candidateId }));
+            } else {
+                setDiscussionError(error instanceof Error ? error.message : t('errors.sendFailed'));
+            }
+            setPendingCandidateDraftIds((prev) => {
+                if (!prev.has(notice.candidateId)) return prev;
+                const next = new Set(prev);
+                next.delete(notice.candidateId);
+                return next;
+            });
+        } finally {
+            setCreatingCandidateDraftId((current) => (current === notice.candidateId ? null : current));
+        }
+    }, [
+        creatingCandidateDraftId,
+        discussionCircleId,
+        onDraftsChanged,
+        onOpenCrucible,
+        t,
+    ]);
+
     const handleCandidateRetry = useCallback((notice: DraftCandidateInlineNotice) => {
         const recovery = resolveCandidateRecoveryActions({
             notice,
@@ -1232,15 +1301,8 @@ function PlazaTab({
             }));
             return;
         }
-        const proposalHint = notice.lastProposalId
-            ? t('candidate.proposalId', { proposalId: notice.lastProposalId })
-            : t('candidate.currentProposal');
-        setDiscussionStatus(
-            recovery.retryExecutionReusesPassedProposal
-                ? t('candidate.retryReusePassedProposal', { proposalHint })
-                : t('candidate.retryNeedsNewProposal', { proposalHint }),
-        );
-    }, [viewerIdentity]);
+        void handleCandidateCreateDraft(notice);
+    }, [handleCandidateCreateDraft, t, viewerIdentity]);
 
     const handleCandidateCancel = useCallback((notice: DraftCandidateInlineNotice) => {
         const recovery = resolveCandidateRecoveryActions({
@@ -1261,48 +1323,6 @@ function PlazaTab({
             proposalHint,
         }));
     }, [t, viewerIdentity]);
-
-    const handleCandidateCreateDraft = useCallback(async (notice: DraftCandidateInlineNotice) => {
-        if (creatingCandidateDraftId) return;
-        setCreatingCandidateDraftId(notice.candidateId);
-        setDiscussionError(null);
-        try {
-            const response = await createDraftFromCandidate({
-                circleId: discussionCircleId,
-                candidateId: notice.candidateId,
-            });
-            const draftPostId = response.result.draftPostId;
-            setDiscussionStatus(
-                response.result.created
-                    ? t('candidate.createSucceeded', { candidateId: notice.candidateId.slice(0, 8) })
-                    : t('candidate.createExistingDraft', { candidateId: notice.candidateId.slice(0, 8) }),
-            );
-            void onDraftsChanged?.();
-            onOpenCrucible?.(draftPostId);
-        } catch (error) {
-            const code = typeof (error as { code?: unknown })?.code === 'string'
-                ? (error as { code: string }).code
-                : '';
-            const candidateId = notice.candidateId.slice(0, 8);
-            if (code === 'candidate_generation_forbidden' || code === 'authentication_required') {
-                setDiscussionStatus(t('candidate.createDenied', { candidateId }));
-            } else if (code === 'draft_candidate_not_ready') {
-                setDiscussionStatus(t('candidate.createNotReady', { candidateId }));
-            } else if (code === 'draft_candidate_missing_sources') {
-                setDiscussionStatus(t('candidate.createMissingSources', { candidateId }));
-            } else {
-                setDiscussionError(error instanceof Error ? error.message : t('errors.sendFailed'));
-            }
-        } finally {
-            setCreatingCandidateDraftId((current) => (current === notice.candidateId ? null : current));
-        }
-    }, [
-        creatingCandidateDraftId,
-        discussionCircleId,
-        onDraftsChanged,
-        onOpenCrucible,
-        t,
-    ]);
 
     const EMOJI_LIST = [
         '😀', '😂', '🤔', '👍', '🔥', '💡', '✨', '🎯',
@@ -1435,11 +1455,24 @@ function PlazaTab({
                             const candidateRecovery = candidateNotice
                                 ? resolveCandidateRecoveryActions({ notice: candidateNotice, viewerIdentity })
                                 : null;
+                            const canApplyLocalPendingState = candidateNotice
+                                ? candidateNotice.state === 'open' || candidateNotice.state === 'pending'
+                                : false;
+                            const isLocallyPendingCandidate = candidateNotice
+                                ? canApplyLocalPendingState
+                                    && pendingCandidateDraftIds.has(candidateNotice.candidateId)
+                                    && !candidateNotice.draftPostId
+                                : false;
                             const candidateNoticeForRender = candidateNotice
                                 ? {
                                     ...candidateNotice,
-                                    canRetry: candidateRecovery?.canRetry ?? candidateNotice.canRetry,
-                                    canCancel: candidateRecovery?.canCancel ?? candidateNotice.canCancel,
+                                    state: isLocallyPendingCandidate ? 'pending' as const : candidateNotice.state,
+                                    canRetry: isLocallyPendingCandidate
+                                        ? false
+                                        : candidateRecovery?.canRetry ?? candidateNotice.canRetry,
+                                    canCancel: isLocallyPendingCandidate
+                                        ? false
+                                        : candidateRecovery?.canCancel ?? candidateNotice.canCancel,
                                 }
                                 : null;
                             const acceptedHandoff = toAcceptedCandidateHandoffContext(candidateNoticeForRender);

@@ -43,6 +43,11 @@ export interface PublishDraftCandidateSystemNoticesInput {
     sourceAuthorAnnotations: AuthorAnnotationKind[];
     draftPostId?: number | null;
     triggerReason: string;
+    candidateStateOverride?: DraftCandidateGovernanceStatus | null;
+    draftGenerationStatus?: string | null;
+    draftGenerationMethod?: string | null;
+    draftGenerationError?: string | null;
+    draftGenerationSourceDigest?: string | null;
 }
 
 export interface PublishedDraftCandidateSystemNotices {
@@ -115,22 +120,27 @@ function buildNoticePayloadText(input: {
 }): string {
     if (input.kind === 'draft_candidate_notice') {
         if (input.state === 'accepted') return 'discussion candidate accepted as draft';
+        if (input.state === 'pending') return 'discussion candidate draft generation pending';
         if (input.state === 'generation_failed') return 'discussion candidate generation failed';
         return 'discussion candidate notice';
     }
+    if (input.state === 'pending') return 'governance execution pending for draft generation';
     if (input.state === 'generation_failed') return 'governance execution failed for draft generation';
     if (input.state === 'proposal_active') return 'governance proposal active for draft generation';
     if (input.state === 'accepted') return 'governance executed for draft generation';
     return 'governance notice for draft generation';
 }
 
-function buildNoticeEventKey(input: {
+export function buildNoticeEventKey(input: {
     kind: NoticeKind;
     candidateId: string;
     state: DraftCandidateGovernanceStatus;
     draftPostId: number | null;
     proposalId: string | null;
     executionError: string | null;
+    draftGenerationStatus?: string | null;
+    draftGenerationError?: string | null;
+    draftGenerationSourceDigest?: string | null;
 }): string {
     const seed = [
         input.kind,
@@ -139,6 +149,9 @@ function buildNoticeEventKey(input: {
         input.draftPostId ? String(input.draftPostId) : '',
         input.proposalId || '',
         input.executionError || '',
+        input.draftGenerationStatus || '',
+        input.draftGenerationError || '',
+        input.draftGenerationSourceDigest || '',
     ].join('|');
     return `notice_${sha256Hex(seed).slice(0, 24)}`;
 }
@@ -359,13 +372,16 @@ export async function publishDraftCandidateSystemNotices(
         candidateId,
     });
 
-    const candidateState = resolveCandidateStateForNotice({
+    const candidateState = input.candidateStateOverride ?? resolveCandidateStateForNotice({
         governanceState: governance.candidateStatus,
         draftPostId,
     });
 
     const proposalId = governance.proposal?.proposalId ?? null;
     const executionError = governance.proposal?.executionError ?? null;
+    const draftGenerationStatus = input.draftGenerationStatus ?? candidateState;
+    const draftGenerationError = input.draftGenerationError ?? executionError;
+    const draftGenerationSourceDigest = input.draftGenerationSourceDigest ?? null;
     const noticeMetadata: Record<string, unknown> = {
         candidateId,
         state: candidateState,
@@ -386,6 +402,10 @@ export async function publishDraftCandidateSystemNotices(
         governanceCandidateStatus: governance.candidateStatus,
         governanceProposalStatus: governance.proposal?.status ?? null,
         triggerReason: input.triggerReason,
+        draftGenerationStatus,
+        draftGenerationMethod: input.draftGenerationMethod ?? null,
+        draftGenerationError,
+        draftGenerationSourceDigest,
     };
 
     const subjectId = sourceMessageIds[sourceMessageIds.length - 1] ?? null;
@@ -396,6 +416,9 @@ export async function publishDraftCandidateSystemNotices(
         draftPostId,
         proposalId,
         executionError,
+        draftGenerationStatus,
+        draftGenerationError,
+        draftGenerationSourceDigest,
     });
     const draftCandidateNoticeEnvelopeId = await publishSystemNotice({
         prisma,
@@ -415,7 +438,7 @@ export async function publishDraftCandidateSystemNotices(
     });
 
     let governanceNoticeEnvelopeId: string | null = null;
-    if (governance.proposal || candidateState === 'generation_failed' || candidateState === 'proposal_active') {
+    if (governance.proposal || candidateState === 'pending' || candidateState === 'generation_failed' || candidateState === 'proposal_active') {
         const governanceNoticeEventKey = buildNoticeEventKey({
             kind: 'governance_notice',
             candidateId,
@@ -423,6 +446,9 @@ export async function publishDraftCandidateSystemNotices(
             draftPostId,
             proposalId,
             executionError,
+            draftGenerationStatus,
+            draftGenerationError,
+            draftGenerationSourceDigest,
         });
         governanceNoticeEnvelopeId = await publishSystemNotice({
             prisma,

@@ -55,6 +55,15 @@ test('DraftCandidateInlineCard hides create action when a draft already exists',
     assert.match(cardSource, /const canCreateDraft = !canOpenDraft && notice\.state === 'open'/);
 });
 
+test('DraftCandidateInlineCard treats pending generation as non-clickable status', () => {
+    assert.match(cardSource, /case 'pending':\s*return t\('states\.pending\.label'\);/);
+    assert.match(cardSource, /case 'pending':\s*return t\('states\.pending\.title'\);/);
+    assert.match(cardSource, /const showPendingHint = notice\.state === 'open' \|\| notice\.state === 'pending' \|\| notice\.state === 'proposal_active';/);
+    assert.match(cardSource, /const canCreateDraft = !canOpenDraft && notice\.state === 'open'/);
+    assert.match(enMessages, /"pending":\s*\{[\s\S]*"label":\s*"Generating"/);
+    assert.match(zhMessages, /"pending":\s*\{[\s\S]*"label":\s*"生成中"/);
+});
+
 test('DraftCandidateInlineCard supports embedded rendering inside system message bubbles', () => {
     assert.match(cardSource, /embedded\?: boolean;/);
     assert.match(cardSource, /footerNote\?: string;/);

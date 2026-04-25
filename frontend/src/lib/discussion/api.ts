@@ -141,14 +141,39 @@ export interface DraftCrystallizationBindingResponse {
     knowledgeHeatScore: number;
 }
 
-export interface DraftCandidateCreateDraftResponse {
-    ok: boolean;
-    result: {
+export type DraftCandidateCreateDraftResult =
+    | {
+        status: 'created';
         candidateId: string;
         draftPostId: number;
-        created: boolean;
-        ghostDraftGenerationId: number | null;
+        created: true;
+        ghostDraftGenerationId: null;
+    }
+    | {
+        status: 'existing';
+        candidateId: string;
+        draftPostId: number;
+        created: false;
+        ghostDraftGenerationId: null;
+    }
+    | {
+        status: 'pending';
+        candidateId: string;
+        attemptId: number;
+        claimedUntil: string;
+        created: false;
+    }
+    | {
+        status: 'generation_failed';
+        candidateId: string;
+        canRetry: boolean;
+        draftGenerationError: string;
+        created: false;
     };
+
+export interface DraftCandidateCreateDraftResponse {
+    ok: boolean;
+    result: DraftCandidateCreateDraftResult;
 }
 
 export type DraftDiscussionState = 'open' | 'proposed' | 'accepted' | 'rejected' | 'applied' | 'withdrawn';

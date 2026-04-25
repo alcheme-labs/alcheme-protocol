@@ -1820,6 +1820,11 @@
         "title": "Cette discussion a été reconnue comme un brouillon candidat",
         "hint": "Le candidat est prêt. Les responsables du cercle peuvent relire la discussion source puis créer un brouillon formel."
       },
+      "pending": {
+        "label": "Génération",
+        "title": "La génération du brouillon est en cours",
+        "hint": "Le brouillon formel est en cours de génération. Le lien apparaîtra une fois l'opération terminée."
+      },
       "proposal_active": {
         "label": "Proposition active",
         "title": "La proposition de génération du brouillon est en cours",
@@ -1986,6 +1991,8 @@
       "createDenied": "Le candidat {candidateId} doit être transformé en brouillon formel par un responsable du cercle.",
       "createSucceeded": "Le candidat {candidateId} est maintenant un brouillon formel.",
       "createExistingDraft": "Le candidat {candidateId} possède déjà un brouillon formel.",
+      "createPending": "Le candidat {candidateId} est déjà en train de générer un brouillon formel.",
+      "createFailed": "Le candidat {candidateId} n'a pas pu générer de brouillon : {error}.",
       "createNotReady": "Le candidat {candidateId} n'est pas encore prêt à générer un brouillon formel.",
       "createMissingSources": "Le candidat {candidateId} n'a pas de messages source, le brouillon ne peut pas encore être créé.",
       "cancelDenied": "Le candidat {candidateId} ne peut pas être annulé avec la politique actuelle.",

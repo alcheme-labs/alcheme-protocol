@@ -176,6 +176,7 @@ export interface GovernanceVote {
 
 export type DraftCandidateGovernanceStatus =
     | 'open'
+    | 'pending'
     | 'proposal_active'
     | 'accepted'
     | 'generation_failed'

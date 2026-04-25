@@ -1820,6 +1820,11 @@
         "title": "This discussion has been identified as a draft candidate",
         "hint": "The candidate is ready. Circle managers can review the source discussion and create a formal draft."
       },
+      "pending": {
+        "label": "Generating",
+        "title": "Draft generation is in progress",
+        "hint": "The formal draft is being generated. The draft link will appear when generation completes."
+      },
       "proposal_active": {
         "label": "Proposal active",
         "title": "The draft-generation proposal is in progress",
@@ -1986,6 +1991,8 @@
       "createDenied": "Candidate {candidateId} needs a circle manager to create the formal draft.",
       "createSucceeded": "Candidate {candidateId} is now a formal draft.",
       "createExistingDraft": "Candidate {candidateId} already has a formal draft.",
+      "createPending": "Candidate {candidateId} is already generating a formal draft.",
+      "createFailed": "Candidate {candidateId} could not generate a draft: {error}.",
       "createNotReady": "Candidate {candidateId} is not ready to generate a formal draft yet.",
       "createMissingSources": "Candidate {candidateId} is missing source messages, so a draft cannot be created yet.",
       "cancelDenied": "Candidate {candidateId} cannot be canceled under the current policy.",

@@ -1820,6 +1820,11 @@
         "title": "这段讨论已被识别为候选草稿",
         "hint": "候选已经识别，圈层管理员可以先查看来源，再手动生成正式草稿。"
       },
+      "pending": {
+        "label": "生成中",
+        "title": "正式草稿正在生成",
+        "hint": "系统正在基于来源讨论生成正式草稿，生成完成后才会出现草稿入口。"
+      },
       "proposal_active": {
         "label": "提案中",
         "title": "草稿生成提案进行中",
@@ -1986,6 +1991,8 @@
       "createDenied": "候选 {candidateId} 需要圈层管理员来生成正式草稿。",
       "createSucceeded": "候选 {candidateId} 已生成正式草稿。",
       "createExistingDraft": "候选 {candidateId} 已经有正式草稿了。",
+      "createPending": "候选 {candidateId} 正在生成正式草稿。",
+      "createFailed": "候选 {candidateId} 生成草稿失败：{error}。",
       "createNotReady": "候选 {candidateId} 当前状态还不能生成正式草稿。",
       "createMissingSources": "候选 {candidateId} 缺少来源消息，暂时不能生成草稿。",
       "cancelDenied": "候选 {candidateId} 当前策略下不能取消。",

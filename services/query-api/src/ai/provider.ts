@@ -20,6 +20,7 @@ import { generateExternalAiEmbedding, generateExternalAiText } from './external-
 export type AiModelTask =
     | 'scoring'
     | 'ghost-draft'
+    | 'discussion-initial-draft'
     | 'discussion-summary'
     | 'discussion-trigger'
     | 'embedding';
@@ -141,6 +142,7 @@ export function getModelId(
     const defaults: Record<string, string> = {
         scoring: modelConfig.scoring,
         'ghost-draft': modelConfig.ghostDraft,
+        'discussion-initial-draft': modelConfig.discussionInitialDraft,
         'discussion-summary': modelConfig.discussionSummary,
         'discussion-trigger': modelConfig.discussionTrigger,
         embedding: modelConfig.embedding,

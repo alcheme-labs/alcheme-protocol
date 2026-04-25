@@ -10,6 +10,8 @@ function resolveStateLabel(
     switch (state) {
         case 'open':
             return t('states.open.label');
+        case 'pending':
+            return t('states.pending.label');
         case 'proposal_active':
             return t('states.proposal_active.label');
         case 'accepted':
@@ -34,6 +36,8 @@ function resolveStateTitle(
     switch (state) {
         case 'open':
             return t('states.open.title');
+        case 'pending':
+            return t('states.pending.title');
         case 'proposal_active':
             return t('states.proposal_active.title');
         case 'accepted':
@@ -91,7 +95,7 @@ export default function DraftCandidateInlineCard({
     const canOpenDraft = typeof notice.draftPostId === 'number' && notice.draftPostId > 0;
     const canCreateDraft = !canOpenDraft && notice.state === 'open' && typeof onCreateDraft === 'function';
     const canViewSource = notice.sourceMessageIds.length > 0;
-    const showPendingHint = notice.state === 'open' || notice.state === 'proposal_active';
+    const showPendingHint = notice.state === 'open' || notice.state === 'pending' || notice.state === 'proposal_active';
     const hasMeta = notice.sourceMessageIds.length > 0
         || notice.sourceSemanticFacets.length > 0
         || notice.sourceAuthorAnnotations.length > 0;

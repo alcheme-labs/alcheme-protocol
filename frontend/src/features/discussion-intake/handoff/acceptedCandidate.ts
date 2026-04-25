@@ -6,6 +6,7 @@ import {
 
 export const DRAFT_CANDIDATE_STATES = [
     'open',
+    'pending',
     'proposal_active',
     'accepted',
     'generation_failed',
@@ -62,6 +63,7 @@ function normalizeState(value: unknown): DraftCandidateState | null {
     const normalized = value.trim().toLowerCase();
     if (
         normalized === 'open'
+        || normalized === 'pending'
         || normalized === 'proposal_active'
         || normalized === 'accepted'
         || normalized === 'generation_failed'

@@ -4,7 +4,6 @@ import * as versionSnapshotService from '../../services/draftLifecycle/versionSn
 import { createInMemoryAiJobPrisma } from '../../services/aiJobs/testStore';
 import {
     buildDraftOpportunityNotification,
-    buildDraftText,
     createTriggeredDraftPostWithInitialSnapshot,
     enqueueDiscussionTriggerEvaluationJob,
     isDraftTriggerEligibleMessageKind,
@@ -170,16 +169,6 @@ describe('discussion draft trigger initial snapshot transaction', () => {
         expect(isDraftTriggerEligibleMessageKind('draft_candidate_notice')).toBe(false);
         expect(isDraftTriggerEligibleMessageKind('governance_notice')).toBe(false);
         expect(isDraftTriggerEligibleMessageKind(null)).toBe(true);
-    });
-
-    test('draft seed text stays language-neutral and only keeps circle name plus summary', () => {
-        expect(buildDraftText({
-            circleName: 'Discussion Synthesis Lab',
-            summary: 'A draft is forming from the recent discussion.',
-            messageCount: 12,
-            focusedRatio: 0.75,
-            questionCount: 2,
-        })).toBe('Discussion Synthesis Lab\n\nA draft is forming from the recent discussion.');
     });
 
     test('draft opportunity notification uses canonical english copy for later localization', () => {

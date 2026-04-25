@@ -65,6 +65,7 @@ model User {
   ghostDraftGenerationsRequested GhostDraftGeneration[] @relation("GhostDraftRequestedBy")
   ghostDraftAcceptances GhostDraftAcceptance[] @relation("GhostDraftAcceptedBy")
   acceptedDraftCandidates DraftCandidateAcceptance[] @relation("DraftCandidateAcceptedBy")
+  attemptedDraftCandidateGenerations DraftCandidateGenerationAttempt[] @relation("DraftCandidateAttemptedBy")
   createdAgents      Agent[]    @relation("AgentCreatedBy")
   ownedAgents        Agent[]    @relation("AgentOwner")
   updatedAgentPolicies CircleAgentPolicy[] @relation("AgentPolicyUpdatedBy")
@@ -136,6 +137,7 @@ model Post {
   ghostDraftGenerations GhostDraftGeneration[]
   ghostDraftAcceptances GhostDraftAcceptance[]
   draftCandidateAcceptance DraftCandidateAcceptance?
+  draftCandidateGenerationAttempts DraftCandidateGenerationAttempt[]
   
   @@index([authorId])
   @@index([createdAt(sort: Desc)])
@@ -225,6 +227,7 @@ model Circle {
   agents             Agent[]
   agentPolicy        CircleAgentPolicy?
   acceptedDraftCandidates DraftCandidateAcceptance[]
+  draftCandidateGenerationAttempts DraftCandidateGenerationAttempt[]
   
   @@index([creatorId])
   @@index([circleType])
@@ -1609,6 +1612,39 @@ model DraftCandidateAcceptance {
   @@index([circleId, acceptedAt(sort: Desc)])
   @@index([acceptedByUserId, acceptedAt(sort: Desc)])
   @@map("draft_candidate_acceptances")
+}
+
+model DraftCandidateGenerationAttempt {
+  id                         Int      @id @default(autoincrement())
+  circleId                   Int      @map("circle_id")
+  candidateId                String   @map("candidate_id") @db.VarChar(64)
+  sourceMessagesDigest       String   @map("source_messages_digest") @db.Char(64)
+  status                     String   @db.VarChar(32)
+  draftPostId                Int?     @map("draft_post_id")
+  attemptedByUserId          Int?     @map("attempted_by_user_id")
+  claimToken                 String?  @map("claim_token") @db.VarChar(64)
+  claimedUntil               DateTime? @map("claimed_until")
+  attemptCount               Int      @default(0) @map("attempt_count")
+  sourceMessageIds           Json     @default("[]") @map("source_message_ids")
+  sourceSemanticFacets       Json     @default("[]") @map("source_semantic_facets")
+  sourceAuthorAnnotations    Json     @default("[]") @map("source_author_annotations")
+  lastProposalId             String?  @map("last_proposal_id") @db.VarChar(128)
+  summaryMethod              String?  @map("summary_method") @db.VarChar(32)
+  draftGenerationMethod      String?  @map("draft_generation_method") @db.VarChar(32)
+  draftGenerationError       String?  @map("draft_generation_error") @db.VarChar(128)
+  draftGenerationDiagnostics Json?    @map("draft_generation_diagnostics")
+  createdAt                  DateTime @default(now()) @map("created_at")
+  updatedAt                  DateTime @default(now()) @updatedAt @map("updated_at")
+
+  circle                     Circle   @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  draftPost                  Post?    @relation(fields: [draftPostId], references: [id], onDelete: SetNull)
+  attemptedBy                User?    @relation("DraftCandidateAttemptedBy", fields: [attemptedByUserId], references: [id], onDelete: SetNull)
+
+  @@unique([circleId, candidateId, sourceMessagesDigest])
+  @@index([circleId, status, updatedAt(sort: Desc)])
+  @@index([draftPostId])
+  @@index([attemptedByUserId, updatedAt(sort: Desc)])
+  @@map("draft_candidate_generation_attempts")
 }
 
 // ==================== Tracker 服务写入的表 (只读) ====================
