@@ -51,3 +51,15 @@ test('candidate handoff parser accepts persisted pending candidate state', () =>
     assert.match(handoffSource, /'pending',/);
     assert.match(handoffSource, /normalized === 'pending'/);
 });
+
+test('PlazaTab exposes a manual discussion-to-draft action using source message ids', () => {
+    assert.match(discussionApiSource, /export async function createDraftFromDiscussionMessages/);
+    assert.match(discussionApiSource, /\/api\/v1\/discussion\/circles\/\$\{input\.circleId\}\/drafts\/from-messages/);
+    assert.match(plazaTabSource, /createDraftFromDiscussionMessages/);
+    assert.match(plazaTabSource, /const manualDraftSourceMessageIds = useMemo/);
+    assert.match(plazaTabSource, /message\.messageKind !== 'draft_candidate_notice'/);
+    assert.match(plazaTabSource, /message\.messageKind !== 'governance_notice'/);
+    assert.match(plazaTabSource, /!message\.deleted/);
+    assert.match(plazaTabSource, /!message\.ephemeral/);
+    assert.match(plazaTabSource, /sourceMessageIds: manualDraftSourceMessageIds/);
+});

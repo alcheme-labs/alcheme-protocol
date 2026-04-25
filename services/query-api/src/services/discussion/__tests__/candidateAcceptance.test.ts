@@ -65,6 +65,7 @@ jest.mock('../candidateGenerationAttempts', () => ({
 
 import {
     acceptDraftCandidateIntoDraft,
+    createDraftFromManualDiscussionSelection,
     DraftCandidateAcceptanceError,
 } from '../candidateAcceptance';
 
@@ -360,6 +361,51 @@ describe('candidateAcceptance', () => {
             sourceMessageIds: ['env_a', 'env_b'],
             attemptedByUserId: 19,
         }));
+    });
+
+    test('creates a manual discussion candidate notice before accepting selected messages', async () => {
+        const noticeMetadata = {
+            candidateId: 'cand_001',
+            state: 'open',
+            summary: 'Manual draft request from 2 discussion messages.',
+            sourceMessageIds: ['env_a', 'env_b'],
+            sourceSemanticFacets: [],
+            sourceAuthorAnnotations: [],
+            draftPostId: null,
+        };
+        const { prisma } = createPrismaMock({
+            noticeMetadata,
+            circleCreatorId: 41,
+        });
+
+        const result = await createDraftFromManualDiscussionSelection(prisma, {
+            circleId: 7,
+            sourceMessageIds: ['env_a', 'env_b'],
+            userId: 19,
+        });
+
+        expect(result).toEqual({
+            status: 'created',
+            candidateId: 'cand_001',
+            draftPostId: 88,
+            created: true,
+            ghostDraftGenerationId: null,
+        });
+        expect(publishDraftCandidateSystemNoticesMock).toHaveBeenNthCalledWith(1, prisma, {
+            circleId: 7,
+            summary: 'Manual draft request from 2 discussion messages.',
+            sourceMessageIds: ['env_a', 'env_b'],
+            sourceSemanticFacets: [],
+            sourceAuthorAnnotations: [],
+            draftPostId: null,
+            triggerReason: 'manual_discussion_selection',
+        });
+        expect(generateInitialDiscussionDraftMock).toHaveBeenCalledWith(prisma, {
+            circleId: 7,
+            circleName: 'Discussion Synthesis Lab',
+            circleDescription: null,
+            sourceMessageIds: ['env_a', 'env_b'],
+        });
     });
 
     test('keeps manual candidate draft creation successful when post-commit anchor evidence fails', async () => {

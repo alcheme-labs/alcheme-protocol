@@ -663,6 +663,26 @@ export async function createDraftFromCandidate(input: {
     );
 }
 
+export async function createDraftFromDiscussionMessages(input: {
+    circleId: number;
+    sourceMessageIds: string[];
+}): Promise<DraftCandidateCreateDraftResponse> {
+    const baseUrl = await getNodeBaseUrl('discussion_runtime');
+    return fetchDiscussionJson<DraftCandidateCreateDraftResponse>(
+        `${baseUrl}/api/v1/discussion/circles/${input.circleId}/drafts/from-messages`,
+        {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                sourceMessageIds: input.sourceMessageIds,
+            }),
+        },
+    );
+}
+
 export async function listDraftDiscussions(input: {
     draftPostId: number;
     limit?: number;

@@ -74,6 +74,12 @@ export interface AcceptDraftCandidateInput {
     userId: number | null | undefined;
 }
 
+export interface CreateDraftFromManualDiscussionSelectionInput {
+    circleId: number;
+    sourceMessageIds: string[];
+    userId: number | null | undefined;
+}
+
 export interface AcceptDraftCandidateResult {
     status: 'created' | 'existing' | 'pending' | 'generation_failed';
     candidateId: string;
@@ -104,6 +110,8 @@ type CreatedDraftTransactionResult =
         sourceSemanticFacets: SemanticFacet[];
         sourceAuthorAnnotations: AuthorAnnotationKind[];
     };
+
+const MANUAL_DISCUSSION_SOURCE_MESSAGE_LIMIT = 20;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -592,4 +600,65 @@ export async function acceptDraftCandidateIntoDraft(
         created: createdDraft.created,
         ghostDraftGenerationId: null,
     };
+}
+
+export async function createDraftFromManualDiscussionSelection(
+    prisma: PrismaClient,
+    input: CreateDraftFromManualDiscussionSelectionInput,
+): Promise<AcceptDraftCandidateResult> {
+    if (!input.userId) {
+        throw new DraftCandidateAcceptanceError({
+            statusCode: 401,
+            code: 'authentication_required',
+            message: 'authentication is required',
+        });
+    }
+    const userId = input.userId;
+
+    const canManage = await requireCircleManagerRole(prisma, {
+        circleId: input.circleId,
+        userId,
+        allowModerator: true,
+    });
+    if (!canManage) {
+        throw new DraftCandidateAcceptanceError({
+            statusCode: 403,
+            code: 'candidate_generation_forbidden',
+            message: 'only circle managers can generate a draft from discussion messages',
+        });
+    }
+
+    const sourceMessageIds = normalizeStringArray(input.sourceMessageIds)
+        .slice(-MANUAL_DISCUSSION_SOURCE_MESSAGE_LIMIT);
+    if (sourceMessageIds.length === 0) {
+        throw new DraftCandidateAcceptanceError({
+            statusCode: 400,
+            code: 'draft_candidate_missing_sources',
+            message: 'select at least one discussion message before generating a draft',
+        });
+    }
+
+    const sourceCount = sourceMessageIds.length;
+    const notice = await publishDraftCandidateSystemNotices(prisma, {
+        circleId: input.circleId,
+        summary: `Manual draft request from ${sourceCount} discussion message${sourceCount === 1 ? '' : 's'}.`,
+        sourceMessageIds,
+        sourceSemanticFacets: [],
+        sourceAuthorAnnotations: [],
+        draftPostId: null,
+        triggerReason: 'manual_discussion_selection',
+    });
+    if (!notice?.candidateId) {
+        throw new DraftCandidateAcceptanceError({
+            statusCode: 500,
+            code: 'draft_candidate_notice_failed',
+            message: 'failed to prepare manual discussion draft candidate',
+        });
+    }
+
+    return acceptDraftCandidateIntoDraft(prisma, {
+        circleId: input.circleId,
+        candidateId: notice.candidateId,
+        userId,
+    });
 }

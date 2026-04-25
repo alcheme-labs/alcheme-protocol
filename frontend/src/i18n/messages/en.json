@@ -1961,7 +1961,9 @@
         "emoji": "Emoji",
         "attachments": "Files soon",
         "attachmentsUnavailable": "Discussion file uploads are not available yet",
-        "mention": "Mention"
+        "mention": "Mention",
+        "createDraft": "Create draft",
+        "draftBusy": "Creating"
       },
       "authorAnnotations": {
         "title": "Author annotations",
@@ -2002,6 +2004,16 @@
       "sourceFocused": "Jumped to the source discussion for candidate {candidateId}.",
       "systemTag": "System",
       "persistedNotice": "Persisted notice"
+    },
+    "manualDraft": {
+      "noSources": "The visible discussion does not have analyzed messages ready for a draft yet.",
+      "creating": "Creating a draft from the latest {count} discussion messages…",
+      "succeeded": "Created a draft from the current discussion.",
+      "existing": "This discussion already has a draft.",
+      "pending": "This discussion is already generating a formal draft.",
+      "failed": "Draft generation failed: {error}.",
+      "failedGeneric": "Draft generation failed.",
+      "denied": "A circle manager is required to generate a formal draft from discussion."
     },
     "forward": {
       "cardLabel": "Forward card",

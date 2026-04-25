@@ -1961,7 +1961,9 @@
         "emoji": "Emoji",
         "attachments": "Fichiers bientôt",
         "attachmentsUnavailable": "L’envoi de fichiers de discussion n’est pas encore disponible",
-        "mention": "Mentionner"
+        "mention": "Mentionner",
+        "createDraft": "Créer un brouillon",
+        "draftBusy": "Création"
       },
       "authorAnnotations": {
         "title": "Annotations de l’auteur",
@@ -2002,6 +2004,16 @@
       "sourceFocused": "Retour à la discussion source du candidat {candidateId}.",
       "systemTag": "Système",
       "persistedNotice": "Avis enregistré"
+    },
+    "manualDraft": {
+      "noSources": "La discussion visible n’a pas encore de messages analysés prêts pour un brouillon.",
+      "creating": "Création d’un brouillon à partir des {count} derniers messages…",
+      "succeeded": "Brouillon créé à partir de la discussion actuelle.",
+      "existing": "Cette discussion a déjà un brouillon.",
+      "pending": "Cette discussion génère déjà un brouillon formel.",
+      "failed": "La génération du brouillon a échoué : {error}.",
+      "failedGeneric": "La génération du brouillon a échoué.",
+      "denied": "Un responsable du cercle est requis pour générer un brouillon formel depuis la discussion."
     },
     "forward": {
       "cardLabel": "Carte transférée",

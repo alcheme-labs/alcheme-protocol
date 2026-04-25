@@ -97,6 +97,7 @@ import {
 } from '../services/ghostDraft/acceptance';
 import {
     acceptDraftCandidateIntoDraft,
+    createDraftFromManualDiscussionSelection,
     DraftCandidateAcceptanceError,
 } from '../services/discussion/candidateAcceptance';
 import { bumpKnowledgeHeat, KNOWLEDGE_HEAT_EVENTS } from '../services/heat/knowledgeHeat';
@@ -3266,6 +3267,46 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
             const result = await acceptDraftCandidateIntoDraft(prisma as any, {
                 circleId,
                 candidateId,
+                userId: parseAuthUserIdFromRequest(req),
+            });
+
+            return res.json({
+                ok: true,
+                result,
+            });
+        } catch (error) {
+            if (error instanceof DraftCandidateAcceptanceError) {
+                return res.status(error.statusCode).json({
+                    error: error.code,
+                    message: error.message,
+                });
+            }
+            next(error);
+        }
+    });
+
+    router.post('/circles/:circleId/drafts/from-messages', async (req, res, next) => {
+        try {
+            const circleId = parsePositiveInt(req.params.circleId, NaN);
+            if (!Number.isFinite(circleId)) {
+                return res.status(400).json({ error: 'invalid_circle_id' });
+            }
+            const body = req.body ?? {};
+            const sourceMessageIds = Array.isArray(body.sourceMessageIds)
+                ? body.sourceMessageIds
+                    .map((value: unknown) => String(value || '').trim())
+                    .filter((value: string) => value.length > 0)
+                : [];
+            if (sourceMessageIds.length === 0) {
+                return res.status(400).json({
+                    error: 'invalid_source_message_ids',
+                    message: 'sourceMessageIds must contain at least one discussion message id',
+                });
+            }
+
+            const result = await createDraftFromManualDiscussionSelection(prisma as any, {
+                circleId,
+                sourceMessageIds,
                 userId: parseAuthUserIdFromRequest(req),
             });
 

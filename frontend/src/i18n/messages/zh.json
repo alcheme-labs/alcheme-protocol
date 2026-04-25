@@ -1961,7 +1961,9 @@
         "emoji": "表情",
         "attachments": "文件待开放",
         "attachmentsUnavailable": "讨论文件上传暂未开放",
-        "mention": "提及"
+        "mention": "提及",
+        "createDraft": "生成草稿",
+        "draftBusy": "生成中"
       },
       "authorAnnotations": {
         "title": "作者标注",
@@ -2002,6 +2004,16 @@
       "sourceFocused": "已定位到候选 {candidateId} 的来源讨论。",
       "systemTag": "系统",
       "persistedNotice": "已保存通知"
+    },
+    "manualDraft": {
+      "noSources": "当前可见讨论还没有可用于生成草稿的已分析消息。",
+      "creating": "正在从最近 {count} 条讨论生成草稿…",
+      "succeeded": "已从当前讨论生成草稿。",
+      "existing": "这段讨论已经有草稿了。",
+      "pending": "这段讨论正在生成正式草稿。",
+      "failed": "生成草稿失败：{error}。",
+      "failedGeneric": "生成草稿失败。",
+      "denied": "需要圈层管理员才能从讨论生成正式草稿。"
     },
     "forward": {
       "cardLabel": "转发卡",

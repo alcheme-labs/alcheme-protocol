@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { useMutation } from '@apollo/client/react';
-import { Smile, Paperclip, AtSign, SendHorizonal, CornerDownLeft, Copy, Trash2, Compass, Rss, Plus, X, ChevronUp, ChevronDown } from 'lucide-react';
+import { Smile, Paperclip, AtSign, SendHorizonal, CornerDownLeft, Copy, Trash2, Compass, Rss, Plus, X, ChevronUp, ChevronDown, FileEdit } from 'lucide-react';
 
 import HighlightButton from '@/components/circle/HighlightButton';
 import MessageActionSheet from '@/components/circle/MessageActionSheet/MessageActionSheet';
@@ -26,6 +26,7 @@ import { HIGHLIGHT_MESSAGE } from '@/lib/apollo/queries';
 import {
     createDiscussionSession,
     createDraftFromCandidate,
+    createDraftFromDiscussionMessages,
     fetchDiscussionMessages,
     fetchDiscussionMessagesByEnvelopeIds,
     getDiscussionProtocolBaseUrl,
@@ -64,6 +65,7 @@ const DISCUSSION_ATTACHMENTS_ENABLED = false;
 const REPLY_PREVIEW_MAX_LENGTH = 64;
 const COMPOSER_HINT_AUTO_HIDE_MS = 40_000;
 const DISCUSSION_SYNC_LIMIT = 120;
+const MANUAL_DRAFT_SOURCE_LIMIT = 16;
 
 function messageMatchesContentFilters(
     message: PlazaMessage,
@@ -219,6 +221,7 @@ function PlazaTab({
     const [forwardingMessageId, setForwardingMessageId] = useState<number | null>(null);
     const [discussionStatus, setDiscussionStatus] = useState<string | null>(null);
     const [creatingCandidateDraftId, setCreatingCandidateDraftId] = useState<string | null>(null);
+    const [creatingDiscussionDraft, setCreatingDiscussionDraft] = useState(false);
     const [pendingCandidateDraftIds, setPendingCandidateDraftIds] = useState<Set<string>>(new Set());
     const [composerLabels, setComposerLabels] = useState<AuthorAnnotationKind[]>([]);
     const [activeContentFilters, setActiveContentFilters] = useState<AuthorAnnotationKind[]>([]);
@@ -699,6 +702,20 @@ function PlazaTab({
 
         return filteredByViewMode.filter((message) => messageMatchesContentFilters(message, activeContentFilters));
     }, [activeContentFilters, localMessages, viewMode, walletPubkey]);
+
+    const manualDraftSourceMessageIds = useMemo(() => visibleMessages
+        .filter((message) =>
+            Boolean(message.envelopeId)
+            && message.messageKind !== 'draft_candidate_notice'
+            && message.messageKind !== 'governance_notice'
+            && !message.deleted
+            && !message.ephemeral
+            && message.text.trim().length > 0
+            && (message.relevanceStatus === 'ready' || !message.relevanceStatus)
+        )
+        .slice(-MANUAL_DRAFT_SOURCE_LIMIT)
+        .map((message) => message.envelopeId!)
+    , [visibleMessages]);
 
     useEffect(() => {
         if (!focusedEnvelopeId || visibleMessages.length === 0) return;
@@ -1285,6 +1302,65 @@ function PlazaTab({
     }, [
         creatingCandidateDraftId,
         discussionCircleId,
+        onDraftsChanged,
+        onOpenCrucible,
+        t,
+    ]);
+
+    const handleCreateDraftFromDiscussion = useCallback(async () => {
+        if (creatingDiscussionDraft) return;
+        if (manualDraftSourceMessageIds.length === 0) {
+            setDiscussionStatus(t('manualDraft.noSources'));
+            return;
+        }
+
+        setCreatingDiscussionDraft(true);
+        setShowPanel(false);
+        setDiscussionError(null);
+        setDiscussionStatus(t('manualDraft.creating', { count: manualDraftSourceMessageIds.length }));
+        try {
+            const response = await createDraftFromDiscussionMessages({
+                circleId: discussionCircleId,
+                sourceMessageIds: manualDraftSourceMessageIds,
+            });
+
+            if (response.result.status === 'pending') {
+                setDiscussionStatus(t('manualDraft.pending'));
+                return;
+            }
+            if (response.result.status === 'generation_failed') {
+                setDiscussionStatus(t('manualDraft.failed', {
+                    error: response.result.draftGenerationError,
+                }));
+                return;
+            }
+            if (response.result.status === 'created' || response.result.status === 'existing') {
+                setDiscussionStatus(
+                    response.result.status === 'created'
+                        ? t('manualDraft.succeeded')
+                        : t('manualDraft.existing'),
+                );
+                void onDraftsChanged?.();
+                onOpenCrucible?.(response.result.draftPostId);
+            }
+        } catch (error) {
+            const code = typeof (error as { code?: unknown })?.code === 'string'
+                ? (error as { code: string }).code
+                : '';
+            if (code === 'candidate_generation_forbidden') {
+                setDiscussionStatus(t('manualDraft.denied'));
+            } else if (code === 'draft_candidate_missing_sources' || code === 'invalid_source_message_ids') {
+                setDiscussionStatus(t('manualDraft.noSources'));
+            } else {
+                setDiscussionError(error instanceof Error ? error.message : t('manualDraft.failedGeneric'));
+            }
+        } finally {
+            setCreatingDiscussionDraft(false);
+        }
+    }, [
+        creatingDiscussionDraft,
+        discussionCircleId,
+        manualDraftSourceMessageIds,
         onDraftsChanged,
         onOpenCrucible,
         t,
@@ -1900,6 +1976,16 @@ function PlazaTab({
                                 >
                                     <AtSign size={22} />
                                     <span>{t('composer.actions.mention')}</span>
+                                </button>
+                                <button
+                                    className={styles.composerOpBtn}
+                                    type="button"
+                                    onClick={handleCreateDraftFromDiscussion}
+                                    disabled={!walletPubkey || creatingDiscussionDraft || manualDraftSourceMessageIds.length === 0}
+                                    title={manualDraftSourceMessageIds.length === 0 ? t('manualDraft.noSources') : undefined}
+                                >
+                                    <FileEdit size={22} />
+                                    <span>{creatingDiscussionDraft ? t('composer.actions.draftBusy') : t('composer.actions.createDraft')}</span>
                                 </button>
                             </div>
                             <div className={styles.composerLabelSection}>

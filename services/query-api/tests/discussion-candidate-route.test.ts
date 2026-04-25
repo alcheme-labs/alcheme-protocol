@@ -2,9 +2,11 @@ import { beforeEach, describe, expect, jest, test } from '@jest/globals';
 import type { Router } from 'express';
 
 const acceptDraftCandidateIntoDraftMock = jest.fn();
+const createDraftFromManualDiscussionSelectionMock = jest.fn();
 
 jest.mock('../src/services/discussion/candidateAcceptance', () => ({
     acceptDraftCandidateIntoDraft: acceptDraftCandidateIntoDraftMock,
+    createDraftFromManualDiscussionSelection: createDraftFromManualDiscussionSelectionMock,
     DraftCandidateAcceptanceError: class DraftCandidateAcceptanceError extends Error {
         statusCode: number;
         code: string;
@@ -53,6 +55,13 @@ describe('discussion candidate route', () => {
             status: 'created',
             candidateId: 'cand_001',
             draftPostId: 88,
+            created: true,
+            ghostDraftGenerationId: null,
+        });
+        (createDraftFromManualDiscussionSelectionMock as any).mockResolvedValue({
+            status: 'created',
+            candidateId: 'cand_manual',
+            draftPostId: 89,
             created: true,
             ghostDraftGenerationId: null,
         });
@@ -117,6 +126,38 @@ describe('discussion candidate route', () => {
                 attemptId: 501,
                 claimedUntil: new Date('2026-04-24T01:00:00.000Z'),
                 created: false,
+            },
+        });
+        expect(next).not.toHaveBeenCalled();
+    });
+
+    test('creates a draft from explicitly selected discussion messages', async () => {
+        const prisma = {} as any;
+        const router = discussionRouter(prisma, {} as any);
+        const handler = getRouteHandler(router, '/circles/:circleId/drafts/from-messages', 'post');
+        const res = createMockResponse();
+        const next = jest.fn();
+
+        await handler({
+            params: { circleId: '7' },
+            body: { sourceMessageIds: ['env_001', 'env_002'] },
+            userId: 19,
+        } as any, res as any, next);
+
+        expect(createDraftFromManualDiscussionSelectionMock).toHaveBeenCalledWith(prisma, {
+            circleId: 7,
+            sourceMessageIds: ['env_001', 'env_002'],
+            userId: 19,
+        });
+        expect(res.statusCode).toBe(200);
+        expect(res.payload).toEqual({
+            ok: true,
+            result: {
+                candidateId: 'cand_manual',
+                status: 'created',
+                draftPostId: 89,
+                created: true,
+                ghostDraftGenerationId: null,
             },
         });
         expect(next).not.toHaveBeenCalled();

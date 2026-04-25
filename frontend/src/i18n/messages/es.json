@@ -1961,7 +1961,9 @@
         "emoji": "Emoji",
         "attachments": "Archivos pronto",
         "attachmentsUnavailable": "La carga de archivos de discusión todavía no está disponible",
-        "mention": "Mencionar"
+        "mention": "Mencionar",
+        "createDraft": "Crear borrador",
+        "draftBusy": "Creando"
       },
       "authorAnnotations": {
         "title": "Anotaciones del autor",
@@ -2002,6 +2004,16 @@
       "sourceFocused": "Saltaste a la discusión de origen del candidato {candidateId}.",
       "systemTag": "Sistema",
       "persistedNotice": "Aviso guardado"
+    },
+    "manualDraft": {
+      "noSources": "La discusión visible todavía no tiene mensajes analizados listos para un borrador.",
+      "creating": "Creando un borrador a partir de los últimos {count} mensajes…",
+      "succeeded": "Se creó un borrador desde la discusión actual.",
+      "existing": "Esta discusión ya tiene un borrador.",
+      "pending": "Esta discusión ya está generando un borrador formal.",
+      "failed": "La generación del borrador falló: {error}.",
+      "failedGeneric": "La generación del borrador falló.",
+      "denied": "Se necesita una persona gestora del círculo para generar un borrador formal desde la discusión."
     },
     "forward": {
       "cardLabel": "Tarjeta reenviada",
