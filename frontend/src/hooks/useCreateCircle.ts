@@ -54,15 +54,21 @@ interface CreateCircleOptions {
     };
 }
 
+interface CreateCircleResult {
+    txSignature: string;
+    circleId: number;
+    notice: string | null;
+    indexed: boolean;
+}
+
 interface UseCreateCircleReturn {
-    createCircle: (options: CreateCircleOptions) => Promise<{
-        txSignature: string;
-        circleId: number;
-    } | null>;
+    createCircle: (options: CreateCircleOptions) => Promise<CreateCircleResult | null>;
+    clearNotice: () => void;
     loading: boolean;
     syncing: boolean;
     indexed: boolean;
     error: string | null;
+    notice: string | null;
     txSignature: string | null;
 }
 
@@ -425,16 +431,15 @@ export function useCreateCircle(): UseCreateCircleReturn {
     const [syncing, setSyncing] = useState(false);
     const [indexed, setIndexed] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [notice, setNotice] = useState<string | null>(null);
     const [txSignature, setTxSignature] = useState<string | null>(null);
-    const inFlightRef = useRef<Promise<{
-        txSignature: string;
-        circleId: number;
-    } | null> | null>(null);
+    const inFlightRef = useRef<Promise<CreateCircleResult | null> | null>(null);
 
-    const createCircle = useCallback(async (options: CreateCircleOptions): Promise<{
-        txSignature: string;
-        circleId: number;
-    } | null> => {
+    const clearNotice = useCallback(() => {
+        setNotice(null);
+    }, []);
+
+    const createCircle = useCallback(async (options: CreateCircleOptions): Promise<CreateCircleResult | null> => {
         if (inFlightRef.current) return inFlightRef.current;
 
         const run = (async () => {
@@ -463,6 +468,7 @@ export function useCreateCircle(): UseCreateCircleReturn {
             setSyncing(false);
             setIndexed(false);
             setError(null);
+            setNotice(null);
             setTxSignature(null);
 
             try {
@@ -476,6 +482,11 @@ export function useCreateCircle(): UseCreateCircleReturn {
                 let tx: string | null = null;
                 let createdCircleId: number | null = null;
                 let e2eSignatureSlot: number | null = null;
+                let completionNotice: string | null = null;
+                const addCompletionNotice = (message: string) => {
+                    completionNotice = appendCreateCircleNotice(completionNotice, message);
+                    setNotice(completionNotice);
+                };
 
                 const activeSdk = sdk;
                 if (!activeSdk) {
@@ -633,10 +644,10 @@ export function useCreateCircle(): UseCreateCircleReturn {
                 if (targetIndexedSlot !== null) {
                     const indexWait = await waitForIndexedSlot(targetIndexedSlot);
                     if (!indexWait.ok) {
-                        setError(t('errors.indexerLagging'));
+                        addCompletionNotice(t('errors.indexerLagging'));
                     }
                 } else {
-                    setError(t('errors.signatureSlotMissing'));
+                    addCompletionNotice(t('errors.signatureSlotMissing'));
                 }
 
                 const circleVisible = await waitForCircleReadModelVisibility({
@@ -644,11 +655,7 @@ export function useCreateCircle(): UseCreateCircleReturn {
                 });
                 setIndexed(circleVisible);
                 if (!circleVisible) {
-                    setError((prev) => appendCreateCircleNotice(prev, t('errors.readModelLagging')));
-                    return {
-                        txSignature: tx,
-                        circleId: createdCircleId,
-                    };
+                    addCompletionNotice(t('errors.readModelLagging'));
                 }
 
                 const syncPostCreateCircleSettings = async (): Promise<void> => {
@@ -798,6 +805,8 @@ export function useCreateCircle(): UseCreateCircleReturn {
                 return {
                     txSignature: tx,
                     circleId: createdCircleId,
+                    notice: completionNotice,
+                    indexed: circleVisible,
                 };
             } catch (err: unknown) {
                 const msg = normalizeCreateCircleError(err, t);
@@ -816,5 +825,5 @@ export function useCreateCircle(): UseCreateCircleReturn {
         return inFlightRef.current;
     }, [sdk, publicKey, signMessage, t]);
 
-    return { createCircle, loading, syncing, indexed, error, txSignature };
+    return { createCircle, clearNotice, loading, syncing, indexed, error, notice, txSignature };
 }

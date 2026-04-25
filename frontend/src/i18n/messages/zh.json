@@ -771,6 +771,9 @@
     "createCircle": {
       "title": "创建圈层 · {name} (Lv.{level})",
       "parentCircleName": "{name}（第 {level} 层）",
+      "notices": {
+        "invitePending": "圈层 #{circleId} 已创建，但暂未出现在读模型中。稍后刷新后再打开邀请。"
+      },
       "errors": {
         "invalidParentCircle": "当前圈层 ID 无效，无法创建。",
         "noNextLevelPermission": "当前账号没有创建下一级圈层的权限。"

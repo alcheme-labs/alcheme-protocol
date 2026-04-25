@@ -771,6 +771,9 @@
     "createCircle": {
       "title": "Create circle · {name} (Lv.{level})",
       "parentCircleName": "{name} (Level {level})",
+      "notices": {
+        "invitePending": "Circle #{circleId} was created, but it is not visible in the read model yet. Refresh shortly before opening invites."
+      },
       "errors": {
         "invalidParentCircle": "This circle is invalid, so creation cannot start yet.",
         "noNextLevelPermission": "This account cannot create the next-level circle from here yet."

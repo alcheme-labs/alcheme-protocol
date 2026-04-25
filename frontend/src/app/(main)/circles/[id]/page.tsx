@@ -581,7 +581,15 @@ export default function CircleDetailPage() {
     const [showNotifications, setShowNotifications] = useState(false);
     const [identityProgressExpanded, setIdentityProgressExpanded] = useState(false);
     const [identityTransitionDismissed, setIdentityTransitionDismissed] = useState(false);
-    const { createCircle, loading: isCreatingCircle, error: createCircleError } = useCreateCircle();
+    const [createCircleStatusNotice, setCreateCircleStatusNotice] = useState<string | null>(null);
+    const [, setPendingInviteCircleId] = useState<number | null>(null);
+    const {
+        createCircle,
+        clearNotice: clearCreateCircleNotice,
+        loading: isCreatingCircle,
+        error: createCircleError,
+        notice: createCircleNotice,
+    } = useCreateCircle();
     const selectedMemberRequestRef = useRef<number | null>(null);
     const inviteSourceRequestRef = useRef<number | null>(null);
     const restoredPendingForkSourceRef = useRef<number | null>(null);
@@ -2087,6 +2095,7 @@ export default function CircleDetailPage() {
     )
         ? (circleGhostSettings ?? DEFAULT_CIRCLE_GHOST_SETTINGS)
         : undefined;
+    const visibleCreateCircleNotice = createCircleStatusNotice || (!showCreateCircle ? createCircleNotice : null);
 
     return (
         <div className={isPlaza ? styles.pageChat : styles.page} style={colorTempStyle as React.CSSProperties} suppressHydrationWarning>
@@ -2133,6 +2142,9 @@ export default function CircleDetailPage() {
                                 setIsLifted={setIsPillLifted}
                                 onCreateCircle={() => {
                                     setCreatePermissionError(null);
+                                    setCreateCircleStatusNotice(null);
+                                    setPendingInviteCircleId(null);
+                                    clearCreateCircleNotice();
                                     setShowCreateCircle(true);
                                 }}
                             />
@@ -2159,6 +2171,11 @@ export default function CircleDetailPage() {
                             <Settings size={18} strokeWidth={1.5} />
                         </button>
                     </motion.header>
+                    {visibleCreateCircleNotice && (
+                        <div className={styles.createCircleNotice} role="status">
+                            {visibleCreateCircleNotice}
+                        </div>
+                    )}
                     {hasRealData && showForkLineageCard && (
                         <Card state="ore" className={styles.forkLineageCard}>
                             <div className={styles.forkLineageHeader}>
@@ -2584,8 +2601,16 @@ export default function CircleDetailPage() {
                     });
 
                     if (!result?.txSignature) return false;
+                    if (result.notice) {
+                        setCreateCircleStatusNotice(result.notice);
+                    }
 
-                    const refreshed = await refetch();
+                    let refreshed: Awaited<ReturnType<typeof refetch>> | null = null;
+                    try {
+                        refreshed = await refetch();
+                    } catch (error) {
+                        console.warn('[CirclePage] refetch after circle creation failed', error);
+                    }
 
                     if (data.accessType === 'invite') {
                         // Invite-only circles open the invite sheet right after creation.
@@ -2594,8 +2619,8 @@ export default function CircleDetailPage() {
                             ? Math.max(0, (activeMainCircle.level ?? 0) + 1)
                             : Math.max(0, activeMainCircle.level ?? 0);
                         const allCircles = [
-                            refreshed.data?.circle,
-                            ...(refreshed.data?.circleDescendants || []),
+                            refreshed?.data?.circle,
+                            ...(refreshed?.data?.circleDescendants || []),
                         ].filter(Boolean) as any[];
                         const createdCircle = allCircles.find((circle) => {
                             if (circle.name !== data.name) return false;
@@ -2611,7 +2636,10 @@ export default function CircleDetailPage() {
                             if (createdCircle?.id) {
                                 openInviteSheetForCircle(createdCircle.id, createdCircle.name);
                             } else {
-                                openInviteSheetForCircle(parentCircle, activeMainCircle.name);
+                                setPendingInviteCircleId(result.circleId);
+                                setCreateCircleStatusNotice(result.notice || circleDetailT('createCircle.notices.invitePending', {
+                                    circleId: result.circleId,
+                                }));
                             }
                         }, 300);
                     }
@@ -2620,6 +2648,7 @@ export default function CircleDetailPage() {
                 }}
                 submitting={isCreatingCircle}
                 submitError={createPermissionError || createCircleError}
+                submitNotice={createCircleNotice}
             />
 
             <ForkCreateSheet

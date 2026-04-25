@@ -13,6 +13,9 @@ import {
 const filePath = fileURLToPath(import.meta.url);
 const frontendRoot = path.resolve(path.dirname(filePath), '..');
 const hookPath = path.join(frontendRoot, 'src/hooks/useCreateCircle.ts');
+const sheetPath = path.join(frontendRoot, 'src/components/circle/CreateCircleSheet/CreateCircleSheet.tsx');
+const circlesPagePath = path.join(frontendRoot, 'src/app/(main)/circles/page.tsx');
+const circleDetailPagePath = path.join(frontendRoot, 'src/app/(main)/circles/[id]/page.tsx');
 
 function read(targetPath) {
   assert.equal(fs.existsSync(targetPath), true, `missing file: ${targetPath}`);
@@ -106,4 +109,29 @@ test('useCreateCircle gates partial creation on message signing and waits for ci
   assert.match(source, /getCreateCircleSignerUnavailableError/);
   assert.match(source, /settleCreateCirclePostCreateSync/);
   assert.match(source, /waitForCircleReadModelVisibility/);
+});
+
+test('create-circle read-model lag notice is elevated outside the closing sheet', () => {
+  const hookSource = read(hookPath);
+  const sheetSource = read(sheetPath);
+  const circlesPageSource = read(circlesPagePath);
+  const circleDetailSource = read(circleDetailPagePath);
+
+  assert.match(hookSource, /clearNotice/);
+  assert.match(hookSource, /notice:\s*completionNotice/);
+  assert.match(sheetSource, /submitNotice/);
+  assert.match(circlesPageSource, /createCircleStatusNotice/);
+  assert.match(circleDetailSource, /createCircleStatusNotice/);
+  assert.match(circlesPageSource, /role="status"/);
+  assert.match(circleDetailSource, /role="status"/);
+});
+
+test('invite-only circle creation waits for the created circle before opening invites', () => {
+  const circleDetailSource = read(circleDetailPagePath);
+
+  assert.doesNotMatch(
+    circleDetailSource,
+    /openInviteSheetForCircle\(parentCircle,\s*activeMainCircle\.name\)/,
+  );
+  assert.match(circleDetailSource, /setPendingInviteCircleId/);
 });

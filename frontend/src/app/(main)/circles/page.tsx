@@ -25,7 +25,14 @@ export default function CirclesPage() {
     const t = useI18n('CirclesPage');
     const [searchQuery, setSearchQuery] = useState('');
     const [showCreateSheet, setShowCreateSheet] = useState(false);
-    const { createCircle, loading: isCreating, error: createCircleError } = useCreateCircle();
+    const [createCircleStatusNotice, setCreateCircleStatusNotice] = useState<string | null>(null);
+    const {
+        createCircle,
+        clearNotice: clearCreateCircleNotice,
+        loading: isCreating,
+        error: createCircleError,
+        notice: createCircleNotice,
+    } = useCreateCircle();
 
     // Fetch all circles by default
     const {
@@ -63,6 +70,7 @@ export default function CirclesPage() {
     const relatedResultsHint = hasSearchResults
         ? t('search.relatedResults', {count: searchPostData.searchPosts.length})
         : null;
+    const visibleCreateCircleNotice = createCircleStatusNotice || (!showCreateSheet ? createCircleNotice : null);
     const formatCircleType = (circleType: GQLCircle['circleType']) => {
         if (circleType === 'Closed') return t('circle.type.closed');
         if (circleType === 'Secret') return t('circle.type.secret');
@@ -86,12 +94,21 @@ export default function CirclesPage() {
                     </div>
                     <button
                         className={styles.createBtn}
-                        onClick={() => setShowCreateSheet(true)}
+                        onClick={() => {
+                            clearCreateCircleNotice();
+                            setCreateCircleStatusNotice(null);
+                            setShowCreateSheet(true);
+                        }}
                         aria-label={t('actions.createAria')}
                     >
                         <Plus size={20} strokeWidth={2} />
                     </button>
                 </motion.header>
+                {visibleCreateCircleNotice && (
+                    <div className={styles.createCircleNotice} role="status">
+                        {visibleCreateCircleNotice}
+                    </div>
+                )}
 
                 {/* Search */}
                 <motion.div
@@ -192,12 +209,20 @@ export default function CirclesPage() {
                         draftWorkflowPolicy: data.draftWorkflowPolicy,
                     });
                     if (result?.txSignature) {
-                        await refetchAllCircles();
+                        if (result.notice) {
+                            setCreateCircleStatusNotice(result.notice);
+                        }
+                        try {
+                            await refetchAllCircles();
+                        } catch (error) {
+                            console.warn('[CirclesPage] refetch after circle creation failed', error);
+                        }
                     }
                     return !!result?.txSignature;
                 }}
                 submitting={isCreating}
                 submitError={createCircleError}
+                submitNotice={createCircleNotice}
             />
         </div>
     );

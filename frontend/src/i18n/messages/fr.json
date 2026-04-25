@@ -771,6 +771,9 @@
     "createCircle": {
       "title": "Créer un cercle · {name} (Nv.{level})",
       "parentCircleName": "{name} (Niveau {level})",
+      "notices": {
+        "invitePending": "Le cercle #{circleId} a été créé, mais il n’apparaît pas encore dans le modèle de lecture. Actualisez dans un instant avant d’ouvrir les invitations."
+      },
       "errors": {
         "invalidParentCircle": "Ce cercle est invalide, donc la création ne peut pas encore démarrer.",
         "noNextLevelPermission": "Ce compte ne peut pas encore créer le niveau suivant depuis ici."

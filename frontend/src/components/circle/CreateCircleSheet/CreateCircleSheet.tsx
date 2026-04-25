@@ -68,6 +68,7 @@ interface CreateCircleSheetProps {
     onCreate: (data: CreateCircleData) => Promise<boolean | void> | boolean | void;
     submitting?: boolean;
     submitError?: string | null;
+    submitNotice?: string | null;
 }
 
 /* ═══ Constants ═══ */
@@ -121,6 +122,7 @@ export default function CreateCircleSheet({
     onCreate,
     submitting = false,
     submitError = null,
+    submitNotice = null,
 }: CreateCircleSheetProps) {
     const t = useI18n('CreateCircleSheet');
     const locale = useCurrentLocale();
@@ -1145,6 +1147,11 @@ export default function CreateCircleSheet({
                         {(localValidationError || submitError) && (
                             <div className={styles.submitError} role="alert">
                                 {localValidationError || submitError}
+                            </div>
+                        )}
+                        {!localValidationError && !submitError && submitNotice && (
+                            <div className={styles.submitNotice} role="status">
+                                {submitNotice}
                             </div>
                         )}
 

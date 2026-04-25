@@ -143,6 +143,17 @@
     color: var(--color-text-secondary);
 }
 
+.createCircleNotice {
+    margin: 0 0 var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid rgba(199, 168, 107, 0.36);
+    border-radius: var(--radius-sm);
+    background: rgba(199, 168, 107, 0.1);
+    color: var(--color-accent-gold, #c7a86b);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
 .identityTransitionClose {
     display: inline-flex;
     align-items: center;

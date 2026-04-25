@@ -771,6 +771,9 @@
     "createCircle": {
       "title": "Crear círculo · {name} (Nv.{level})",
       "parentCircleName": "{name} (Nivel {level})",
+      "notices": {
+        "invitePending": "El círculo #{circleId} se creó, pero aún no aparece en el modelo de lectura. Actualiza en un momento antes de abrir invitaciones."
+      },
       "errors": {
         "invalidParentCircle": "Este círculo no es válido, así que la creación todavía no puede empezar.",
         "noNextLevelPermission": "Esta cuenta todavía no puede crear el siguiente nivel desde aquí."
