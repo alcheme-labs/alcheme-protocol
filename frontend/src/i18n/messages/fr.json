@@ -2440,12 +2440,20 @@
       "contributionLedger": "Grand livre des contributions"
     },
     "actions": {
-      "copy": "Copier",
+      "copy": "Copier le lien",
       "cite": "Citer",
       "citePending": "La citation du cristal n’est pas encore disponible"
     }
   },
   "DraftCard": {
+    "heat": {
+      "active": "Actif",
+      "cooling": "En refroidissement",
+      "frozen": "Faible activité"
+    },
+    "lifecycle": {
+      "crystallized": "Cristallisé"
+    },
     "meta": {
       "editors": "{count} éditeurs",
       "comments": "{count} commentaires"

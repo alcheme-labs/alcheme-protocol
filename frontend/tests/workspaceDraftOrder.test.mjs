@@ -51,8 +51,12 @@ test('prioritizeWorkspaceDrafts leaves the original order intact when no draftin
 });
 
 test('CrucibleTab probes draft lifecycle status and prefers drafting drafts in the list order', () => {
-    assert.match(crucibleTabSource, /const orderedDrafts = useMemo\(\s*\(\) => prioritizeWorkspaceDrafts\(drafts, draftWorkspaceStatuses\)/);
-    assert.match(crucibleTabSource, /const lifecycle = await fetchDraftLifecycle\(\{ draftPostId: draft\.id \}\)/);
+    assert.match(crucibleTabSource, /const effectiveDraftWorkspaceStatuses = useMemo/);
+    assert.match(crucibleTabSource, /next\[draft\.id\] = draft\.documentStatus/);
+    assert.match(crucibleTabSource, /const orderedDrafts = useMemo\(\s*\(\) => prioritizeWorkspaceDrafts\(drafts, effectiveDraftWorkspaceStatuses\)/);
+    assert.match(crucibleTabSource, /const draftsMissingGraphqlStatus = drafts\.filter/);
+    assert.match(crucibleTabSource, /for \(const draft of draftsMissingGraphqlStatus\)/);
+    assert.doesNotMatch(crucibleTabSource, /for \(const draft of drafts\)[\s\S]{0,240}fetchDraftLifecycle/);
     assert.match(crucibleTabSource, /orderedDrafts\.map\(\(draft, i\) => \(/);
     assert.match(crucibleTabSource, /setDraftWorkspaceStatuses\(\(current\) => \{/);
     assert.match(crucibleTabSource, /\[selectedDraftPostId\]: draftLifecycle\.documentStatus/);

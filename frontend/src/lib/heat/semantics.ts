@@ -4,9 +4,9 @@ export const HEAT_ACTIVE_MIN = 50;
 export const HEAT_COOLING_MIN = 10;
 
 const HEAT_STATE_LABELS: Record<HeatState, string> = {
-    active: '活跃',
-    cooling: '冷却中',
-    frozen: '已冻结',
+    active: 'Active',
+    cooling: 'Cooling',
+    frozen: 'Low heat',
 };
 
 export function clampHeatScore(score: number): number {

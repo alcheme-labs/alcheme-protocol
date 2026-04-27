@@ -570,6 +570,7 @@ export interface GQLDraftSummary {
     excerpt: string | null;
     heatScore: number;
     status: string;
+    documentStatus: string;
     commentCount: number;
     ageDays: number;
     createdAt: string;

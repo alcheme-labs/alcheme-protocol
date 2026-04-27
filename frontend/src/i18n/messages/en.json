@@ -2440,12 +2440,20 @@
       "contributionLedger": "Contribution ledger"
     },
     "actions": {
-      "copy": "Copy",
+      "copy": "Copy link",
       "cite": "Cite",
       "citePending": "Crystal citation is not available yet"
     }
   },
   "DraftCard": {
+    "heat": {
+      "active": "Active",
+      "cooling": "Cooling",
+      "frozen": "Low heat"
+    },
+    "lifecycle": {
+      "crystallized": "Crystallized"
+    },
     "meta": {
       "editors": "{count} editors",
       "comments": "{count} comments"

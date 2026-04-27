@@ -449,6 +449,7 @@ export const typeDefs = gql`
     excerpt: String
     heatScore: Float!
     status: PostStatus!
+    documentStatus: String!
     commentCount: Int!
     ageDays: Int!
     createdAt: DateTime!

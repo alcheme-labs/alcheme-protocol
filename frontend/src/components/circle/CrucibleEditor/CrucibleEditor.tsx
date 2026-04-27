@@ -9,7 +9,7 @@ import {
     type CrucibleAcceptedIssueCarryView,
     type CrucibleParagraphBlockView,
 } from '@/lib/circle/crucibleViewModel';
-import { clampHeatScore, resolveHeatState, resolveHeatStateLabel } from '@/lib/heat/semantics';
+import { clampHeatScore, resolveHeatState } from '@/lib/heat/semantics';
 import type { KnowledgeReferenceOption } from '@/lib/circle/knowledgeReferenceOptions';
 import { useI18n } from '@/i18n/useI18n';
 import { resolveTemporaryGrantControls } from './temporaryGrantControls';
@@ -157,12 +157,7 @@ export default function CrucibleEditor({
 
     const heatPercent = clampHeatScore(draft.heat);
     const heatState = resolveHeatState(heatPercent);
-    const rawHeatLabel = resolveHeatStateLabel(heatState);
-    const heatLabel = rawHeatLabel === 'Active'
-        ? t('heat.active')
-        : rawHeatLabel === 'Cooling'
-            ? t('heat.cooling')
-            : t('heat.frozen');
+    const heatLabel = t(`heat.${heatState}`);
     const heatIcon = heatState === 'active'
         ? '🔥'
         : heatState === 'cooling'
@@ -175,7 +170,9 @@ export default function CrucibleEditor({
     );
 
     useEffect(() => {
-        setActiveCommentParagraph(selectedParagraphIndex);
+        if (selectedParagraphIndex === null) {
+            setActiveCommentParagraph(null);
+        }
     }, [selectedParagraphIndex]);
 
     useEffect(() => {
@@ -183,18 +180,22 @@ export default function CrucibleEditor({
         setEditingParagraphIndex((current) => (current === null ? current : selectedParagraphIndex));
     }, [selectedParagraphIndex]);
 
-    const activateParagraph = useCallback((paragraphIndex: number | null) => {
-        setActiveCommentParagraph(paragraphIndex);
+    const selectParagraph = useCallback((paragraphIndex: number | null) => {
         onSelectionParagraphChange?.(paragraphIndex);
     }, [onSelectionParagraphChange]);
+
+    const openCommentPanel = useCallback((paragraphIndex: number | null) => {
+        setActiveCommentParagraph(paragraphIndex);
+        selectParagraph(paragraphIndex);
+    }, [selectParagraph]);
 
     useEffect(() => {
         if (!insertReferenceRequest) return;
         if (editingParagraphIndex !== null) return;
         if (selectedParagraphIndex === null) return;
-        activateParagraph(selectedParagraphIndex);
+        selectParagraph(selectedParagraphIndex);
         setEditingParagraphIndex(selectedParagraphIndex);
-    }, [activateParagraph, editingParagraphIndex, insertReferenceRequest, selectedParagraphIndex]);
+    }, [editingParagraphIndex, insertReferenceRequest, selectParagraph, selectedParagraphIndex]);
 
     const handleAddComment = useCallback(() => {
         if (activeCommentParagraph !== null && commentText.trim()) {
@@ -245,7 +246,8 @@ export default function CrucibleEditor({
     }, [issueCarrySelections, onApplyAcceptedIssues]);
 
     const beginParagraphEditing = useCallback((paragraphIndex: number) => {
-        activateParagraph(paragraphIndex);
+        selectParagraph(paragraphIndex);
+        setActiveCommentParagraph(null);
         setIssueCarryError(null);
 
         setEditingParagraphIndex(paragraphIndex);
@@ -255,7 +257,7 @@ export default function CrucibleEditor({
                 ? (prev[paragraphIndex] || [])
                 : (defaultIssueCarrySelections[paragraphIndex] || []),
         }));
-    }, [activateParagraph, defaultIssueCarrySelections]);
+    }, [defaultIssueCarrySelections, selectParagraph]);
 
     const requestTemporaryEditGrant = useCallback(async (blockId: string) => {
         if (!onRequestTemporaryEditGrant) return;
@@ -359,7 +361,7 @@ export default function CrucibleEditor({
                         });
                         const isEditableParagraph = grantControls.isEditableParagraph;
                         const isEditingParagraph = editingParagraphIndex === block.index && isEditableParagraph;
-                        const isCommentPanelOpen = activeCommentParagraph === block.index;
+                        const isCommentPanelOpen = activeCommentParagraph === block.index && !isEditingParagraph;
                         const blockComments = comments.filter((comment) => comment.paragraphIndex === block.index);
                         const acceptedIssues = acceptedIssuesByParagraph[block.index] || [];
                         const selectedIssueIds = issueCarrySelections[block.index] || [];
@@ -386,7 +388,7 @@ export default function CrucibleEditor({
                                         <button
                                             type="button"
                                             className={styles.paragraphMetaButton}
-                                            onClick={() => activateParagraph(block.index)}
+                                            onClick={() => openCommentPanel(block.index)}
                                         >
                                             {t('meta.commentCount', { count: blockComments.length })}
                                         </button>
@@ -407,7 +409,7 @@ export default function CrucibleEditor({
                                         <button
                                             type="button"
                                             className={styles.paragraphAction}
-                                            onClick={() => activateParagraph(block.index)}
+                                            onClick={() => openCommentPanel(block.index)}
                                         >
                                             {t('actions.viewDiscussion')}
                                         </button>
@@ -510,7 +512,7 @@ export default function CrucibleEditor({
                                                     }
                                                     : null}
                                                 placeholder={t('placeholders.continueParagraph', { title: block.title })}
-                                                onSelectionParagraphChange={() => activateParagraph(block.index)}
+                                                onSelectionParagraphChange={() => selectParagraph(block.index)}
                                                 onUpdate={(nextParagraph) => handleParagraphEdit(block.index, nextParagraph)}
                                                 onKnowledgeReferenceInserted={onKnowledgeReferenceInserted}
                                             />
@@ -534,7 +536,7 @@ export default function CrucibleEditor({
                                     <button
                                         type="button"
                                         className={styles.paragraphReadOnly}
-                                        onClick={() => activateParagraph(block.index)}
+                                        onClick={() => openCommentPanel(block.index)}
                                     >
                                         {paragraphText || t('fallback.emptyParagraph')}
                                     </button>
@@ -553,7 +555,7 @@ export default function CrucibleEditor({
                                             </span>
                                             <button
                                                 className={styles.closeBtn}
-                                                onClick={() => activateParagraph(null)}
+                                                onClick={() => openCommentPanel(null)}
                                             >
                                                 ✕
                                             </button>

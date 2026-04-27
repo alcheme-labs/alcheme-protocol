@@ -128,6 +128,7 @@ import { useIdentityOnboarding } from '@/lib/auth/identityOnboarding';
 import { useCurrentLocale, useI18n } from '@/i18n/useI18n';
 import { buildKnowledgeReferenceOptions } from '@/lib/circle/knowledgeReferenceOptions';
 import { normalizeCircleRouteTab } from '@/lib/circle/routeTabs';
+import type { WorkspaceDraftLifecycleStatus } from '@/lib/circle/workspaceDraftOrder';
 import {
     buildForkReadinessViewModel,
     createForkReadinessCopy,
@@ -251,6 +252,20 @@ function normalizeNotificationType(raw: string): Notification['type'] {
         return raw;
     }
     return 'system';
+}
+
+function normalizeDraftDocumentStatus(raw: string | null | undefined): WorkspaceDraftLifecycleStatus {
+    if (
+        raw === 'drafting'
+        || raw === 'review'
+        || raw === 'crystallization_active'
+        || raw === 'crystallization_failed'
+        || raw === 'crystallized'
+        || raw === 'archived'
+    ) {
+        return raw;
+    }
+    return 'drafting';
 }
 
 function formatForkLineageDate(value: string | null | undefined, locale: string): string | null {
@@ -993,7 +1008,7 @@ export default function CircleDetailPage() {
     }, [activeTierId, subCircles]);
 
     /* ── Knowledge (Sanctuary crystals) ── */
-    const { data: knowledgeData } = useQuery<KnowledgeByCircleResponse>(GET_KNOWLEDGE_BY_CIRCLE, {
+    const { data: knowledgeData, refetch: refetchKnowledgeByCircle } = useQuery<KnowledgeByCircleResponse>(GET_KNOWLEDGE_BY_CIRCLE, {
         variables: { circleId: activeDiscussionCircleId, limit: 50 },
         skip: !Number.isFinite(activeDiscussionCircleId) || activeDiscussionCircleId <= 0,
         errorPolicy: 'all',
@@ -1038,6 +1053,23 @@ export default function CircleDetailPage() {
         skip: !Number.isFinite(activeDiscussionCircleId) || activeDiscussionCircleId <= 0,
         errorPolicy: 'all',
     });
+    const draftSummariesByCircleRef = useRef<Map<number, GQLDraftSummary[]>>(new Map());
+
+    useEffect(() => {
+        if (!Number.isFinite(activeDiscussionCircleId) || activeDiscussionCircleId <= 0) return;
+        if (!draftsData?.circleDrafts) return;
+        draftSummariesByCircleRef.current.set(activeDiscussionCircleId, draftsData.circleDrafts);
+    }, [activeDiscussionCircleId, draftsData?.circleDrafts]);
+
+    const handleCrystallizationComplete = useCallback(async () => {
+        if (!Number.isFinite(activeDiscussionCircleId) || activeDiscussionCircleId <= 0) return;
+
+        await Promise.all([
+            refetchKnowledgeByCircle({ circleId: activeDiscussionCircleId, limit: 50 }),
+            refetchDrafts({ circleId: activeDiscussionCircleId, limit: 50 }),
+            refetch(),
+        ]);
+    }, [activeDiscussionCircleId, refetch, refetchDrafts, refetchKnowledgeByCircle]);
 
     /* ── Notifications ── */
     const { data: notificationData } = useQuery<NotificationsResponse>(GET_NOTIFICATIONS, {
@@ -1137,19 +1169,22 @@ export default function CircleDetailPage() {
         [knowledgeData?.knowledgeByCircle],
     );
 
+    const draftSummaries = draftsData?.circleDrafts ?? draftSummariesByCircleRef.current.get(activeDiscussionCircleId) ?? [];
+
     // Map API drafts for CrucibleTab
     const drafts = useMemo(() => {
-        if (draftsData?.circleDrafts?.length) {
-            return draftsData.circleDrafts.map((d: GQLDraftSummary) => ({
+        if (draftSummaries.length) {
+            return draftSummaries.map((d: GQLDraftSummary) => ({
                 id: d.postId,
                 title: d.title,
                 heat: Math.max(0, Number(d.heatScore ?? 0)),
                 editors: d.commentCount > 0 ? Math.ceil(d.commentCount / 3) : 1,
                 comments: d.commentCount,
+                documentStatus: normalizeDraftDocumentStatus(d.documentStatus),
             }));
         }
         return [];
-    }, [draftsData]);
+    }, [draftSummaries]);
 
     const { style: colorTempStyle } = useColorTemperature({
         activeTab,
@@ -2524,6 +2559,7 @@ export default function CircleDetailPage() {
                                         viewerMembership={viewerDraftPermissionMembership}
                                         requestedDraftId={requestedCrucibleDraftId}
                                         onRequestedDraftHandled={handleRequestedCrucibleDraftHandled}
+                                        onCrystallizationComplete={handleCrystallizationComplete}
                                     />
                                 )}
                                 {activeTab === 'sanctuary' && <SanctuaryTab crystals={crystals} onCrystalClick={(c) => setSelectedCrystal(c)} />}
@@ -3086,7 +3122,9 @@ export default function CircleDetailPage() {
                 patinaLevel={selectedCrystal?.patinaLevel as 'fresh' | 'settling' | 'ancient'}
                 onClose={() => setSelectedCrystal(null)}
                 onCopy={() => {
-                    if (selectedCrystal) navigator.clipboard.writeText(selectedCrystal.content);
+                    if (!selectedCrystal?.knowledgeId) return;
+                    const crystalHref = new URL(`/knowledge/${selectedCrystal.knowledgeId}`, window.location.origin).toString();
+                    void navigator.clipboard.writeText(crystalHref);
                 }}
                 onCite={selectedCrystal?.knowledgeId
                     ? () => {

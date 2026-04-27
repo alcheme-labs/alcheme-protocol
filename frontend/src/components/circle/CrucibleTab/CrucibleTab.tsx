@@ -84,6 +84,7 @@ interface CrucibleDraft {
     heat: number;
     editors: number;
     comments: number;
+    documentStatus?: WorkspaceDraftLifecycleStatus;
 }
 
 interface TemporaryEditGrantView {
@@ -150,6 +151,7 @@ interface CrucibleTabProps {
     viewerMembership?: DraftPermissionMembership | null;
     requestedDraftId?: number | null;
     onRequestedDraftHandled?: () => void;
+    onCrystallizationComplete?: () => Promise<void> | void;
 }
 
 function CrucibleTab({
@@ -162,6 +164,7 @@ function CrucibleTab({
     viewerMembership = null,
     requestedDraftId = null,
     onRequestedDraftHandled,
+    onCrystallizationComplete,
 }: CrucibleTabProps) {
     const t = useI18n('CrucibleTab');
     const ghostRevealT = useI18n('GhostReveal');
@@ -291,9 +294,21 @@ function CrucibleTab({
     const selectedDraftSummary = selectedDraft
         ? drafts.find((draft) => String(draft.id) === selectedDraft)
         : null;
+    const effectiveDraftWorkspaceStatuses = useMemo(() => {
+        const next: Record<number, WorkspaceDraftLifecycleStatus> = {};
+        for (const draft of drafts) {
+            if (draft.documentStatus) {
+                next[draft.id] = draft.documentStatus;
+            }
+        }
+        return {
+            ...draftWorkspaceStatuses,
+            ...next,
+        };
+    }, [draftWorkspaceStatuses, drafts]);
     const orderedDrafts = useMemo(
-        () => prioritizeWorkspaceDrafts(drafts, draftWorkspaceStatuses),
-        [draftWorkspaceStatuses, drafts],
+        () => prioritizeWorkspaceDrafts(drafts, effectiveDraftWorkspaceStatuses),
+        [drafts, effectiveDraftWorkspaceStatuses],
     );
     const selectedDraftEditCount = Math.max(1, selectedDraftSummary?.editors ?? 1);
     const stableSnapshotVersion = draftLifecycle?.stableSnapshot.draftVersion || 1;
@@ -463,13 +478,20 @@ function CrucibleTab({
             return;
         }
 
+        const draftsMissingGraphqlStatus = drafts.filter((draft) => !draft.documentStatus);
+        if (draftsMissingGraphqlStatus.length === 0) {
+            draftWorkspaceStatusRequestRef.current += 1;
+            setDraftWorkspaceStatuses((current) => (Object.keys(current).length === 0 ? current : {}));
+            return;
+        }
+
         const requestId = draftWorkspaceStatusRequestRef.current + 1;
         draftWorkspaceStatusRequestRef.current = requestId;
         let cancelled = false;
 
         void (async () => {
             const nextStatuses: Record<number, WorkspaceDraftLifecycleStatus> = {};
-            for (const draft of drafts) {
+            for (const draft of draftsMissingGraphqlStatus) {
                 try {
                     const lifecycle = await fetchDraftLifecycle({ draftPostId: draft.id });
                     nextStatuses[draft.id] = lifecycle.documentStatus;
@@ -1623,7 +1645,14 @@ function CrucibleTab({
                 postId: selectedDraftPostId,
                 emptyMessage: t('errors.crystallizeRequiresBody'),
             });
-            await crystallizeDraft();
+            const result = await crystallizeDraft();
+            if (result) {
+                try {
+                    await onCrystallizationComplete?.();
+                } catch (refreshError) {
+                    console.warn('[CrucibleTab] refresh after crystallization failed', refreshError);
+                }
+            }
         } catch (error) {
             const message = error instanceof Error ? error.message : t('errors.executeCrystallization');
             setDraftLifecycleError(message);
@@ -1643,6 +1672,7 @@ function CrucibleTab({
         flushDraftBeforeWorkflowAction,
         refreshDraftDiscussions,
         refreshDraftLifecycle,
+        onCrystallizationComplete,
         selectedDraftPostId,
         t,
     ]);
@@ -2189,7 +2219,10 @@ function CrucibleTab({
             {orderedDrafts.map((draft, i) => (
                 <DraftCard
                     key={draft.id}
-                    draft={draft}
+                    draft={{
+                        ...draft,
+                        lifecycleStatus: effectiveDraftWorkspaceStatuses[draft.id],
+                    }}
                     index={i}
                     onClick={() => setSelectedDraft(String(draft.id))}
                 />

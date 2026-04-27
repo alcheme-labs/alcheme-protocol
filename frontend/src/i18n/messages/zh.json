@@ -2440,12 +2440,20 @@
       "contributionLedger": "贡献账本"
     },
     "actions": {
-      "copy": "复制",
+      "copy": "复制链接",
       "cite": "引用",
       "citePending": "晶体引用待开放"
     }
   },
   "DraftCard": {
+    "heat": {
+      "active": "活跃",
+      "cooling": "冷却中",
+      "frozen": "低热度"
+    },
+    "lifecycle": {
+      "crystallized": "已结晶"
+    },
     "meta": {
       "editors": "{count} 位编辑",
       "comments": "{count} 条评论"

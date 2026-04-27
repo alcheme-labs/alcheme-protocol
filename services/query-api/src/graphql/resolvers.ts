@@ -932,6 +932,19 @@ export const resolvers = {
                     _count: { select: { draftComments: true } },
                 },
             });
+            const draftIds = drafts.map((draft: any) => draft.id);
+            const workflowStates = draftIds.length > 0
+                ? await prisma.draftWorkflowState.findMany({
+                    where: { draftPostId: { in: draftIds } },
+                    select: { draftPostId: true, documentStatus: true },
+                })
+                : [];
+            const documentStatusByDraftId = new Map<number, string>(
+                workflowStates.map((state: any) => [
+                    Number(state.draftPostId),
+                    String(state.documentStatus || 'drafting'),
+                ]),
+            );
 
             const now = Date.now();
             return drafts.map((d: any) => ({
@@ -940,6 +953,7 @@ export const resolvers = {
                 excerpt: d.text?.slice(0, 200),
                 heatScore: Number(d.heatScore ?? 0),
                 status: d.status,
+                documentStatus: documentStatusByDraftId.get(d.id) || 'drafting',
                 commentCount: d._count?.draftComments ?? 0,
                 ageDays: Math.floor((now - new Date(d.createdAt).getTime()) / (1000 * 60 * 60 * 24)),
                 createdAt: d.createdAt,

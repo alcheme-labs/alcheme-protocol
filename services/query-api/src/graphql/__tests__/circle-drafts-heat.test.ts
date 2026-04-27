@@ -21,6 +21,14 @@ describe('GraphQL draft heat wiring', () => {
                     },
                 ]),
             },
+            draftWorkflowState: {
+                findMany: jest.fn<() => Promise<any[]>>().mockResolvedValue([
+                    {
+                        draftPostId: 7,
+                        documentStatus: 'crystallized',
+                    },
+                ]),
+            },
         } as any;
 
         const result = await (resolvers as any).Query.circleDrafts(
@@ -33,9 +41,14 @@ describe('GraphQL draft heat wiring', () => {
             expect.objectContaining({
                 postId: 7,
                 heatScore: 18.5,
+                documentStatus: 'crystallized',
                 commentCount: 2,
             }),
         ]);
+        expect(prisma.draftWorkflowState.findMany).toHaveBeenCalledWith({
+            where: { draftPostId: { in: [7] } },
+            select: { draftPostId: true, documentStatus: true },
+        });
     });
 
     test('addDraftComment bumps draft heat in the same transaction', async () => {

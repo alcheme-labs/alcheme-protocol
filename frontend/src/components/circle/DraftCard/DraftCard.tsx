@@ -1,16 +1,16 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Flame, Snowflake, Users, MessageSquare } from 'lucide-react';
+import { Flame, Gem, Snowflake, Users, MessageSquare } from 'lucide-react';
 import { HeatGauge, useColorTemperature } from '@/alchemy';
 import { Card } from '@/components/ui/Card';
 import { useI18n } from '@/i18n/useI18n';
 import {
     clampHeatScore,
-    resolveHeatLabel,
     resolveHeatState,
     resolveHeatTemperature,
 } from '@/lib/heat/semantics';
+import type { WorkspaceDraftLifecycleStatus } from '@/lib/circle/workspaceDraftOrder';
 import styles from './DraftCard.module.css';
 
 /* ═══ Types ═══ */
@@ -21,6 +21,7 @@ export interface DraftData {
     heat: number;
     editors: number;
     comments: number;
+    lifecycleStatus?: WorkspaceDraftLifecycleStatus;
 }
 
 interface DraftCardProps {
@@ -35,6 +36,8 @@ export default function DraftCard({ draft, index, onClick }: DraftCardProps) {
     const t = useI18n('DraftCard');
     const heat = clampHeatScore(Number(draft.heat ?? 0));
     const heatState = resolveHeatState(heat);
+    const isCrystallized = draft.lifecycleStatus === 'crystallized';
+    const visualHeatState = isCrystallized ? 'frozen' : heatState;
     const temperature = resolveHeatTemperature(heat);
 
     const { style: tempStyle } = useColorTemperature({
@@ -42,11 +45,15 @@ export default function DraftCard({ draft, index, onClick }: DraftCardProps) {
         activeTab: 'crucible',
     });
 
-    const heatIcon = heatState === 'frozen'
+    const heatIcon = isCrystallized
+        ? <Gem size={12} className={styles.frozenIcon} />
+        : heatState === 'frozen'
         ? <Snowflake size={12} className={styles.frozenIcon} />
         : <Flame size={12} className={styles.flameIcon} />;
 
-    const heatLabel = resolveHeatLabel(heat);
+    const heatLabel = isCrystallized
+        ? t('lifecycle.crystallized')
+        : t(`heat.${heatState}`);
 
     return (
         <motion.div
@@ -59,7 +66,7 @@ export default function DraftCard({ draft, index, onClick }: DraftCardProps) {
         >
             <Card
                 state="alloy"
-                heatState={heatState}
+                heatState={visualHeatState}
                 footer={
                     <div className={styles.footer} style={tempStyle as React.CSSProperties}>
                         {/* Heat gauge */}
@@ -70,10 +77,10 @@ export default function DraftCard({ draft, index, onClick }: DraftCardProps) {
                         {/* Heat label */}
                         <div className={styles.heatInfo}>
                             {heatIcon}
-                            <span className={`${styles.heatLabel} ${styles[heatState]}`}>
+                            <span className={`${styles.heatLabel} ${styles[visualHeatState]}`}>
                                 {heatLabel}
                             </span>
-                            <span className={`${styles.heatTemp} ${styles[heatState]}`}>
+                            <span className={`${styles.heatTemp} ${styles[visualHeatState]}`}>
                                 {Math.round(heat)}°
                             </span>
                         </div>
@@ -94,7 +101,7 @@ export default function DraftCard({ draft, index, onClick }: DraftCardProps) {
                 </div>
 
                 {/* Frost overlay for frozen state */}
-                {heatState === 'frozen' && (
+                {visualHeatState === 'frozen' && (
                     <div className={styles.frostOverlay} />
                 )}
             </Card>

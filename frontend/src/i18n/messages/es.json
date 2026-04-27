@@ -2440,12 +2440,20 @@
       "contributionLedger": "Libro de contribuciones"
     },
     "actions": {
-      "copy": "Copiar",
+      "copy": "Copiar enlace",
       "cite": "Citar",
       "citePending": "La cita del cristal todavía no está disponible"
     }
   },
   "DraftCard": {
+    "heat": {
+      "active": "Activo",
+      "cooling": "En enfriamiento",
+      "frozen": "Baja actividad"
+    },
+    "lifecycle": {
+      "crystallized": "Cristalizado"
+    },
     "meta": {
       "editors": "{count} editores",
       "comments": "{count} comentarios"

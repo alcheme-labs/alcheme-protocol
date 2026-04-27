@@ -843,6 +843,7 @@ export const GET_CIRCLE_DRAFTS = gql`
       excerpt
       heatScore
       status
+      documentStatus
       commentCount
       ageDays
       createdAt
