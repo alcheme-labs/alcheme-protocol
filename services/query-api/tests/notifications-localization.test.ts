@@ -94,6 +94,311 @@ describe('notifications localization', () => {
         ]);
     });
 
+    test('myNotifications localizes indexer-generated crystal notifications for en locale', async () => {
+        const prisma = {
+            notification: {
+                findMany: jest.fn(async () => ([
+                    {
+                        id: 7,
+                        type: 'crystal',
+                        title: '知识已结晶',
+                        body: '你的知识「# Alcheme Founder Vision: From Recognition Gap to Social Infrastructure for Know」已成功结晶',
+                        sourceType: 'knowledge',
+                        sourceId: 'knowledge-1',
+                        circleId: 7,
+                        read: false,
+                        createdAt: new Date('2026-04-03T10:06:00.000Z'),
+                    },
+                    {
+                        id: 8,
+                        type: 'crystal',
+                        title: '你的图腾开始萌芽了',
+                        body: '你的首个知识晶体为图腾注入了生命',
+                        sourceType: 'totem',
+                        sourceId: 'totem:sprout',
+                        circleId: null,
+                        read: false,
+                        createdAt: new Date('2026-04-03T10:07:00.000Z'),
+                    },
+                    {
+                        id: 9,
+                        type: 'citation',
+                        title: '你的晶体被引用了',
+                        body: '你的知识「Alpha」被其他晶体引用',
+                        sourceType: 'knowledge',
+                        sourceId: 'ref:source:target',
+                        circleId: null,
+                        read: false,
+                        createdAt: new Date('2026-04-03T10:08:00.000Z'),
+                    },
+                    {
+                        id: 10,
+                        type: 'circle',
+                        title: '晶体里程碑',
+                        body: '你已拥有 5 枚知识晶体！继续探索更多圈层吧',
+                        sourceType: 'milestone',
+                        sourceId: 'milestone:5',
+                        circleId: null,
+                        read: false,
+                        createdAt: new Date('2026-04-03T10:09:00.000Z'),
+                    },
+                ])),
+            },
+            circle: {
+                findMany: jest.fn(async () => ([
+                    { id: 7, name: 'Alpha' },
+                ])),
+            },
+        } as any;
+
+        const result = await (resolvers as any).Query.myNotifications(
+            null,
+            { limit: 20, offset: 0 },
+            {
+                prisma,
+                userId: 42,
+                locale: 'en',
+            },
+        );
+
+        expect(result).toEqual([
+            expect.objectContaining({
+                id: 7,
+                displayTitle: 'Knowledge crystallized',
+                displayBody: 'Your knowledge “# Alcheme Founder Vision: From Recognition Gap to Social Infrastructure for Know” was successfully crystallized.',
+            }),
+            expect.objectContaining({
+                id: 8,
+                displayTitle: 'Your totem began to sprout',
+                displayBody: 'Your first knowledge crystal brought your totem to life.',
+            }),
+            expect.objectContaining({
+                id: 9,
+                displayTitle: 'Your crystal was cited',
+                displayBody: 'Your knowledge “Alpha” was cited by another crystal.',
+            }),
+            expect.objectContaining({
+                id: 10,
+                displayTitle: 'Crystal milestone',
+                displayBody: 'You now have 5 knowledge crystals. Keep exploring more circles.',
+            }),
+        ]);
+    });
+
+    test('myNotifications prefers structured notification metadata over stored body parsing', async () => {
+        const prisma = {
+            notification: {
+                findMany: jest.fn(async () => ([
+                    {
+                        id: 11,
+                        type: 'crystal',
+                        title: 'knowledge.crystallized',
+                        body: null,
+                        metadata: {
+                            messageKey: 'knowledge.crystallized',
+                            params: {
+                                knowledgeTitle: 'Structured Contract',
+                            },
+                        },
+                        sourceType: 'knowledge',
+                        sourceId: 'knowledge-structured',
+                        circleId: null,
+                        read: false,
+                        createdAt: new Date('2026-04-03T10:10:00.000Z'),
+                    },
+                    {
+                        id: 12,
+                        type: 'circle',
+                        title: 'knowledge.crystal_milestone',
+                        body: 'legacy body intentionally not parseable',
+                        metadata: {
+                            messageKey: 'knowledge.crystal_milestone',
+                            params: {
+                                milestone: 10,
+                            },
+                        },
+                        sourceType: 'milestone',
+                        sourceId: 'legacy-source',
+                        circleId: null,
+                        read: false,
+                        createdAt: new Date('2026-04-03T10:11:00.000Z'),
+                    },
+                ])),
+            },
+            circle: {
+                findMany: jest.fn(async () => ([
+                    { id: 7, name: 'Alpha' },
+                ])),
+            },
+        } as any;
+
+        const result = await (resolvers as any).Query.myNotifications(
+            null,
+            { limit: 20, offset: 0 },
+            {
+                prisma,
+                userId: 42,
+                locale: 'en',
+            },
+        );
+
+        expect(result).toEqual([
+            expect.objectContaining({
+                id: 11,
+                displayTitle: 'Knowledge crystallized',
+                displayBody: 'Your knowledge “Structured Contract” was successfully crystallized.',
+            }),
+            expect.objectContaining({
+                id: 12,
+                displayTitle: 'Crystal milestone',
+                displayBody: 'You now have 10 knowledge crystals. Keep exploring more circles.',
+            }),
+        ]);
+    });
+
+    test('myNotifications localizes structured identity demotion reasons without Chinese fallback', async () => {
+        const prisma = {
+            notification: {
+                findMany: jest.fn(async () => ([
+                    {
+                        id: 13,
+                        type: 'identity',
+                        title: 'identity.level_changed',
+                        body: null,
+                        metadata: {
+                            messageKey: 'identity.level_changed',
+                            params: {
+                                circleName: 'Alpha',
+                                previousLevel: 'Elder',
+                                nextLevel: 'Member',
+                                reasonKey: 'identity.reputation_demotion',
+                                reasonParams: {
+                                    reputationPercentile: '35',
+                                    threshold: '10',
+                                },
+                            },
+                        },
+                        sourceType: 'circle_identity',
+                        sourceId: 'Elder->Member',
+                        circleId: 7,
+                        read: false,
+                        createdAt: new Date('2026-04-03T10:12:00.000Z'),
+                    },
+                    {
+                        id: 14,
+                        type: 'identity',
+                        title: 'identity.level_changed',
+                        body: null,
+                        metadata: {
+                            messageKey: 'identity.level_changed',
+                            params: {
+                                previousLevel: 'Member',
+                                nextLevel: 'Initiate',
+                                reasonKey: 'identity.inactivity_demotion',
+                                reasonParams: {
+                                    daysInactive: 45,
+                                    threshold: 30,
+                                },
+                            },
+                        },
+                        sourceType: 'circle_identity',
+                        sourceId: 'Member->Initiate',
+                        circleId: 7,
+                        read: false,
+                        createdAt: new Date('2026-04-03T10:13:00.000Z'),
+                    },
+                ])),
+            },
+            circle: {
+                findMany: jest.fn(async () => ([
+                    { id: 7, name: 'Alpha' },
+                ])),
+            },
+        } as any;
+
+        const result = await (resolvers as any).Query.myNotifications(
+            null,
+            { limit: 20, offset: 0 },
+            {
+                prisma,
+                userId: 42,
+                locale: 'en',
+            },
+        );
+
+        expect(result).toEqual([
+            expect.objectContaining({
+                id: 13,
+                displayTitle: 'Identity updated to Member',
+                displayBody: 'Your role in “Alpha” changed from Elder to Member. Your reputation is now in the top 35%, outside the Elder threshold of 10%, so your role changed to Member.',
+            }),
+            expect.objectContaining({
+                id: 14,
+                displayTitle: 'Identity updated to Initiate',
+                displayBody: 'Your role in “Alpha” changed from Member to Initiate. You have been inactive for 45 days; the inactivity threshold is 30 days.',
+            }),
+        ]);
+        expect(result.map((notification: any) => notification.displayBody).join('\n')).not.toMatch(/[\u4e00-\u9fff]/);
+    });
+
+    test('myNotifications localizes source-neutral structured identity notifications for zh locale', async () => {
+        const prisma = {
+            notification: {
+                findMany: jest.fn(async () => ([
+                    {
+                        id: 15,
+                        type: 'identity',
+                        title: 'identity.level_changed',
+                        body: null,
+                        metadata: {
+                            messageKey: 'identity.level_changed',
+                            params: {
+                                circleName: 'Alpha',
+                                previousLevel: 'Elder',
+                                nextLevel: 'Member',
+                                reasonKey: 'identity.reputation_demotion',
+                                reasonParams: {
+                                    reputationPercentile: '35',
+                                    threshold: '10',
+                                },
+                            },
+                        },
+                        sourceType: 'circle_identity',
+                        sourceId: 'Elder->Member',
+                        circleId: 7,
+                        read: false,
+                        createdAt: new Date('2026-04-03T10:14:00.000Z'),
+                    },
+                ])),
+            },
+            circle: {
+                findMany: jest.fn(async () => ([
+                    { id: 7, name: 'Beta' },
+                ])),
+            },
+        } as any;
+
+        const result = await (resolvers as any).Query.myNotifications(
+            null,
+            { limit: 20, offset: 0 },
+            {
+                prisma,
+                userId: 42,
+                locale: 'zh',
+            },
+        );
+
+        expect(result).toEqual([
+            expect.objectContaining({
+                id: 15,
+                title: 'identity.level_changed',
+                body: null,
+                displayTitle: '身份调整为成员',
+                displayBody: '你在「Alpha」的身份由长老变更为成员。原因：当前信誉已降至前 35% 之外（阈值前 10%），身份调整为成员。',
+            }),
+        ]);
+    });
+
     test('myNotifications localizes canonical english draft notifications back into zh display copy', async () => {
         const prisma = {
             notification: {
@@ -143,7 +448,7 @@ describe('notifications localization', () => {
                 findMany: jest.fn(async () => ([
                     {
                         id: 5,
-                        type: 'citation',
+                        type: 'system',
                         title: '引用提醒',
                         body: '有人引用了你的内容',
                         sourceType: 'knowledge',

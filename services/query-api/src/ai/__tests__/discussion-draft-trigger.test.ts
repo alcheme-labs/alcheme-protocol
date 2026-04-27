@@ -171,15 +171,24 @@ describe('discussion draft trigger initial snapshot transaction', () => {
         expect(isDraftTriggerEligibleMessageKind(null)).toBe(true);
     });
 
-    test('draft opportunity notification uses canonical english copy for later localization', () => {
+    test('draft opportunity notification stores only structured source-neutral copy', () => {
         expect(buildDraftOpportunityNotification({
             summary: 'A draft is forming.',
             messageCount: 12,
             focusedRatio: 0.75,
             questionCount: 2,
         })).toEqual({
-            title: 'Discussion ready for a draft',
-            body: 'This discussion is showing draft-ready signals (12 messages, 75% focused, 2 questions).\nOpen the Draft tab to shape it before turning it into a crystal.\nSummary: A draft is forming.',
+            title: 'discussion.draft_ready',
+            body: null,
+            metadata: {
+                messageKey: 'discussion.draft_ready',
+                params: {
+                    messageCount: 12,
+                    focusedPercent: 75,
+                    questionCount: 2,
+                    summary: 'A draft is forming.',
+                },
+            },
         });
     });
 });

@@ -1705,6 +1705,7 @@ model Notification {
   type               String    @db.VarChar(32) // 'like', 'comment', 'follow', 'mention', 'crystal', 'reputation'
   title              String    @db.VarChar(256)
   body               String?
+  metadata           Json?     @db.JsonB
   
   sourceType         String?   @map("source_type") @db.VarChar(32) // 'post', 'user', 'circle', 'knowledge'
   sourceId           String?   @map("source_id") @db.VarChar(128)

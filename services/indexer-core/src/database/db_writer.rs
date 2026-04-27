@@ -1716,12 +1716,19 @@ impl DbWriter {
 
         // Notify the author about the new crystallization (idempotent — skips if
         // a 'crystal' notification for this knowledge_id already exists).
-        let notif_title = format!("知识已结晶");
-        let notif_body = format!("你的知识「{}」已成功结晶", title);
+        let notif_title = "knowledge.crystallized";
+        let notif_body: Option<String> = None;
+        let notif_metadata = serde_json::to_string(&serde_json::json!({
+            "messageKey": "knowledge.crystallized",
+            "params": {
+                "knowledgeTitle": title,
+            },
+        }))
+        .context("Failed to encode crystal notification metadata")?;
         sqlx::query(
             r#"
-            INSERT INTO notifications (user_id, type, title, body, source_type, source_id, circle_id, read, created_at)
-            SELECT $1, 'crystal', $2, $3, 'knowledge', $4, $5, false, NOW()
+            INSERT INTO notifications (user_id, type, title, body, source_type, source_id, circle_id, read, created_at, metadata)
+            SELECT $1, 'crystal', $2, $3, 'knowledge', $4, $5, false, NOW(), $6::jsonb
             WHERE NOT EXISTS (
                 SELECT 1 FROM notifications
                 WHERE user_id = $1
@@ -1732,10 +1739,11 @@ impl DbWriter {
             "#,
         )
         .bind(author_id)
-        .bind(&notif_title)
-        .bind(&notif_body)
+        .bind(notif_title)
+        .bind(notif_body)
         .bind(knowledge_id)
         .bind(circle_id)
+        .bind(&notif_metadata)
         .execute(&self.pool)
         .await
         .context("Failed to create crystal notification")?;
@@ -1754,12 +1762,19 @@ impl DbWriter {
         for &milestone in milestones {
             if count >= milestone {
                 let ms_source_id = format!("milestone:{}", milestone);
-                let ms_title = format!("晶体里程碑");
-                let ms_body = format!("你已拥有 {} 枚知识晶体！继续探索更多圈层吧", milestone);
+                let ms_title = "knowledge.crystal_milestone";
+                let ms_body: Option<String> = None;
+                let ms_metadata = serde_json::to_string(&serde_json::json!({
+                    "messageKey": "knowledge.crystal_milestone",
+                    "params": {
+                        "milestone": milestone,
+                    },
+                }))
+                .context("Failed to encode milestone notification metadata")?;
                 sqlx::query(
                     r#"
-                    INSERT INTO notifications (user_id, type, title, body, source_type, source_id, read, created_at)
-                    SELECT $1, 'circle', $2, $3, 'milestone', $4, false, NOW()
+                    INSERT INTO notifications (user_id, type, title, body, source_type, source_id, read, created_at, metadata)
+                    SELECT $1, 'circle', $2, $3, 'milestone', $4, false, NOW(), $5::jsonb
                     WHERE NOT EXISTS (
                         SELECT 1 FROM notifications
                         WHERE user_id = $1
@@ -1770,9 +1785,10 @@ impl DbWriter {
                     "#,
                 )
                 .bind(author_id)
-                .bind(&ms_title)
-                .bind(&ms_body)
+                .bind(ms_title)
+                .bind(ms_body)
                 .bind(&ms_source_id)
+                .bind(&ms_metadata)
                 .execute(&self.pool)
                 .await
                 .context("Failed to create milestone notification")?;
@@ -1901,10 +1917,14 @@ impl DbWriter {
         );
         sqlx::query(
             r#"
-            INSERT INTO notifications (user_id, type, title, body, source_type, source_id, read, created_at)
-            SELECT k.author_id, 'citation', '你的晶体被引用了',
-                   CONCAT('你的知识「', k.title, '」被其他晶体引用'),
-                   'knowledge', $2, false, NOW()
+            INSERT INTO notifications (user_id, type, title, body, source_type, source_id, read, created_at, metadata)
+            SELECT k.author_id, 'citation', 'knowledge.cited',
+                   NULL,
+                   'knowledge', $2, false, NOW(),
+                   jsonb_build_object(
+                       'messageKey', 'knowledge.cited',
+                       'params', jsonb_build_object('knowledgeTitle', k.title)
+                   )
             FROM knowledge k WHERE k.knowledge_id = $1
             AND NOT EXISTS (
                 SELECT 1 FROM notifications
@@ -2043,19 +2063,25 @@ impl DbWriter {
         let new_order = stage_order(new_stage);
 
         if new_order > old_order {
-            let (notif_title, notif_body) = match new_stage {
-                "sprout" => ("你的图腾开始萌芽了", "你的首个知识晶体为图腾注入了生命"),
-                "bloom" => ("你的图腾正在绽放", "持续的贡献让你的图腾更加明亮"),
-                "radiant" => ("你的图腾璀璨夺目", "你的思考在多个圈层扎根，图腾放射出光芒"),
-                "legendary" => ("你的图腾已成传世之作", "你的知识已成为社区的基石"),
-                _ => return Ok(()),
-            };
+            if !matches!(new_stage, "sprout" | "bloom" | "radiant" | "legendary") {
+                return Ok(());
+            }
+
+            let notif_title = "totem.stage_upgraded";
+            let notif_body: Option<String> = None;
 
             let notif_source_id = format!("totem:{}", new_stage);
+            let notif_metadata = serde_json::to_string(&serde_json::json!({
+                "messageKey": "totem.stage_upgraded",
+                "params": {
+                    "stage": new_stage,
+                },
+            }))
+            .context("Failed to encode totem notification metadata")?;
             sqlx::query(
                 r#"
-                INSERT INTO notifications (user_id, type, title, body, source_type, source_id, read, created_at)
-                SELECT $1, 'crystal', $2, $3, 'totem', $4, false, NOW()
+                INSERT INTO notifications (user_id, type, title, body, source_type, source_id, read, created_at, metadata)
+                SELECT $1, 'crystal', $2, $3, 'totem', $4, false, NOW(), $5::jsonb
                 WHERE NOT EXISTS (
                     SELECT 1 FROM notifications
                     WHERE user_id = $1 AND source_type = 'totem' AND source_id = $4
@@ -2066,6 +2092,7 @@ impl DbWriter {
             .bind(notif_title)
             .bind(notif_body)
             .bind(&notif_source_id)
+            .bind(&notif_metadata)
             .execute(&self.pool)
             .await
             .context("Failed to create totem notification")?;

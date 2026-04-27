@@ -4,6 +4,7 @@ import { IdentityLevel } from '../thresholds';
 import {
     buildCompletedIdentityTransitionReason,
     buildIdentityHint,
+    buildIdentityNotification,
 } from '../copy';
 
 describe('identity copy helpers', () => {
@@ -63,5 +64,28 @@ describe('identity copy helpers', () => {
             citationCount: 0,
             reputationPercentile: 10,
         })).toBe('当前信誉位于前 10%（阈值前 10%），已晋升为长老。');
+    });
+
+    test('does not store localized fallback circle labels in identity metadata', () => {
+        const notification = buildIdentityNotification({
+            circleId: 7,
+            circleName: null,
+            previousLevel: IdentityLevel.Elder,
+            newLevel: IdentityLevel.Member,
+            reason: '当前信誉已降至前 35% 之外（阈值前 10%），身份调整为成员。',
+        });
+
+        expect(notification.title).toBe('identity.level_changed');
+        expect(notification.body).toBeNull();
+        expect(notification.metadata.params).toEqual(expect.objectContaining({
+            previousLevel: IdentityLevel.Elder,
+            nextLevel: IdentityLevel.Member,
+            reasonKey: 'identity.reputation_demotion',
+            reasonParams: {
+                reputationPercentile: '35',
+                threshold: '10',
+            },
+        }));
+        expect(notification.metadata.params).not.toHaveProperty('circleName');
     });
 });

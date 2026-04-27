@@ -279,6 +279,7 @@ export async function evaluateAndUpdate(
                         type: 'identity',
                         title: notification.title,
                         body: notification.body,
+                        metadata: notification.metadata,
                         sourceType: 'circle_identity',
                         sourceId: notification.sourceId,
                         circleId,

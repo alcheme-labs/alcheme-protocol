@@ -2040,9 +2040,10 @@ export const resolvers = {
 
                 if (inserted.count > 0 && targetUser) {
                     await tx.$executeRaw`
-                        INSERT INTO notifications (user_id, type, title, body, source_type, source_id, circle_id, read, created_at)
-                        SELECT ${targetUser.id}, 'highlight', '你的发言被点亮了', '你在讨论中的发言被其他成员点亮',
-                               'discussion', ${envelopeId}, ${circleId}, false, NOW()
+                        INSERT INTO notifications (user_id, type, title, body, source_type, source_id, circle_id, read, created_at, metadata)
+                        SELECT ${targetUser.id}, 'highlight', 'discussion.highlighted', NULL,
+                               'discussion', ${envelopeId}, ${circleId}, false, NOW(),
+                               jsonb_build_object('messageKey', 'discussion.highlighted', 'params', jsonb_build_object())
                         WHERE NOT EXISTS (
                             SELECT 1 FROM notifications WHERE user_id = ${targetUser.id}
                               AND type = 'highlight' AND source_id = ${envelopeId}

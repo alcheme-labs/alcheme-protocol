@@ -3944,12 +3944,20 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                 });
 
                 if (sourceAuthorUser && sourceAuthorUser.id !== authUser.id) {
+                    const senderLabel = formatSenderLabel(authUser);
                     await tx.notification.create({
                         data: {
                             userId: sourceAuthorUser.id,
                             type: 'forward',
-                            title: '你的消息被转发了',
-                            body: `${formatSenderLabel(authUser)} 将你的消息转发到了 ${targetCircle.name}`,
+                            title: 'discussion.forwarded',
+                            body: null,
+                            metadata: {
+                                messageKey: 'discussion.forwarded',
+                                params: {
+                                    senderLabel,
+                                    targetCircleName: targetCircle.name,
+                                },
+                            },
                             sourceType: 'discussion',
                             sourceId: row.envelopeId,
                             circleId: targetCircle.id,

@@ -1052,7 +1052,7 @@ export default function CircleDetailPage() {
         return notificationData.myNotifications.map(n => ({
             id: n.id,
             type: normalizeNotificationType(n.type),
-            text: n.body || n.title,
+            text: n.displayBody || n.displayTitle,
             time: formatRelativeTime(n.createdAt),
             circle: undefined,
             sourceType: n.sourceType,

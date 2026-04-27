@@ -349,15 +349,32 @@ export function buildDraftOpportunityNotification(input: {
     questionCount: number;
 }): {
     title: string;
-    body: string;
+    body: string | null;
+    metadata: {
+        messageKey: 'discussion.draft_ready';
+        params: {
+            messageCount: number;
+            focusedPercent: number;
+            questionCount: number;
+            summary: string;
+        };
+    };
 } {
+    const focusedPercent = Number((input.focusedRatio * 100).toFixed(0));
+    const summary = clipText(input.summary.replace(/\s+/g, ' ').trim(), 180);
+
     return {
-        title: 'Discussion ready for a draft',
-        body: [
-            `This discussion is showing draft-ready signals (${input.messageCount} messages, ${(input.focusedRatio * 100).toFixed(0)}% focused, ${input.questionCount} questions).`,
-            'Open the Draft tab to shape it before turning it into a crystal.',
-            `Summary: ${clipText(input.summary.replace(/\s+/g, ' ').trim(), 180)}`,
-        ].join('\n'),
+        title: 'discussion.draft_ready',
+        body: null,
+        metadata: {
+            messageKey: 'discussion.draft_ready',
+            params: {
+                messageCount: input.messageCount,
+                focusedPercent,
+                questionCount: input.questionCount,
+                summary,
+            },
+        },
     };
 }
 
@@ -406,6 +423,7 @@ async function notifyDraftOpportunity(input: {
             type: 'draft',
             title: notification.title,
             body: notification.body,
+            metadata: notification.metadata,
             sourceType: 'discussion_trigger',
             sourceId: String(input.circleId),
             circleId: input.circleId,

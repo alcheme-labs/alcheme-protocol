@@ -76,11 +76,25 @@ describe('identity machine feedback side effects', () => {
             data: expect.objectContaining({
                 userId: 11,
                 type: 'identity',
+                title: 'identity.level_changed',
                 sourceType: 'circle_identity',
                 sourceId: 'Visitor->Initiate',
                 circleId: 7,
                 read: false,
-                body: expect.stringContaining('原因：已发送 4 条消息，达到 3 条门槛，已晋升为入局者。'),
+                body: null,
+                metadata: expect.objectContaining({
+                    messageKey: 'identity.level_changed',
+                    params: expect.objectContaining({
+                        circleName: 'E2E Circle 8',
+                        previousLevel: IdentityLevel.Visitor,
+                        nextLevel: IdentityLevel.Initiate,
+                        reasonKey: 'identity.message_threshold_promoted',
+                        reasonParams: {
+                            messageCount: '4',
+                            threshold: '3',
+                        },
+                    }),
+                }),
             }),
         }));
     });
@@ -198,7 +212,7 @@ describe('identity machine feedback side effects', () => {
                 count: jest.fn(async () => 0),
                 findMany: jest.fn(async () => []),
                 findFirst: jest.fn(async () => ({
-                    createdAt: new Date('2026-03-02T09:00:00.000Z'),
+                    createdAt: new Date(),
                 })),
             },
             user: {
@@ -222,7 +236,18 @@ describe('identity machine feedback side effects', () => {
         }));
         expect(tx.notification.create).toHaveBeenCalledWith(expect.objectContaining({
             data: expect.objectContaining({
-                body: expect.stringContaining('原因：当前信誉位于前 10%（阈值前 10%），已晋升为长老。'),
+                title: 'identity.level_changed',
+                body: null,
+                metadata: expect.objectContaining({
+                    messageKey: 'identity.level_changed',
+                    params: expect.objectContaining({
+                        reasonKey: 'identity.reputation_threshold_promoted',
+                        reasonParams: {
+                            reputationPercentile: '10',
+                            threshold: '10',
+                        },
+                    }),
+                }),
             }),
         }));
     });
@@ -280,7 +305,18 @@ describe('identity machine feedback side effects', () => {
         }));
         expect(tx.notification.create).toHaveBeenCalledWith(expect.objectContaining({
             data: expect.objectContaining({
-                body: expect.stringContaining('原因：已获得 3 次引用，达到 2 次门槛，已晋升为成员。'),
+                title: 'identity.level_changed',
+                body: null,
+                metadata: expect.objectContaining({
+                    messageKey: 'identity.level_changed',
+                    params: expect.objectContaining({
+                        reasonKey: 'identity.citation_threshold_promoted',
+                        reasonParams: {
+                            citationCount: '3',
+                            threshold: '2',
+                        },
+                    }),
+                }),
             }),
         }));
     });

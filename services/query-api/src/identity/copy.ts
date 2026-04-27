@@ -1,18 +1,16 @@
 import { IdentityLevel, type IdentityThresholds } from './thresholds';
 
-const IDENTITY_LEVEL_LABEL: Record<IdentityLevel, string> = {
-    [IdentityLevel.Visitor]: '游客',
-    [IdentityLevel.Initiate]: '入局者',
-    [IdentityLevel.Member]: '成员',
-    [IdentityLevel.Elder]: '长老',
-};
+type IdentityReasonKey =
+    | 'identity.message_threshold_promoted'
+    | 'identity.citation_threshold_promoted'
+    | 'identity.reputation_threshold_promoted'
+    | 'identity.reputation_demotion'
+    | 'identity.inactivity_demotion';
 
-const IDENTITY_LEVEL_ORDER: Record<IdentityLevel, number> = {
-    [IdentityLevel.Visitor]: 0,
-    [IdentityLevel.Initiate]: 1,
-    [IdentityLevel.Member]: 2,
-    [IdentityLevel.Elder]: 3,
-};
+interface IdentityReasonMetadata {
+    reasonKey: IdentityReasonKey;
+    reasonParams: Record<string, string>;
+}
 
 export function buildVisitorEligibilityReason(messageCount: number, initiateMessages: number): string {
     return `已发送 ${messageCount} 条消息，达到 ${initiateMessages} 条可晋升为入局者。`;
@@ -104,18 +102,95 @@ export function buildIdentityNotification(input: {
     reason?: string;
 }): {
     title: string;
-    body: string;
+    body: string | null;
     sourceId: string;
+    metadata: {
+        messageKey: 'identity.level_changed';
+        params: {
+            circleName?: string;
+            previousLevel: IdentityLevel;
+            nextLevel: IdentityLevel;
+            reasonKey?: IdentityReasonKey;
+            reasonParams?: Record<string, string>;
+        };
+    };
 } {
-    const circleLabel = String(input.circleName || '').trim() || `圈层 #${input.circleId}`;
-    const previousLabel = IDENTITY_LEVEL_LABEL[input.previousLevel];
-    const nextLabel = IDENTITY_LEVEL_LABEL[input.newLevel];
-    const isPromotion = IDENTITY_LEVEL_ORDER[input.newLevel] > IDENTITY_LEVEL_ORDER[input.previousLevel];
-    const title = isPromotion
-        ? `身份晋升为${nextLabel}`
-        : `身份调整为${nextLabel}`;
-    const reasonText = input.reason ? `原因：${input.reason}` : '系统基于贡献与活跃度自动评估。';
-    const body = `你在「${circleLabel}」的身份由${previousLabel}变更为${nextLabel}。${reasonText}`;
     const sourceId = `${input.previousLevel}->${input.newLevel}`;
-    return { title, body, sourceId };
+    const reasonMetadata = buildIdentityReasonMetadata(input.reason);
+    const circleName = String(input.circleName || '').trim();
+    return {
+        title: 'identity.level_changed',
+        body: null,
+        sourceId,
+        metadata: {
+            messageKey: 'identity.level_changed',
+            params: {
+                ...(circleName ? { circleName } : {}),
+                previousLevel: input.previousLevel,
+                nextLevel: input.newLevel,
+                ...(reasonMetadata ?? {}),
+            },
+        },
+    };
+}
+
+function buildIdentityReasonMetadata(reason: string | undefined): IdentityReasonMetadata | null {
+    if (!reason) return null;
+
+    const messagePromotion = reason.match(/^已发送 (\d+) 条消息，达到 (\d+) 条门槛，已晋升为入局者。$/);
+    if (messagePromotion) {
+        return {
+            reasonKey: 'identity.message_threshold_promoted',
+            reasonParams: {
+                messageCount: messagePromotion[1],
+                threshold: messagePromotion[2],
+            },
+        };
+    }
+
+    const citationPromotion = reason.match(/^已获得 (\d+) 次引用，达到 (\d+) 次门槛，已晋升为成员。$/);
+    if (citationPromotion) {
+        return {
+            reasonKey: 'identity.citation_threshold_promoted',
+            reasonParams: {
+                citationCount: citationPromotion[1],
+                threshold: citationPromotion[2],
+            },
+        };
+    }
+
+    const reputationPromotion = reason.match(/^当前信誉位于前 ([\d.]+)%（阈值前 ([\d.]+)%），已晋升为长老。$/);
+    if (reputationPromotion) {
+        return {
+            reasonKey: 'identity.reputation_threshold_promoted',
+            reasonParams: {
+                reputationPercentile: reputationPromotion[1],
+                threshold: reputationPromotion[2],
+            },
+        };
+    }
+
+    const reputationDemotion = reason.match(/^当前信誉已降至前 ([\d.]+)% 之外（阈值前 ([\d.]+)%），身份调整为成员。$/);
+    if (reputationDemotion) {
+        return {
+            reasonKey: 'identity.reputation_demotion',
+            reasonParams: {
+                reputationPercentile: reputationDemotion[1],
+                threshold: reputationDemotion[2],
+            },
+        };
+    }
+
+    const inactivityDemotion = reason.match(/^已 (\d+) 天未活跃（阈值 (\d+) 天），身份调整为入局者。$/);
+    if (inactivityDemotion) {
+        return {
+            reasonKey: 'identity.inactivity_demotion',
+            reasonParams: {
+                daysInactive: inactivityDemotion[1],
+                threshold: inactivityDemotion[2],
+            },
+        };
+    }
+
+    return null;
 }
