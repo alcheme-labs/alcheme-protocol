@@ -1,6 +1,8 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { Redis } from 'ioredis';
+import { resolveRequestLocale } from '../i18n/locale';
+import { localizeNotification } from '../notifications/localize';
 
 export function notificationRouter(prisma: PrismaClient, redis: Redis): Router {
     const router = Router();
@@ -12,6 +14,10 @@ export function notificationRouter(prisma: PrismaClient, redis: Redis): Router {
             const unread = req.query.unread === 'true';
             const limit = parseInt(req.query.limit as string) || 20;
             const offset = parseInt(req.query.offset as string) || 0;
+            const locale = resolveRequestLocale({
+                requestedLocale: getRequestHeader(req, 'x-alcheme-locale'),
+                acceptLanguage: getRequestHeader(req, 'accept-language'),
+            });
 
             if (isNaN(userId)) {
                 return res.status(400).json({ error: 'userId required' });
@@ -33,8 +39,38 @@ export function notificationRouter(prisma: PrismaClient, redis: Redis): Router {
                 prisma.notification.count({ where: { userId, read: false } }),
             ]);
 
+            const circleIds = Array.from(
+                new Set(
+                    notifications
+                        .map((notification) => notification.circleId)
+                        .filter((circleId): circleId is number => typeof circleId === 'number'),
+                ),
+            );
+            const circleNameById = circleIds.length > 0
+                ? new Map(
+                    (
+                        await prisma.circle.findMany({
+                            where: { id: { in: circleIds } },
+                            select: { id: true, name: true },
+                        })
+                    ).map((circle) => [circle.id, circle.name]),
+                )
+                : new Map<number, string>();
+
+            const localizedNotifications = notifications.map((notification) => {
+                const localized = localizeNotification(notification, {
+                    locale,
+                    circleName: notification.circleId ? circleNameById.get(notification.circleId) ?? null : null,
+                });
+                return {
+                    ...notification,
+                    displayTitle: localized.displayTitle,
+                    displayBody: localized.displayBody,
+                };
+            });
+
             return res.json({
-                data: notifications,
+                data: localizedNotifications,
                 unreadCount,
                 pagination: { total, limit, offset, hasMore: offset + limit < total },
             });
@@ -85,4 +121,12 @@ export function notificationRouter(prisma: PrismaClient, redis: Redis): Router {
     });
 
     return router;
+}
+
+function getRequestHeader(req: Request, name: string): string | undefined {
+    if (typeof req.header === 'function') {
+        return req.header(name) ?? undefined;
+    }
+    const value = req.headers?.[name.toLowerCase()];
+    return Array.isArray(value) ? value[0] : value;
 }
