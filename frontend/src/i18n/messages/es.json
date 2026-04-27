@@ -1360,6 +1360,39 @@
       "loadingMessage": "Cargando el CrystalOutput formal…",
       "emptyMessage": "Todavía no hay un CrystalOutput formal consumible, así que esta página no finge que el libro de contribuciones sea el contrato final."
     },
+    "asset": {
+      "sectionTitle": "NFT del cristal",
+      "status": {
+        "minted": "Mint completado",
+        "pending": "Mint en curso",
+        "mock": "Recibo demo",
+        "failed": "Mint fallido",
+        "unknown": "Estado desconocido"
+      },
+      "master": {
+        "kicker": "CRYSTAL ASSET",
+        "title": "NFT maestro",
+        "description": "Este NFT maestro representa el cristal de conocimiento asentado. Cuando la cristalización termina, entra automáticamente en la cola de mint.",
+        "standard": "Estándar del activo",
+        "address": "Dirección NFT",
+        "demoAddress": "Dirección demo",
+        "mintedAt": "Mint realizado",
+        "lastError": "Error",
+        "pendingStandard": "Esperando mint",
+        "pendingAddress": "Esperando dirección"
+      },
+      "receipts": {
+        "kicker": "CONTRIBUTOR RECEIPTS",
+        "title": "Recibos de contribución",
+        "count": "{count} recibos",
+        "minted": "Mint {count}",
+        "pending": "Pendientes {count}",
+        "failed": "Fallidos {count}",
+        "showingSubset": "Mostrando los primeros {shown} de {count}.",
+        "empty": "Aún no existe una proyección de recibos de contribución. Los nuevos cristales la completan después de crear los derechos de contribución.",
+        "pendingAddress": "Esperando dirección"
+      }
+    },
     "contributors": {
       "title": "Contribuidores ({count})",
       "roles": {

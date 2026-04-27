@@ -1,6 +1,9 @@
 .panel {
   display: grid;
   gap: 16px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   padding: 18px;
   border: 1px solid rgba(212, 175, 55, 0.18);
   border-radius: 18px;
@@ -9,9 +12,14 @@
     radial-gradient(circle at top right, rgba(212, 175, 55, 0.12), transparent 44%);
 }
 
+.panel > * {
+  min-width: 0;
+}
+
 .header {
   display: grid;
   gap: 6px;
+  min-width: 0;
 }
 
 .title {
@@ -26,17 +34,20 @@
   font-size: 0.9rem;
   line-height: 1.5;
   color: rgba(228, 226, 218, 0.72);
+  overflow-wrap: anywhere;
 }
 
 .controls {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+  min-width: 0;
 }
 
 .field {
   display: grid;
   gap: 6px;
+  min-width: 0;
 }
 
 .label {
@@ -48,6 +59,8 @@
 
 .select {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 42px;
   padding: 0 12px;
   border-radius: 12px;
@@ -63,17 +76,20 @@
   color: rgba(255, 233, 194, 0.88);
   font-size: 0.88rem;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+  min-width: 0;
 }
 
 .snapshot {
   display: grid;
   gap: 10px;
+  min-width: 0;
   padding: 14px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.03);
@@ -92,16 +108,20 @@
   gap: 6px;
   font-size: 0.84rem;
   color: rgba(228, 226, 218, 0.78);
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .changes {
   display: grid;
   gap: 10px;
+  min-width: 0;
 }
 
 .changeRow {
   display: grid;
   gap: 6px;
+  min-width: 0;
   padding: 12px 14px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.025);
@@ -121,11 +141,14 @@
   gap: 10px;
   font-size: 0.88rem;
   color: rgba(255, 248, 230, 0.9);
+  min-width: 0;
 }
 
 .changeValue {
   display: grid;
   gap: 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .changeHint {
@@ -137,6 +160,7 @@
   margin: 0;
   font-size: 0.9rem;
   color: rgba(228, 226, 218, 0.72);
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 760px) {

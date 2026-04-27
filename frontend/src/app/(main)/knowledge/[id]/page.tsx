@@ -10,6 +10,7 @@ import dynamic from 'next/dynamic';
 
 import { GET_KNOWLEDGE, GET_KNOWLEDGE_BY_ONCHAIN_ADDRESS } from '@/lib/apollo/queries';
 import type {
+    GQLCrystalReceipt,
     KnowledgeByOnChainAddressResponse,
     KnowledgeResponse,
 } from '@/lib/apollo/types';
@@ -49,6 +50,29 @@ const CrystalDisplay = dynamic(
 /* ══════════════════════════════════════
    Knowledge Detail Page
    ══════════════════════════════════════ */
+
+type MintStatusKey = 'minted' | 'pending' | 'failed' | 'unknown';
+type DisplayMintStatusKey = MintStatusKey | 'mock';
+
+function normalizeMintStatus(value: string | null | undefined): MintStatusKey {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (normalized === 'minted' || normalized === 'pending' || normalized === 'failed') {
+        return normalized;
+    }
+    return 'unknown';
+}
+
+function isMockAssetReference(...values: Array<string | null | undefined>): boolean {
+    return values.some((value) => {
+        const normalized = String(value || '').trim().toLowerCase();
+        return normalized.startsWith('mock_chain') || normalized.startsWith('mock_');
+    });
+}
+
+function formatContributionWeight(weightBps: number): string {
+    if (!Number.isFinite(weightBps)) return '0%';
+    return `${Math.round(weightBps / 100)}%`;
+}
 
 export default function KnowledgeDetailPage() {
     const t = useI18n('KnowledgeDetailPage');
@@ -133,6 +157,44 @@ export default function KnowledgeDetailPage() {
             timeStyle: 'short',
         }).format(date);
     };
+
+    const crystalAsset = knowledge?.crystalAsset ?? null;
+    const crystalReceipts = useMemo(
+        () => knowledge?.crystalReceipts ?? [] as GQLCrystalReceipt[],
+        [knowledge?.crystalReceipts],
+    );
+    const crystalAssetStatus = normalizeMintStatus(crystalAsset?.mintStatus);
+    const crystalAssetMintedAt = crystalAsset?.mintedAt
+        ? formatTimelineTime(crystalAsset.mintedAt)
+        : null;
+    const isMockCrystalAsset = isMockAssetReference(
+        crystalAsset?.assetStandard,
+        crystalAsset?.masterAssetAddress,
+    );
+    const crystalAssetDisplayStatus: DisplayMintStatusKey = isMockCrystalAsset ? 'mock' : crystalAssetStatus;
+    const receiptStats = useMemo(() => {
+        if (knowledge?.crystalReceiptStats) {
+            return knowledge.crystalReceiptStats;
+        }
+        return crystalReceipts.reduce(
+            (acc, receipt) => {
+                const status = normalizeMintStatus(receipt.mintStatus);
+                acc.totalCount += 1;
+                if (status === 'minted') acc.mintedCount += 1;
+                else if (status === 'pending') acc.pendingCount += 1;
+                else if (status === 'failed') acc.failedCount += 1;
+                else acc.unknownCount += 1;
+                return acc;
+            },
+            {
+                totalCount: 0,
+                mintedCount: 0,
+                pendingCount: 0,
+                failedCount: 0,
+                unknownCount: 0,
+            },
+        );
+    }, [crystalReceipts, knowledge?.crystalReceiptStats]);
 
     const versionTimeline = useMemo(() => {
         if (!knowledge) return [] as Array<{ id: string; version: number; versionLabel: string; title: string; at: string; detail: string }>;
@@ -407,6 +469,107 @@ export default function KnowledgeDetailPage() {
                     ))}
                 </div>
             )}
+
+            {/* ── Crystal NFT ── */}
+            <div className={styles.sectionHeader}>
+                <Gem size={16} strokeWidth={1.5} className={styles.sectionIcon} />
+                <h2 className={styles.sectionTitle}>{t('asset.sectionTitle')}</h2>
+            </div>
+            <div className={styles.assetCard} data-status={crystalAssetDisplayStatus}>
+                <div className={styles.assetHeader}>
+                    <div>
+                        <span className={styles.assetKicker}>{t('asset.master.kicker')}</span>
+                        <h3 className={styles.assetTitle}>{t('asset.master.title')}</h3>
+                    </div>
+                    <span className={styles.assetStatus} data-status={crystalAssetDisplayStatus}>
+                        {t(`asset.status.${crystalAssetDisplayStatus}`)}
+                    </span>
+                </div>
+                <p className={styles.assetLead}>{t('asset.master.description')}</p>
+                <div className={styles.assetRows}>
+                    <div className={styles.assetRow}>
+                        <span className={styles.assetLabel}>{t('asset.master.standard')}</span>
+                        <span className={styles.assetValue}>{crystalAsset?.assetStandard || t('asset.master.pendingStandard')}</span>
+                    </div>
+                    <div className={styles.assetRow}>
+                        <span className={styles.assetLabel}>
+                            {isMockCrystalAsset ? t('asset.master.demoAddress') : t('asset.master.address')}
+                        </span>
+                        <span className={styles.assetAddress} title={crystalAsset?.masterAssetAddress ?? undefined}>
+                            {crystalAsset?.masterAssetAddress
+                                ? shortenPubkey(crystalAsset.masterAssetAddress)
+                                : t('asset.master.pendingAddress')}
+                        </span>
+                    </div>
+                    {crystalAssetMintedAt && (
+                        <div className={styles.assetRow}>
+                            <span className={styles.assetLabel}>{t('asset.master.mintedAt')}</span>
+                            <span className={styles.assetValue}>{crystalAssetMintedAt}</span>
+                        </div>
+                    )}
+                    {crystalAsset?.lastError && (
+                        <div className={styles.assetRow}>
+                            <span className={styles.assetLabel}>{t('asset.master.lastError')}</span>
+                            <span className={styles.assetError}>{crystalAsset.lastError}</span>
+                        </div>
+                    )}
+                </div>
+
+                <div className={styles.receiptPanel}>
+                    <div className={styles.receiptHeader}>
+                        <div>
+                            <span className={styles.assetKicker}>{t('asset.receipts.kicker')}</span>
+                            <h3 className={styles.receiptTitle}>{t('asset.receipts.title')}</h3>
+                        </div>
+                        <span className={styles.receiptCount}>{t('asset.receipts.count', {count: receiptStats.totalCount})}</span>
+                    </div>
+                    <div className={styles.receiptSummary}>
+                        <span>{t('asset.receipts.minted', {count: receiptStats.mintedCount})}</span>
+                        <span>{t('asset.receipts.pending', {count: receiptStats.pendingCount})}</span>
+                        <span>{t('asset.receipts.failed', {count: receiptStats.failedCount})}</span>
+                    </div>
+                    {crystalReceipts.length === 0 ? (
+                        <p className={styles.assetEmpty}>{t('asset.receipts.empty')}</p>
+                    ) : (
+                        <div className={styles.receiptList}>
+                            {crystalReceipts.slice(0, 4).map((receipt) => {
+                                const receiptStatus = normalizeMintStatus(receipt.mintStatus);
+                                const receiptDisplayStatus: DisplayMintStatusKey = isMockAssetReference(
+                                    receipt.assetStandard,
+                                    receipt.receiptAssetAddress,
+                                ) ? 'mock' : receiptStatus;
+                                return (
+                                    <div key={receipt.id} className={styles.receiptRow}>
+                                        <div className={styles.receiptOwner}>
+                                            <span>{shortenPubkey(receipt.ownerPubkey)}</span>
+                                            <small>
+                                                {receipt.contributionRole} · {formatContributionWeight(receipt.contributionWeightBps)}
+                                            </small>
+                                        </div>
+                                        <span className={styles.assetStatus} data-status={receiptDisplayStatus}>
+                                            {t(`asset.status.${receiptDisplayStatus}`)}
+                                        </span>
+                                        <span className={styles.assetAddress} title={receipt.receiptAssetAddress ?? undefined}>
+                                            {receipt.receiptAssetAddress
+                                                ? shortenPubkey(receipt.receiptAssetAddress)
+                                                : t('asset.receipts.pendingAddress')}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                            {receiptStats.totalCount > Math.min(crystalReceipts.length, 4) && (
+                                <p className={styles.assetEmpty}>
+                                    {t('asset.receipts.showingSubset', {
+                                        shown: Math.min(crystalReceipts.length, 4),
+                                        count: receiptStats.totalCount,
+                                    })}
+                                </p>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+            <div className={styles.divider} />
 
             {/* ── Version Timeline ── */}
             <div className={styles.sectionHeader}>

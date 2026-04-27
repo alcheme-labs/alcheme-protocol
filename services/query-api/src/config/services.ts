@@ -26,7 +26,7 @@ export type QueryApiDeploymentProfile =
     | 'public_node_only';
 export type SidecarAuthMode = 'session_cookie';
 export type SidecarProxyMode = 'none' | 'ephemeral_same_origin';
-export type CrystalMintAdapterMode = 'disabled' | 'mock_chain' | 'token2022_local';
+export type CrystalMintAdapterMode = 'mock_chain' | 'token2022_local';
 export type NodeApiSurface =
     | 'graphql'
     | 'extensions_capabilities'
@@ -93,12 +93,6 @@ const VALID_SIDECAR_PROXY_MODES: SidecarProxyMode[] = [
     'none',
     'ephemeral_same_origin',
 ];
-const VALID_CRYSTAL_MINT_ADAPTER_MODES: CrystalMintAdapterMode[] = [
-    'disabled',
-    'mock_chain',
-    'token2022_local',
-];
-
 function parseBoundedInteger(
     raw: unknown,
     input: { min: number; max?: number },
@@ -148,15 +142,6 @@ function parseSidecarProxyMode(
     if (typeof raw !== 'string') return fallback;
     const normalized = raw.trim().toLowerCase() as SidecarProxyMode;
     return VALID_SIDECAR_PROXY_MODES.includes(normalized) ? normalized : fallback;
-}
-
-function parseCrystalMintAdapterMode(
-    raw: string | undefined,
-    fallback: CrystalMintAdapterMode = 'disabled',
-): CrystalMintAdapterMode {
-    if (typeof raw !== 'string') return fallback;
-    const normalized = raw.trim().toLowerCase() as CrystalMintAdapterMode;
-    return VALID_CRYSTAL_MINT_ADAPTER_MODES.includes(normalized) ? normalized : fallback;
 }
 
 function parseOptionalIdentityNotificationMode(raw: unknown): IdentityNotificationMode | undefined {
@@ -256,11 +241,16 @@ export function loadNodeRuntimeConfig(): QueryApiRuntimeConfig {
 }
 
 export function loadCrystalMintRuntimeConfig(env: NodeJS.ProcessEnv = process.env): CrystalMintRuntimeConfig {
-    const adapterMode = parseCrystalMintAdapterMode(env.CRYSTAL_MINT_ADAPTER);
     const rpcUrl = String(env.CRYSTAL_MINT_RPC_URL || '').trim() || null;
     const authoritySecret = String(env.CRYSTAL_MINT_AUTHORITY_SECRET || '').trim() || null;
     const masterOwnerPubkey = String(env.CRYSTAL_MASTER_OWNER_PUBKEY || '').trim() || null;
     const metadataBaseUrl = String(env.CRYSTAL_METADATA_BASE_URL || '').trim() || null;
+    const isProduction = String(env.NODE_ENV || '').trim().toLowerCase() === 'production';
+    const hasRealMintCredentials = !!(rpcUrl && authoritySecret);
+    if (isProduction && !hasRealMintCredentials) {
+        throw new Error('crystal_mint_credentials_required');
+    }
+    const adapterMode: CrystalMintAdapterMode = hasRealMintCredentials ? 'token2022_local' : 'mock_chain';
 
     return {
         adapterMode,

@@ -1,6 +1,6 @@
 'use client';
 
-import { type ReactNode, useEffect, useMemo, useState } from 'react';
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useCurrentLocale, useI18n } from '@/i18n/useI18n';
 import { resolveNodeRoute } from '@/lib/config/nodeRouting';
 
@@ -160,6 +160,114 @@ const REVISION_DIRECTION_ACCEPTANCE_MODES: RevisionDirectionAcceptanceMode[] = [
     'role_confirm',
     'governance_vote',
 ];
+
+interface DraftSelectOption {
+    value: string;
+    label: string;
+    disabled?: boolean;
+}
+
+interface DraftSelectProps {
+    id: string;
+    value: string;
+    options: DraftSelectOption[];
+    onChange: (value: string) => void;
+    disabled?: boolean;
+}
+
+function DraftSelect({
+    id,
+    value,
+    options,
+    onChange,
+    disabled = false,
+}: DraftSelectProps) {
+    const [open, setOpen] = useState(false);
+    const rootRef = useRef<HTMLDivElement>(null);
+    const triggerRef = useRef<HTMLButtonElement>(null);
+    const listboxId = `${id}-listbox`;
+    const selectedOption = options.find((option) => option.value === value);
+
+    useEffect(() => {
+        if (!open) return;
+
+        const handlePointerDown = (event: PointerEvent) => {
+            if (!rootRef.current?.contains(event.target as Node)) {
+                setOpen(false);
+            }
+        };
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setOpen(false);
+                triggerRef.current?.focus();
+            }
+        };
+
+        document.addEventListener('pointerdown', handlePointerDown);
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('pointerdown', handlePointerDown);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [open]);
+
+    useEffect(() => {
+        if (disabled) setOpen(false);
+    }, [disabled]);
+
+    const handleSelect = (nextValue: string) => {
+        onChange(nextValue);
+        setOpen(false);
+        triggerRef.current?.focus();
+    };
+
+    return (
+        <div className={styles.selectRoot} ref={rootRef}>
+            <button
+                id={id}
+                ref={triggerRef}
+                type="button"
+                className={styles.selectTrigger}
+                aria-haspopup="listbox"
+                aria-expanded={open}
+                aria-controls={open ? listboxId : undefined}
+                disabled={disabled}
+                onClick={() => setOpen((prev) => !prev)}
+                onKeyDown={(event) => {
+                    if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        setOpen(true);
+                    }
+                }}
+            >
+                <span className={styles.selectValue}>
+                    {selectedOption?.label || options[0]?.label || ''}
+                </span>
+                <span className={styles.selectChevron} aria-hidden="true" />
+            </button>
+            {open && !disabled && (
+                <div id={listboxId} className={styles.selectMenu} role="listbox" aria-labelledby={id}>
+                    {options.map((option) => {
+                        const selected = option.value === value;
+                        return (
+                            <button
+                                key={option.value}
+                                type="button"
+                                role="option"
+                                aria-selected={selected}
+                                className={`${styles.selectOption}${selected ? ` ${styles.selectOptionActive}` : ''}`}
+                                disabled={option.disabled}
+                                onClick={() => handleSelect(option.value)}
+                            >
+                                <span className={styles.selectOptionLabel}>{option.label}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
+}
 
 function formatRevisionDirectionAcceptanceMode(
     mode: RevisionDirectionAcceptanceMode,
@@ -807,6 +915,23 @@ export default function DraftDiscussionPanel(props: DraftDiscussionPanelProps) {
         }
     };
 
+    const targetTypeOptions: DraftSelectOption[] = [
+        { value: 'paragraph', label: formatTargetType('paragraph') },
+        { value: 'structure', label: formatTargetType('structure') },
+        { value: 'document', label: formatTargetType('document') },
+    ];
+    const issueTypeOptions: DraftSelectOption[] = ISSUE_TYPE_OPTIONS.map((issueType) => ({
+        value: issueType,
+        label: formatIssueType(issueType),
+    }));
+    const paragraphSelectOptions: DraftSelectOption[] = [
+        { value: '', label: t('create.selectParagraph') },
+        ...paragraphOptions.map((option) => ({
+            value: String(option.index),
+            label: t('create.paragraphOption', {index: option.index + 1, preview: option.preview}),
+        })),
+    ];
+
     return (
         <aside className={styles.panel} aria-label={t('aria.panel')}>
             <div className={styles.panelHeading}>
@@ -1008,44 +1133,33 @@ export default function DraftDiscussionPanel(props: DraftDiscussionPanelProps) {
                 </p>
                 <div className={styles.formRow}>
                     <label className={styles.fieldLabel} htmlFor="draft-discussion-target-type">{t('create.targetTypeLabel')}</label>
-                    <select
+                    <DraftSelect
                         id="draft-discussion-target-type"
-                        className={styles.select}
                         value={targetType}
-                        onChange={(event) => handleTargetTypeChange(event.target.value as DraftDiscussionTargetType)}
+                        options={targetTypeOptions}
+                        onChange={(nextValue) => handleTargetTypeChange(nextValue as DraftDiscussionTargetType)}
                         disabled={!props.canCreate || isBlocked}
-                    >
-                        <option value="paragraph">{formatTargetType('paragraph')}</option>
-                        <option value="structure">{formatTargetType('structure')}</option>
-                        <option value="document">{formatTargetType('document')}</option>
-                    </select>
+                    />
                 </div>
                 <div className={styles.formRow}>
                     <label className={styles.fieldLabel} htmlFor="draft-discussion-issue-type">{t('create.issueTypeLabel')}</label>
-                    <select
+                    <DraftSelect
                         id="draft-discussion-issue-type"
-                        className={styles.select}
                         value={targetIssueType}
-                        onChange={(event) => setTargetIssueType(event.target.value as DraftDiscussionIssueType)}
+                        options={issueTypeOptions}
+                        onChange={(nextValue) => setTargetIssueType(nextValue as DraftDiscussionIssueType)}
                         disabled={!props.canCreate || isBlocked}
-                    >
-                        {ISSUE_TYPE_OPTIONS.map((issueType) => (
-                            <option key={issueType} value={issueType}>
-                                {formatIssueType(issueType)}
-                            </option>
-                        ))}
-                    </select>
+                    />
                 </div>
                 <div className={styles.formRow}>
                     {targetType === 'paragraph' ? (
                         <>
                             <label className={styles.fieldLabel} htmlFor="draft-discussion-target-paragraph">{t('create.paragraphTargetLabel')}</label>
-                            <select
+                            <DraftSelect
                                 id="draft-discussion-target-paragraph"
-                                className={styles.select}
-                                value={selectedParagraphIndex ?? ''}
-                                onChange={(event) => {
-                                    const nextValue = event.target.value;
+                                value={selectedParagraphIndex !== null ? String(selectedParagraphIndex) : ''}
+                                options={paragraphSelectOptions}
+                                onChange={(nextValue) => {
                                     if (!nextValue) {
                                         props.onSelectParagraph?.(null);
                                         setTargetRef('');
@@ -1061,14 +1175,7 @@ export default function DraftDiscussionPanel(props: DraftDiscussionPanelProps) {
                                     setTargetRef(`paragraph:${parsed}`);
                                 }}
                                 disabled={!props.canCreate || isBlocked || paragraphOptions.length === 0}
-                            >
-                                <option value="">{t('create.selectParagraph')}</option>
-                                {paragraphOptions.map((option) => (
-                                    <option key={option.index} value={option.index}>
-                                        {t('create.paragraphOption', {index: option.index + 1, preview: option.preview})}
-                                    </option>
-                                ))}
-                            </select>
+                            />
                             <p className={styles.paragraphHint}>
                                 {selectedParagraphIndex !== null
                                     ? t('create.paragraphSelectedHint', {index: selectedParagraphIndex + 1})
@@ -1270,22 +1377,16 @@ export default function DraftDiscussionPanel(props: DraftDiscussionPanelProps) {
                                             <div className={styles.actionBlock}>
                                                 <label className={styles.fieldLabel} htmlFor={`thread-issue-type-${thread.id}`}>{t('threads.issueTypeLabel')}</label>
                                                 {canEditIssueType ? (
-                                                    <select
+                                                    <DraftSelect
                                                         id={`thread-issue-type-${thread.id}`}
-                                                        className={styles.select}
                                                         value={draft.issueType}
-                                                        onChange={(event) => updateThreadDraft(thread, (prev) => ({
+                                                        options={issueTypeOptions}
+                                                        onChange={(nextValue) => updateThreadDraft(thread, (prev) => ({
                                                             ...prev,
-                                                            issueType: event.target.value as DraftDiscussionIssueType,
+                                                            issueType: nextValue as DraftDiscussionIssueType,
                                                         }))}
                                                         disabled={isBlocked}
-                                                    >
-                                                        {ISSUE_TYPE_OPTIONS.map((issueType) => (
-                                                            <option key={issueType} value={issueType}>
-                                                                {formatIssueType(issueType)}
-                                                            </option>
-                                                        ))}
-                                                    </select>
+                                                    />
                                                 ) : (
                                                     <p className={styles.staticIssueType}>
                                                         {formatIssueType(thread.issueType)}

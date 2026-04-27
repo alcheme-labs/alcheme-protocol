@@ -270,9 +270,52 @@ export const typeDefs = gql`
     citedBy(limit: Int = 8): [KnowledgeLineageLink!]!
     stats: KnowledgeStats!
     crystalParams: CrystalParams
+    crystalAsset: CrystalAsset
+    crystalReceiptStats: CrystalReceiptStats!
+    crystalReceipts(limit: Int = 20): [CrystalReceipt!]!
     binding: KnowledgeBinding
     versionTimeline(limit: Int = 20): [KnowledgeVersionEvent!]!
     versionDiff(fromVersion: Int!, toVersion: Int!): KnowledgeVersionDiff
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type CrystalAsset {
+    id: Int!
+    knowledgePublicId: String!
+    ownerPubkey: String!
+    masterAssetAddress: String
+    assetStandard: String!
+    mintStatus: String!
+    metadataUri: String
+    mintedAt: DateTime
+    lastError: String
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type CrystalReceiptStats {
+    totalCount: Int!
+    mintedCount: Int!
+    pendingCount: Int!
+    failedCount: Int!
+    unknownCount: Int!
+  }
+
+  type CrystalReceipt {
+    id: Int!
+    knowledgePublicId: String!
+    ownerPubkey: String!
+    ownerUserId: Int
+    contributionRole: String!
+    contributionWeightBps: Int!
+    receiptAssetAddress: String
+    assetStandard: String!
+    transferMode: String!
+    mintStatus: String!
+    metadataUri: String
+    mintedAt: DateTime
+    lastError: String
     createdAt: DateTime!
     updatedAt: DateTime!
   }

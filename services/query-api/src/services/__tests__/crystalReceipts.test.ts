@@ -1,6 +1,16 @@
-import { describe, expect, jest, test } from '@jest/globals';
+import { afterEach, describe, expect, jest, test } from '@jest/globals';
 
-import { prepareCrystalAssetProjection } from '../crystalAssets/enqueue';
+jest.mock('../aiJobs/runtime', () => ({
+    enqueueAiJob: jest.fn(async () => ({
+        id: 88,
+    })),
+}));
+
+import {
+    enqueueCrystalAssetIssueJob,
+    prepareCrystalAssetProjection,
+} from '../crystalAssets/enqueue';
+import { enqueueAiJob } from '../aiJobs/runtime';
 
 function createPrismaMock() {
     const crystalAsset = {
@@ -68,6 +78,10 @@ function createPrismaMock() {
 }
 
 describe('crystal receipt projection', () => {
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
     test('creates one master asset projection and one pending receipt per active entitlement', async () => {
         const { prisma, crystalAsset, crystalReceipt } = createPrismaMock();
 
@@ -120,6 +134,36 @@ describe('crystal receipt projection', () => {
                 contributionRole: 'Discussant',
                 contributionWeightBps: 3000,
             }),
+        }));
+    });
+
+    test('enqueues a crystal asset issue job without a mint adapter env switch', async () => {
+        const { prisma } = createPrismaMock();
+        const now = new Date('2026-04-26T12:00:00.000Z');
+
+        const result = await enqueueCrystalAssetIssueJob(prisma as any, {
+            knowledgeRowId: 9,
+            requestedByUserId: 11,
+            now,
+        });
+
+        expect(result).toMatchObject({
+            knowledgeRowId: 9,
+            knowledgePublicId: 'knowledge-9',
+            enqueued: true,
+            jobId: 88,
+            adapterMode: 'mock_chain',
+            reason: 'enqueued',
+        });
+        expect(enqueueAiJob).toHaveBeenCalledWith(prisma, expect.objectContaining({
+            jobType: 'crystal_asset_issue',
+            dedupeKey: 'crystal-asset-issue:9',
+            requestedByUserId: 11,
+            availableAt: now,
+            payload: {
+                knowledgeRowId: 9,
+                knowledgePublicId: 'knowledge-9',
+            },
         }));
     });
 });

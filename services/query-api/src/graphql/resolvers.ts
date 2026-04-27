@@ -96,6 +96,49 @@ function normalizeContributionRole(role: string | null | undefined): 'Author' | 
     return 'Unknown';
 }
 
+function emptyCrystalReceiptStats(): {
+    totalCount: number;
+    mintedCount: number;
+    pendingCount: number;
+    failedCount: number;
+    unknownCount: number;
+} {
+    return {
+        totalCount: 0,
+        mintedCount: 0,
+        pendingCount: 0,
+        failedCount: 0,
+        unknownCount: 0,
+    };
+}
+
+function summarizeCrystalReceiptStatusBuckets(rows: Array<{
+    mintStatus?: string | null;
+    _count?: { _all?: number | null } | number | null;
+}>): ReturnType<typeof emptyCrystalReceiptStats> {
+    return rows.reduce(
+        (acc, row) => {
+            const count = typeof row._count === 'number'
+                ? row._count
+                : Number(row._count?._all ?? 0);
+            if (!Number.isFinite(count) || count <= 0) return acc;
+            acc.totalCount += count;
+            const status = String(row.mintStatus || '').trim().toLowerCase();
+            if (status === 'minted') {
+                acc.mintedCount += count;
+            } else if (status === 'pending') {
+                acc.pendingCount += count;
+            } else if (status === 'failed') {
+                acc.failedCount += count;
+            } else {
+                acc.unknownCount += count;
+            }
+            return acc;
+        },
+        emptyCrystalReceiptStats(),
+    );
+}
+
 async function loadAgentDirectoryByPubkey(
     prisma: Context['prisma'],
     input: {
@@ -1502,6 +1545,78 @@ export const resolvers = {
                 hue: cp.hue ?? 42,
                 facets: cp.facets ?? 6,
             };
+        },
+
+        crystalAsset: async (
+            knowledge: any,
+            _: any,
+            { prisma }: Context,
+        ) => {
+            if (knowledge.crystalAsset !== undefined) return knowledge.crystalAsset;
+            const knowledgeRowId = Number(knowledge.id ?? 0);
+            if (!Number.isFinite(knowledgeRowId) || knowledgeRowId <= 0) return null;
+
+            return prisma.crystalAsset.findUnique({
+                where: {
+                    knowledgeRowId,
+                },
+            });
+        },
+
+        crystalReceiptStats: async (
+            knowledge: any,
+            _: any,
+            { prisma }: Context,
+        ) => {
+            if (
+                knowledge.crystalReceiptStats
+                && typeof knowledge.crystalReceiptStats === 'object'
+                && !Array.isArray(knowledge.crystalReceiptStats)
+            ) {
+                return knowledge.crystalReceiptStats;
+            }
+
+            const knowledgeRowId = Number(knowledge.id ?? 0);
+            if (!Number.isFinite(knowledgeRowId) || knowledgeRowId <= 0) {
+                return emptyCrystalReceiptStats();
+            }
+
+            const receiptStatusBuckets = await prisma.crystalReceipt.groupBy({
+                where: {
+                    knowledgeRowId,
+                },
+                by: ['mintStatus'],
+                _count: {
+                    _all: true,
+                },
+            });
+
+            return summarizeCrystalReceiptStatusBuckets(receiptStatusBuckets);
+        },
+
+        crystalReceipts: async (
+            knowledge: any,
+            { limit }: { limit: number },
+            { prisma }: Context,
+        ) => {
+            const resolvedLimit = Math.max(1, Math.min(limit ?? 20, 100));
+            if (Array.isArray(knowledge.crystalReceipts)) {
+                return knowledge.crystalReceipts.slice(0, resolvedLimit);
+            }
+
+            const knowledgeRowId = Number(knowledge.id ?? 0);
+            if (!Number.isFinite(knowledgeRowId) || knowledgeRowId <= 0) return [];
+
+            return prisma.crystalReceipt.findMany({
+                where: {
+                    knowledgeRowId,
+                },
+                orderBy: [
+                    { contributionWeightBps: 'desc' },
+                    { updatedAt: 'desc' },
+                ],
+                take: resolvedLimit,
+            });
         },
 
         binding: async (

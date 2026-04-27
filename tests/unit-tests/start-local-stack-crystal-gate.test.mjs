@@ -16,7 +16,7 @@ function readScript() {
 test('start-local-stack defines crystal mint env defaults for query-api runtime', () => {
   const source = readScript();
 
-  assert.match(source, /CRYSTAL_MINT_ADAPTER="\$\{CRYSTAL_MINT_ADAPTER:-disabled\}"/);
+  assert.doesNotMatch(source, /CRYSTAL_MINT_ADAPTER="\$\{CRYSTAL_MINT_ADAPTER:-disabled\}"/);
   assert.match(source, /CRYSTAL_MINT_RPC_URL="\$\{CRYSTAL_MINT_RPC_URL:-\$RPC_URL\}"/);
   assert.match(source, /CRYSTAL_MINT_AUTHORITY_SECRET="\$\{CRYSTAL_MINT_AUTHORITY_SECRET:-\}"/);
   assert.match(source, /CRYSTAL_MASTER_OWNER_PUBKEY="\$\{CRYSTAL_MASTER_OWNER_PUBKEY:-\}"/);
@@ -26,7 +26,7 @@ test('start-local-stack defines crystal mint env defaults for query-api runtime'
 test('start-local-stack forwards crystal mint env into the query-api process env', () => {
   const source = readScript();
 
-  assert.match(source, /CRYSTAL_MINT_ADAPTER=\\?"\$CRYSTAL_MINT_ADAPTER\\?"/);
+  assert.doesNotMatch(source, /CRYSTAL_MINT_ADAPTER=\\?"\$CRYSTAL_MINT_ADAPTER\\?"/);
   assert.match(source, /CRYSTAL_MINT_RPC_URL=\\?"\$CRYSTAL_MINT_RPC_URL\\?"/);
   assert.match(source, /CRYSTAL_MINT_AUTHORITY_SECRET=\\?"\$CRYSTAL_MINT_AUTHORITY_SECRET\\?"/);
   assert.match(source, /CRYSTAL_MASTER_OWNER_PUBKEY=\\?"\$CRYSTAL_MASTER_OWNER_PUBKEY\\?"/);

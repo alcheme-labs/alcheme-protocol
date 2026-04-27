@@ -3,14 +3,23 @@ import crypto from 'crypto';
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
     ExtensionType,
+    LENGTH_SIZE,
     TOKEN_2022_PROGRAM_ID,
+    TYPE_SIZE,
     createAssociatedTokenAccountIdempotentInstruction,
     createInitializeMintInstruction,
+    createInitializeMetadataPointerInstruction,
     createInitializeNonTransferableMintInstruction,
     createMintToInstruction,
     getAssociatedTokenAddressSync,
     getMintLen,
 } from '@solana/spl-token';
+import {
+    createInitializeInstruction as createInitializeTokenMetadataInstruction,
+    createUpdateFieldInstruction as createUpdateTokenMetadataFieldInstruction,
+    pack as packTokenMetadata,
+    type TokenMetadata,
+} from '@solana/spl-token-metadata';
 import {
     Connection,
     Keypair,
@@ -63,7 +72,7 @@ export interface CrystalMintOutcome {
 }
 
 export interface CrystalMintAdapter {
-    readonly mode: Exclude<CrystalMintAdapterMode, 'disabled'>;
+    readonly mode: CrystalMintAdapterMode;
     issueMasterAsset(input: IssueMasterCrystalAssetInput): Promise<CrystalMintOutcome>;
     issueReceipt(input: IssueCrystalReceiptInput): Promise<CrystalMintOutcome>;
 }
@@ -101,6 +110,10 @@ function buildMetadataUri(
 function buildMockAddress(scope: 'master' | 'receipt', entropy: string): string {
     const digest = crypto.createHash('sha256').update(`${scope}:${entropy}`).digest('hex');
     return `mock_${scope}_${digest.slice(0, 48)}`;
+}
+
+function truncateMetadataText(value: string, maxLength: number): string {
+    return value.length <= maxLength ? value : value.slice(0, maxLength);
 }
 
 export function resolveMasterAssetOwnerPubkey(
@@ -194,14 +207,30 @@ function createToken2022LocalCrystalMintAdapter(config: CrystalMintRuntimeConfig
     async function issueMint(input: {
         ownerPubkey: string;
         metadataUri: string;
+        name: string;
+        symbol: string;
+        additionalMetadata: Array<readonly [string, string]>;
         nonTransferable: boolean;
         assetStandard: string;
     }): Promise<CrystalMintOutcome> {
         const owner = new PublicKey(input.ownerPubkey);
         const mint = Keypair.generate();
-        const extensions = input.nonTransferable ? [ExtensionType.NonTransferable] : [];
+        const extensions = [
+            ExtensionType.MetadataPointer,
+            ...(input.nonTransferable ? [ExtensionType.NonTransferable] : []),
+        ];
+        const tokenMetadata: TokenMetadata = {
+            updateAuthority: authority.publicKey,
+            mint: mint.publicKey,
+            name: truncateMetadataText(input.name, 64),
+            symbol: truncateMetadataText(input.symbol, 10),
+            uri: input.metadataUri,
+            additionalMetadata: input.additionalMetadata,
+        };
         const mintLength = getMintLen(extensions);
-        const lamports = await connection.getMinimumBalanceForRentExemption(mintLength);
+        const metadataLength = TYPE_SIZE + LENGTH_SIZE + packTokenMetadata(tokenMetadata).length;
+        const accountLength = mintLength + metadataLength;
+        const lamports = await connection.getMinimumBalanceForRentExemption(accountLength);
         const ownerAta = getAssociatedTokenAddressSync(
             mint.publicKey,
             owner,
@@ -213,10 +242,16 @@ function createToken2022LocalCrystalMintAdapter(config: CrystalMintRuntimeConfig
             SystemProgram.createAccount({
                 fromPubkey: authority.publicKey,
                 newAccountPubkey: mint.publicKey,
-                space: mintLength,
+                space: accountLength,
                 lamports,
                 programId: TOKEN_2022_PROGRAM_ID,
             }),
+            createInitializeMetadataPointerInstruction(
+                mint.publicKey,
+                authority.publicKey,
+                mint.publicKey,
+                TOKEN_2022_PROGRAM_ID,
+            ),
         );
 
         if (input.nonTransferable) {
@@ -236,6 +271,23 @@ function createToken2022LocalCrystalMintAdapter(config: CrystalMintRuntimeConfig
                 authority.publicKey,
                 TOKEN_2022_PROGRAM_ID,
             ),
+            createInitializeTokenMetadataInstruction({
+                programId: TOKEN_2022_PROGRAM_ID,
+                metadata: mint.publicKey,
+                updateAuthority: authority.publicKey,
+                mint: mint.publicKey,
+                mintAuthority: authority.publicKey,
+                name: tokenMetadata.name,
+                symbol: tokenMetadata.symbol,
+                uri: input.metadataUri,
+            }),
+            ...input.additionalMetadata.map(([field, value]) => createUpdateTokenMetadataFieldInstruction({
+                programId: TOKEN_2022_PROGRAM_ID,
+                metadata: mint.publicKey,
+                updateAuthority: authority.publicKey,
+                field,
+                value,
+            })),
             createAssociatedTokenAccountIdempotentInstruction(
                 authority.publicKey,
                 ownerAta,
@@ -289,6 +341,15 @@ function createToken2022LocalCrystalMintAdapter(config: CrystalMintRuntimeConfig
             return issueMint({
                 ownerPubkey,
                 metadataUri,
+                name: input.title || `Alcheme Crystal ${input.knowledgePublicId}`,
+                symbol: 'ALCH-X',
+                additionalMetadata: [
+                    ['kind', 'master'],
+                    ['knowledge_id', input.knowledgePublicId],
+                    ['proof_hash', input.proofPackageHash],
+                    ['source_anchor', input.sourceAnchorId],
+                    ['contributors_root', input.contributorsRoot],
+                ],
                 nonTransferable: false,
                 assetStandard: 'token2022_master_nft',
             });
@@ -314,6 +375,16 @@ function createToken2022LocalCrystalMintAdapter(config: CrystalMintRuntimeConfig
             return issueMint({
                 ownerPubkey: input.ownerPubkey,
                 metadataUri,
+                name: `Alcheme Receipt ${input.knowledgePublicId}`,
+                symbol: 'ALCH-R',
+                additionalMetadata: [
+                    ['kind', 'receipt'],
+                    ['knowledge_id', input.knowledgePublicId],
+                    ['entitlement_id', String(input.entitlementId)],
+                    ['role', input.contributionRole],
+                    ['weight_bps', String(input.contributionWeightBps)],
+                    ['proof_hash', input.proofPackageHash],
+                ],
                 nonTransferable: true,
                 assetStandard: 'token2022_non_transferable_receipt',
             });
@@ -323,10 +394,7 @@ function createToken2022LocalCrystalMintAdapter(config: CrystalMintRuntimeConfig
 
 export function createCrystalMintAdapter(
     config: CrystalMintRuntimeConfig = loadCrystalMintRuntimeConfig(),
-): CrystalMintAdapter | null {
-    if (config.adapterMode === 'disabled') {
-        return null;
-    }
+): CrystalMintAdapter {
     if (config.adapterMode === 'mock_chain') {
         return createMockChainCrystalMintAdapter(config);
     }

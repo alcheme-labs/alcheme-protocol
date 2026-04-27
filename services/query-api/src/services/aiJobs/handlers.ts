@@ -16,7 +16,7 @@ import type { AiJobHandlerMap } from './types';
 export function createAiJobHandlers(input: {
     prisma: PrismaClient;
     redis: Redis;
-    crystalMintAdapter?: CrystalMintAdapter | null;
+    crystalMintAdapter?: CrystalMintAdapter;
 }): AiJobHandlerMap {
     const prismaAny = input.prisma as any;
 

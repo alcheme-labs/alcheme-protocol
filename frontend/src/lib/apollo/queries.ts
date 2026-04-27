@@ -521,6 +521,39 @@ export const GET_KNOWLEDGE = gql`
         hue
         facets
       }
+      crystalAsset {
+        id
+        knowledgePublicId
+        ownerPubkey
+        masterAssetAddress
+        assetStandard
+        mintStatus
+        metadataUri
+        mintedAt
+        lastError
+      }
+      crystalReceiptStats {
+        totalCount
+        mintedCount
+        pendingCount
+        failedCount
+        unknownCount
+      }
+      crystalReceipts(limit: 12) {
+        id
+        knowledgePublicId
+        ownerPubkey
+        ownerUserId
+        contributionRole
+        contributionWeightBps
+        receiptAssetAddress
+        assetStandard
+        transferMode
+        mintStatus
+        metadataUri
+        mintedAt
+        lastError
+      }
       createdAt
       updatedAt
     }
@@ -613,6 +646,39 @@ export const GET_KNOWLEDGE_BY_ONCHAIN_ADDRESS = gql`
         seed
         hue
         facets
+      }
+      crystalAsset {
+        id
+        knowledgePublicId
+        ownerPubkey
+        masterAssetAddress
+        assetStandard
+        mintStatus
+        metadataUri
+        mintedAt
+        lastError
+      }
+      crystalReceiptStats {
+        totalCount
+        mintedCount
+        pendingCount
+        failedCount
+        unknownCount
+      }
+      crystalReceipts(limit: 12) {
+        id
+        knowledgePublicId
+        ownerPubkey
+        ownerUserId
+        contributionRole
+        contributionWeightBps
+        receiptAssetAddress
+        assetStandard
+        transferMode
+        mintStatus
+        metadataUri
+        mintedAt
+        lastError
       }
       createdAt
       updatedAt

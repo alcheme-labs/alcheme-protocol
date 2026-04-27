@@ -280,20 +280,10 @@ export async function enqueueCrystalAssetIssueJob(
         enqueued: boolean;
         jobId: number | null;
         adapterMode: string;
-        reason: 'enqueued' | 'adapter_disabled';
+        reason: 'enqueued';
     }> {
     const projection = await prepareCrystalAssetProjection(prisma, input);
     const config = loadCrystalMintRuntimeConfig();
-    if (config.adapterMode === 'disabled') {
-        return {
-            knowledgeRowId: projection.knowledgeRowId,
-            knowledgePublicId: projection.knowledgePublicId,
-            enqueued: false,
-            jobId: null,
-            adapterMode: config.adapterMode,
-            reason: 'adapter_disabled',
-        };
-    }
 
     const job = await enqueueAiJob(prisma, {
         jobType: 'crystal_asset_issue',

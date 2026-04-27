@@ -379,6 +379,9 @@ export interface GQLKnowledge {
         heatScore: number;
     };
     crystalParams: GQLCrystalParams | null;
+    crystalAsset: GQLCrystalAsset | null;
+    crystalReceiptStats: GQLCrystalReceiptStats;
+    crystalReceipts: GQLCrystalReceipt[];
     createdAt: string;
     updatedAt: string;
 }
@@ -387,6 +390,42 @@ export interface GQLCrystalParams {
     seed: string;
     hue: number;
     facets: number;
+}
+
+export interface GQLCrystalAsset {
+    id: number;
+    knowledgePublicId: string;
+    ownerPubkey: string;
+    masterAssetAddress: string | null;
+    assetStandard: string;
+    mintStatus: string;
+    metadataUri: string | null;
+    mintedAt: string | null;
+    lastError: string | null;
+}
+
+export interface GQLCrystalReceiptStats {
+    totalCount: number;
+    mintedCount: number;
+    pendingCount: number;
+    failedCount: number;
+    unknownCount: number;
+}
+
+export interface GQLCrystalReceipt {
+    id: number;
+    knowledgePublicId: string;
+    ownerPubkey: string;
+    ownerUserId: number | null;
+    contributionRole: string;
+    contributionWeightBps: number;
+    receiptAssetAddress: string | null;
+    assetStandard: string;
+    transferMode: string;
+    mintStatus: string;
+    metadataUri: string | null;
+    mintedAt: string | null;
+    lastError: string | null;
 }
 
 export interface GQLKnowledgeContributor {

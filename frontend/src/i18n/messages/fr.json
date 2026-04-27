@@ -1360,6 +1360,39 @@
       "loadingMessage": "Chargement du CrystalOutput formel…",
       "emptyMessage": "Il n'existe pas encore de CrystalOutput formel exploitable, donc cette page ne prétend pas que le registre des contributions constitue déjà le contrat final."
     },
+    "asset": {
+      "sectionTitle": "NFT du cristal",
+      "status": {
+        "minted": "Mint effectué",
+        "pending": "Mint en cours",
+        "mock": "Reçu démo",
+        "failed": "Mint échoué",
+        "unknown": "Statut inconnu"
+      },
+      "master": {
+        "kicker": "CRYSTAL ASSET",
+        "title": "NFT maître",
+        "description": "Ce NFT maître représente le cristal de connaissance stabilisé. Une fois la cristallisation réussie, il entre automatiquement dans la file de mint.",
+        "standard": "Standard d'actif",
+        "address": "Adresse NFT",
+        "demoAddress": "Adresse démo",
+        "mintedAt": "Mint effectué le",
+        "lastError": "Erreur",
+        "pendingStandard": "En attente de mint",
+        "pendingAddress": "Adresse en attente"
+      },
+      "receipts": {
+        "kicker": "CONTRIBUTOR RECEIPTS",
+        "title": "Reçus de contribution",
+        "count": "{count} reçus",
+        "minted": "Mint {count}",
+        "pending": "En attente {count}",
+        "failed": "Échoués {count}",
+        "showingSubset": "Affichage des {shown} premiers sur {count}.",
+        "empty": "Aucune projection de reçu de contribution n'existe encore. Les nouveaux cristaux la complètent après la création des droits de contribution.",
+        "pendingAddress": "Adresse en attente"
+      }
+    },
     "contributors": {
       "title": "Contributeurs ({count})",
       "roles": {

@@ -181,7 +181,7 @@ export async function issueCrystalAssetJob(
     input: {
         knowledgeRowId?: number;
         knowledgePublicId?: string;
-        mintAdapter?: CrystalMintAdapter | null;
+        mintAdapter?: CrystalMintAdapter;
         now?: Date;
     },
 ): Promise<{
@@ -202,18 +202,6 @@ export async function issueCrystalAssetJob(
     const binding = source.binding!;
     const masterOwnerPubkey = source.crystalAsset?.ownerPubkey
         || resolveMasterAssetOwnerPubkey(config, authorPubkey);
-
-    if (!mintAdapter) {
-        return {
-            knowledgeRowId: source.id,
-            knowledgePublicId: source.knowledgeId,
-            adapterMode: 'disabled',
-            masterAssetIssued: false,
-            masterAssetAddress: source.crystalAsset?.masterAssetAddress ?? null,
-            receiptCount: source.crystalEntitlements.length,
-            issuedReceiptCount: 0,
-        };
-    }
 
     let masterAssetIssued = false;
     let masterAssetAddress = source.crystalAsset?.masterAssetAddress ?? null;

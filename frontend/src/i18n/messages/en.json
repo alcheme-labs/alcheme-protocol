@@ -1431,6 +1431,39 @@
       "loadingMessage": "Loading the formal CrystalOutput…",
       "emptyMessage": "There is no consumable formal CrystalOutput yet, so this page does not pretend the contribution ledger is the final contract."
     },
+    "asset": {
+      "sectionTitle": "Crystal NFT",
+      "status": {
+        "minted": "Minted",
+        "pending": "Minting",
+        "mock": "Demo receipt",
+        "failed": "Mint failed",
+        "unknown": "Unknown"
+      },
+      "master": {
+        "kicker": "CRYSTAL ASSET",
+        "title": "Master NFT",
+        "description": "This master NFT represents the settled knowledge crystal itself. Once crystallization succeeds, it enters the mint queue automatically.",
+        "standard": "Asset standard",
+        "address": "NFT address",
+        "demoAddress": "Demo address",
+        "mintedAt": "Minted at",
+        "lastError": "Error",
+        "pendingStandard": "Waiting for mint",
+        "pendingAddress": "Waiting for address"
+      },
+      "receipts": {
+        "kicker": "CONTRIBUTOR RECEIPTS",
+        "title": "Contributor receipts",
+        "count": "{count} receipts",
+        "minted": "Minted {count}",
+        "pending": "Pending {count}",
+        "failed": "Failed {count}",
+        "showingSubset": "Showing the first {shown} of {count}.",
+        "empty": "No contributor receipt projection exists yet. New crystals fill this after contributor entitlements are created.",
+        "pendingAddress": "Waiting for address"
+      }
+    },
     "contributors": {
       "title": "Contributors ({count})",
       "roles": {

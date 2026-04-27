@@ -1,0 +1,20 @@
+import { describe, expect, test } from '@jest/globals';
+import { readFileSync } from 'fs';
+import path from 'path';
+
+const source = readFileSync(
+    path.resolve(__dirname, '../crystalAssets/mintAdapter.ts'),
+    'utf8',
+);
+
+describe('Token-2022 crystal mint metadata wiring', () => {
+    test('initializes token metadata on the mint account before minting supply', () => {
+        expect(source).toContain('createInitializeMetadataPointerInstruction');
+        expect(source).toContain('createInitializeTokenMetadataInstruction');
+        expect(source).toContain('createUpdateTokenMetadataFieldInstruction');
+        expect(source).toContain('packTokenMetadata');
+        expect(source).toContain('TYPE_SIZE + LENGTH_SIZE + packTokenMetadata(tokenMetadata).length');
+        expect(source).toContain('metadata: mint.publicKey');
+        expect(source).toContain('uri: input.metadataUri');
+    });
+});

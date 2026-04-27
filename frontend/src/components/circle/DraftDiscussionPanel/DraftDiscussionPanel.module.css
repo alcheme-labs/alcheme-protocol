@@ -310,6 +310,109 @@
     padding: 10px 12px;
 }
 
+.selectRoot {
+    position: relative;
+    width: 100%;
+}
+
+.selectTrigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    min-height: 48px;
+    padding: 0 12px 0 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.018)),
+        rgba(21, 28, 25, 0.92);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-caption);
+    text-align: left;
+    cursor: pointer;
+}
+
+.selectTrigger[aria-expanded='true'] {
+    border-color: var(--color-accent-gold);
+    box-shadow: 0 0 0 1px rgba(199, 168, 107, 0.16);
+}
+
+.selectTrigger:disabled {
+    cursor: not-allowed;
+    opacity: 0.52;
+}
+
+.selectValue {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.selectChevron {
+    width: 8px;
+    height: 8px;
+    flex: 0 0 auto;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    opacity: 0.8;
+    transform: translateY(-2px) rotate(45deg);
+}
+
+.selectMenu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: min(288px, 46dvh);
+    padding: 6px;
+    overflow-y: auto;
+    border: 1px solid rgba(199, 168, 107, 0.28);
+    border-radius: 14px;
+    background:
+        linear-gradient(180deg, rgba(33, 40, 36, 0.98), rgba(19, 25, 22, 0.98)),
+        rgba(19, 25, 22, 0.98);
+    box-shadow:
+        0 18px 42px rgba(0, 0, 0, 0.36),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.selectOption {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-caption);
+    line-height: 1.35;
+    text-align: left;
+    cursor: pointer;
+}
+
+.selectOption:active,
+.selectOptionActive {
+    background: rgba(199, 168, 107, 0.16);
+    color: var(--color-accent-ivory-glow);
+}
+
+.selectOption:disabled {
+    cursor: not-allowed;
+    opacity: 0.48;
+}
+
+.selectOptionLabel {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
 .textarea {
     min-height: 88px;
     resize: vertical;
@@ -317,6 +420,7 @@
 
 .input:focus,
 .select:focus,
+.selectTrigger:focus,
 .textarea:focus {
     outline: none;
     border-color: var(--color-accent-gold);
