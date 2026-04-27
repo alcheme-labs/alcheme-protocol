@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import type { CircleGhostSettings } from '@/lib/circles/ghostSettings';
 import type { SeededSourceInput } from '@/lib/circles/seeded';
+import { CIRCLE_NAME_MAX_BYTES, clampUtf8Bytes } from '@/lib/circles/nameLimit';
 import {
     DEFAULT_CIRCLE_DRAFT_WORKFLOW_POLICY,
 } from '@/lib/circles/policyProfile';
@@ -337,6 +338,10 @@ export default function CreateCircleSheet({
         setDraftWorkflowPolicy((prev) => ({ ...prev, [key]: value }));
     };
 
+    const handleNameChange = (value: string) => {
+        setName(clampUtf8Bytes(value));
+    };
+
     const creationScopeSummary = creationScope === 'auxiliary'
         ? t('confirm.creationScope.auxiliary')
         : t('confirm.creationScope.nextLevel');
@@ -504,8 +509,8 @@ export default function CreateCircleSheet({
                                                 className={styles.inputField}
                                                 placeholder={t('fields.namePlaceholder')}
                                                 value={name}
-                                                onChange={(e) => setName(e.target.value)}
-                                                maxLength={30}
+                                                onChange={(e) => handleNameChange(e.target.value)}
+                                                maxLength={CIRCLE_NAME_MAX_BYTES}
                                                 autoFocus
                                                 disabled={isSubmitting}
                                             />
