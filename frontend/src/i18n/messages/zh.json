@@ -1636,6 +1636,22 @@
     "labels": {
       "from": "From",
       "to": "To"
+    },
+    "fields": {
+      "eventType": "事件类型",
+      "actorHandle": "执行者",
+      "contributorsCount": "贡献者人数",
+      "contributorsRoot": "贡献根",
+      "sourceEventTimestamp": "来源事件时间戳",
+      "title": "标题",
+      "description": "描述",
+      "ipfsCid": "IPFS CID",
+      "contentHash": "内容哈希"
+    },
+    "summary": {
+      "metadataOnly": "当前只能比较版本事件元数据；历史正文快照尚未入库。",
+      "changed": "当前可读到 {count} 处版本差异。",
+      "noFieldChanges": "两个版本在当前可读范围内没有差异。"
     }
   },
   "DiscussionDiagnosticsPage": {

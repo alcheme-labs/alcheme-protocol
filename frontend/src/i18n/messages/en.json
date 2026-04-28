@@ -1636,6 +1636,22 @@
     "labels": {
       "from": "From",
       "to": "To"
+    },
+    "fields": {
+      "eventType": "Event type",
+      "actorHandle": "Actor",
+      "contributorsCount": "Contributor count",
+      "contributorsRoot": "Contribution root",
+      "sourceEventTimestamp": "Source event timestamp",
+      "title": "Title",
+      "description": "Description",
+      "ipfsCid": "IPFS CID",
+      "contentHash": "Content hash"
+    },
+    "summary": {
+      "metadataOnly": "For now only version-event metadata can be compared because historical body snapshots are not stored yet.",
+      "changed": "{count} readable version differences found.",
+      "noFieldChanges": "There are no readable differences between these two versions."
     }
   },
   "DiscussionDiagnosticsPage": {

@@ -11,6 +11,7 @@ const panelPath = path.join(frontendRoot, 'src/components/knowledge/KnowledgeVer
 const panelStylesPath = path.join(frontendRoot, 'src/components/knowledge/KnowledgeVersionDiffPanel/KnowledgeVersionDiffPanel.module.css');
 const queriesPath = path.join(frontendRoot, 'src/lib/apollo/queries.ts');
 const typesPath = path.join(frontendRoot, 'src/lib/apollo/types.ts');
+const enMessagesPath = path.join(frontendRoot, 'src/i18n/messages/en.json');
 const zhMessagesPath = path.join(frontendRoot, 'src/i18n/messages/zh.json');
 
 function readSource(targetPath) {
@@ -30,10 +31,17 @@ test('knowledge version diff panel uses a dedicated GraphQL compare query and wa
   const panelSource = readSource(panelPath);
   const queriesSource = readSource(queriesPath);
   const typesSource = readSource(typesPath);
+  const enMessagesSource = readSource(enMessagesPath);
   const zhMessagesSource = readSource(zhMessagesPath);
 
   assert.match(panelSource, /GET_KNOWLEDGE_VERSION_DIFF/);
   assert.match(panelSource, /t\('notes\.metadataOnly'\)/);
+  assert.match(panelSource, /formatSummary/);
+  assert.match(panelSource, /formatFieldLabel/);
+  assert.doesNotMatch(panelSource, /\{diff\.summary\}/);
+  assert.doesNotMatch(panelSource, /\{change\.label\}/);
+  assert.match(enMessagesSource, /For now only version-event metadata can be compared/);
+  assert.match(enMessagesSource, /Contributor count/);
   assert.match(zhMessagesSource, /历史正文快照尚未入库/);
   assert.match(panelSource, /fromVersion/);
   assert.match(panelSource, /toVersion/);

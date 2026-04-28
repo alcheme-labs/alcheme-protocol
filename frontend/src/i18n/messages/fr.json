@@ -1565,6 +1565,22 @@
     "labels": {
       "from": "De",
       "to": "À"
+    },
+    "fields": {
+      "eventType": "Type d'événement",
+      "actorHandle": "Acteur",
+      "contributorsCount": "Nombre de contributeurs",
+      "contributorsRoot": "Racine de contribution",
+      "sourceEventTimestamp": "Horodatage de l'événement source",
+      "title": "Titre",
+      "description": "Description",
+      "ipfsCid": "CID IPFS",
+      "contentHash": "Hash de contenu"
+    },
+    "summary": {
+      "metadataOnly": "Pour l'instant, seuls les métadonnées des événements de version peuvent être comparées, car les instantanés historiques du corps ne sont pas encore stockés.",
+      "changed": "{count} différences de version lisibles trouvées.",
+      "noFieldChanges": "Aucune différence lisible entre ces deux versions."
     }
   },
   "DiscussionDiagnosticsPage": {

@@ -45,6 +45,14 @@ function formatMaybeDate(value: string, locale: string): string {
     }).format(date);
 }
 
+function humanizeFieldName(field: string): string {
+    return field
+        .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+        .replace(/[_-]+/g, ' ')
+        .trim()
+        .replace(/^./, (char) => char.toUpperCase());
+}
+
 export default function KnowledgeVersionDiffPanel({
     knowledgeId,
     currentVersion,
@@ -71,6 +79,40 @@ export default function KnowledgeVersionDiffPanel({
     });
 
     const diff = data?.knowledge?.versionDiff ?? null;
+    const formatFieldLabel = (field: string): string => {
+        switch (field) {
+        case 'eventType':
+            return t('fields.eventType');
+        case 'actorHandle':
+            return t('fields.actorHandle');
+        case 'contributorsCount':
+            return t('fields.contributorsCount');
+        case 'contributorsRoot':
+            return t('fields.contributorsRoot');
+        case 'sourceEventTimestamp':
+            return t('fields.sourceEventTimestamp');
+        case 'title':
+            return t('fields.title');
+        case 'description':
+            return t('fields.description');
+        case 'ipfsCid':
+            return t('fields.ipfsCid');
+        case 'contentHash':
+            return t('fields.contentHash');
+        default:
+            return humanizeFieldName(field);
+        }
+    };
+    const formatSummary = (): string => {
+        if (!diff) return '';
+        if (diff.unavailableFields.length > 0) {
+            return t('summary.metadataOnly');
+        }
+        if (diff.fieldChanges.length > 0) {
+            return t('summary.changed', {count: diff.fieldChanges.length});
+        }
+        return t('summary.noFieldChanges');
+    };
 
     return (
         <section className={styles.panel}>
@@ -150,7 +192,7 @@ export default function KnowledgeVersionDiffPanel({
                                 </div>
                             </div>
 
-                            <div className={styles.note}>{diff.summary}</div>
+                            <div className={styles.note}>{formatSummary()}</div>
 
                             <div className={styles.changes}>
                                 {diff.fieldChanges.length === 0 ? (
@@ -158,7 +200,7 @@ export default function KnowledgeVersionDiffPanel({
                                 ) : (
                                     diff.fieldChanges.map((change) => (
                                         <div key={`${change.field}:${change.fromValue}:${change.toValue}`} className={styles.changeRow}>
-                                            <span className={styles.changeLabel}>{change.label}</span>
+                                            <span className={styles.changeLabel}>{formatFieldLabel(change.field)}</span>
                                             <div className={styles.changeValues}>
                                                 <div className={styles.changeValue}>
                                                     <span className={styles.changeHint}>{t('labels.from')}</span>
