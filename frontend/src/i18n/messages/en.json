@@ -2441,8 +2441,8 @@
     },
     "actions": {
       "copy": "Copy link",
-      "cite": "Cite",
-      "citePending": "Crystal citation is not available yet"
+      "openKnowledge": "Open knowledge",
+      "openKnowledgePending": "Knowledge page is not available yet"
     }
   },
   "DraftCard": {

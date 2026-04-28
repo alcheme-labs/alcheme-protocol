@@ -43,6 +43,21 @@ export interface DraftReviewBindingView {
     latestThreadUpdatedAt: string | null;
 }
 
+export interface ResumableCrystallizationAttemptView {
+    proofPackageHash: string;
+    knowledgeId: string | null;
+    knowledgeOnChainAddress: string;
+    status:
+        | 'submitted'
+        | 'binding_pending'
+        | 'binding_synced'
+        | 'references_synced'
+        | 'references_failed'
+        | 'finalization_failed';
+    failureCode?: string | null;
+    failureMessage?: string | null;
+}
+
 export interface DraftLifecycleReadModel {
     draftPostId: number;
     circleId: number | null;
@@ -76,6 +91,7 @@ export interface DraftLifecycleReadModel {
     stableSnapshot: DraftStableSnapshotView;
     workingCopy: DraftWorkingCopyView;
     reviewBinding: DraftReviewBindingView;
+    resumableCrystallizationAttempt?: ResumableCrystallizationAttemptView | null;
     warnings: string[];
 }
 

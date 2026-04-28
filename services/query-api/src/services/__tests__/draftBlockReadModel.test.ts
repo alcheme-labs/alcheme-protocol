@@ -152,6 +152,8 @@ describe('draftBlocks read model', () => {
                 sourceBlockId: 'paragraph:0',
                 crystalName: 'Seed Crystal',
                 crystalBlockAnchor: null,
+                markerKnowledgeId: null,
+                markerRaw: '@crystal(Seed Crystal)',
                 status: 'parsed',
             }),
             expect.objectContaining({
@@ -160,6 +162,8 @@ describe('draftBlocks read model', () => {
                 sourceBlockId: 'paragraph:1',
                 crystalName: 'Seed Crystal',
                 crystalBlockAnchor: 'support-block',
+                markerKnowledgeId: null,
+                markerRaw: '@crystal(Seed Crystal#support-block)',
                 status: 'parsed',
             }),
         ]);
@@ -312,7 +316,7 @@ describe('draftBlocks read model', () => {
                 workingCopyId: 'draft:61:working-copy',
                 draftPostId: 61,
                 basedOnSnapshotVersion: 3,
-                workingCopyContent: 'Gamma claim with @crystal(Frozen Crystal#anchor-1).',
+                workingCopyContent: 'Gamma claim with @crystal(Frozen Crystal#anchor-1){kid=K-source}.',
                 workingCopyHash: '8'.repeat(64),
                 status: 'active',
                 roomKey: 'crucible-61',
@@ -346,6 +350,8 @@ describe('draftBlocks read model', () => {
                 sourceBlockId: 'paragraph:0',
                 crystalName: 'Frozen Crystal',
                 crystalBlockAnchor: 'anchor-1',
+                markerKnowledgeId: 'K-source',
+                markerRaw: '@crystal(Frozen Crystal#anchor-1){kid=K-source}',
                 status: 'parsed',
             },
         ]);

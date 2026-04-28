@@ -39,6 +39,10 @@ import {
 import { loadDraftVersionSnapshot } from './versionSnapshots';
 import { applyGhostDraftSuggestionToContent } from '../ghostDraft/suggestionPatches';
 import { toGhostDraftResultView, type GhostDraftSuggestionView } from '../ghostDraft/readModel';
+import {
+    findLatestResumableCrystallizationAttemptForDraft,
+    type CrystallizationAttemptStatus,
+} from '../draftReferences/crystallizationAttempt';
 
 interface AcceptedCandidateNoticeRow {
     messageKind: string;
@@ -126,6 +130,15 @@ export interface DraftReviewBindingView {
     latestThreadUpdatedAt: string | null;
 }
 
+export interface ResumableCrystallizationAttemptView {
+    proofPackageHash: string;
+    knowledgeId: string | null;
+    knowledgeOnChainAddress: string;
+    status: Exclude<CrystallizationAttemptStatus, 'finalized'>;
+    failureCode?: string | null;
+    failureMessage?: string | null;
+}
+
 export interface DraftLifecycleReadModel {
     draftPostId: number;
     circleId: number | null;
@@ -142,6 +155,7 @@ export interface DraftLifecycleReadModel {
     stableSnapshot: DraftStableSnapshotView;
     workingCopy: DraftWorkingCopyView;
     reviewBinding: DraftReviewBindingView;
+    resumableCrystallizationAttempt?: ResumableCrystallizationAttemptView | null;
     warnings: string[];
 }
 
@@ -704,6 +718,27 @@ function selectLifecyclePolicyProfileDigest(input: {
     return input.livePolicyProfileDigest;
 }
 
+async function resolveResumableCrystallizationAttemptView(
+    prisma: PrismaClient,
+    draftPostId: number,
+): Promise<ResumableCrystallizationAttemptView | null> {
+    if (typeof (prisma as any).$queryRaw !== 'function') {
+        return null;
+    }
+    const attempt = await findLatestResumableCrystallizationAttemptForDraft(prisma, {
+        draftPostId,
+    });
+    if (!attempt || attempt.status === 'finalized') return null;
+    return {
+        proofPackageHash: attempt.proofPackageHash,
+        knowledgeId: attempt.knowledgeId,
+        knowledgeOnChainAddress: attempt.knowledgeOnChainAddress,
+        status: attempt.status,
+        failureCode: attempt.failureCode,
+        failureMessage: attempt.failureMessage,
+    };
+}
+
 export async function resolveDraftLifecycleReadModel(
     prisma: PrismaClient,
     input: {
@@ -828,6 +863,10 @@ export async function resolveDraftLifecycleReadModel(
         };
 
     const workingCopyContent = String(post.text || '');
+    const resumableCrystallizationAttempt = await resolveResumableCrystallizationAttemptView(
+        prisma,
+        draftPostId,
+    );
 
     return {
         draftPostId,
@@ -860,6 +899,7 @@ export async function resolveDraftLifecycleReadModel(
             updatedAt: post.updatedAt.toISOString(),
         },
         reviewBinding,
+        resumableCrystallizationAttempt,
         warnings,
     };
 }

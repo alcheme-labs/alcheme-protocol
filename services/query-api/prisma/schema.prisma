@@ -1170,6 +1170,23 @@ model DraftProofPackageIssuance {
   @@map("draft_proof_package_issuances")
 }
 
+model DraftCrystallizationAttempt {
+  id                      BigInt   @id @default(autoincrement())
+  draftPostId             Int      @map("draft_post_id")
+  proofPackageHash        String   @map("proof_package_hash") @db.Char(64)
+  knowledgeId             String?  @map("knowledge_id") @db.VarChar(64)
+  knowledgeOnChainAddress String   @map("knowledge_on_chain_address") @db.VarChar(44)
+  status                  String   @default("submitted") @db.VarChar(32)
+  failureCode             String?  @map("failure_code") @db.VarChar(64)
+  failureMessage          String?  @map("failure_message")
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  @@unique([draftPostId, proofPackageHash])
+  @@index([draftPostId, status])
+  @@map("draft_crystallization_attempts")
+}
+
 model OffchainSyncWatermark {
   streamKey        String    @id @map("stream_key") @db.VarChar(64)
   lastLamport      BigInt    @default(0) @map("last_lamport")

@@ -3126,11 +3126,11 @@ export default function CircleDetailPage() {
                     const crystalHref = new URL(`/knowledge/${selectedCrystal.knowledgeId}`, window.location.origin).toString();
                     void navigator.clipboard.writeText(crystalHref);
                 }}
-                onCite={selectedCrystal?.knowledgeId
+                onOpenKnowledge={selectedCrystal?.knowledgeId
                     ? () => {
                         const targetKnowledgeId = selectedCrystal.knowledgeId;
                         setSelectedCrystal(null);
-                        void router.push(`/knowledge/${targetKnowledgeId}?action=cite`);
+                        void router.push(`/knowledge/${targetKnowledgeId}`);
                     }
                     : undefined}
             />

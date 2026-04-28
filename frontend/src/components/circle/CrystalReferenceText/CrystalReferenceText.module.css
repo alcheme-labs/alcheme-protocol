@@ -1,0 +1,18 @@
+.root {
+    white-space: pre-wrap;
+}
+
+.reference {
+    color: var(--color-accent-gold);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.reference:hover {
+    text-decoration: underline;
+}
+
+.plainReference {
+    color: var(--color-text-secondary);
+    overflow-wrap: anywhere;
+}

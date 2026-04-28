@@ -7,12 +7,15 @@ import {
     fetchDraftContributorProof,
     fetchDraftProofPackage,
     fetchDraftPublishReadiness,
+    registerDraftCrystallizationAttempt,
     submitDraftCrystallizationBinding,
 } from '@/lib/discussion/api';
 import {
+    fetchDraftLifecycle,
     failDraftLifecycleCrystallization,
     repairDraftLifecycleCrystallizationEvidence,
 } from '@/features/draft-working-copy/api';
+import { sanitizeCrystalReferenceMarkersForDisplay } from '@/lib/crystal/referenceMarkerText';
 import { useAlchemeSDK } from './useAlchemeSDK';
 
 type NoticeType = 'success' | 'error';
@@ -91,7 +94,7 @@ export function buildCrystallizedDraftDocument(input: {
 }
 
 export function buildKnowledgeDescription(content: string, fallbackTitle: string): string {
-    const normalized = collapseWhitespace(content);
+    const normalized = collapseWhitespace(sanitizeCrystalReferenceMarkersForDisplay(content));
     if (!normalized) return clampUtf8ToByteLimit(fallbackTitle, KNOWLEDGE_DESCRIPTION_MAX_BYTES);
     return clampUtf8ToByteLimit(normalized, KNOWLEDGE_DESCRIPTION_MAX_BYTES);
 }
@@ -105,7 +108,8 @@ type CrystallizationDiagnosticCode =
     | 'draft_anchor_unverifiable'
     | 'contribution_sync_required'
     | 'proof_binding_required'
-    | 'knowledge_circle_mismatch';
+    | 'knowledge_circle_mismatch'
+    | 'crystallization_attempt_conflict';
 
 const STRICT_DIAGNOSTIC_COPY: Record<CrystallizationDiagnosticCode, string> = {
     draft_anchor_not_final: '草稿锚定尚未完成，暂不可结晶。',
@@ -113,6 +117,7 @@ const STRICT_DIAGNOSTIC_COPY: Record<CrystallizationDiagnosticCode, string> = {
     contribution_sync_required: '贡献快照尚未同步，请稍后重试。',
     proof_binding_required: '贡献证明包未就绪，无法执行结晶绑定。',
     knowledge_circle_mismatch: '草稿与知识圈层不一致，已阻断本次结晶。',
+    crystallization_attempt_conflict: '检测到已有结晶恢复记录，请重新执行以恢复同一个链上知识。',
 };
 
 function createCrystallizationError(code: CrystallizationDiagnosticCode, message: string): Error & {
@@ -132,6 +137,7 @@ function resolveErrorCode(error: unknown): CrystallizationDiagnosticCode | null 
             || code === 'contribution_sync_required'
             || code === 'proof_binding_required'
             || code === 'knowledge_circle_mismatch'
+            || code === 'crystallization_attempt_conflict'
         ) {
             return code;
         }
@@ -142,6 +148,7 @@ function resolveErrorCode(error: unknown): CrystallizationDiagnosticCode | null 
     if (message === 'contribution_sync_required') return 'contribution_sync_required';
     if (message === 'proof_binding_required') return 'proof_binding_required';
     if (message === 'knowledge_circle_mismatch') return 'knowledge_circle_mismatch';
+    if (message === 'crystallization_attempt_conflict') return 'crystallization_attempt_conflict';
     return null;
 }
 
@@ -513,6 +520,23 @@ function assertProofPackageReady(response: {
     };
 }
 
+function selectMatchingResumableCrystallizationAttempt(
+    lifecycle: Awaited<ReturnType<typeof fetchDraftLifecycle>> | null,
+    proofPackageHash: string,
+): {
+    knowledgeOnChainAddress: string;
+    status: string;
+} | null {
+    const attempt = lifecycle?.resumableCrystallizationAttempt || null;
+    if (!attempt) return null;
+    if (attempt.proofPackageHash !== proofPackageHash) return null;
+    if (!attempt.knowledgeOnChainAddress) return null;
+    return {
+        knowledgeOnChainAddress: attempt.knowledgeOnChainAddress,
+        status: attempt.status,
+    };
+}
+
 export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
     const sdk = useAlchemeSDK();
     const baseUrl = useMemo(() => getQueryApiBaseUrl(), []);
@@ -611,6 +635,11 @@ export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
                     return null;
                 }
                 const { proof, proofPackage } = strictInputs;
+                const lifecycleWithAttempt = await fetchDraftLifecycle({ draftPostId }).catch(() => null);
+                const resumableAttempt = selectMatchingResumableCrystallizationAttempt(
+                    lifecycleWithAttempt,
+                    proofPackage.proofPackageHash,
+                );
 
                 const document = buildCrystallizedDraftDocument({
                     draftPostId,
@@ -660,41 +689,62 @@ export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
                     throw new Error('storage bridge must return ipfs:// URI for submitKnowledge');
                 }
 
-                const knowledgePda = await sdk.circles.predictNextKnowledgePda(upload.circleId);
-                const knowledgeTxSignature = await sdk.circles.submitKnowledge({
-                    circleId: upload.circleId,
-                    knowledgePda,
-                    ipfsCid,
-                    contentHash,
-                    title: buildKnowledgeTitle(title),
-                    description: buildKnowledgeDescription(content, title),
-                });
+                let knowledgePdaBase58 = resumableAttempt?.knowledgeOnChainAddress || '';
+                let knowledgeTxSignature = resumableAttempt ? 'resumed' : '';
+                let contributorsTxSignature = resumableAttempt ? 'resumed' : '';
+                let fullyIndexed = false;
 
-                const contributorsTxSignature = await sdk.circles.bindAndUpdateContributors({
-                    circleId: upload.circleId,
-                    knowledgePda,
-                    sourceAnchorId: proofPackage.sourceAnchorId,
-                    proofPackageHash: proofPackage.proofPackageHash,
-                    contributorsRoot: proofPackage.root,
-                    contributorsCount: proofPackage.count,
-                    bindingVersion: proofPackage.bindingVersion,
-                    generatedAt: proofPackage.generatedAt,
-                    issuerKeyId: proofPackage.issuerKeyId,
-                    issuedSignature: proofPackage.issuedSignature,
-                });
+                if (!resumableAttempt) {
+                    const knowledgePda = await sdk.circles.predictNextKnowledgePda(upload.circleId);
+                    knowledgePdaBase58 = knowledgePda.toBase58();
+                    knowledgeTxSignature = await sdk.circles.submitKnowledge({
+                        circleId: upload.circleId,
+                        knowledgePda,
+                        ipfsCid,
+                        contentHash,
+                        title: buildKnowledgeTitle(title),
+                        description: buildKnowledgeDescription(content, title),
+                    });
 
-                const [knowledgeSlot, contributorsSlot] = await Promise.all([
-                    waitForSignatureSlot(sdk.connection, knowledgeTxSignature),
-                    waitForSignatureSlot(sdk.connection, contributorsTxSignature),
-                ]);
+                    const registeredAttempt = await registerDraftCrystallizationAttempt({
+                        draftPostId,
+                        knowledgePda: knowledgePdaBase58,
+                        proofPackageHash: proofPackage.proofPackageHash,
+                    });
+                    const registeredKnowledgePda = registeredAttempt.attempt?.knowledgeOnChainAddress || knowledgePdaBase58;
+                    if (registeredKnowledgePda !== knowledgePdaBase58) {
+                        throw createCrystallizationError(
+                            'crystallization_attempt_conflict',
+                            'crystallization attempt already exists for a different knowledge address',
+                        );
+                    }
 
-                const targetSlot = Math.max(knowledgeSlot || 0, contributorsSlot || 0);
-                const indexWait = targetSlot > 0 ? await waitForIndexedSlot(targetSlot) : null;
-                const fullyIndexed = indexWait?.ok ?? false;
+                    contributorsTxSignature = await sdk.circles.bindAndUpdateContributors({
+                        circleId: upload.circleId,
+                        knowledgePda,
+                        sourceAnchorId: proofPackage.sourceAnchorId,
+                        proofPackageHash: proofPackage.proofPackageHash,
+                        contributorsRoot: proofPackage.root,
+                        contributorsCount: proofPackage.count,
+                        bindingVersion: proofPackage.bindingVersion,
+                        generatedAt: proofPackage.generatedAt,
+                        issuerKeyId: proofPackage.issuerKeyId,
+                        issuedSignature: proofPackage.issuedSignature,
+                    });
+
+                    const [knowledgeSlot, contributorsSlot] = await Promise.all([
+                        waitForSignatureSlot(sdk.connection, knowledgeTxSignature),
+                        waitForSignatureSlot(sdk.connection, contributorsTxSignature),
+                    ]);
+
+                    const targetSlot = Math.max(knowledgeSlot || 0, contributorsSlot || 0);
+                    const indexWait = targetSlot > 0 ? await waitForIndexedSlot(targetSlot) : null;
+                    fullyIndexed = indexWait?.ok ?? false;
+                }
 
                 await bindCrystallizedKnowledge({
                     draftPostId,
-                    knowledgePda: knowledgePda.toBase58(),
+                    knowledgePda: knowledgePdaBase58,
                     proofPackageHash: proofPackage.proofPackageHash,
                     sourceAnchorId: proofPackage.sourceAnchorId,
                     contributorsRoot: proofPackage.root,
@@ -704,7 +754,7 @@ export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
                     issuerKeyId: proofPackage.issuerKeyId,
                     issuedSignature: proofPackage.issuedSignature,
                     proofPackage: proofPackage.proofPackage,
-                    attempts: fullyIndexed ? 1 : 8,
+                    attempts: fullyIndexed && !resumableAttempt ? 1 : 8,
                 });
 
                 showNotice(
@@ -717,7 +767,7 @@ export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
                 return {
                     circleId: upload.circleId,
                     storageUri: upload.uri,
-                    knowledgePda: knowledgePda.toBase58(),
+                    knowledgePda: knowledgePdaBase58,
                     knowledgeTxSignature,
                     contributorsTxSignature,
                     indexed: fullyIndexed,

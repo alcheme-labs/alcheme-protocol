@@ -13,14 +13,41 @@ describe('draft reference read model', () => {
                 sourceBlockId: 'paragraph:0',
                 crystalName: 'Seed Crystal',
                 crystalBlockAnchor: 'anchor-1',
+                markerKnowledgeId: 'K-source',
+                markerRaw: '@crystal(Seed Crystal#anchor-1){kid=K-source}',
                 status: 'parsed',
             },
         ]);
 
-        const links = await loadDraftReferenceLinks({} as any, 42);
+        const prisma = {
+            post: {
+                findUnique: jest.fn(async () => ({ circleId: 7 })),
+            },
+            knowledge: {
+                findMany: jest.fn(async () => [
+                    {
+                        knowledgeId: 'K-source',
+                        onChainAddress: 'SourcePda1111111111111111111111111111111',
+                    },
+                ]),
+            },
+        } as any;
+
+        const links = await loadDraftReferenceLinks(prisma, 42);
 
         expect(resolveSpy).toHaveBeenCalledWith(expect.anything(), {
             draftPostId: 42,
+        });
+        expect(prisma.knowledge.findMany).toHaveBeenCalledWith({
+            where: {
+                circleId: 7,
+                knowledgeId: 'K-source',
+            },
+            select: {
+                knowledgeId: true,
+                onChainAddress: true,
+            },
+            take: 2,
         });
         expect(links).toEqual([
             {
@@ -30,9 +57,53 @@ describe('draft reference read model', () => {
                 sourceBlockId: 'paragraph:0',
                 crystalName: 'Seed Crystal',
                 crystalBlockAnchor: 'anchor-1',
+                sourceKnowledgeId: 'K-source',
+                sourceOnChainAddress: 'SourcePda1111111111111111111111111111111',
+                resolutionStatus: 'resolved',
                 status: 'parsed',
             },
         ]);
         expect((links[0] as any).linkText).toBeUndefined();
+    });
+
+    test('marks legacy title references ambiguous when same-circle title is not unique', async () => {
+        jest.spyOn(draftBlockReadModel, 'resolveStableDraftReferenceLinkInputs').mockResolvedValue([
+            {
+                referenceId: 'ref-legacy',
+                draftPostId: 43,
+                draftVersion: 1,
+                sourceBlockId: 'paragraph:0',
+                crystalName: 'Shared Title',
+                crystalBlockAnchor: null,
+                markerKnowledgeId: null,
+                markerRaw: '@crystal(Shared Title)',
+                status: 'parsed',
+            },
+        ]);
+        const prisma = {
+            post: {
+                findUnique: jest.fn(async () => ({ circleId: 7 })),
+            },
+            knowledge: {
+                findMany: jest.fn(async () => [
+                    { knowledgeId: 'K-one', onChainAddress: 'One1111111111111111111111111111111111111' },
+                    { knowledgeId: 'K-two', onChainAddress: 'Two1111111111111111111111111111111111111' },
+                ]),
+            },
+        } as any;
+
+        const links = await loadDraftReferenceLinks(prisma, 43);
+
+        expect(prisma.knowledge.findMany).toHaveBeenCalledWith(expect.objectContaining({
+            where: {
+                circleId: 7,
+                title: 'Shared Title',
+            },
+        }));
+        expect(links[0]).toMatchObject({
+            sourceKnowledgeId: null,
+            sourceOnChainAddress: null,
+            resolutionStatus: 'ambiguous',
+        });
     });
 });

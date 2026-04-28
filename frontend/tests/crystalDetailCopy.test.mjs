@@ -28,3 +28,12 @@ test('CrystalDetailSheet copy action is labeled as copying a link', () => {
     assert.equal(enMessages.CrystalDetailSheet.actions.copy, 'Copy link');
     assert.equal(zhMessages.CrystalDetailSheet.actions.copy, '复制链接');
 });
+
+test('CrystalDetailSheet opens the knowledge page instead of launching citation mode', () => {
+    assert.match(detailSheetSource, /onOpenKnowledge\?: \(\) => void/);
+    assert.match(circlePageSource, /onOpenKnowledge=\{selectedCrystal\?\.knowledgeId/);
+    assert.match(circlePageSource, /router\.push\(`\/knowledge\/\$\{targetKnowledgeId\}`\)/);
+    assert.doesNotMatch(circlePageSource, /action=cite/);
+    assert.equal(enMessages.CrystalDetailSheet.actions.openKnowledge, 'Open knowledge');
+    assert.equal(zhMessages.CrystalDetailSheet.actions.openKnowledge, '打开知识页');
+});

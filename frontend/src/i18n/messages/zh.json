@@ -2441,8 +2441,8 @@
     },
     "actions": {
       "copy": "复制链接",
-      "cite": "引用",
-      "citePending": "晶体引用待开放"
+      "openKnowledge": "打开知识页",
+      "openKnowledgePending": "知识页暂不可用"
     }
   },
   "DraftCard": {

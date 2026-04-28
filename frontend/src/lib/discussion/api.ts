@@ -141,6 +141,26 @@ export interface DraftCrystallizationBindingResponse {
     knowledgeHeatScore: number;
 }
 
+export interface DraftCrystallizationAttemptRegistrationResponse {
+    ok: boolean;
+    draftPostId: number;
+    attempt: {
+        proofPackageHash: string;
+        knowledgeId: string | null;
+        knowledgeOnChainAddress: string;
+        status:
+            | 'submitted'
+            | 'binding_pending'
+            | 'binding_synced'
+            | 'references_synced'
+            | 'references_failed'
+            | 'finalization_failed'
+            | 'finalized';
+        failureCode?: string | null;
+        failureMessage?: string | null;
+    };
+}
+
 export type DraftCandidateCreateDraftResult =
     | {
         status: 'created';
@@ -641,6 +661,29 @@ export async function submitDraftCrystallizationBinding(input: {
                 issuerKeyId: input.issuerKeyId,
                 issuedSignature: input.issuedSignature,
                 proofPackage: input.proofPackage,
+            }),
+        },
+    );
+}
+
+export async function registerDraftCrystallizationAttempt(input: {
+    draftPostId: number;
+    knowledgePda: string;
+    proofPackageHash: string;
+}): Promise<DraftCrystallizationAttemptRegistrationResponse> {
+    const baseUrl = await getNodeBaseUrl('discussion_runtime');
+    return fetchDiscussionJson<DraftCrystallizationAttemptRegistrationResponse>(
+        `${baseUrl}/api/v1/discussion/drafts/${input.draftPostId}/crystallization-attempt`,
+        {
+            method: 'POST',
+            credentials: 'include',
+            cache: 'no-store',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                knowledgePda: input.knowledgePda,
+                proofPackageHash: input.proofPackageHash,
             }),
         },
     );

@@ -55,6 +55,8 @@ export interface DraftReferenceLinkView {
     linkText: string;
     crystalName: string;
     crystalBlockAnchor: string | null;
+    markerKnowledgeId: string | null;
+    markerRaw: string;
     status: 'parsed';
 }
 
@@ -65,6 +67,8 @@ export interface StableDraftReferenceLinkInput {
     sourceBlockId: string;
     crystalName: string;
     crystalBlockAnchor: string | null;
+    markerKnowledgeId: string | null;
+    markerRaw: string;
     status: 'parsed';
 }
 
@@ -152,7 +156,7 @@ function parseCrystalLinks(input: {
     sourceBlockId: string;
     contentSnapshot: string;
 }): DraftReferenceLinkView[] {
-    const pattern = /@crystal\(\s*([^#)\n]+?)\s*(?:#([^)]+?)\s*)?\)/g;
+    const pattern = /@crystal\(\s*([^#)\n]+?)\s*(?:#([^)]+?)\s*)?\)(?:\{kid=([^}\s]+)\})?/g;
     const links: DraftReferenceLinkView[] = [];
     let match: RegExpExecArray | null = null;
     let occurrenceIndex = 0;
@@ -161,6 +165,7 @@ function parseCrystalLinks(input: {
         const crystalName = String(match[1] || '').trim();
         if (!crystalName) continue;
         const crystalBlockAnchor = String(match[2] || '').trim() || null;
+        const markerKnowledgeId = String(match[3] || '').trim() || null;
         const linkText = String(match[0] || '').trim();
 
         links.push({
@@ -179,6 +184,8 @@ function parseCrystalLinks(input: {
             linkText,
             crystalName,
             crystalBlockAnchor,
+            markerKnowledgeId,
+            markerRaw: linkText,
             status: 'parsed',
         });
         occurrenceIndex += 1;
@@ -251,6 +258,8 @@ export function projectStableDraftReferenceLinks(
         sourceBlockId: referenceLink.sourceBlockId,
         crystalName: referenceLink.crystalName,
         crystalBlockAnchor: referenceLink.crystalBlockAnchor,
+        markerKnowledgeId: referenceLink.markerKnowledgeId,
+        markerRaw: referenceLink.markerRaw,
         status: referenceLink.status,
     }));
 }

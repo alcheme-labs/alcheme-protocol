@@ -2441,8 +2441,8 @@
     },
     "actions": {
       "copy": "Copier le lien",
-      "cite": "Citer",
-      "citePending": "La citation du cristal n’est pas encore disponible"
+      "openKnowledge": "Ouvrir la connaissance",
+      "openKnowledgePending": "La page de connaissance n’est pas encore disponible"
     }
   },
   "DraftCard": {

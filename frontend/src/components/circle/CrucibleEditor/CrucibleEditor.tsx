@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, type KeyboardEvent } from 'react';
 import { motion } from 'framer-motion';
 import type * as Y from 'yjs';
 import {
@@ -12,6 +12,7 @@ import {
 import { clampHeatScore, resolveHeatState } from '@/lib/heat/semantics';
 import type { KnowledgeReferenceOption } from '@/lib/circle/knowledgeReferenceOptions';
 import { useI18n } from '@/i18n/useI18n';
+import CrystalReferenceText from '@/components/circle/CrystalReferenceText/CrystalReferenceText';
 import { resolveTemporaryGrantControls } from './temporaryGrantControls';
 import CollaborativeEditor from './CollaborativeEditor';
 import styles from './CrucibleEditor.module.css';
@@ -188,6 +189,12 @@ export default function CrucibleEditor({
         setActiveCommentParagraph(paragraphIndex);
         selectParagraph(paragraphIndex);
     }, [selectParagraph]);
+
+    const handleReadOnlyParagraphKeyDown = useCallback((event: KeyboardEvent, paragraphIndex: number) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        openCommentPanel(paragraphIndex);
+    }, [openCommentPanel]);
 
     useEffect(() => {
         if (!insertReferenceRequest) return;
@@ -533,13 +540,15 @@ export default function CrucibleEditor({
                                         </div>
                                     </>
                                 ) : (
-                                    <button
-                                        type="button"
+                                    <div
+                                        role="button"
+                                        tabIndex={0}
                                         className={styles.paragraphReadOnly}
                                         onClick={() => openCommentPanel(block.index)}
+                                        onKeyDown={(event) => handleReadOnlyParagraphKeyDown(event, block.index)}
                                     >
-                                        {paragraphText || t('fallback.emptyParagraph')}
-                                    </button>
+                                        <CrystalReferenceText text={paragraphText || t('fallback.emptyParagraph')} />
+                                    </div>
                                 )}
 
                                 {isCommentPanelOpen && (

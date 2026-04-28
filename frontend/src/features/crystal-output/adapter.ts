@@ -13,6 +13,9 @@ export interface DraftReferenceLink {
     sourceBlockId: string;
     crystalName: string;
     crystalBlockAnchor: string | null;
+    sourceKnowledgeId: string | null;
+    sourceOnChainAddress: string | null;
+    resolutionStatus: 'resolved' | 'not_found' | 'ambiguous';
     status: 'parsed';
 }
 
@@ -101,6 +104,12 @@ function normalizeDateString(value: unknown): string | null {
         return value;
     }
     return null;
+}
+
+function normalizeDraftReferenceResolutionStatus(value: unknown): DraftReferenceLink['resolutionStatus'] {
+    return value === 'resolved' || value === 'ambiguous' || value === 'not_found'
+        ? value
+        : 'not_found';
 }
 
 function normalizeSnapshotContributor(
@@ -236,6 +245,17 @@ export function pickDraftReferenceLinks(payload: unknown): DraftReferenceLink[] 
                     ? root.crystalBlockAnchor
                     : null,
             ),
+            sourceKnowledgeId: normalizeNullableString(
+                typeof root.sourceKnowledgeId === 'string'
+                    ? root.sourceKnowledgeId
+                    : null,
+            ),
+            sourceOnChainAddress: normalizeNullableString(
+                typeof root.sourceOnChainAddress === 'string'
+                    ? root.sourceOnChainAddress
+                    : null,
+            ),
+            resolutionStatus: normalizeDraftReferenceResolutionStatus(root.resolutionStatus),
             status: 'parsed' as const,
         };
     }).filter((row) =>

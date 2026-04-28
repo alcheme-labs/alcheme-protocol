@@ -16,6 +16,14 @@ function normalizeTitle(title: string | null | undefined): string {
     return String(title || '').replace(/\s+/g, ' ').trim();
 }
 
+function normalizeReferenceId(value: string | null | undefined): string {
+    return String(value || '').trim();
+}
+
+function isParserSafeReferenceId(value: string): boolean {
+    return value.length > 0 && !/[\s{}]/.test(value);
+}
+
 function isParserSafeTitle(rawTitle: string | null | undefined, normalizedTitle: string): boolean {
     return normalizedTitle.length > 0 && !/[#)\n]/.test(String(rawTitle || ''));
 }
@@ -47,8 +55,15 @@ export function buildKnowledgeReferenceOptions(
         .sort((left, right) => left.title.localeCompare(right.title, 'en'));
 }
 
-export function formatCrystalReferenceMarkup(option: Pick<KnowledgeReferenceOption, 'title'>): string {
-    return `@crystal(${normalizeTitle(option.title)})`;
+export function formatCrystalReferenceMarkup(
+    option: Pick<KnowledgeReferenceOption, 'title' | 'knowledgeId'>,
+): string {
+    const title = normalizeTitle(option.title);
+    const knowledgeId = normalizeReferenceId(option.knowledgeId);
+    if (!title || !isParserSafeReferenceId(knowledgeId)) {
+        throw new Error('knowledge reference requires title and knowledgeId');
+    }
+    return `@crystal(${title}){kid=${knowledgeId}}`;
 }
 
 export function filterKnowledgeReferenceOptions(

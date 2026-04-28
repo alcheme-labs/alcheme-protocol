@@ -9,6 +9,9 @@ export interface DraftReferenceLinkRecord {
     sourceBlockId: string;
     crystalName: string;
     crystalBlockAnchor: string | null;
+    sourceKnowledgeId: string | null;
+    sourceOnChainAddress: string | null;
+    resolutionStatus: 'resolved' | 'not_found' | 'ambiguous';
     status: 'parsed';
 }
 
@@ -51,7 +54,73 @@ function mapDraftReferenceLinkRecord(
         sourceBlockId: row.sourceBlockId,
         crystalName: row.crystalName,
         crystalBlockAnchor: asNullableString(row.crystalBlockAnchor),
+        sourceKnowledgeId: typeof row.sourceKnowledgeId === 'string' && row.sourceKnowledgeId.trim()
+            ? row.sourceKnowledgeId
+            : null,
+        sourceOnChainAddress: typeof row.sourceOnChainAddress === 'string' && row.sourceOnChainAddress.trim()
+            ? row.sourceOnChainAddress
+            : null,
+        resolutionStatus:
+            row.resolutionStatus === 'resolved'
+            || row.resolutionStatus === 'not_found'
+            || row.resolutionStatus === 'ambiguous'
+                ? row.resolutionStatus
+                : 'not_found',
         status: 'parsed',
+    };
+}
+
+async function resolveDraftCircleId(prisma: PrismaClient, draftPostId: number): Promise<number | null> {
+    const post = await prisma.post.findUnique({
+        where: { id: draftPostId },
+        select: { circleId: true },
+    });
+    return typeof post?.circleId === 'number' ? post.circleId : null;
+}
+
+async function resolveReferenceTarget(
+    prisma: PrismaClient,
+    input: {
+        circleId: number | null;
+        crystalName: string;
+        markerKnowledgeId: string | null;
+    },
+): Promise<{
+    sourceKnowledgeId: string | null;
+    sourceOnChainAddress: string | null;
+    resolutionStatus: 'resolved' | 'not_found' | 'ambiguous';
+}> {
+    if (!input.circleId) {
+        return {
+            sourceKnowledgeId: null,
+            sourceOnChainAddress: null,
+            resolutionStatus: 'not_found',
+        };
+    }
+
+    const where = input.markerKnowledgeId
+        ? { circleId: input.circleId, knowledgeId: input.markerKnowledgeId }
+        : { circleId: input.circleId, title: input.crystalName };
+    const rows = await prisma.knowledge.findMany({
+        where,
+        select: {
+            knowledgeId: true,
+            onChainAddress: true,
+        },
+        take: 2,
+    });
+
+    if (rows.length === 1) {
+        return {
+            sourceKnowledgeId: rows[0].knowledgeId,
+            sourceOnChainAddress: rows[0].onChainAddress,
+            resolutionStatus: 'resolved',
+        };
+    }
+    return {
+        sourceKnowledgeId: null,
+        sourceOnChainAddress: null,
+        resolutionStatus: rows.length > 1 ? 'ambiguous' : 'not_found',
     };
 }
 
@@ -59,11 +128,26 @@ export async function loadDraftReferenceLinks(
     prisma: PrismaClient,
     draftPostId: number,
 ): Promise<DraftReferenceLinkRecord[]> {
-    const rows = await draftBlockReadModelService.resolveStableDraftReferenceLinkInputs(prisma, {
-        draftPostId,
-    });
+    const [rows, circleId] = await Promise.all([
+        draftBlockReadModelService.resolveStableDraftReferenceLinkInputs(prisma, {
+            draftPostId,
+        }),
+        resolveDraftCircleId(prisma, draftPostId),
+    ]);
 
-    return rows
+    const resolvedRows = await Promise.all(rows.map(async (row) => {
+        const resolution = await resolveReferenceTarget(prisma, {
+            circleId,
+            crystalName: String((row as any).crystalName || ''),
+            markerKnowledgeId: asNullableString((row as any).markerKnowledgeId),
+        });
+        return {
+            ...row,
+            ...resolution,
+        };
+    }));
+
+    return resolvedRows
         .map((row) => mapDraftReferenceLinkRecord(row))
         .filter((row): row is DraftReferenceLinkRecord => Boolean(row));
 }

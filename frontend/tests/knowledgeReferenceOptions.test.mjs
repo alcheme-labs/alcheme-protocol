@@ -37,5 +37,16 @@ test('formatCrystalReferenceMarkup renders canonical draft parser syntax', () =>
         { knowledgeId: 'k-1', title: 'Onboarding Flow', onChainAddress: 'addr-1', version: 2 },
     ]);
 
-    assert.equal(formatCrystalReferenceMarkup(options[0]), '@crystal(Onboarding Flow)');
+    assert.equal(formatCrystalReferenceMarkup(options[0]), '@crystal(Onboarding Flow){kid=k-1}');
+});
+
+test('formatCrystalReferenceMarkup requires a stable knowledge id', () => {
+    assert.throws(
+        () => formatCrystalReferenceMarkup({ title: 'Onboarding Flow', knowledgeId: '' }),
+        /knowledge reference requires title and knowledgeId/,
+    );
+    assert.throws(
+        () => formatCrystalReferenceMarkup({ title: 'Onboarding Flow', knowledgeId: 'bad}id' }),
+        /knowledge reference requires title and knowledgeId/,
+    );
 });

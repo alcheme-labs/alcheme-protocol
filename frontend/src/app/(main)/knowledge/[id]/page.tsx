@@ -23,6 +23,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import KnowledgeDiscussionPanel from '@/components/knowledge/KnowledgeDiscussionPanel/KnowledgeDiscussionPanel';
 import KnowledgeCitationPanel from '@/components/knowledge/KnowledgeCitationPanel/KnowledgeCitationPanel';
 import KnowledgeVersionDiffPanel from '@/components/knowledge/KnowledgeVersionDiffPanel/KnowledgeVersionDiffPanel';
+import CrystalReferenceText from '@/components/circle/CrystalReferenceText/CrystalReferenceText';
 import { clampHeatScore, resolveHeatState } from '@/lib/heat/semantics';
 import {
     buildCrystalOutputViewModelFromRecord,
@@ -465,7 +466,9 @@ export default function KnowledgeDetailPage() {
             {knowledge.description && (
                 <div className={styles.body}>
                     {knowledge.description.split('\n\n').map((paragraph, i) => (
-                        <p key={i}>{paragraph}</p>
+                        <p key={i}>
+                            <CrystalReferenceText text={paragraph} />
+                        </p>
                     ))}
                 </div>
             )}

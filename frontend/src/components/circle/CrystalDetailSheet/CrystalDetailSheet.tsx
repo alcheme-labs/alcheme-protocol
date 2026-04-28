@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link2, Copy, Gem, Users, Bot } from 'lucide-react';
+import { Link2, Copy, BookOpen, Users, Bot } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { computeCrystalVisualParams, type CrystalDataInput } from '@/lib/crystal/visualParams';
 import {
@@ -80,7 +80,7 @@ interface CrystalDetailSheetProps {
     patinaLevel?: 'fresh' | 'settling' | 'ancient';
     onClose: () => void;
     onCopy?: () => void;
-    onCite?: () => void;
+    onOpenKnowledge?: () => void;
 }
 
 /* ═══ Component ═══ */
@@ -91,7 +91,7 @@ export default function CrystalDetailSheet({
     patinaLevel = 'fresh',
     onClose,
     onCopy,
-    onCite,
+    onOpenKnowledge,
 }: CrystalDetailSheetProps) {
     const t = useI18n('CrystalDetailSheet');
     const [formalOutputRecord, setFormalOutputRecord] = useState<CrystallizationOutputRecordInput | null>(null);
@@ -408,13 +408,13 @@ export default function CrystalDetailSheet({
                                 </button>
                                 <button
                                     className={styles.actionBtn}
-                                    onClick={onCite}
-                                    disabled={!onCite}
-                                    aria-label={!onCite ? t('actions.citePending') : undefined}
-                                    title={!onCite ? t('actions.citePending') : undefined}
+                                    onClick={onOpenKnowledge}
+                                    disabled={!onOpenKnowledge}
+                                    aria-label={!onOpenKnowledge ? t('actions.openKnowledgePending') : undefined}
+                                    title={!onOpenKnowledge ? t('actions.openKnowledgePending') : undefined}
                                 >
-                                    <Gem size={16} className={styles.actionBtnIcon} />
-                                    {onCite ? t('actions.cite') : t('actions.citePending')}
+                                    <BookOpen size={16} className={styles.actionBtnIcon} />
+                                    {onOpenKnowledge ? t('actions.openKnowledge') : t('actions.openKnowledgePending')}
                                 </button>
                             </div>
                         </div>

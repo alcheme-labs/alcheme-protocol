@@ -126,6 +126,22 @@ import {
 import { enqueueCrystalAssetIssueJob } from '../services/crystalAssets/enqueue';
 import { upsertCrystalEntitlementsForKnowledge } from '../services/crystalEntitlements/upsert';
 import {
+    markCrystallizationAttemptBindingSynced,
+    markCrystallizationAttemptFinalizationFailed,
+    markCrystallizationAttemptFinalized,
+    markCrystallizationAttemptReferencesFailed,
+    markCrystallizationAttemptReferencesSynced,
+    upsertCrystallizationAttempt,
+} from '../services/draftReferences/crystallizationAttempt';
+import {
+    DraftReferenceMaterializationError,
+    materializeDraftCrystalReferencesOrThrow,
+} from '../services/draftReferences/materialization';
+import {
+    createReferenceMaterializationClientFromEnv,
+    type ReferenceMaterializationClient,
+} from '../services/draftReferences/referenceMaterializationClient';
+import {
     evaluateDraftStrictBindingViolation,
     resolveDraftStrictBindingMode,
 } from '../services/crystallizationContract';
@@ -1006,6 +1022,15 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                 '结晶绑定已完成，但草稿生命周期未能收口，请稍后重试。',
             );
         }
+    }
+
+    function createLazyReferenceMaterializationClient(): ReferenceMaterializationClient {
+        return {
+            async addReferences(references) {
+                if (references.length === 0) return [];
+                return createReferenceMaterializationClientFromEnv().addReferences(references);
+            },
+        };
     }
 
     interface DraftProofSnapshotInput {
@@ -2464,6 +2489,83 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
         }
     });
 
+    router.post('/drafts/:postId/crystallization-attempt', async (req, res, next) => {
+        try {
+            const postId = parsePositiveInt(req.params.postId, NaN);
+            if (!Number.isFinite(postId)) {
+                return res.status(400).json({ error: 'invalid_post_id' });
+            }
+
+            const access = await ensureDraftAccessFromRequest(req, res, postId, 'read');
+            if (!access) return;
+
+            const circleId = access.post?.circleId;
+            const authUserId = parseAuthUserIdFromRequest(req);
+            if (!authUserId || !circleId) {
+                return res.status(403).json({
+                    error: 'draft_crystallize_permission_denied',
+                    message: '缺少圈层上下文，无法登记结晶恢复记录。',
+                });
+            }
+            const permission = await resolveDraftWorkflowPermission(prisma, {
+                circleId,
+                userId: authUserId,
+                action: 'enter_crystallization',
+            });
+            if (!permission.allowed) {
+                return res.status(403).json({
+                    error: 'draft_crystallize_permission_denied',
+                    message: permission.reason,
+                });
+            }
+            const lifecycle = await resolveDraftLifecycleReadModel(prisma, {
+                draftPostId: postId,
+            });
+            if (lifecycle.documentStatus !== 'crystallization_active') {
+                return res.status(409).json({
+                    error: 'draft_not_ready_for_crystallization_execution',
+                    message: '请先发起结晶，进入结晶阶段后再登记结晶恢复记录。',
+                });
+            }
+
+            const knowledgePda = parsePublicKey(req.body?.knowledgePda);
+            if (!knowledgePda) {
+                return res.status(400).json({
+                    error: 'invalid_knowledge_pda',
+                    message: 'knowledgePda must be a valid public key',
+                });
+            }
+            const proofPackageHash = parseHex64(req.body?.proofPackageHash ?? req.body?.proof_package_hash);
+            if (!proofPackageHash) {
+                return res.status(400).json({
+                    error: 'invalid_proof_package_hash',
+                    message: 'proofPackageHash must be a 64-character hex string',
+                });
+            }
+
+            const attempt = await upsertCrystallizationAttempt(prisma as any, {
+                draftPostId: postId,
+                proofPackageHash,
+                knowledgeOnChainAddress: knowledgePda,
+            });
+
+            return res.json({
+                ok: true,
+                draftPostId: postId,
+                attempt: {
+                    proofPackageHash: attempt.proofPackageHash,
+                    knowledgeId: attempt.knowledgeId,
+                    knowledgeOnChainAddress: attempt.knowledgeOnChainAddress,
+                    status: attempt.status,
+                    failureCode: attempt.failureCode,
+                    failureMessage: attempt.failureMessage,
+                },
+            });
+        } catch (error) {
+            next(error);
+        }
+    });
+
     router.post('/drafts/:postId/crystallization-binding', async (req, res, next) => {
         try {
             const postId = parsePositiveInt(req.params.postId, NaN);
@@ -2592,6 +2694,17 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                     });
                 }
             }
+            let effectiveKnowledgePda = knowledgePda;
+            let currentCrystallizationAttemptStatus: string | null = null;
+            if (validatedProofSnapshot?.proofPackageHash) {
+                const attempt = await upsertCrystallizationAttempt(prisma as any, {
+                    draftPostId: postId,
+                    proofPackageHash: validatedProofSnapshot.proofPackageHash,
+                    knowledgeOnChainAddress: knowledgePda,
+                });
+                effectiveKnowledgePda = attempt.knowledgeOnChainAddress;
+                currentCrystallizationAttemptStatus = attempt.status;
+            }
 
             let contributionSnapshot: {
                 synced: boolean;
@@ -2619,16 +2732,129 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
             } = {
                 persisted: false,
             };
+
+            const markBindingAttemptSynced = async (input: {
+                proofPackageHash: string | undefined;
+                knowledgeId: string;
+            }) => {
+                if (!input.proofPackageHash) return;
+                await markCrystallizationAttemptBindingSynced(prisma as any, {
+                    draftPostId: postId,
+                    proofPackageHash: input.proofPackageHash,
+                    knowledgeId: input.knowledgeId,
+                });
+            };
+
+            const materializeReferencesBeforeFinalization = async (input: {
+                proofPackageHash: string | undefined;
+                knowledgeId: string;
+                attemptStatus: string | null;
+            }) => {
+                if (
+                    input.attemptStatus === 'references_synced'
+                    || input.attemptStatus === 'finalization_failed'
+                ) {
+                    return {
+                        attempted: 0,
+                        succeeded: 0,
+                        skipped: 0,
+                        signatures: [],
+                    };
+                }
+                try {
+                    const result = await materializeDraftCrystalReferencesOrThrow(prisma as any, {
+                        draftPostId: postId,
+                        targetKnowledgeId: input.knowledgeId,
+                        targetOnChainAddress: effectiveKnowledgePda,
+                        requestedByUserId: authUserId || null,
+                        referenceClient: createLazyReferenceMaterializationClient(),
+                    });
+                    if (input.proofPackageHash) {
+                        await markCrystallizationAttemptReferencesSynced(prisma as any, {
+                            draftPostId: postId,
+                            proofPackageHash: input.proofPackageHash,
+                        });
+                    }
+                    return result;
+                } catch (error) {
+                    if (input.proofPackageHash) {
+                        await markCrystallizationAttemptReferencesFailed(prisma as any, {
+                            draftPostId: postId,
+                            proofPackageHash: input.proofPackageHash,
+                            failureCode: error instanceof DraftReferenceMaterializationError
+                                ? error.code
+                                : 'reference_materialization_failed',
+                            failureMessage: error instanceof Error
+                                ? error.message
+                                : String(error),
+                        }).catch((markError) => {
+                            console.warn('[discussion][crystallization_attempt_references_failed_mark_failed]', {
+                                draftPostId: postId,
+                                message: markError instanceof Error ? markError.message : String(markError),
+                            });
+                        });
+                    }
+                    throw error;
+                }
+            };
+
+            const finalizeLifecycleAndAttempt = async (input: {
+                proofPackageHash: string | undefined;
+            }) => {
+                try {
+                    await finalizeCrystallizationLifecycleOrThrow({
+                        draftPostId: postId,
+                        actorUserId: authUserId || null,
+                    });
+                    if (input.proofPackageHash) {
+                        await markCrystallizationAttemptFinalized(prisma as any, {
+                            draftPostId: postId,
+                            proofPackageHash: input.proofPackageHash,
+                        });
+                    }
+                } catch (error) {
+                    if (input.proofPackageHash) {
+                        await markCrystallizationAttemptFinalizationFailed(prisma as any, {
+                            draftPostId: postId,
+                            proofPackageHash: input.proofPackageHash,
+                            failureCode: error instanceof CrystallizationBindingError
+                                ? error.code
+                                : 'draft_lifecycle_finalize_failed',
+                            failureMessage: error instanceof Error
+                                ? error.message
+                                : String(error),
+                        }).catch((markError) => {
+                            console.warn('[discussion][crystallization_attempt_finalization_failed_mark_failed]', {
+                                draftPostId: postId,
+                                message: markError instanceof Error ? markError.message : String(markError),
+                            });
+                        });
+                    }
+                    throw error;
+                }
+            };
+
+            const syncCrystalAssetsAfterFinalization = async (knowledgeId: string) => {
+                const entitlementSync = await upsertCrystalEntitlementsForKnowledge(prisma as any, {
+                    knowledgePublicId: knowledgeId,
+                });
+                await enqueueCrystalAssetIssueJob(prisma as any, {
+                    knowledgeRowId: entitlementSync.knowledgeRowId,
+                    knowledgePublicId: entitlementSync.knowledgePublicId,
+                    requestedByUserId: authUserId || null,
+                });
+            };
+
             if (draftStrictBindingMode === 'enforce') {
                 try {
                     const atomicResult = await prisma.$transaction(async (tx) => {
                         const atomicBinding = await bindKnowledgeToDraftSource(tx as any, {
                             draftPostId: postId,
-                            knowledgeOnChainAddress: knowledgePda,
+                            knowledgeOnChainAddress: effectiveKnowledgePda,
                         });
                         const synced = await syncKnowledgeContributionsFromDraftProof(prisma, {
                             draftPostId: postId,
-                            knowledgeOnChainAddress: knowledgePda,
+                            knowledgeOnChainAddress: effectiveKnowledgePda,
                         }, {
                             tx,
                             requireBindingProjection: true,
@@ -2665,25 +2891,27 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                         issuedSignature: atomicResult.persistedIssuance.issuedSignature,
                         issuedAt: atomicResult.persistedIssuance.issuedAt,
                     };
-                    const entitlementSync = await upsertCrystalEntitlementsForKnowledge(prisma as any, {
-                        knowledgePublicId: atomicResult.synced.knowledgeId,
+                    await markBindingAttemptSynced({
+                        proofPackageHash: atomicResult.persistedIssuance.proofPackageHash,
+                        knowledgeId: atomicResult.synced.knowledgeId,
                     });
-                    await enqueueCrystalAssetIssueJob(prisma as any, {
-                        knowledgeRowId: entitlementSync.knowledgeRowId,
-                        knowledgePublicId: entitlementSync.knowledgePublicId,
-                        requestedByUserId: authUserId || null,
+                    const referenceMaterialization = await materializeReferencesBeforeFinalization({
+                        proofPackageHash: atomicResult.persistedIssuance.proofPackageHash,
+                        knowledgeId: atomicResult.synced.knowledgeId,
+                        attemptStatus: currentCrystallizationAttemptStatus,
                     });
-                    await finalizeCrystallizationLifecycleOrThrow({
-                        draftPostId: postId,
-                        actorUserId: authUserId || null,
+                    await finalizeLifecycleAndAttempt({
+                        proofPackageHash: atomicResult.persistedIssuance.proofPackageHash,
                     });
+                    await syncCrystalAssetsAfterFinalization(atomicResult.synced.knowledgeId);
 
                     return res.json({
                         ok: true,
                         draftPostId: postId,
-                        knowledgePda,
+                        knowledgePda: effectiveKnowledgePda,
                         policyProfileDigest,
                         mode: draftStrictBindingMode,
+                        referenceMaterialization,
                         contributionSnapshot: {
                             synced: true,
                             contributorsCount: atomicResult.synced.contributorsCount,
@@ -2694,6 +2922,9 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                     });
                 } catch (error) {
                     if (error instanceof CrystallizationBindingError) {
+                        throw error;
+                    }
+                    if (error instanceof DraftReferenceMaterializationError) {
                         throw error;
                     }
                     if (error instanceof ProofPackageIssuanceTxError) {
@@ -2737,12 +2968,12 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
 
             const binding = await bindKnowledgeToDraftSource(prisma, {
                 draftPostId: postId,
-                knowledgeOnChainAddress: knowledgePda,
+                knowledgeOnChainAddress: effectiveKnowledgePda,
             });
             try {
                 const synced = await syncKnowledgeContributionsFromDraftProof(prisma, {
                     draftPostId: postId,
-                    knowledgeOnChainAddress: knowledgePda,
+                    knowledgeOnChainAddress: effectiveKnowledgePda,
                 }, {
                     proofAnchorId: validatedProofSnapshot?.sourceAnchorId || undefined,
                     expectedProofPackageHash: validatedProofSnapshot?.proofPackageHash || undefined,
@@ -2804,11 +3035,33 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                     issuedSignature: persisted.issuedSignature,
                     issuedAt: persisted.issuedAt,
                 };
-                await finalizeCrystallizationLifecycleOrThrow({
+                const persistedAttempt = await upsertCrystallizationAttempt(prisma as any, {
                     draftPostId: postId,
-                    actorUserId: authUserId || null,
+                    proofPackageHash: persisted.proofPackageHash,
+                    knowledgeId: binding.knowledgeId,
+                    knowledgeOnChainAddress: effectiveKnowledgePda,
                 });
+                currentCrystallizationAttemptStatus = persistedAttempt.status;
+                await markBindingAttemptSynced({
+                    proofPackageHash: persisted.proofPackageHash,
+                    knowledgeId: binding.knowledgeId,
+                });
+                await materializeReferencesBeforeFinalization({
+                    proofPackageHash: persisted.proofPackageHash,
+                    knowledgeId: binding.knowledgeId,
+                    attemptStatus: currentCrystallizationAttemptStatus,
+                });
+                await finalizeLifecycleAndAttempt({
+                    proofPackageHash: persisted.proofPackageHash,
+                });
+                await syncCrystalAssetsAfterFinalization(binding.knowledgeId);
             } catch (error) {
+                if (error instanceof DraftReferenceMaterializationError) {
+                    throw error;
+                }
+                if (error instanceof CrystallizationBindingError) {
+                    throw error;
+                }
                 const mapped = mapProofPackageIssuanceError(error);
                 if (!isBusinessStatusCode(mapped.statusCode)) {
                     throw error;
@@ -2844,7 +3097,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
             return res.json({
                 ok: true,
                 draftPostId: postId,
-                knowledgePda,
+                knowledgePda: effectiveKnowledgePda,
                 policyProfileDigest,
                 mode: draftStrictBindingMode,
                 contributionSnapshot,
@@ -2856,6 +3109,14 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                 return res.status(error.statusCode).json({
                     error: error.code,
                     message: error.message,
+                });
+            }
+            if (error instanceof DraftReferenceMaterializationError) {
+                const statusCode = error.code === 'reference_materialization_failed' ? 503 : 409;
+                return res.status(statusCode).json({
+                    error: error.code,
+                    message: error.message,
+                    details: error.details || null,
                 });
             }
             next(error);
