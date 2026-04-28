@@ -4,9 +4,10 @@ import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     X, ArrowLeft, Globe, Lock, Users, GitBranch,
-    MessageSquare, BookOpen, FileEdit, Rss, ChevronDown,
+    MessageSquare, BookOpen, FileEdit, Rss,
 } from 'lucide-react';
 import type { CircleGhostSettings } from '@/lib/circles/ghostSettings';
+import { Select } from '@/components/ui/Select';
 import type { SeededSourceInput } from '@/lib/circles/seeded';
 import { CIRCLE_NAME_MAX_BYTES, clampUtf8Bytes } from '@/lib/circles/nameLimit';
 import {
@@ -96,6 +97,16 @@ const WORKFLOW_ROLE_VALUES: CircleDraftWorkflowPolicy['createIssueMinRole'][] = 
     'Admin',
     'Owner',
 ];
+
+type WorkflowPolicyRoleField =
+    | 'createIssueMinRole'
+    | 'followupIssueMinRole'
+    | 'reviewIssueMinRole'
+    | 'retagIssueMinRole'
+    | 'applyIssueMinRole'
+    | 'manualEndDraftingMinRole'
+    | 'advanceFromReviewMinRole'
+    | 'enterCrystallizationMinRole';
 
 async function readSeededSources(files: File[]): Promise<SeededSourceInput[]> {
     return Promise.all(files.map(async (file) => ({
@@ -337,6 +348,15 @@ export default function CreateCircleSheet({
     ) => {
         setDraftWorkflowPolicy((prev) => ({ ...prev, [key]: value }));
     };
+    const renderWorkflowRoleSelect = (key: WorkflowPolicyRoleField, ariaLabel: string) => (
+        <Select
+            ariaLabel={ariaLabel}
+            value={draftWorkflowPolicy[key]}
+            options={workflowRoleOptions}
+            onChange={(value) => updateDraftWorkflowPolicy(key, value)}
+            disabled={isSubmitting}
+        />
+    );
 
     const handleNameChange = (value: string) => {
         setName(clampUtf8Bytes(value));
@@ -804,152 +824,56 @@ export default function CreateCircleSheet({
                                                             <div className={styles.workflowPolicyCopy}>
                                                                 <div className={styles.aiSettingTitle}>{t('workflow.createIssueMinRole')}</div>
                                                             </div>
-                                                            <div className={styles.workflowSelectWrap}>
-                                                                <select
-                                                                    className={styles.workflowSelect}
-                                                                    value={draftWorkflowPolicy.createIssueMinRole}
-                                                                    onChange={(e) => updateDraftWorkflowPolicy('createIssueMinRole', e.target.value as CircleDraftWorkflowPolicy['createIssueMinRole'])}
-                                                                    disabled={isSubmitting}
-                                                                >
-                                                                    {workflowRoleOptions.map((option) => (
-                                                                        <option key={`create-${option.value}`} value={option.value}>{option.label}</option>
-                                                                    ))}
-                                                                </select>
-                                                                <ChevronDown size={16} className={styles.workflowSelectIcon} />
-                                                            </div>
+                                                            {renderWorkflowRoleSelect('createIssueMinRole', t('workflow.createIssueMinRole'))}
                                                         </div>
 
                                                         <div className={styles.workflowPolicyField}>
                                                             <div className={styles.workflowPolicyCopy}>
                                                                 <div className={styles.aiSettingTitle}>{t('workflow.followupIssueMinRole')}</div>
                                                             </div>
-                                                            <div className={styles.workflowSelectWrap}>
-                                                                <select
-                                                                    className={styles.workflowSelect}
-                                                                    value={draftWorkflowPolicy.followupIssueMinRole}
-                                                                    onChange={(e) => updateDraftWorkflowPolicy('followupIssueMinRole', e.target.value as CircleDraftWorkflowPolicy['followupIssueMinRole'])}
-                                                                    disabled={isSubmitting}
-                                                                >
-                                                                    {workflowRoleOptions.map((option) => (
-                                                                        <option key={`followup-${option.value}`} value={option.value}>{option.label}</option>
-                                                                    ))}
-                                                                </select>
-                                                                <ChevronDown size={16} className={styles.workflowSelectIcon} />
-                                                            </div>
+                                                            {renderWorkflowRoleSelect('followupIssueMinRole', t('workflow.followupIssueMinRole'))}
                                                         </div>
 
                                                         <div className={styles.workflowPolicyField}>
                                                             <div className={styles.workflowPolicyCopy}>
                                                                 <div className={styles.aiSettingTitle}>{t('workflow.reviewIssueMinRole')}</div>
                                                             </div>
-                                                            <div className={styles.workflowSelectWrap}>
-                                                                <select
-                                                                    className={styles.workflowSelect}
-                                                                    value={draftWorkflowPolicy.reviewIssueMinRole}
-                                                                    onChange={(e) => updateDraftWorkflowPolicy('reviewIssueMinRole', e.target.value as CircleDraftWorkflowPolicy['reviewIssueMinRole'])}
-                                                                    disabled={isSubmitting}
-                                                                >
-                                                                    {workflowRoleOptions.map((option) => (
-                                                                        <option key={`review-${option.value}`} value={option.value}>{option.label}</option>
-                                                                    ))}
-                                                                </select>
-                                                                <ChevronDown size={16} className={styles.workflowSelectIcon} />
-                                                            </div>
+                                                            {renderWorkflowRoleSelect('reviewIssueMinRole', t('workflow.reviewIssueMinRole'))}
                                                         </div>
 
                                                         <div className={styles.workflowPolicyField}>
                                                             <div className={styles.workflowPolicyCopy}>
                                                                 <div className={styles.aiSettingTitle}>{t('workflow.retagIssueMinRole')}</div>
                                                             </div>
-                                                            <div className={styles.workflowSelectWrap}>
-                                                                <select
-                                                                    className={styles.workflowSelect}
-                                                                    value={draftWorkflowPolicy.retagIssueMinRole}
-                                                                    onChange={(e) => updateDraftWorkflowPolicy('retagIssueMinRole', e.target.value as CircleDraftWorkflowPolicy['retagIssueMinRole'])}
-                                                                    disabled={isSubmitting}
-                                                                >
-                                                                    {workflowRoleOptions.map((option) => (
-                                                                        <option key={`retag-${option.value}`} value={option.value}>{option.label}</option>
-                                                                    ))}
-                                                                </select>
-                                                                <ChevronDown size={16} className={styles.workflowSelectIcon} />
-                                                            </div>
+                                                            {renderWorkflowRoleSelect('retagIssueMinRole', t('workflow.retagIssueMinRole'))}
                                                         </div>
 
                                                         <div className={styles.workflowPolicyField}>
                                                             <div className={styles.workflowPolicyCopy}>
                                                                 <div className={styles.aiSettingTitle}>{t('workflow.applyIssueMinRole')}</div>
                                                             </div>
-                                                            <div className={styles.workflowSelectWrap}>
-                                                                <select
-                                                                    className={styles.workflowSelect}
-                                                                    value={draftWorkflowPolicy.applyIssueMinRole}
-                                                                    onChange={(e) => updateDraftWorkflowPolicy('applyIssueMinRole', e.target.value as CircleDraftWorkflowPolicy['applyIssueMinRole'])}
-                                                                    disabled={isSubmitting}
-                                                                >
-                                                                    {workflowRoleOptions.map((option) => (
-                                                                        <option key={`apply-${option.value}`} value={option.value}>{option.label}</option>
-                                                                    ))}
-                                                                </select>
-                                                                <ChevronDown size={16} className={styles.workflowSelectIcon} />
-                                                            </div>
+                                                            {renderWorkflowRoleSelect('applyIssueMinRole', t('workflow.applyIssueMinRole'))}
                                                         </div>
 
                                                         <div className={styles.workflowPolicyField}>
                                                             <div className={styles.workflowPolicyCopy}>
                                                                 <div className={styles.aiSettingTitle}>{t('workflow.manualEndDraftingMinRole')}</div>
                                                             </div>
-                                                            <div className={styles.workflowSelectWrap}>
-                                                                <select
-                                                                    className={styles.workflowSelect}
-                                                                    value={draftWorkflowPolicy.manualEndDraftingMinRole}
-                                                                    onChange={(e) => updateDraftWorkflowPolicy('manualEndDraftingMinRole', e.target.value as CircleDraftWorkflowPolicy['manualEndDraftingMinRole'])}
-                                                                    disabled={isSubmitting}
-                                                                >
-                                                                    {workflowRoleOptions.map((option) => (
-                                                                        <option key={`end-drafting-${option.value}`} value={option.value}>{option.label}</option>
-                                                                    ))}
-                                                                </select>
-                                                                <ChevronDown size={16} className={styles.workflowSelectIcon} />
-                                                            </div>
+                                                            {renderWorkflowRoleSelect('manualEndDraftingMinRole', t('workflow.manualEndDraftingMinRole'))}
                                                         </div>
 
                                                         <div className={styles.workflowPolicyField}>
                                                             <div className={styles.workflowPolicyCopy}>
                                                                 <div className={styles.aiSettingTitle}>{t('workflow.advanceFromReviewMinRole')}</div>
                                                             </div>
-                                                            <div className={styles.workflowSelectWrap}>
-                                                                <select
-                                                                    className={styles.workflowSelect}
-                                                                    value={draftWorkflowPolicy.advanceFromReviewMinRole}
-                                                                    onChange={(e) => updateDraftWorkflowPolicy('advanceFromReviewMinRole', e.target.value as CircleDraftWorkflowPolicy['advanceFromReviewMinRole'])}
-                                                                    disabled={isSubmitting}
-                                                                >
-                                                                    {workflowRoleOptions.map((option) => (
-                                                                        <option key={`advance-review-${option.value}`} value={option.value}>{option.label}</option>
-                                                                    ))}
-                                                                </select>
-                                                                <ChevronDown size={16} className={styles.workflowSelectIcon} />
-                                                            </div>
+                                                            {renderWorkflowRoleSelect('advanceFromReviewMinRole', t('workflow.advanceFromReviewMinRole'))}
                                                         </div>
 
                                                         <div className={styles.workflowPolicyField}>
                                                             <div className={styles.workflowPolicyCopy}>
                                                                 <div className={styles.aiSettingTitle}>{t('workflow.enterCrystallizationMinRole')}</div>
                                                             </div>
-                                                            <div className={styles.workflowSelectWrap}>
-                                                                <select
-                                                                    className={styles.workflowSelect}
-                                                                    value={draftWorkflowPolicy.enterCrystallizationMinRole}
-                                                                    onChange={(e) => updateDraftWorkflowPolicy('enterCrystallizationMinRole', e.target.value as CircleDraftWorkflowPolicy['enterCrystallizationMinRole'])}
-                                                                    disabled={isSubmitting}
-                                                                >
-                                                                    {workflowRoleOptions.map((option) => (
-                                                                        <option key={`enter-crystallization-${option.value}`} value={option.value}>{option.label}</option>
-                                                                    ))}
-                                                                </select>
-                                                                <ChevronDown size={16} className={styles.workflowSelectIcon} />
-                                                            </div>
+                                                            {renderWorkflowRoleSelect('enterCrystallizationMinRole', t('workflow.enterCrystallizationMinRole'))}
                                                         </div>
 
                                                         <div className={styles.workflowToggleRow}>

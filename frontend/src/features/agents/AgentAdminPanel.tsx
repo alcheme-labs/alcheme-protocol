@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import { useI18n } from '@/i18n/useI18n';
+import { Select } from '@/components/ui/Select';
 import type {
     CircleAgentPolicy,
     CircleAgentReviewMode,
@@ -48,6 +49,16 @@ export default function AgentAdminPanel({
     }, [agentPolicy]);
 
     const ownerOnly = currentUserRole !== 'owner';
+    const triggerScopeOptions = [
+        {value: 'disabled' as const, label: t('fields.triggerScope.options.disabled')},
+        {value: 'draft_only' as const, label: t('fields.triggerScope.options.draftOnly')},
+        {value: 'circle_wide' as const, label: t('fields.triggerScope.options.circleWide')},
+    ];
+    const reviewModeOptions = [
+        {value: 'owner_review' as const, label: t('fields.reviewMode.options.ownerReview')},
+        {value: 'admin_review' as const, label: t('fields.reviewMode.options.adminReview')},
+        {value: 'self_serve' as const, label: t('fields.reviewMode.options.selfServe')},
+    ];
 
     const handleSave = async () => {
         if (!onSavePolicy || saving || ownerOnly) return;
@@ -102,20 +113,16 @@ export default function AgentAdminPanel({
                 <div className={styles.formGrid}>
                     <label className={styles.field}>
                         <span className={styles.fieldLabel}>{t('fields.triggerScope.label')}</span>
-                        <select
-                            aria-label={t('fields.triggerScope.label')}
-                            className={styles.select}
+                        <Select
+                            ariaLabel={t('fields.triggerScope.label')}
                             value={triggerScope}
-                            onChange={(event) => {
-                                setTriggerScope(event.target.value as CircleAgentTriggerScope);
+                            options={triggerScopeOptions}
+                            onChange={(value) => {
+                                setTriggerScope(value as CircleAgentTriggerScope);
                                 setDirty(true);
                             }}
                             disabled={saving || ownerOnly}
-                        >
-                            <option value="disabled">{t('fields.triggerScope.options.disabled')}</option>
-                            <option value="draft_only">{t('fields.triggerScope.options.draftOnly')}</option>
-                            <option value="circle_wide">{t('fields.triggerScope.options.circleWide')}</option>
-                        </select>
+                        />
                     </label>
 
                     <label className={styles.field}>
@@ -137,20 +144,16 @@ export default function AgentAdminPanel({
 
                     <label className={styles.field}>
                         <span className={styles.fieldLabel}>{t('fields.reviewMode.label')}</span>
-                        <select
-                            aria-label={t('fields.reviewMode.aria')}
-                            className={styles.select}
+                        <Select
+                            ariaLabel={t('fields.reviewMode.aria')}
                             value={reviewMode}
-                            onChange={(event) => {
-                                setReviewMode(event.target.value as CircleAgentReviewMode);
+                            options={reviewModeOptions}
+                            onChange={(value) => {
+                                setReviewMode(value as CircleAgentReviewMode);
                                 setDirty(true);
                             }}
                             disabled={saving || ownerOnly}
-                        >
-                            <option value="owner_review">{t('fields.reviewMode.options.ownerReview')}</option>
-                            <option value="admin_review">{t('fields.reviewMode.options.adminReview')}</option>
-                            <option value="self_serve">{t('fields.reviewMode.options.selfServe')}</option>
-                        </select>
+                        />
                     </label>
                 </div>
 

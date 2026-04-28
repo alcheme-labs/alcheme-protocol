@@ -531,7 +531,10 @@ test.describe('Draft Discussion Workflow', () => {
         await page.getByText('Workflow Draft').first().click();
         await expect(page.getByRole('heading', { name: '问题单审议' })).toBeVisible();
 
-        await page.getByLabel('目标段落').selectOption('0');
+        const targetParagraphSelect = page.getByLabel('目标段落');
+        await targetParagraphSelect.click();
+        await page.getByRole('option', { name: /第 1 段/ }).click();
+        await expect(targetParagraphSelect).toContainText(/第 1 段/);
         await page.getByLabel('问题描述').fill('建议补全开场段论证。');
         await page.getByRole('button', { name: '提交问题单' }).click();
 

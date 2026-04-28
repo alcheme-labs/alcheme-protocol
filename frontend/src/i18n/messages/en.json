@@ -1436,16 +1436,29 @@
       "status": {
         "minted": "Minted",
         "pending": "Minting",
-        "mock": "Demo receipt",
+        "mock": "Demo only",
         "failed": "Mint failed",
         "unknown": "Unknown"
+      },
+      "standardLabels": {
+        "demoAsset": "Demo asset",
+        "demoReceipt": "Demo receipt",
+        "token2022MasterNft": "Token-2022 master NFT",
+        "token2022Receipt": "Token-2022 contribution receipt"
+      },
+      "actions": {
+        "copyAddress": "Copy address",
+        "copied": "Copied",
+        "viewOnExplorer": "View on explorer",
+        "demoOnly": "Demo only"
       },
       "master": {
         "kicker": "CRYSTAL ASSET",
         "title": "Master NFT",
         "description": "This master NFT represents the settled knowledge crystal itself. Once crystallization succeeds, it enters the mint queue automatically.",
         "standard": "Asset standard",
-        "address": "NFT address",
+        "address": "Asset address",
+        "mintAddress": "Mint address",
         "demoAddress": "Demo address",
         "mintedAt": "Minted at",
         "lastError": "Error",
@@ -1455,6 +1468,7 @@
       "receipts": {
         "kicker": "CONTRIBUTOR RECEIPTS",
         "title": "Contributor receipts",
+        "receiptMint": "Receipt mint",
         "count": "{count} receipts",
         "minted": "Minted {count}",
         "pending": "Pending {count}",

@@ -4,6 +4,7 @@ import {useEffect, useState, useTransition} from 'react';
 import {useRouter} from 'next/navigation';
 import {useI18n, useCurrentLocale} from '@/i18n/useI18n';
 import {LOCALE_OPTIONS, type AppLocale} from '@/i18n/config';
+import { Select } from '@/components/ui/Select';
 import styles from './LanguageSwitcher.module.css';
 
 export function LanguageSwitcher() {
@@ -41,19 +42,18 @@ export function LanguageSwitcher() {
   return (
     <div className={styles.shell}>
       <span className={styles.label}>{t('label')}</span>
-      <select
-        className={styles.select}
-        aria-label={t('ariaLabel')}
+      <Select
+        className={styles.selectRoot}
+        buttonClassName={styles.selectButton}
+        ariaLabel={t('ariaLabel')}
         value={selectedLocale}
-        onChange={(event) => handleChange(event.target.value as AppLocale)}
+        options={LOCALE_OPTIONS.map((option) => ({
+          value: option.value,
+          label: t(`options.${option.value}`)
+        }))}
+        onChange={(value) => handleChange(value as AppLocale)}
         disabled={isPending}
-      >
-        {LOCALE_OPTIONS.map(option => (
-          <option key={option.value} value={option.value}>
-            {t(`options.${option.value}`)}
-          </option>
-        ))}
-      </select>
+      />
     </div>
   );
 }

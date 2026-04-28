@@ -20,22 +20,25 @@
   color: color-mix(in srgb, var(--color-accent-ivory-glow, #f4efe2) 75%, white 25%);
 }
 
-.select {
+.selectRoot {
+  --select-control-bg: rgba(255, 255, 255, 0.96);
+  --select-control-color: #1f2421;
+  --select-control-border: transparent;
+  --select-control-border-open: rgba(244, 239, 226, 0.7);
+  --select-control-radius: 999px;
+  --select-control-min-height: 30px;
+  --select-control-padding: 0 10px;
+  --select-menu-bg: rgba(255, 255, 255, 0.98);
+  --select-menu-border: rgba(31, 36, 33, 0.12);
+  --select-option-color: #1f2421;
+  --select-option-active-bg: rgba(31, 36, 33, 0.08);
+  --select-option-active-color: #1f2421;
   min-width: 92px;
-  border: none;
-  border-radius: 999px;
-  padding: 6px 28px 6px 10px;
-  background: rgba(255, 255, 255, 0.96);
-  color: #1f2421;
-  font-size: 13px;
-  font-weight: 600;
-  appearance: none;
-  cursor: pointer;
 }
 
-.select:disabled {
-  cursor: progress;
-  opacity: 0.72;
+.selectButton {
+  font-size: 13px;
+  font-weight: 600;
 }
 
 @media (max-width: 640px) {
@@ -49,8 +52,11 @@
     display: none;
   }
 
-  .select {
+  .selectRoot {
     min-width: 82px;
+  }
+
+  .selectButton {
     font-size: 12px;
   }
 }

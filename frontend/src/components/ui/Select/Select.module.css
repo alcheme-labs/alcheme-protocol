@@ -1,0 +1,137 @@
+.root {
+  --select-control-bg: rgba(255, 255, 255, 0.04);
+  --select-control-color: rgba(255, 248, 230, 0.96);
+  --select-control-border: rgba(212, 175, 55, 0.2);
+  --select-control-border-open: rgba(212, 175, 55, 0.86);
+  --select-control-radius: 12px;
+  --select-control-min-height: 42px;
+  --select-control-padding: 0 12px;
+  --select-menu-bg: linear-gradient(180deg, rgba(35, 39, 33, 0.98), rgba(18, 21, 19, 0.98));
+  --select-menu-border: rgba(212, 175, 55, 0.26);
+  --select-option-color: rgba(255, 248, 230, 0.88);
+  --select-option-active-bg: rgba(212, 175, 55, 0.16);
+  --select-option-active-color: rgba(255, 248, 230, 0.98);
+  position: relative;
+  min-width: 0;
+  width: 100%;
+}
+
+.open {
+  z-index: 60;
+}
+
+.disabled {
+  opacity: 0.64;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: transparent;
+  cursor: default;
+}
+
+.button {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: var(--select-control-min-height);
+  padding: var(--select-control-padding);
+  border-radius: var(--select-control-radius);
+  border: 1px solid var(--select-control-border);
+  background: var(--select-control-bg);
+  color: var(--select-control-color);
+  font: inherit;
+  text-align: left;
+}
+
+.button[aria-expanded="true"] {
+  border-color: var(--select-control-border-open);
+  box-shadow:
+    0 0 0 2px rgba(212, 175, 55, 0.18),
+    0 12px 28px rgba(0, 0, 0, 0.22);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+}
+
+.value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  flex: 0 0 auto;
+  color: color-mix(in srgb, var(--select-control-color) 76%, transparent);
+  font-size: 1.05rem;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.menu {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  display: grid;
+  gap: 4px;
+  max-height: 220px;
+  padding: 6px;
+  overflow: auto;
+  border: 1px solid var(--select-menu-border);
+  border-radius: 14px;
+  background: var(--select-menu-bg);
+  box-shadow:
+    0 18px 46px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--select-option-color);
+  font: inherit;
+  text-align: left;
+}
+
+.option:active,
+.option:hover,
+.optionActive {
+  background: var(--select-option-active-bg);
+  color: var(--select-option-active-color);
+}
+
+.optionDisabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.optionLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.check {
+  flex: 0 0 auto;
+  color: rgba(227, 190, 107, 0.96);
+}

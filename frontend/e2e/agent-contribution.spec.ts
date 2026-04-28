@@ -3,7 +3,8 @@ import { test, expect, type Route } from '@playwright/test';
 import { installIdentityOnboardingMocks } from './support/identity-onboarding-app';
 import { installMockWallet } from './support/mock-wallet';
 
-test.describe('Agent contribution admin', () => {
+// CircleSettingsSheet keeps SHOW_AGENT_GOVERNANCE_PANEL disabled until agent policy drives runtime behavior.
+test.describe.skip('Agent contribution admin', () => {
     test.beforeEach(async ({ page }) => {
         await installMockWallet(page);
     });
@@ -139,21 +140,43 @@ test.describe('Agent contribution admin', () => {
         await Promise.all([
             page.waitForResponse((response) => response.url().includes('/api/v1/membership/circles/246/me') && response.ok()),
             page.waitForResponse((response) => response.url().includes('/api/v1/membership/circles/246/identity-status') && response.ok()),
-            page.waitForResponse((response) => response.url().includes('/api/v1/circles/246/agents/policy') && response.ok()),
-            page.waitForResponse((response) => response.url().includes('/api/v1/policy/circles/246/profile') && response.ok()),
             page.goto('/circles/246', { waitUntil: 'domcontentloaded' }),
         ]);
 
-        const settingsButton = page.getByRole('button', { name: '圈层设置' });
+        const settingsButton = page.getByRole('button', { name: /圈层设置|Open circle settings/ });
         await expect(settingsButton).toBeVisible();
-        await settingsButton.click();
-        await expect(page.getByText('测试圈层 · 设置')).toBeVisible({ timeout: 15000 });
+        await Promise.all([
+            page.waitForResponse((response) => (
+                response.url().includes('/api/v1/circles/246/agents')
+                && !response.url().includes('/api/v1/circles/246/agents/policy')
+                && response.request().method() === 'GET'
+                && response.ok()
+            )),
+            page.waitForResponse((response) => (
+                response.url().includes('/api/v1/circles/246/agents/policy')
+                && response.request().method() === 'GET'
+                && response.ok()
+            )),
+            page.waitForResponse((response) => response.url().includes('/api/v1/policy/circles/246/profile') && response.ok()),
+            settingsButton.click(),
+        ]);
+        await expect(page.getByText(/测试圈层 · (设置|Settings)/)).toBeVisible({ timeout: 15000 });
 
-        await expect(page.getByLabel('Agent 触发范围')).toBeVisible({ timeout: 15000 });
-        await expect(page.getByText('Agent 管理与审计')).toBeVisible({ timeout: 15000 });
+        const triggerScopeSelect = page.getByLabel(/Agent (触发范围|trigger scope)/);
+        await expect(triggerScopeSelect).toBeVisible({ timeout: 15000 });
+        await expect(page.getByText(/Agent (管理与审计|governance and audit)/)).toBeVisible({ timeout: 15000 });
         await expect(page.getByText('scribe-bot')).toBeVisible({ timeout: 15000 });
-        await page.getByLabel('Agent 触发范围').selectOption('circle_wide');
-        await page.getByRole('button', { name: '保存 Agent 策略' }).click();
-        await expect(page.locator('select[aria-label="Agent 触发范围"]')).toHaveValue('circle_wide');
+        await triggerScopeSelect.click();
+        await page.getByRole('option', { name: /circle_wide|Circle-wide/ }).click();
+        await expect(triggerScopeSelect).toContainText(/circle_wide|Circle-wide/);
+
+        const savePolicyResponse = page.waitForResponse((response) => (
+            response.url().includes('/api/v1/circles/246/agents/policy')
+            && response.request().method() === 'PUT'
+            && response.ok()
+        ));
+        await page.getByRole('button', { name: /保存 Agent 策略|Save agent policy/ }).click();
+        await savePolicyResponse;
+        expect(policyState.triggerScope).toBe('circle_wide');
     });
 });

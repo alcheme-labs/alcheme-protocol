@@ -1365,16 +1365,29 @@
       "status": {
         "minted": "Mint completado",
         "pending": "Mint en curso",
-        "mock": "Recibo demo",
+        "mock": "Solo demo",
         "failed": "Mint fallido",
         "unknown": "Estado desconocido"
+      },
+      "standardLabels": {
+        "demoAsset": "Activo demo",
+        "demoReceipt": "Recibo demo",
+        "token2022MasterNft": "NFT maestro Token-2022",
+        "token2022Receipt": "Recibo de contribución Token-2022"
+      },
+      "actions": {
+        "copyAddress": "Copiar dirección",
+        "copied": "Copiado",
+        "viewOnExplorer": "Ver en explorer",
+        "demoOnly": "Solo demo"
       },
       "master": {
         "kicker": "CRYSTAL ASSET",
         "title": "NFT maestro",
         "description": "Este NFT maestro representa el cristal de conocimiento asentado. Cuando la cristalización termina, entra automáticamente en la cola de mint.",
         "standard": "Estándar del activo",
-        "address": "Dirección NFT",
+        "address": "Dirección del activo",
+        "mintAddress": "Dirección mint",
         "demoAddress": "Dirección demo",
         "mintedAt": "Mint realizado",
         "lastError": "Error",
@@ -1384,6 +1397,7 @@
       "receipts": {
         "kicker": "CONTRIBUTOR RECEIPTS",
         "title": "Recibos de contribución",
+        "receiptMint": "Mint del recibo",
         "count": "{count} recibos",
         "minted": "Mint {count}",
         "pending": "Pendientes {count}",

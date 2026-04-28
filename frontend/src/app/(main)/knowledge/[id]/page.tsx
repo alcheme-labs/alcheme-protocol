@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@apollo/client/react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Users, Gem, BookOpen } from 'lucide-react';
+import { ArrowLeft, Users, Gem, BookOpen, Copy, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
@@ -54,6 +54,7 @@ const CrystalDisplay = dynamic(
 
 type MintStatusKey = 'minted' | 'pending' | 'failed' | 'unknown';
 type DisplayMintStatusKey = MintStatusKey | 'mock';
+type AssetAddressKind = 'master' | 'receipt';
 
 function normalizeMintStatus(value: string | null | undefined): MintStatusKey {
     const normalized = String(value || '').trim().toLowerCase();
@@ -68,6 +69,43 @@ function isMockAssetReference(...values: Array<string | null | undefined>): bool
         const normalized = String(value || '').trim().toLowerCase();
         return normalized.startsWith('mock_chain') || normalized.startsWith('mock_');
     });
+}
+
+function formatAssetStandardLabel(
+    value: string | null | undefined,
+    t: ReturnType<typeof useI18n>,
+): string {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (normalized === 'mock_chain_master') return t('asset.standardLabels.demoAsset');
+    if (normalized === 'mock_chain_receipt') return t('asset.standardLabels.demoReceipt');
+    if (normalized === 'token2022_master_nft') return t('asset.standardLabels.token2022MasterNft');
+    if (normalized === 'token2022_non_transferable_receipt') return t('asset.standardLabels.token2022Receipt');
+    if (!normalized || normalized === 'pending') return t('asset.master.pendingStandard');
+    return value || t('asset.master.pendingStandard');
+}
+
+function resolveSolanaExplorerCluster(): 'devnet' | 'testnet' | 'mainnet-beta' | null {
+    const configuredCluster = String(process.env.NEXT_PUBLIC_SOLANA_CLUSTER || '').trim().toLowerCase();
+    const rpcUrl = String(process.env.NEXT_PUBLIC_SOLANA_RPC_URL || '').trim().toLowerCase();
+    const source = `${configuredCluster} ${rpcUrl}`;
+
+    if (source.includes('localhost') || source.includes('127.0.0.1')) return null;
+    if (source.includes('devnet')) return 'devnet';
+    if (source.includes('testnet')) return 'testnet';
+    if (source.includes('mainnet')) return 'mainnet-beta';
+    if (!configuredCluster && !rpcUrl) return 'devnet';
+    return null;
+}
+
+function buildSolanaExplorerUrl(address: string | null | undefined, isMock: boolean): string | null {
+    const normalized = String(address || '').trim();
+    if (!normalized || isMock) return null;
+
+    const cluster = resolveSolanaExplorerCluster();
+    if (!cluster) return null;
+
+    const clusterQuery = cluster === 'mainnet-beta' ? '' : `?cluster=${cluster}`;
+    return `https://solscan.io/token/${encodeURIComponent(normalized)}${clusterQuery}`;
 }
 
 function formatContributionWeight(weightBps: number): string {
@@ -89,6 +127,7 @@ export default function KnowledgeDetailPage() {
     const [draftReferenceLinks, setDraftReferenceLinks] = useState<DraftReferenceLink[]>([]);
     const [draftReferenceLinksLoading, setDraftReferenceLinksLoading] = useState(false);
     const [draftReferenceLinksError, setDraftReferenceLinksError] = useState<string | null>(null);
+    const [copiedAssetKey, setCopiedAssetKey] = useState<string | null>(null);
 
     const {
         data: knowledgeData,
@@ -157,6 +196,74 @@ export default function KnowledgeDetailPage() {
             dateStyle: 'medium',
             timeStyle: 'short',
         }).format(date);
+    };
+
+    const copyAssetAddress = async (assetKey: string, address: string | null | undefined) => {
+        const normalized = String(address || '').trim();
+        if (!normalized || typeof navigator === 'undefined' || !navigator.clipboard) return;
+
+        try {
+            await navigator.clipboard.writeText(normalized);
+        } catch {
+            return;
+        }
+        setCopiedAssetKey(assetKey);
+        window.setTimeout(() => {
+            setCopiedAssetKey((current) => (current === assetKey ? null : current));
+        }, 1600);
+    };
+
+    const renderAssetAddress = (input: {
+        assetKey: string;
+        address: string | null | undefined;
+        isMock: boolean;
+        kind: AssetAddressKind;
+    }) => {
+        const normalizedAddress = String(input.address || '').trim();
+        const pendingLabel = input.kind === 'receipt'
+            ? t('asset.receipts.pendingAddress')
+            : t('asset.master.pendingAddress');
+        if (!normalizedAddress) {
+            return <span className={styles.assetAddress}>{pendingLabel}</span>;
+        }
+
+        const explorerUrl = buildSolanaExplorerUrl(normalizedAddress, input.isMock);
+        const copied = copiedAssetKey === input.assetKey;
+
+        return (
+            <div className={styles.assetAddressGroup}>
+                <span className={styles.assetAddress} title={normalizedAddress}>
+                    {shortenPubkey(normalizedAddress)}
+                </span>
+                <div className={styles.assetActions}>
+                    <button
+                        type="button"
+                        className={styles.assetActionButton}
+                        onClick={() => void copyAssetAddress(input.assetKey, normalizedAddress)}
+                        aria-label={t('asset.actions.copyAddress')}
+                    >
+                        <Copy size={13} strokeWidth={1.8} aria-hidden="true" />
+                        <span>{copied ? t('asset.actions.copied') : t('asset.actions.copyAddress')}</span>
+                    </button>
+                    {explorerUrl && (
+                        <a
+                            className={styles.assetExplorerLink}
+                            href={explorerUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <ExternalLink size={13} strokeWidth={1.8} aria-hidden="true" />
+                            <span>{t('asset.actions.viewOnExplorer')}</span>
+                        </a>
+                    )}
+                    {input.isMock && (
+                        <span className={styles.assetDemoOnly}>
+                            {t('asset.actions.demoOnly')}
+                        </span>
+                    )}
+                </div>
+            </div>
+        );
     };
 
     const crystalAsset = knowledge?.crystalAsset ?? null;
@@ -492,17 +599,18 @@ export default function KnowledgeDetailPage() {
                 <div className={styles.assetRows}>
                     <div className={styles.assetRow}>
                         <span className={styles.assetLabel}>{t('asset.master.standard')}</span>
-                        <span className={styles.assetValue}>{crystalAsset?.assetStandard || t('asset.master.pendingStandard')}</span>
+                        <span className={styles.assetValue}>{formatAssetStandardLabel(crystalAsset?.assetStandard, t)}</span>
                     </div>
                     <div className={styles.assetRow}>
                         <span className={styles.assetLabel}>
-                            {isMockCrystalAsset ? t('asset.master.demoAddress') : t('asset.master.address')}
+                            {isMockCrystalAsset ? t('asset.master.demoAddress') : t('asset.master.mintAddress')}
                         </span>
-                        <span className={styles.assetAddress} title={crystalAsset?.masterAssetAddress ?? undefined}>
-                            {crystalAsset?.masterAssetAddress
-                                ? shortenPubkey(crystalAsset.masterAssetAddress)
-                                : t('asset.master.pendingAddress')}
-                        </span>
+                        {renderAssetAddress({
+                            assetKey: 'master',
+                            address: crystalAsset?.masterAssetAddress,
+                            isMock: isMockCrystalAsset,
+                            kind: 'master',
+                        })}
                     </div>
                     {crystalAssetMintedAt && (
                         <div className={styles.assetRow}>
@@ -552,11 +660,20 @@ export default function KnowledgeDetailPage() {
                                         <span className={styles.assetStatus} data-status={receiptDisplayStatus}>
                                             {t(`asset.status.${receiptDisplayStatus}`)}
                                         </span>
-                                        <span className={styles.assetAddress} title={receipt.receiptAssetAddress ?? undefined}>
-                                            {receipt.receiptAssetAddress
-                                                ? shortenPubkey(receipt.receiptAssetAddress)
-                                                : t('asset.receipts.pendingAddress')}
-                                        </span>
+                                        <div className={styles.receiptAssetDetails}>
+                                            <span className={styles.receiptAssetLabel}>
+                                                {t('asset.receipts.receiptMint')}
+                                            </span>
+                                            {renderAssetAddress({
+                                                assetKey: `receipt:${receipt.id}`,
+                                                address: receipt.receiptAssetAddress,
+                                                isMock: receiptDisplayStatus === 'mock',
+                                                kind: 'receipt',
+                                            })}
+                                            <span className={styles.receiptAssetStandard}>
+                                                {formatAssetStandardLabel(receipt.assetStandard, t)}
+                                            </span>
+                                        </div>
                                     </div>
                                 );
                             })}

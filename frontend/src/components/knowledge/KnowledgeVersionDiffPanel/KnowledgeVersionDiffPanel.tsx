@@ -8,6 +8,7 @@ import type {
     GQLKnowledgeVersionEvent,
     KnowledgeVersionDiffResponse,
 } from '@/lib/apollo/types';
+import { Select } from '@/components/ui/Select';
 import { useCurrentLocale, useI18n } from '@/i18n/useI18n';
 import styles from './KnowledgeVersionDiffPanel.module.css';
 
@@ -113,6 +114,10 @@ export default function KnowledgeVersionDiffPanel({
         }
         return t('summary.noFieldChanges');
     };
+    const versionOptions = useMemo(
+        () => availableVersions.map((version) => ({value: version, label: `v${version}`})),
+        [availableVersions],
+    );
 
     return (
         <section className={styles.panel}>
@@ -124,35 +129,27 @@ export default function KnowledgeVersionDiffPanel({
             </div>
 
             <div className={styles.controls}>
-                <label className={styles.field}>
-                    <span className={styles.label}>{t('controls.fromVersion')}</span>
-                    <select
-                        className={styles.select}
+                <div className={styles.field}>
+                    <span id="knowledge-version-from-label" className={styles.label}>{t('controls.fromVersion')}</span>
+                    <Select
+                        labelId="knowledge-version-from-label"
+                        ariaLabel={t('controls.fromVersion')}
                         value={fromVersion}
-                        onChange={(event) => setFromVersion(Number(event.target.value))}
-                    >
-                        {availableVersions.map((version) => (
-                            <option key={`from:${version}`} value={version}>
-                                v{version}
-                            </option>
-                        ))}
-                    </select>
-                </label>
+                        options={versionOptions}
+                        onChange={setFromVersion}
+                    />
+                </div>
 
-                <label className={styles.field}>
-                    <span className={styles.label}>{t('controls.toVersion')}</span>
-                    <select
-                        className={styles.select}
+                <div className={styles.field}>
+                    <span id="knowledge-version-to-label" className={styles.label}>{t('controls.toVersion')}</span>
+                    <Select
+                        labelId="knowledge-version-to-label"
+                        ariaLabel={t('controls.toVersion')}
                         value={toVersion}
-                        onChange={(event) => setToVersion(Number(event.target.value))}
-                    >
-                        {availableVersions.map((version) => (
-                            <option key={`to:${version}`} value={version}>
-                                v{version}
-                            </option>
-                        ))}
-                    </select>
-                </label>
+                        options={versionOptions}
+                        onChange={setToVersion}
+                    />
+                </div>
             </div>
 
             {!canCompare && (

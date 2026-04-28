@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { GitBranch, ShieldCheck, X } from 'lucide-react';
 import type { CircleGhostSettings } from '@/lib/circles/ghostSettings';
+import { Select } from '@/components/ui/Select';
 import { useI18n } from '@/i18n/useI18n';
 import ForkReadinessPanel from '@/features/fork-lineage/ForkReadinessPanel';
 import type { ForkReadinessViewModel } from '@/features/fork-lineage/adapter';
@@ -73,6 +74,14 @@ export default function ForkCreateSheet(props: ForkCreateSheetProps) {
         { value: 'Moderator', label: t('roles.Moderator') },
         { value: 'Admin', label: t('roles.Admin') },
         { value: 'Owner', label: t('roles.Owner') },
+    ], [t]);
+    const reviewEntryModeOptions = useMemo<Array<{
+        value: DraftReviewEntryMode;
+        label: string;
+    }>>(() => [
+        { value: 'auto_or_manual', label: t('reviewEntryMode.auto_or_manual') },
+        { value: 'auto_only', label: t('reviewEntryMode.auto_only') },
+        { value: 'manual_only', label: t('reviewEntryMode.manual_only') },
     ], [t]);
     const defaultGhostSettings = useMemo<CircleGhostSettings>(() => ({
         summaryUseLLM: props.initialGhostSettings?.summaryUseLLM ?? true,
@@ -334,19 +343,15 @@ export default function ForkCreateSheet(props: ForkCreateSheetProps) {
                                     <div className={styles.field}>
                                         <label className={styles.label}>{t('fields.draftLifecycleTemplate')}</label>
                                         <div className={styles.inlineGrid}>
-                                            <select
-                                                className={styles.select}
+                                            <Select
                                                 value={draftLifecycleTemplate.reviewEntryMode}
-                                                onChange={(event) => setDraftLifecycleTemplate((prev) => ({
+                                                options={reviewEntryModeOptions}
+                                                onChange={(value) => setDraftLifecycleTemplate((prev) => ({
                                                     ...prev,
-                                                    reviewEntryMode: event.target.value as DraftReviewEntryMode,
+                                                    reviewEntryMode: value,
                                                 }))}
                                                 disabled={isSubmitting}
-                                            >
-                                                <option value="auto_or_manual">{t('reviewEntryMode.auto_or_manual')}</option>
-                                                <option value="auto_only">{t('reviewEntryMode.auto_only')}</option>
-                                                <option value="manual_only">{t('reviewEntryMode.manual_only')}</option>
-                                            </select>
+                                            />
                                             <input
                                                 className={styles.input}
                                                 type="number"
@@ -386,45 +391,33 @@ export default function ForkCreateSheet(props: ForkCreateSheetProps) {
                                     <div className={styles.field}>
                                         <label className={styles.label}>{t('fields.draftWorkflowPolicy')}</label>
                                         <div className={styles.inlineGrid}>
-                                            <select
-                                                className={styles.select}
+                                            <Select
                                                 value={draftWorkflowPolicy.createIssueMinRole}
-                                                onChange={(event) => setDraftWorkflowPolicy((prev) => ({
+                                                options={workflowRoleOptions}
+                                                onChange={(value) => setDraftWorkflowPolicy((prev) => ({
                                                     ...prev,
-                                                    createIssueMinRole: event.target.value as CircleDraftWorkflowPolicy['createIssueMinRole'],
+                                                    createIssueMinRole: value,
                                                 }))}
                                                 disabled={isSubmitting}
-                                            >
-                                                {workflowRoleOptions.map((option) => (
-                                                    <option key={option.value} value={option.value}>{option.label}</option>
-                                                ))}
-                                            </select>
-                                            <select
-                                                className={styles.select}
+                                            />
+                                            <Select
                                                 value={draftWorkflowPolicy.manualEndDraftingMinRole}
-                                                onChange={(event) => setDraftWorkflowPolicy((prev) => ({
+                                                options={workflowRoleOptions}
+                                                onChange={(value) => setDraftWorkflowPolicy((prev) => ({
                                                     ...prev,
-                                                    manualEndDraftingMinRole: event.target.value as CircleDraftWorkflowPolicy['manualEndDraftingMinRole'],
+                                                    manualEndDraftingMinRole: value,
                                                 }))}
                                                 disabled={isSubmitting}
-                                            >
-                                                {workflowRoleOptions.map((option) => (
-                                                    <option key={option.value} value={option.value}>{option.label}</option>
-                                                ))}
-                                            </select>
-                                            <select
-                                                className={styles.select}
+                                            />
+                                            <Select
                                                 value={draftWorkflowPolicy.enterCrystallizationMinRole}
-                                                onChange={(event) => setDraftWorkflowPolicy((prev) => ({
+                                                options={workflowRoleOptions}
+                                                onChange={(value) => setDraftWorkflowPolicy((prev) => ({
                                                     ...prev,
-                                                    enterCrystallizationMinRole: event.target.value as CircleDraftWorkflowPolicy['enterCrystallizationMinRole'],
+                                                    enterCrystallizationMinRole: value,
                                                 }))}
                                                 disabled={isSubmitting}
-                                            >
-                                                {workflowRoleOptions.map((option) => (
-                                                    <option key={option.value} value={option.value}>{option.label}</option>
-                                                ))}
-                                            </select>
+                                            />
                                         </div>
                                     </div>
                                 </div>

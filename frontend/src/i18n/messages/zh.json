@@ -1436,16 +1436,29 @@
       "status": {
         "minted": "已铸造",
         "pending": "铸造中",
-        "mock": "演示凭证",
+        "mock": "仅演示",
         "failed": "铸造失败",
         "unknown": "状态未知"
+      },
+      "standardLabels": {
+        "demoAsset": "演示资产",
+        "demoReceipt": "演示凭证",
+        "token2022MasterNft": "Token-2022 主 NFT",
+        "token2022Receipt": "Token-2022 贡献凭证"
+      },
+      "actions": {
+        "copyAddress": "复制地址",
+        "copied": "已复制",
+        "viewOnExplorer": "链上查看",
+        "demoOnly": "仅演示"
       },
       "master": {
         "kicker": "CRYSTAL ASSET",
         "title": "主 NFT",
         "description": "这枚主 NFT 代表当前知识结晶本身；结晶完成后会自动进入铸造队列。",
         "standard": "资产标准",
-        "address": "NFT 地址",
+        "address": "资产地址",
+        "mintAddress": "Mint 地址",
         "demoAddress": "演示地址",
         "mintedAt": "铸造时间",
         "lastError": "错误",
@@ -1455,6 +1468,7 @@
       "receipts": {
         "kicker": "CONTRIBUTOR RECEIPTS",
         "title": "贡献凭证",
+        "receiptMint": "凭证 Mint",
         "count": "{count} 份",
         "minted": "已铸造 {count}",
         "pending": "等待 {count}",
