@@ -15,7 +15,7 @@ import {
     ensureWalletSession,
     isIdentityNotRegisteredError,
     logoutSession,
-} from '@/lib/auth/session';
+} from '@/lib/api/session';
 import { E2EWalletAdapter } from './e2eWalletAdapter';
 import {
     NativePhantomWalletAdapter,

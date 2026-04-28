@@ -34,7 +34,8 @@ import {
     getIdentityNotificationMode,
     getThresholds,
 } from '../identity/thresholds';
-import { buildIdentityHint } from '../identity/copy';
+import { buildIdentityHint, buildVisitorDustHint } from '../identity/copy';
+import { resolveRequestLocale } from '../i18n/locale';
 import {
     normalizeManagedMemberRole,
     validateCircleMemberRemoval,
@@ -256,7 +257,6 @@ export function membershipRouter(prisma: PrismaClient, redis: Redis): Router {
             if (!circleId) {
                 return res.status(400).json({ error: 'invalid_circle_id' });
             }
-
             const circle = await prisma.circle.findUnique({
                 where: { id: circleId },
                 select: {
@@ -407,6 +407,10 @@ export function membershipRouter(prisma: PrismaClient, redis: Redis): Router {
             if (!circleId) {
                 return res.status(400).json({ error: 'invalid_circle_id' });
             }
+            const locale = resolveRequestLocale({
+                requestedLocale: (req.query.locale as string | string[] | undefined) ?? req.header('x-alcheme-locale'),
+                acceptLanguage: req.headers['accept-language'],
+            });
 
             const circle = await prisma.circle.findUnique({
                 where: { id: circleId },
@@ -430,7 +434,7 @@ export function membershipRouter(prisma: PrismaClient, redis: Redis): Router {
                     currentLevel: IdentityLevel.Visitor,
                     nextLevel: IdentityLevel.Initiate,
                     messagingMode: 'dust_only',
-                    hint: '游客可发烟尘消息，但不进入正式沉淀链路。',
+                    hint: buildVisitorDustHint(locale),
                     thresholds,
                     policy: {
                         notificationMode,
@@ -500,6 +504,7 @@ export function membershipRouter(prisma: PrismaClient, redis: Redis): Router {
                         messageCount: visitorMessageCount,
                         citationCount: 0,
                         reputationPercentile: null,
+                        locale,
                     }),
                     thresholds,
                     policy: {
@@ -574,6 +579,7 @@ export function membershipRouter(prisma: PrismaClient, redis: Redis): Router {
                     citationCount: stats.citationCount,
                     reputationPercentile,
                     latestEvaluationReason: evaluation.reason ?? null,
+                    locale,
                 }),
                 thresholds,
                 policy: {

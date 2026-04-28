@@ -1,11 +1,13 @@
 'use client';
 
-import { type ReactNode } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { ApolloProvider } from '@apollo/client/react';
 import { apolloClient } from '@/lib/apollo/client';
 import IdentityOnboardingProvider from '@/components/auth/IdentityOnboardingProvider';
 import SolanaProvider from '@/lib/solana/wallet-provider';
 import { useServiceWorker } from '@/hooks/useServiceWorker';
+import { useCurrentLocale } from '@/i18n/useI18n';
+import { setActiveRequestLocale } from '@/lib/api/fetch';
 
 interface ProvidersProps {
     children: ReactNode;
@@ -17,7 +19,12 @@ interface ProvidersProps {
  * Registers service worker in production.
  */
 export default function Providers({ children }: ProvidersProps) {
+    const locale = useCurrentLocale();
     useServiceWorker();
+
+    useEffect(() => {
+        setActiveRequestLocale(locale);
+    }, [locale]);
 
     return (
         <ApolloProvider client={apolloClient}>

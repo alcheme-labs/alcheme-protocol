@@ -4,12 +4,12 @@ import { useCallback, useState } from 'react';
 import { useApolloClient } from '@apollo/client/react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useAlchemeSDK } from './useAlchemeSDK';
-import { waitForIndexedSlot, waitForSignatureSlot } from '@/lib/consistency/sync';
+import { waitForIndexedSlot, waitForSignatureSlot } from '@/lib/api/sync';
 import {
     ensureWalletSession,
     fetchSessionMe,
     isIdentityNotRegisteredError,
-} from '@/lib/auth/session';
+} from '@/lib/api/session';
 import { shouldSignAuthSession } from '@/lib/auth/sessionPolicy';
 import { validateIdentityHandle } from '@/lib/identity/handle';
 import { getBrowserOnlyMockUnsupportedError } from '@/lib/testing/browserOnlyMockPolicy';

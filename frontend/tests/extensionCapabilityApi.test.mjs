@@ -31,12 +31,10 @@ test('fetches capabilities catalog through injected fetch', async () => {
   });
 
   assert.equal(requestedUrl, 'http://127.0.0.1:4100/api/v1/extensions/capabilities');
-  assert.deepEqual(requestedInit, {
-    cache: 'no-store',
-    headers: {
-      Accept: 'application/json',
-    },
-  });
+  assert.equal(requestedInit.cache, 'no-store');
+  const headers = new Headers(requestedInit.headers);
+  assert.equal(headers.get('accept'), 'application/json');
+  assert.equal(headers.get('x-alcheme-locale'), 'en');
   assert.deepEqual(result, payload);
 });
 

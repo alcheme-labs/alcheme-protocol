@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import type { DraftLifecycleReadModel } from '@/features/draft-working-copy/api';
+import type { DraftLifecycleReadModel } from '@/lib/api/draftWorkingCopy';
 import { useCurrentLocale, useI18n } from '@/i18n/useI18n';
 import styles from './CrucibleLifecycleHeader.module.css';
 

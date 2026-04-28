@@ -63,19 +63,19 @@ import {
     sendDiscussionMessage,
     tombstoneDiscussionMessage,
     type DiscussionMessageDto,
-} from '@/lib/discussion/api';
+} from '@/lib/api/discussion';
 import {
     fetchCircleGhostSettings,
     updateCircleGhostSettings,
     type CircleGhostSettings,
-} from '@/lib/circles/ghostSettings';
+} from '@/lib/api/circlesGhostSettings';
 import {
     fetchCircleAgents,
     fetchCircleAgentPolicy,
     updateCircleAgentPolicy,
     type CircleAgentPolicy,
     type CircleAgentRecord,
-} from '@/lib/circles/agents';
+} from '@/lib/api/circlesAgents';
 import {
     DEFAULT_CIRCLE_FORK_POLICY,
     DEFAULT_CIRCLE_DRAFT_WORKFLOW_POLICY,
@@ -85,7 +85,7 @@ import {
     type CircleDraftLifecycleTemplate,
     type CircleForkPolicy,
     type CircleDraftWorkflowPolicy,
-} from '@/lib/circles/policyProfile';
+} from '@/lib/api/circlesPolicyProfile';
 import {
     createCircleInvite,
     fetchCircleIdentityStatus,
@@ -96,7 +96,7 @@ import {
     updateCircleMemberRole,
     type CircleIdentityStatus,
     type CircleMembershipSnapshot,
-} from '@/lib/circles/membership';
+} from '@/lib/api/circlesMembership';
 import styles from './page.module.css';
 import TierPill from '@/components/circle/TierPill/TierPill';
 import AccessGate from '@/components/circle/AccessGate/AccessGate';
@@ -143,7 +143,7 @@ import {
     fetchForkTeam04ResolvedInputs,
     type ForkLineageView,
     type ForkLineageViewItem,
-} from '@/features/fork-lineage/api';
+} from '@/lib/api/forkLineage';
 import {
     clearPendingForkFinalization,
     readPendingForkFinalization,
@@ -666,7 +666,7 @@ export default function CircleDetailPage() {
                 setMembershipRefreshFailed(snapshotFailed || statusFailed);
             },
         });
-    }, [circleId, publicKey, identityState, sessionUser?.id]);
+    }, [circleId, publicKey, identityState, locale, sessionUser?.id]);
 
     const activeMembershipCircleId = Number(activeTierId || circleId);
 
@@ -767,6 +767,7 @@ export default function CircleDetailPage() {
         circleId,
         joinActionLoading,
         membershipSnapshot,
+        locale,
         publicKey,
         refetch,
         setWalletModalVisible,
@@ -811,7 +812,7 @@ export default function CircleDetailPage() {
         } finally {
             setJoinActionLoading(false);
         }
-    }, [activeMembershipCircleId, applyMembershipSnapshot, applyIdentityStatusSnapshot, refetch, registerIdentity]);
+    }, [activeMembershipCircleId, applyMembershipSnapshot, applyIdentityStatusSnapshot, locale, refetch, registerIdentity]);
 
     // ── P6: Invite flow state ──
     const [showInviteSheet, setShowInviteSheet] = useState(false);
@@ -873,7 +874,7 @@ export default function CircleDetailPage() {
                 setActiveTierMembershipLoading(false);
             },
         });
-    }, [activeDiscussionCircleId, circleId, publicKey, identityState, sessionUser?.id]);
+    }, [activeDiscussionCircleId, circleId, publicKey, identityState, locale, sessionUser?.id]);
 
     const handleTierChange = useCallback(
         (newTierId: string) => {

@@ -9,7 +9,7 @@ import type {
     CircleAgentReviewMode,
     CircleAgentRecord,
     CircleAgentTriggerScope,
-} from '@/lib/circles/agents';
+} from '@/lib/api/circlesAgents';
 import styles from './AgentAdminPanel.module.css';
 
 interface AgentAdminPanelProps {

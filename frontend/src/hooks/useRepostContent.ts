@@ -4,9 +4,9 @@ import { useCallback, useRef, useState } from 'react';
 import { BN } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
 import { useAlchemeSDK } from './useAlchemeSDK';
-import { waitForIndexedSlot, waitForSignatureSlot } from '@/lib/consistency/sync';
-import { bindPostToCircle } from '@/lib/posts/bindPostToCircle';
-import { fetchSessionMe } from '@/lib/auth/session';
+import { waitForIndexedSlot, waitForSignatureSlot } from '@/lib/api/sync';
+import { bindPostToCircle } from '@/lib/api/bindPostToCircle';
+import { fetchSessionMe } from '@/lib/api/session';
 import {
     buildV2RouteOptions,
     isV2ContentIdConflictError,

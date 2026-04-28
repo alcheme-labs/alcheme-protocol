@@ -179,5 +179,7 @@ test('sends credentials for session-cookie sidecar requests and bearer headers w
   assert.deepEqual(result, payload);
   assert.equal(captured.url, 'https://sidecar.alcheme.test/api/v1/discussion/sessions/abc/refresh');
   assert.equal(captured.init.credentials, 'include');
-  assert.equal(captured.init.headers.Authorization, 'Bearer discussion-token');
+  const headers = new Headers(captured.init.headers);
+  assert.equal(headers.get('authorization'), 'Bearer discussion-token');
+  assert.equal(headers.get('x-alcheme-locale'), 'en');
 });

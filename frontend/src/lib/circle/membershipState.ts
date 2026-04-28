@@ -3,7 +3,7 @@ import type {
     CircleIdentityStatus,
     CircleMembershipSnapshot,
     CircleMembershipView,
-} from '@/lib/circles/membership';
+} from '@/lib/api/circlesMembership';
 
 export function resolveActiveMembershipSnapshot(input: {
     routeCircleId: number;

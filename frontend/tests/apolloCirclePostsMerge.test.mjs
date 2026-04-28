@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const apolloClientSource = readFileSync(
-  new URL('../src/lib/apollo/client.ts', import.meta.url),
+  new URL('../src/lib/api/graphqlClient.ts', import.meta.url),
   'utf8',
 );
 

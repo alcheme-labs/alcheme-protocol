@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const apiSource = readFileSync(
-    new URL('../src/features/draft-working-copy/api.ts', import.meta.url),
+    new URL('../src/lib/api/draftWorkingCopy.ts', import.meta.url),
     'utf8',
 );
 

@@ -2,9 +2,9 @@
 
 import { useState, useCallback } from 'react';
 import { useAlchemeSDK } from './useAlchemeSDK';
-import { waitForSignatureSlot, waitForIndexedSlot } from '@/lib/consistency/sync';
-import { fetchSessionMe } from '@/lib/auth/session';
-import { bindPostToCircle } from '@/lib/posts/bindPostToCircle';
+import { waitForSignatureSlot, waitForIndexedSlot } from '@/lib/api/sync';
+import { fetchSessionMe } from '@/lib/api/session';
+import { bindPostToCircle } from '@/lib/api/bindPostToCircle';
 import {
     buildV2RouteOptions,
     isV2ContentIdConflictError,

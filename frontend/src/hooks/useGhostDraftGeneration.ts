@@ -3,10 +3,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation } from '@apollo/client/react';
 
-import { fetchDraftLifecycle } from '@/features/draft-working-copy/api';
+import { fetchDraftLifecycle } from '@/lib/api/draftWorkingCopy';
 import { getQueryApiBaseUrl } from '@/lib/config/queryApiBase';
+import {
+    fetchAiJobPayload,
+    fetchDraftAiJobsPayload,
+    fetchGhostDraftGenerationPayload,
+    openAiJobEventStream,
+} from '@/lib/api/ghostDrafts';
 import { ACCEPT_GHOST_DRAFT, GENERATE_GHOST_DRAFT } from '@/lib/apollo/queries';
-import type { SeededReferenceSelection } from '@/lib/circles/seeded';
+import type { SeededReferenceSelection } from '@/lib/api/circlesSeeded';
 import type {
     AcceptGhostDraftResponse,
     GQLGhostDraftProvenance,
@@ -188,24 +194,6 @@ function toJobSnapshot(payload: any): GhostDraftJobSnapshot | null {
     };
 }
 
-async function fetchJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
-    const response = await fetch(input, {
-        credentials: 'include',
-        cache: 'no-store',
-        ...init,
-    });
-    const payload = await response.json().catch(() => null);
-    if (!response.ok) {
-        const message = typeof payload?.message === 'string'
-            ? payload.message
-            : typeof payload?.error === 'string'
-                ? payload.error
-                : `request failed: ${response.status}`;
-        throw new Error(message);
-    }
-    return payload as T;
-}
-
 function delay(ms: number): Promise<void> {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
@@ -355,12 +343,10 @@ export function useGhostDraftGeneration(options: UseGhostDraftGenerationOptions)
 
         for (let attempt = 0; attempt < attempts; attempt += 1) {
             try {
-                const payload = await fetchJson<{ ok: true; generation: GQLGhostDraftResult }>(
-                    `${queryApiBaseUrl}/api/v1/ai/ghost-drafts/${generationId}`,
-                    {
-                        method: 'GET',
-                    },
-                );
+                const payload = await fetchGhostDraftGenerationPayload<{ ok: true; generation: GQLGhostDraftResult }>({
+                    queryApiBaseUrl,
+                    generationId,
+                });
                 const candidate = normalizeCandidate(payload.generation);
                 if (!candidate) {
                     throw new Error(options.copy.errors.missingContent);
@@ -380,12 +366,10 @@ export function useGhostDraftGeneration(options: UseGhostDraftGenerationOptions)
     }, [options.copy.errors.missingContent, queryApiBaseUrl]);
 
     const fetchJobSnapshot = useCallback(async (jobId: number) => {
-        const payload = await fetchJson<{ ok: true; job: any }>(
-            `${queryApiBaseUrl}/api/v1/ai-jobs/${jobId}`,
-            {
-                method: 'GET',
-            },
-        );
+        const payload = await fetchAiJobPayload<{ ok: true; job: any }>({
+            queryApiBaseUrl,
+            jobId,
+        });
         return toJobSnapshot(payload.job);
     }, [queryApiBaseUrl]);
 
@@ -393,12 +377,11 @@ export function useGhostDraftGeneration(options: UseGhostDraftGenerationOptions)
         postId: number,
         preferredJobId?: number | null,
     ) => {
-        const payload = await fetchJson<GhostDraftJobListResponse>(
-            `${queryApiBaseUrl}/api/v1/ai-jobs?draftPostId=${encodeURIComponent(String(postId))}&limit=10`,
-            {
-                method: 'GET',
-            },
-        );
+        const payload = await fetchDraftAiJobsPayload<GhostDraftJobListResponse>({
+            queryApiBaseUrl,
+            postId,
+            limit: 10,
+        });
         const jobs = Array.isArray(payload.jobs) ? payload.jobs : [];
         const ghostDraftJobs = jobs
             .map((job) => ({
@@ -555,13 +538,15 @@ export function useGhostDraftGeneration(options: UseGhostDraftGenerationOptions)
         pendingJobIdRef.current = jobId;
         schedulePoll(jobId);
 
-        if (typeof window === 'undefined' || typeof EventSource === 'undefined') {
+        if (typeof window === 'undefined') {
             return;
         }
 
-        const source = new EventSource(`${queryApiBaseUrl}/api/v1/ai-jobs/${jobId}/stream`, {
-            withCredentials: true,
+        const source = openAiJobEventStream({
+            queryApiBaseUrl,
+            jobId,
         });
+        if (!source) return;
         eventSourceRef.current = source;
 
         source.addEventListener('ai-job', (event: MessageEvent<string>) => {

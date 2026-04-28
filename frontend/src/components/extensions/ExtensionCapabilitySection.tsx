@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { fetchExtensionCapabilities } from '@/lib/extensions/api';
+import { fetchExtensionCapabilities } from '@/lib/api/extensions';
 import { getHomeExtensionEntries } from '@/lib/extensions/entryRegistry';
 import {
     buildExtensionCapabilityCardModel,

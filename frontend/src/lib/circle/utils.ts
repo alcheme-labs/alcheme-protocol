@@ -1,7 +1,7 @@
 import type { GQLKnowledgeContributor } from '@/lib/apollo/types';
 import type { IdentityState } from '@/components/circle/IdentityBadge';
-import type { CircleMembershipSnapshot } from '@/lib/circles/membership';
-import type { DiscussionMessageDto } from '@/lib/discussion/api';
+import type { CircleMembershipSnapshot } from '@/lib/api/circlesMembership';
+import type { DiscussionMessageDto } from '@/lib/api/discussion';
 import type { PlazaMessage } from './types';
 import {
     extractStructuredDiscussionMetadata,

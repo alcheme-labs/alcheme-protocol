@@ -34,7 +34,7 @@ import {
     refreshDiscussionSession,
     sendDiscussionMessage,
     tombstoneDiscussionMessage,
-} from '@/lib/discussion/api';
+} from '@/lib/api/discussion';
 import {
     runWithDiscussionSessionRecovery,
     type DiscussionSessionTokenOptions,

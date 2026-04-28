@@ -14,6 +14,10 @@ const hookSource = readFileSync(
     new URL('../src/hooks/useGhostDraftGeneration.ts', import.meta.url),
     'utf8',
 );
+const ghostDraftApiSource = readFileSync(
+    new URL('../src/lib/api/ghostDrafts.ts', import.meta.url),
+    'utf8',
+);
 const ghostRevealSource = readFileSync(
     new URL('../src/components/circle/GhostReveal/GhostReveal.tsx', import.meta.url),
     'utf8',
@@ -30,14 +34,16 @@ test('frontend generate mutation requests an async job envelope instead of synch
 
 test('ghost draft hook tracks pending ai jobs and subscribes to dedicated ai job updates', () => {
     assert.match(hookSource, /EventSource/);
+    assert.match(hookSource, /openAiJobEventStream/);
     assert.match(hookSource, /pendingJobId/);
-    assert.match(hookSource, /\/api\/v1\/ai-jobs\//);
+    assert.match(ghostDraftApiSource, /\/api\/v1\/ai-jobs\/\$\{input\.jobId\}/);
+    assert.match(ghostDraftApiSource, /\/api\/v1\/ai-jobs\/\$\{input\.jobId\}\/stream/);
     assert.match(hookSource, /status:\s*'pending'/);
 });
 
 test('ghost draft hook recovers persisted draft-scoped generations after refresh', () => {
     assert.match(hookSource, /fetchLatestGhostDraftJobSnapshot/);
-    assert.match(hookSource, /\/api\/v1\/ai-jobs\?draftPostId=/);
+    assert.match(ghostDraftApiSource, /\/api\/v1\/ai-jobs\?draftPostId=/);
     assert.match(hookSource, /jobType === 'ghost_draft_generate'/);
     assert.match(hookSource, /recoveredSnapshot\.status === 'succeeded'/);
 });

@@ -2,7 +2,6 @@
 
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useCurrentLocale, useI18n } from '@/i18n/useI18n';
-import { resolveNodeRoute } from '@/lib/config/nodeRouting';
 
 import type {
     DraftDiscussionIssueType,
@@ -10,7 +9,7 @@ import type {
     DraftDiscussionState,
     DraftDiscussionTargetType,
     DraftDiscussionThreadRecord,
-} from '@/lib/discussion/api';
+} from '@/lib/api/discussion';
 import {
     formatSeededReferenceLabel,
 } from '@/lib/circle/draftPresentation';
@@ -19,7 +18,7 @@ import {
     shouldResolveIssueViaParagraphEditing,
 } from '@/lib/circle/crucibleViewModel';
 import type { CrucibleGovernanceSummaryView } from '@/lib/circle/crucibleViewModel';
-import type { SeededReferenceSelection } from '@/lib/circles/seeded';
+import type { SeededReferenceSelection } from '@/lib/api/circlesSeeded';
 import styles from './DraftDiscussionPanel.module.css';
 
 interface CreateDiscussionInput {
@@ -286,23 +285,6 @@ function formatRevisionDirectionStatus(
     if (status === 'rejected') return t('revisionDirections.status.rejected');
     if (status === 'expired') return t('revisionDirections.status.expired');
     return t('revisionDirections.status.open');
-}
-
-async function requestRevisionDirection<T>(
-    path: string,
-    init?: RequestInit,
-): Promise<T> {
-    const response = await fetch(path, init);
-    const payload = await response.json().catch(() => null);
-    if (!response.ok) {
-        const message = typeof payload?.message === 'string'
-            ? payload.message
-            : typeof payload?.error === 'string'
-                ? payload.error
-                : `request failed: ${response.status}`;
-        throw new Error(message);
-    }
-    return payload as T;
 }
 
 function parseParagraphRef(value: string): number | null {

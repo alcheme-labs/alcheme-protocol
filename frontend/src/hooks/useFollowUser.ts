@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 
 import { useAlchemeSDK } from './useAlchemeSDK';
-import { waitForIndexedSlot, waitForSignatureSlot } from '@/lib/consistency/sync';
+import { waitForIndexedSlot, waitForSignatureSlot } from '@/lib/api/sync';
 import { useIdentityOnboarding } from '@/lib/auth/identityOnboarding';
 import {
     beginFollowWrite,

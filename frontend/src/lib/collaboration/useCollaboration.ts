@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
-import { resolveCollabWsBaseUrl } from '@/lib/config/nodeRouting';
+import { resolveCollabWsBaseUrl } from '@/lib/api/nodeRouting';
 
 /* ════════════════════════════════════════════════════
    useCollaboration — Yjs document lifecycle hook

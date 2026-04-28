@@ -4,9 +4,9 @@ import { useMemo, useState } from 'react';
 
 import { useI18n } from '@/i18n/useI18n';
 import type { KnowledgeReferenceOption } from '@/lib/circle/knowledgeReferenceOptions';
-import type { DraftReferenceLink } from '@/lib/drafts/referenceLinks';
+import type { DraftReferenceLink } from '@/lib/api/draftReferenceLinks';
 import type { DraftReferenceSurfaceViewModel } from '@/lib/circle/draftReferenceSurface';
-import type { SeededFileTreeNode, SeededReferenceSelection } from '@/lib/circles/seeded';
+import type { SeededFileTreeNode, SeededReferenceSelection } from '@/lib/api/circlesSeeded';
 import SeededFileTree from '@/components/circle/SeededFileTree/SeededFileTree';
 import KnowledgeReferencePicker from '@/components/circle/KnowledgeReferencePicker/KnowledgeReferencePicker';
 import styles from './ReferencesPanel.module.css';

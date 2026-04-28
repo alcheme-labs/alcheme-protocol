@@ -3,7 +3,7 @@
 import { type ReactNode, useEffect, useMemo, useState } from 'react';
 
 import { useI18n } from '@/i18n/useI18n';
-import type { SeededFileTreeNode, SeededReferenceSelection } from '@/lib/circles/seeded';
+import type { SeededFileTreeNode, SeededReferenceSelection } from '@/lib/api/circlesSeeded';
 import styles from './SeededFileTree.module.css';
 
 interface SeededFileTreeProps {

@@ -5,32 +5,32 @@ import { useAlchemeSDK } from './useAlchemeSDK';
 import { BN } from '@coral-xyz/anchor';
 import { PublicKey, SystemProgram } from '@solana/web3.js';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { waitForSignatureSlot, waitForIndexedSlot } from '@/lib/consistency/sync';
+import { waitForSignatureSlot, waitForIndexedSlot } from '@/lib/api/sync';
 import {
     updateCircleGhostSettings,
     type CircleGhostSettings,
-} from '@/lib/circles/ghostSettings';
+} from '@/lib/api/circlesGhostSettings';
 import {
     updateCircleGenesisMode,
     type CircleGenesisMode,
-} from '@/lib/circles/genesisMode';
-import { updateCircleMetadata } from '@/lib/circles/metadata';
+} from '@/lib/api/circlesGenesisMode';
+import { updateCircleMetadata } from '@/lib/api/circlesMetadata';
 import {
     importSeededSources,
     type SeededSourceInput,
-} from '@/lib/circles/seeded';
-import { updateCircleJoinPolicy } from '@/lib/circles/membership';
+} from '@/lib/api/circlesSeeded';
+import { updateCircleJoinPolicy } from '@/lib/api/circlesMembership';
 import {
     updateCircleDraftWorkflowPolicy,
     updateCircleDraftLifecycleTemplate,
     type CircleDraftWorkflowPolicy,
     type CircleDraftLifecycleTemplatePatch,
-} from '@/lib/circles/policyProfile';
+} from '@/lib/api/circlesPolicyProfile';
 import {
     getCreateCircleSignerUnavailableError,
     settleCreateCirclePostCreateSync,
     waitForCircleReadModelVisibility,
-} from '@/lib/circles/createCircleFlow';
+} from '@/lib/api/createCircleFlow';
 import { useI18n } from '@/i18n/useI18n';
 import { getBrowserOnlyMockUnsupportedError } from '@/lib/testing/browserOnlyMockPolicy';
 

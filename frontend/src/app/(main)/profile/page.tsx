@@ -17,7 +17,7 @@ import EditProfileModal from '@/components/ui/EditProfileModal';
 import TotemDisplay from '@/components/profile/TotemDisplay/TotemDisplay';
 import { useRegisterIdentity } from '@/hooks/useRegisterIdentity';
 import { useAlchemeSDK } from '@/hooks/useAlchemeSDK';
-import { waitForIndexedSlot, waitForSignatureSlot } from '@/lib/consistency/sync';
+import { waitForIndexedSlot, waitForSignatureSlot } from '@/lib/api/sync';
 import { GET_ME, UPDATE_USER, GET_MY_KNOWLEDGE } from '@/lib/apollo/queries';
 import type { MeResponse, UpdateUserResponse, MyKnowledgeResponse, MyKnowledgeItem } from '@/lib/apollo/types';
 import { useIdentityOnboarding } from '@/lib/auth/identityOnboarding';

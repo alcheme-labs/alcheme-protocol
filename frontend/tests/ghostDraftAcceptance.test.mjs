@@ -19,7 +19,7 @@ const crucibleTabSource = readFileSync(
     'utf8',
 );
 const draftLifecycleApiSource = readFileSync(
-    new URL('../src/features/draft-working-copy/api.ts', import.meta.url),
+    new URL('../src/lib/api/draftWorkingCopy.ts', import.meta.url),
     'utf8',
 );
 

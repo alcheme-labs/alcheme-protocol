@@ -7,11 +7,19 @@ const adapterSource = readFileSync(
     'utf8',
 );
 const apiSource = readFileSync(
-    new URL('../src/features/circle-summary/api.ts', import.meta.url),
+    new URL('../src/lib/api/circleSummary.ts', import.meta.url),
     'utf8',
 );
 const panelSource = readFileSync(
     new URL('../src/features/circle-summary/SummaryReadinessPanel.tsx', import.meta.url),
+    'utf8',
+);
+const zhMessagesSource = readFileSync(
+    new URL('../src/i18n/messages/zh.json', import.meta.url),
+    'utf8',
+);
+const enMessagesSource = readFileSync(
+    new URL('../src/i18n/messages/en.json', import.meta.url),
     'utf8',
 );
 
@@ -31,9 +39,15 @@ test('circle summary api keeps the existing synchronous snapshot contract and re
 });
 
 test('SummaryReadinessPanel renders human-readable summary provenance for projection and llm snapshots', () => {
-    assert.match(panelSource, /提示词版本/);
-    assert.match(panelSource, /来源模型/);
-    assert.match(panelSource, /上下文指纹/);
-    assert.match(adapterSource, /系统 LLM/);
-    assert.match(adapterSource, /系统投影/);
+    assert.match(panelSource, /t\('chips\.promptVersion'/);
+    assert.match(panelSource, /t\('chips\.model'/);
+    assert.match(panelSource, /t\('chips\.contextFingerprint'/);
+    assert.match(zhMessagesSource, /提示词版本/);
+    assert.match(zhMessagesSource, /来源模型/);
+    assert.match(zhMessagesSource, /上下文指纹/);
+    assert.match(zhMessagesSource, /系统 LLM/);
+    assert.match(zhMessagesSource, /系统投影/);
+    assert.match(enMessagesSource, /Prompt:/);
+    assert.match(enMessagesSource, /Model:/);
+    assert.match(enMessagesSource, /Context fingerprint/);
 });

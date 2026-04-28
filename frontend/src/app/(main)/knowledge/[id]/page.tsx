@@ -31,9 +31,9 @@ import {
     type CrystallizationOutputRecordInput,
     type DraftReferenceLink,
 } from '@/features/crystal-output/adapter';
-import { fetchCrystallizationOutputRecordByKnowledgeId } from '@/features/crystal-output/api';
+import { fetchCrystallizationOutputRecordByKnowledgeId } from '@/lib/api/crystalOutput';
 import CrystalOutputEvidencePanel from '@/features/crystal-output/CrystalOutputEvidencePanel';
-import { fetchDraftReferenceLinks } from '@/features/circle-summary/api';
+import { fetchDraftReferenceLinks } from '@/lib/api/circleSummary';
 import SummaryReadinessPanel from '@/features/circle-summary/SummaryReadinessPanel';
 import { useCurrentLocale, useI18n } from '@/i18n/useI18n';
 import styles from './page.module.css';

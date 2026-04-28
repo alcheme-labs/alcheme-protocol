@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState, useTransition } from 'react';
 
-import { fetchDiscussionMessages, type DiscussionMessageDto } from '@/lib/discussion/api';
+import { fetchDiscussionMessages, type DiscussionMessageDto } from '@/lib/api/discussion';
 import {
     fetchDiscussionAnalysisDiagnostics,
     fetchDiscussionSummaryDiagnostics,
@@ -11,7 +11,7 @@ import {
     type DiscussionAnalysisDiagnosticsResponse,
     type DiscussionSummaryDiagnosticsResponse,
     type DiscussionTriggerDiagnosticsResponse,
-} from '@/lib/admin/discussionDiagnosticsClient';
+} from '@/lib/api/discussionDiagnostics';
 import { useCurrentLocale, useI18n } from '@/i18n/useI18n';
 
 type AnalysisDiagnostics = DiscussionAnalysisDiagnosticsResponse['diagnostics'];

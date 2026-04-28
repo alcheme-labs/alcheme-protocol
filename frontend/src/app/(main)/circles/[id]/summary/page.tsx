@@ -14,7 +14,7 @@ import {
     fetchCircleSummarySnapshot,
     fetchCircleSummaryKnowledgeOutputs,
     fetchFrozenSummaryDraftConsumption,
-} from '@/features/circle-summary/api';
+} from '@/lib/api/circleSummary';
 import CircleSummaryScaffold from '@/features/circle-summary/CircleSummaryScaffold';
 import type { CrystalOutputViewModel } from '@/features/crystal-output/adapter';
 import { useI18n } from '@/i18n/useI18n';

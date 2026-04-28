@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { fetchDraftReferenceLinks } from '../src/lib/drafts/referenceLinks.ts';
+import { fetchDraftReferenceLinks } from '../src/lib/api/draftReferenceLinks.ts';
 
 const clientSource = readFileSync(
-    new URL('../src/lib/drafts/referenceLinks.ts', import.meta.url),
+    new URL('../src/lib/api/draftReferenceLinks.ts', import.meta.url),
     'utf8',
 );
 

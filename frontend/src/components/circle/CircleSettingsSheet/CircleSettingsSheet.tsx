@@ -6,17 +6,17 @@ import { X, Settings, UserPlus, ChevronDown } from 'lucide-react';
 import { Select } from '@/components/ui/Select';
 import AgentAdminPanel from '@/features/agents/AgentAdminPanel';
 import { useI18n } from '@/i18n/useI18n';
-import type { CircleAgentPolicy, CircleAgentRecord } from '@/lib/circles/agents';
-import type { CircleGhostSettings } from '@/lib/circles/ghostSettings';
+import type { CircleAgentPolicy, CircleAgentRecord } from '@/lib/api/circlesAgents';
+import type { CircleGhostSettings } from '@/lib/api/circlesGhostSettings';
 import {
     DEFAULT_CIRCLE_DRAFT_WORKFLOW_POLICY,
-} from '@/lib/circles/policyProfile';
+} from '@/lib/api/circlesPolicyProfile';
 import { resolveCircleSettingsActionFlags } from '@/lib/circle/memberManagement';
 import type {
     CircleDraftWorkflowPolicy,
     CircleDraftLifecycleTemplate,
     DraftReviewEntryMode,
-} from '@/lib/circles/policyProfile';
+} from '@/lib/api/circlesPolicyProfile';
 import styles from './CircleSettingsSheet.module.css';
 
 /**

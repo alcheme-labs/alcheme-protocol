@@ -22,6 +22,7 @@ describe('identity copy helpers', () => {
             messageCount: 0,
             citationCount: 0,
             reputationPercentile: 30,
+            locale: 'zh',
         })).toBe('当前信誉位于前 30%（需进入前 10%）方可晋升为长老。');
     });
 
@@ -32,6 +33,7 @@ describe('identity copy helpers', () => {
             messageCount: 0,
             citationCount: 0,
             reputationPercentile: 8,
+            locale: 'zh',
         })).toBe('当前信誉位于前 8%（阈值前 10%）可晋升为长老。');
     });
 

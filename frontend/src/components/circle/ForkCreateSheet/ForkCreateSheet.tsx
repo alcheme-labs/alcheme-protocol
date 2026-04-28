@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { GitBranch, ShieldCheck, X } from 'lucide-react';
-import type { CircleGhostSettings } from '@/lib/circles/ghostSettings';
+import type { CircleGhostSettings } from '@/lib/api/circlesGhostSettings';
 import { Select } from '@/components/ui/Select';
 import { useI18n } from '@/i18n/useI18n';
 import ForkReadinessPanel from '@/features/fork-lineage/ForkReadinessPanel';
@@ -15,7 +15,7 @@ import {
     type CircleDraftWorkflowPolicy,
     type CircleForkPolicy,
     type DraftReviewEntryMode,
-} from '@/lib/circles/policyProfile';
+} from '@/lib/api/circlesPolicyProfile';
 import styles from './ForkCreateSheet.module.css';
 
 type AccessType = 'free' | 'crystal' | 'invite' | 'approval';

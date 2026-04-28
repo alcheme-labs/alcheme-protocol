@@ -13,7 +13,7 @@ import { GET_ALL_CIRCLES, SEARCH_CIRCLES, SEARCH_POSTS } from '@/lib/apollo/quer
 import type { AllCirclesResponse, SearchCirclesResponse, SearchPostsResponse, GQLCircle } from '@/lib/apollo/types';
 import { useCreateCircle } from '@/hooks/useCreateCircle';
 import { useI18n } from '@/i18n/useI18n';
-import { DEFAULT_CIRCLE_DRAFT_WORKFLOW_POLICY } from '@/lib/circles/policyProfile';
+import { DEFAULT_CIRCLE_DRAFT_WORKFLOW_POLICY } from '@/lib/api/circlesPolicyProfile';
 import styles from './page.module.css';
 
 function isRootMainCircle(circle: GQLCircle): boolean {

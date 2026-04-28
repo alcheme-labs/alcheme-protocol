@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 
 import { useI18n } from '@/i18n/useI18n';
-import type { SourceMaterialRecord } from '@/lib/circles/sourceMaterials';
+import type { SourceMaterialRecord } from '@/lib/api/circlesSourceMaterials';
 import styles from './SourceMaterialsPanel.module.css';
 
 interface SourceMaterialsPanelProps {

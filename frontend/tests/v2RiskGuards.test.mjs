@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { assertV2ByIdTargetIsPublicActive } from '../src/lib/content/v2RiskGuards.ts';
+import { assertV2ByIdTargetIsPublicActive } from '../src/lib/api/v2RiskGuards.ts';
 
 test('assertV2ByIdTargetIsPublicActive rejects non-200 lookup', async () => {
   const originalFetch = globalThis.fetch;

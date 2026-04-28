@@ -15,7 +15,11 @@ const circlePageSource = readFileSync(
   'utf8'
 );
 const apolloClientSource = readFileSync(
-  new URL('../src/lib/apollo/client.ts', import.meta.url),
+  new URL('../src/lib/api/graphqlClient.ts', import.meta.url),
+  'utf8'
+);
+const apiFetchSource = readFileSync(
+  new URL('../src/lib/api/fetch.ts', import.meta.url),
   'utf8'
 );
 
@@ -33,6 +37,7 @@ test('notifications use locale-aware display fields and forward the locale heade
   assert.doesNotMatch(circlePageSource, /text:\s*n\.body\s*\|\|\s*n\.title/);
   assert.match(notificationsQuerySource, /displayTitle/);
   assert.match(notificationsQuerySource, /displayBody/);
-  assert.match(apolloClientSource, /REQUEST_LOCALE_HEADER/);
-  assert.match(apolloClientSource, /headers\.set\(REQUEST_LOCALE_HEADER/);
+  assert.match(apolloClientSource, /withRequestLocaleHeaders\(options\?\.headers\)/);
+  assert.match(apiFetchSource, /REQUEST_LOCALE_HEADER/);
+  assert.match(apiFetchSource, /nextHeaders\.set\(REQUEST_LOCALE_HEADER/);
 });

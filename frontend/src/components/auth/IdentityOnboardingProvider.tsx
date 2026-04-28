@@ -8,7 +8,7 @@ import {
     isIdentityNotRegisteredError,
     type QueryApiErrorCode,
     type SessionUser,
-} from '@/lib/auth/session';
+} from '@/lib/api/session';
 import { shouldSignAuthSession } from '@/lib/auth/sessionPolicy';
 import {
     IdentityOnboardingContext,

@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { useAlchemeSDK } from './useAlchemeSDK';
 import { PublicKey } from '@solana/web3.js';
 import { BN } from '@coral-xyz/anchor';
-import { waitForSignatureSlot, waitForIndexedSlot } from '@/lib/consistency/sync';
+import { waitForSignatureSlot, waitForIndexedSlot } from '@/lib/api/sync';
 
 interface DeleteContentOptions {
     /** 内容作者的 PublicKey */

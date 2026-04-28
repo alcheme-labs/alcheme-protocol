@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Check, ChevronLeft, ChevronRight, Languages, X } from 'lucide-react';
 import { LOCALE_OPTIONS, type AppLocale } from '@/i18n/config';
 import { useCurrentLocale, useI18n } from '@/i18n/useI18n';
+import { updatePreferredLocale } from '@/lib/api/preferences';
 import styles from './ProfileSettingsSheet.module.css';
 
 interface ProfileSettingsSheetProps {
@@ -44,15 +45,9 @@ export default function ProfileSettingsSheet({ open, onClose }: ProfileSettingsS
 
         setSelectedLocale(nextLocale);
 
-        const response = await fetch('/api/preferences/locale', {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json',
-            },
-            body: JSON.stringify({ locale: nextLocale }),
-        });
-
-        if (!response.ok) {
+        try {
+            await updatePreferredLocale(nextLocale);
+        } catch {
             setSelectedLocale(locale);
             return;
         }

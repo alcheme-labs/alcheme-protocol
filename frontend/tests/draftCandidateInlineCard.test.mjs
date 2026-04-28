@@ -23,7 +23,7 @@ const plazaTabSource = readFileSync(
     'utf8',
 );
 const discussionApiSource = readFileSync(
-    new URL('../src/lib/discussion/api.ts', import.meta.url),
+    new URL('../src/lib/api/discussion.ts', import.meta.url),
     'utf8',
 );
 const pageStyles = readFileSync(

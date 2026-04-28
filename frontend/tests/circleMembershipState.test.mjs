@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 
 import {
   canManageCircleAgents,
@@ -8,6 +9,20 @@ import {
   resolveActiveMembershipSnapshot,
   deriveViewerCircleState,
 } from '../src/lib/circle/membershipState.ts';
+import { fetchCircleIdentityStatus } from '../src/lib/api/circlesMembership.ts';
+
+const membershipApiSource = readFileSync(
+  new URL('../src/lib/api/circlesMembership.ts', import.meta.url),
+  'utf8',
+);
+const providersSource = readFileSync(
+  new URL('../src/app/providers.tsx', import.meta.url),
+  'utf8',
+);
+const apiFetchSource = readFileSync(
+  new URL('../src/lib/api/fetch.ts', import.meta.url),
+  'utf8',
+);
 
 const routeSnapshot = {
   authenticated: true,
@@ -234,4 +249,88 @@ test('agent admin access is limited to active owner, admin, and moderator member
     }),
     false,
   );
+});
+
+test('REST requests carry the active UI locale through the shared API fetch helper', () => {
+  assert.doesNotMatch(providersSource, /installRequestLocaleFetchInterceptor/);
+  assert.doesNotMatch(apiFetchSource, /window\.fetch\s*=/);
+  assert.match(apiFetchSource, /REQUEST_LOCALE_HEADER/);
+  assert.match(apiFetchSource, /let activeRequestLocale: AppLocale \| null = null/);
+  assert.match(apiFetchSource, /apiFetchJson/);
+  assert.match(membershipApiSource, /fetchCircleIdentityStatus\(\s*circleId: number,/);
+  assert.match(membershipApiSource, /apiFetchJson\(input,\s*\{\s*init,/);
+  assert.match(membershipApiSource, /fetchImpl: options\.fetchImpl/);
+  assert.match(membershipApiSource, /locale: options\.locale/);
+  assert.doesNotMatch(membershipApiSource, /searchParams\.set\('locale', locale\)/);
+});
+
+test('fetchCircleIdentityStatus sends the resolved UI locale on the actual REST request', async () => {
+  const originalDocumentDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'document');
+  Object.defineProperty(globalThis, 'document', {
+    configurable: true,
+    value: {
+      documentElement: {
+        lang: 'en-US',
+      },
+      cookie: '',
+    },
+  });
+
+  const requests = [];
+
+  try {
+    const result = await fetchCircleIdentityStatus(7, {
+      fetchImpl: async (input, init) => {
+        const url = String(input);
+        requests.push({ url, init });
+
+        if (url.endsWith('/api/v1/extensions/capabilities')) {
+          return new Response(JSON.stringify({ generatedAt: '2026-04-28T00:00:00.000Z', capabilities: [] }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' },
+          });
+        }
+
+        return new Response(JSON.stringify({
+          authenticated: true,
+          circleId: 7,
+          currentLevel: 'Visitor',
+          nextLevel: 'Initiate',
+          messagingMode: 'formal',
+          hint: 'Send 3 messages to become an initiate.',
+          thresholds: {
+            initiateMessages: 3,
+            memberCitations: 2,
+            elderPercentile: 10,
+            inactivityDays: 30,
+          },
+          transition: null,
+          recentTransition: null,
+          history: [],
+          progress: {
+            messageCount: 0,
+            citationCount: 0,
+            reputationScore: 0,
+            reputationPercentile: 50,
+            daysSinceActive: 1,
+          },
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        });
+      },
+    });
+
+    const identityRequest = requests.find((request) => request.url.endsWith('/api/v1/membership/circles/7/identity-status'));
+    assert.equal(result.circleId, 7);
+    assert.ok(identityRequest, 'identity-status request was not sent');
+    assert.equal(new Headers(identityRequest.init.headers).get('x-alcheme-locale'), 'en');
+    assert.equal(identityRequest.init.credentials, 'include');
+  } finally {
+    if (originalDocumentDescriptor) {
+      Object.defineProperty(globalThis, 'document', originalDocumentDescriptor);
+    } else {
+      delete globalThis.document;
+    }
+  }
 });

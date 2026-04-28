@@ -1,4 +1,4 @@
-import type { CircleDraftWorkflowPolicy, GovernanceRole } from '@/lib/circles/policyProfile';
+import type { CircleDraftWorkflowPolicy, GovernanceRole } from '@/lib/api/circlesPolicyProfile';
 
 export interface DraftPermissionMembership {
     role: 'Owner' | 'Admin' | 'Moderator' | 'Member';

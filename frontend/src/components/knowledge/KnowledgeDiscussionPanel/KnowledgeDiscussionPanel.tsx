@@ -5,14 +5,14 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 
 import type { DiscussionSessionState } from '@/lib/circle/types';
-import { fetchCircleMembershipState } from '@/lib/circles/membership';
+import { fetchCircleMembershipState } from '@/lib/api/circlesMembership';
 import {
     createDiscussionSession,
     fetchKnowledgeDiscussionMessages,
     refreshDiscussionSession,
     sendKnowledgeDiscussionMessage,
     type DiscussionMessageDto,
-} from '@/lib/discussion/api';
+} from '@/lib/api/discussion';
 import { useCurrentLocale, useI18n } from '@/i18n/useI18n';
 import styles from './KnowledgeDiscussionPanel.module.css';
 

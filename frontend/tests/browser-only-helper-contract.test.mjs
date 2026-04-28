@@ -33,7 +33,7 @@ test('browser-only mock mode returns explicit unsupported guidance for chain-dep
 test('shipping frontend code no longer calls testing/e2e helper routes', () => {
     const registerIdentitySource = read('src/hooks/useRegisterIdentity.ts');
     const createCircleSource = read('src/hooks/useCreateCircle.ts');
-    const membershipSource = read('src/lib/circles/membership.ts');
+    const membershipSource = read('src/lib/api/circlesMembership.ts');
 
     assert.doesNotMatch(registerIdentitySource, /\/api\/v1\/testing\/e2e\/register-identity/);
     assert.doesNotMatch(createCircleSource, /\/api\/v1\/testing\/e2e\/create-circle/);

@@ -6,19 +6,19 @@ import {
     X, ArrowLeft, Globe, Lock, Users, GitBranch,
     MessageSquare, BookOpen, FileEdit, Rss,
 } from 'lucide-react';
-import type { CircleGhostSettings } from '@/lib/circles/ghostSettings';
+import type { CircleGhostSettings } from '@/lib/api/circlesGhostSettings';
 import { Select } from '@/components/ui/Select';
-import type { SeededSourceInput } from '@/lib/circles/seeded';
+import type { SeededSourceInput } from '@/lib/api/circlesSeeded';
 import { CIRCLE_NAME_MAX_BYTES, clampUtf8Bytes } from '@/lib/circles/nameLimit';
 import {
     DEFAULT_CIRCLE_DRAFT_WORKFLOW_POLICY,
-} from '@/lib/circles/policyProfile';
+} from '@/lib/api/circlesPolicyProfile';
 import { resolveCreateCircleStepAdvance } from '@/lib/circle/createCircleStepAdvance';
 import type {
     CircleDraftWorkflowPolicy,
     CircleDraftLifecycleTemplate,
     DraftReviewEntryMode,
-} from '@/lib/circles/policyProfile';
+} from '@/lib/api/circlesPolicyProfile';
 import { useCurrentLocale, useI18n } from '@/i18n/useI18n';
 import styles from './CreateCircleSheet.module.css';
 

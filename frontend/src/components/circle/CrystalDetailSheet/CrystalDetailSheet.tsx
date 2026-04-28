@@ -9,7 +9,7 @@ import {
     buildCrystalOutputViewModelFromRecord,
     type CrystallizationOutputRecordInput,
 } from '@/features/crystal-output/adapter';
-import { fetchCrystallizationOutputRecordByKnowledgeId } from '@/features/crystal-output/api';
+import { fetchCrystallizationOutputRecordByKnowledgeId } from '@/lib/api/crystalOutput';
 import { useI18n } from '@/i18n/useI18n';
 import CrystalOutputEvidencePanel from '@/features/crystal-output/CrystalOutputEvidencePanel';
 import styles from './CrystalDetailSheet.module.css';

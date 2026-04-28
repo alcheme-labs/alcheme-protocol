@@ -7,7 +7,7 @@ const circleDetailPageSource = readFileSync(
   'utf8'
 );
 const circleSummaryApiSource = readFileSync(
-  new URL('../src/features/circle-summary/api.ts', import.meta.url),
+  new URL('../src/lib/api/circleSummary.ts', import.meta.url),
   'utf8'
 );
 const circleSummaryPageSource = readFileSync(

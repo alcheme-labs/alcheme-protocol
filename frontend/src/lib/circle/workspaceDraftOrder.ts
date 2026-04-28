@@ -1,4 +1,4 @@
-import type { DraftLifecycleReadModel } from '@/features/draft-working-copy/api';
+import type { DraftLifecycleReadModel } from '@/lib/api/draftWorkingCopy';
 
 export interface WorkspaceDraftLike {
     id: number;

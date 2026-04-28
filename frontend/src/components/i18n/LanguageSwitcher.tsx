@@ -5,6 +5,7 @@ import {useRouter} from 'next/navigation';
 import {useI18n, useCurrentLocale} from '@/i18n/useI18n';
 import {LOCALE_OPTIONS, type AppLocale} from '@/i18n/config';
 import { Select } from '@/components/ui/Select';
+import { updatePreferredLocale } from '@/lib/api/preferences';
 import styles from './LanguageSwitcher.module.css';
 
 export function LanguageSwitcher() {
@@ -21,15 +22,9 @@ export function LanguageSwitcher() {
   async function handleChange(nextLocale: AppLocale) {
     setSelectedLocale(nextLocale);
 
-    const response = await fetch('/api/preferences/locale', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify({locale: nextLocale})
-    });
-
-    if (!response.ok) {
+    try {
+      await updatePreferredLocale(nextLocale);
+    } catch {
       setSelectedLocale(locale);
       return;
     }

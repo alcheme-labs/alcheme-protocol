@@ -2,19 +2,20 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { waitForIndexedSlot, waitForSignatureSlot } from '@/lib/consistency/sync';
+import { waitForIndexedSlot, waitForSignatureSlot } from '@/lib/api/sync';
 import {
     fetchDraftContributorProof,
     fetchDraftProofPackage,
     fetchDraftPublishReadiness,
     registerDraftCrystallizationAttempt,
     submitDraftCrystallizationBinding,
-} from '@/lib/discussion/api';
+} from '@/lib/api/discussion';
 import {
     fetchDraftLifecycle,
     failDraftLifecycleCrystallization,
     repairDraftLifecycleCrystallizationEvidence,
-} from '@/features/draft-working-copy/api';
+} from '@/lib/api/draftWorkingCopy';
+import { uploadFinalDraftDocument } from '@/lib/api/crystallization';
 import { sanitizeCrystalReferenceMarkersForDisplay } from '@/lib/crystal/referenceMarkerText';
 import { useAlchemeSDK } from './useAlchemeSDK';
 
@@ -23,11 +24,6 @@ type NoticeType = 'success' | 'error';
 interface CrystallizeNotice {
     type: NoticeType;
     text: string;
-}
-
-interface StorageUploadPayload {
-    circleId: number;
-    uri: string;
 }
 
 export interface CrystallizeDraftResult {
@@ -201,32 +197,6 @@ function extractIpfsCid(uri: string): string | null {
     if (!normalized.startsWith('ipfs://')) return null;
     const cid = normalized.slice('ipfs://'.length).trim();
     return cid || null;
-}
-
-async function requestJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
-    const response = await fetch(input, init);
-    const payload = await response.json().catch(() => null);
-    if (!response.ok) {
-        const message = typeof payload?.message === 'string'
-            ? payload.message
-            : typeof payload?.error === 'string'
-                ? payload.error
-                : `request failed: ${response.status}`;
-        const error = new Error(message) as Error & {
-            code?: string;
-            status?: number;
-            details?: unknown;
-        };
-        if (typeof payload?.error === 'string') {
-            error.code = payload.error;
-        }
-        error.status = response.status;
-        if (payload && typeof payload === 'object' && 'details' in payload) {
-            error.details = (payload as Record<string, unknown>).details;
-        }
-        throw error;
-    }
-    return payload as T;
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -648,20 +618,12 @@ export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
                 });
                 const contentHash = await sha256Hex(document);
 
-                const upload = await requestJson<StorageUploadPayload>(
-                    `${baseUrl}/api/v1/storage/drafts/${draftPostId}/final-document`,
-                    {
-                        method: 'POST',
-                        credentials: 'include',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            title,
-                            document,
-                        }),
-                    },
-                );
+                const upload = await uploadFinalDraftDocument({
+                    baseUrl,
+                    draftPostId,
+                    title,
+                    document,
+                });
 
                 if (upload.circleId !== proof.circleId) {
                     throw createCrystallizationError(

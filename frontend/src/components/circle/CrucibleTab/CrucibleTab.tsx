@@ -3,7 +3,6 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { resolveNodeRoute } from '@/lib/config/nodeRouting';
 import { useCurrentLocale, useI18n } from '@/i18n/useI18n';
 
 import CrucibleEditor from '@/components/circle/CrucibleEditor';
@@ -23,7 +22,7 @@ import {
     retryDraftLifecycleCrystallization as retryDraftLifecycleCrystallizationRequest,
     rollbackDraftLifecycleCrystallization as rollbackDraftLifecycleCrystallizationRequest,
     type DraftLifecycleReadModel,
-} from '@/features/draft-working-copy/api';
+} from '@/lib/api/draftWorkingCopy';
 import { useCollaboration } from '@/lib/collaboration';
 import { useCrystallizeDraft } from '@/hooks/useCrystallizeDraft';
 import { useGhostDraftGeneration } from '@/hooks/useGhostDraftGeneration';
@@ -54,22 +53,31 @@ import {
     type DraftDiscussionThreadRecord,
     type DraftDiscussionTargetType,
     withdrawDraftDiscussion,
-} from '@/lib/discussion/api';
-import type { CircleDraftLifecycleTemplate, CircleDraftWorkflowPolicy } from '@/lib/circles/policyProfile';
+} from '@/lib/api/discussion';
+import type { CircleDraftLifecycleTemplate, CircleDraftWorkflowPolicy } from '@/lib/api/circlesPolicyProfile';
 import {
     fetchSeededFileTree,
     type SeededFileTreeNode,
     type SeededReferenceSelection,
-} from '@/lib/circles/seeded';
+} from '@/lib/api/circlesSeeded';
 import {
     fetchSourceMaterials,
     uploadSourceMaterial,
     type SourceMaterialRecord,
-} from '@/lib/circles/sourceMaterials';
+} from '@/lib/api/circlesSourceMaterials';
 import {
     fetchDraftReferenceLinks,
     type DraftReferenceLink,
-} from '@/lib/drafts/referenceLinks';
+} from '@/lib/api/draftReferenceLinks';
+import {
+    fetchDiscussionDraftContent,
+    fetchTemporaryEditGrantsForDraft,
+    issueTemporaryEditGrant as issueTemporaryEditGrantRequest,
+    requestTemporaryEditGrantForDraft,
+    revokeTemporaryEditGrant as revokeTemporaryEditGrantRequest,
+    saveDiscussionDraftContent,
+    type TemporaryEditGrantView,
+} from '@/lib/api/draftRuntime';
 import { deriveDraftReferenceSurface } from '@/lib/circle/draftReferenceSurface';
 import type { KnowledgeReferenceOption } from '@/lib/circle/knowledgeReferenceOptions';
 import {
@@ -85,25 +93,6 @@ interface CrucibleDraft {
     editors: number;
     comments: number;
     documentStatus?: WorkspaceDraftLifecycleStatus;
-}
-
-interface TemporaryEditGrantView {
-    grantId: string;
-    draftPostId: number;
-    blockId: string;
-    granteeUserId: number;
-    requestedBy: number;
-    grantedBy: number | null;
-    revokedBy: number | null;
-    approvalMode: 'manager_confirm' | 'governance_vote';
-    status: 'requested' | 'active' | 'revoked' | 'expired' | 'rejected';
-    governanceProposalId: string | null;
-    requestNote: string | null;
-    expiresAt: string | null;
-    requestedAt: string;
-    grantedAt: string | null;
-    revokedAt: string | null;
-    updatedAt: string;
 }
 
 interface GhostDraftReplaceRequest {
@@ -336,11 +325,6 @@ function CrucibleTab({
         },
     );
     const [addDraftComment] = useMutation<AddDraftCommentResponse>(ADD_DRAFT_COMMENT);
-    const getDraftRuntimeBaseUrl = useCallback(async (): Promise<string> => {
-        const route = await resolveNodeRoute('discussion_runtime');
-        return route.urlBase;
-    }, []);
-
     const loadTemporaryEditGrants = useCallback(async (): Promise<void> => {
         if (!selectedDraftPostId || !Number.isFinite(selectedDraftPostId)) {
             setTemporaryEditGrants([]);
@@ -349,26 +333,17 @@ function CrucibleTab({
         }
 
         try {
-            const baseUrl = await getDraftRuntimeBaseUrl();
-            const response = await fetch(
-                `${baseUrl}/api/v1/temporary-edit-grants/drafts/${selectedDraftPostId}/temporary-edit-grants`,
-                {
-                    method: 'GET',
-                    credentials: 'include',
-                    cache: 'no-store',
-                },
+            const grants = await fetchTemporaryEditGrantsForDraft(
+                selectedDraftPostId,
+                t('errors.loadTemporaryEditGrants'),
             );
-            const payload = await response.json().catch(() => null);
-            if (!response.ok) {
-                throw new Error(payload?.message || payload?.error || t('errors.loadTemporaryEditGrants'));
-            }
-            setTemporaryEditGrants(Array.isArray(payload?.grants) ? payload.grants : []);
+            setTemporaryEditGrants(grants);
             setTemporaryEditGrantError(null);
         } catch (error) {
             const message = error instanceof Error ? error.message : t('errors.loadTemporaryEditGrants');
             setTemporaryEditGrantError(message);
         }
-    }, [getDraftRuntimeBaseUrl, selectedDraftPostId, t]);
+    }, [selectedDraftPostId, t]);
 
     useEffect(() => {
         void loadTemporaryEditGrants();
@@ -621,28 +596,18 @@ function CrucibleTab({
         const payloadText = text.trim();
         if (!payloadText) return;
         try {
-            const baseUrl = await getDraftRuntimeBaseUrl();
-            const response = await fetch(`${baseUrl}/api/v1/discussion/drafts/${postId}/content`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ text: payloadText }),
-            });
-            const payload = await response.json().catch(() => null);
-            if (!response.ok) {
-                throw new Error(payload?.message || t('errors.saveDraft'));
-            }
-            const saved = response.ok;
-            if (saved && typeof payload?.heatScore === 'number') {
+            const payload = await saveDiscussionDraftContent(postId, payloadText, t('errors.saveDraft'));
+            const saved = true;
+            if (typeof payload.heatScore === 'number') {
                 setDisplayHeat(Math.max(0, payload.heatScore));
             }
-            if (saved && payload?.updatedAt && draftLifecycle) {
+            if (payload.updatedAt && draftLifecycle) {
                 setDraftLifecycle({
                     ...draftLifecycle,
                     workingCopy: {
                         ...draftLifecycle.workingCopy,
                         workingCopyContent: payloadText,
-                        updatedAt: String(payload.updatedAt),
+                        updatedAt: payload.updatedAt,
                     },
                 });
             }
@@ -661,7 +626,7 @@ function CrucibleTab({
             }
             return null;
         }
-    }, [draftLifecycle, getDraftRuntimeBaseUrl, loadDraftReferenceLinks]);
+    }, [draftLifecycle, loadDraftReferenceLinks, t]);
 
     const syncDraftSurfaceFromLifecycle = useCallback((
         lifecycle: DraftLifecycleReadModel,
@@ -1360,26 +1325,9 @@ function CrucibleTab({
 
         const fetchDraftContent = async () => {
             try {
-                const baseUrl = await getDraftRuntimeBaseUrl();
-                const response = await fetch(
-                    `${baseUrl}/api/v1/discussion/drafts/${selectedDraftPostId}/content`,
-                    {
-                        cache: 'no-store',
-                        credentials: 'include',
-                    },
-                );
-
-                if (!response.ok) {
-                    if (response.status === 404 || response.status === 409) {
-                        if (!cancelled) setSelectedDraftContent('');
-                        return;
-                    }
-                    throw new Error(`draft content fetch failed: ${response.status}`);
-                }
-
-                const payload = await response.json().catch(() => null);
+                const payload = await fetchDiscussionDraftContent(selectedDraftPostId);
                 if (!cancelled) {
-                    const nextText = typeof payload?.text === 'string' ? payload.text : '';
+                    const nextText = payload?.text ?? '';
                     autosaveTextRef.current = nextText;
                     hasUnsavedDraftRef.current = false;
                     setSelectedDraftContent(nextText);
@@ -1403,7 +1351,7 @@ function CrucibleTab({
         return () => {
             cancelled = true;
         };
-    }, [getDraftRuntimeBaseUrl, selectedDraftPostId]);
+    }, [selectedDraftPostId]);
 
     useEffect(() => {
         if (selectedParagraphIndex === null) return;
@@ -1494,16 +1442,8 @@ function CrucibleTab({
             });
             await refetchDraftComments();
             try {
-                const baseUrl = await getDraftRuntimeBaseUrl();
-                const heatResponse = await fetch(
-                    `${baseUrl}/api/v1/discussion/drafts/${selectedDraftPostId}/content`,
-                    {
-                        cache: 'no-store',
-                        credentials: 'include',
-                    },
-                );
-                const heatPayload = await heatResponse.json().catch(() => null);
-                if (heatResponse.ok && typeof heatPayload?.heatScore === 'number') {
+                const heatPayload = await fetchDiscussionDraftContent(selectedDraftPostId);
+                if (typeof heatPayload?.heatScore === 'number') {
                     setDisplayHeat(Math.max(0, heatPayload.heatScore));
                 }
             } catch (error) {
@@ -1513,7 +1453,7 @@ function CrucibleTab({
             console.warn('add draft comment failed:', error);
             showNotice('error', t('errors.sendComment'));
         }
-    }, [addDraftComment, getDraftRuntimeBaseUrl, refetchDraftComments, selectedDraftPostId, showNotice, t]);
+    }, [addDraftComment, refetchDraftComments, selectedDraftPostId, showNotice, t]);
 
     const requestTemporaryEditGrant = useCallback(async (input: {
         blockId: string;
@@ -1522,23 +1462,11 @@ function CrucibleTab({
         setTemporaryEditGrantBusy(true);
         setTemporaryEditGrantError(null);
         try {
-            const baseUrl = await getDraftRuntimeBaseUrl();
-            const response = await fetch(
-                `${baseUrl}/api/v1/temporary-edit-grants/drafts/${selectedDraftPostId}/temporary-edit-grants`,
-                {
-                    method: 'POST',
-                    credentials: 'include',
-                    cache: 'no-store',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        blockId: input.blockId,
-                    }),
-                },
+            await requestTemporaryEditGrantForDraft(
+                selectedDraftPostId,
+                { blockId: input.blockId },
+                t('errors.requestTemporaryEditGrant'),
             );
-            const payload = await response.json().catch(() => null);
-            if (!response.ok) {
-                throw new Error(payload?.message || payload?.error || t('errors.requestTemporaryEditGrant'));
-            }
             await loadTemporaryEditGrants();
             setNotice({
                 type: 'success',
@@ -1554,7 +1482,7 @@ function CrucibleTab({
         } finally {
             setTemporaryEditGrantBusy(false);
         }
-    }, [getDraftRuntimeBaseUrl, loadTemporaryEditGrants, selectedDraftPostId, t]);
+    }, [loadTemporaryEditGrants, selectedDraftPostId, t]);
 
     const issueTemporaryEditGrant = useCallback(async (input: {
         grantId: string;
@@ -1562,23 +1490,11 @@ function CrucibleTab({
         setTemporaryEditGrantBusy(true);
         setTemporaryEditGrantError(null);
         try {
-            const baseUrl = await getDraftRuntimeBaseUrl();
-            const response = await fetch(
-                `${baseUrl}/api/v1/temporary-edit-grants/grants/${input.grantId}/issue`,
-                {
-                    method: 'POST',
-                    credentials: 'include',
-                    cache: 'no-store',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        expiresInMinutes: 60,
-                    }),
-                },
+            await issueTemporaryEditGrantRequest(
+                input.grantId,
+                { expiresInMinutes: 60 },
+                t('errors.issueTemporaryEditGrant'),
             );
-            const payload = await response.json().catch(() => null);
-            if (!response.ok) {
-                throw new Error(payload?.message || payload?.error || t('errors.issueTemporaryEditGrant'));
-            }
             await loadTemporaryEditGrants();
             setNotice({
                 type: 'success',
@@ -1594,7 +1510,7 @@ function CrucibleTab({
         } finally {
             setTemporaryEditGrantBusy(false);
         }
-    }, [getDraftRuntimeBaseUrl, loadTemporaryEditGrants, t]);
+    }, [loadTemporaryEditGrants, t]);
 
     const revokeTemporaryEditGrant = useCallback(async (input: {
         grantId: string;
@@ -1602,19 +1518,7 @@ function CrucibleTab({
         setTemporaryEditGrantBusy(true);
         setTemporaryEditGrantError(null);
         try {
-            const baseUrl = await getDraftRuntimeBaseUrl();
-            const response = await fetch(
-                `${baseUrl}/api/v1/temporary-edit-grants/grants/${input.grantId}/revoke`,
-                {
-                    method: 'POST',
-                    credentials: 'include',
-                    cache: 'no-store',
-                },
-            );
-            const payload = await response.json().catch(() => null);
-            if (!response.ok) {
-                throw new Error(payload?.message || payload?.error || t('errors.revokeTemporaryEditGrant'));
-            }
+            await revokeTemporaryEditGrantRequest(input.grantId, t('errors.revokeTemporaryEditGrant'));
             await loadTemporaryEditGrants();
             setNotice({
                 type: 'success',
@@ -1630,7 +1534,7 @@ function CrucibleTab({
         } finally {
             setTemporaryEditGrantBusy(false);
         }
-    }, [getDraftRuntimeBaseUrl, loadTemporaryEditGrants, t]);
+    }, [loadTemporaryEditGrants, t]);
 
     const handleExecuteCrystallization = useCallback(async () => {
         if (

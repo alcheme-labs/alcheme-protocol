@@ -83,7 +83,7 @@ describe('membership identity-status route', () => {
         } as any;
 
         const response = await request(buildApp(prisma))
-            .get('/api/v1/membership/circles/7/identity-status')
+            .get('/api/v1/membership/circles/7/identity-status?locale=zh')
             .expect(200);
 
         expect(response.body.recentTransition).toBeNull();
@@ -143,11 +143,42 @@ describe('membership identity-status route', () => {
         } as any;
 
         const response = await request(buildApp(prisma))
-            .get('/api/v1/membership/circles/7/identity-status')
+            .get('/api/v1/membership/circles/7/identity-status?locale=zh')
             .expect(200);
 
         expect(response.body.currentLevel).toBe('Member');
         expect(response.body.progress.reputationPercentile).toBe(30);
         expect(response.body.hint).toBe('当前信誉位于前 30%（需进入前 10%）方可晋升为长老。');
+    });
+
+    test('localizes visitor eligibility hint for requested English locale', async () => {
+        const prisma = {
+            circle: {
+                findUnique: jest.fn(async () => ({
+                    id: 7,
+                    creatorId: 99,
+                    createdAt: new Date('2026-03-01T00:00:00.000Z'),
+                })),
+            },
+            user: {
+                findUnique: jest.fn(async () => ({
+                    id: 11,
+                    pubkey: 'wallet-11',
+                    reputationScore: 0,
+                })),
+            },
+            circleMember: {
+                findUnique: jest.fn(async () => null),
+            },
+            $queryRaw: jest.fn(async () => ([{ count: 0 }])),
+        } as any;
+
+        const response = await request(buildApp(prisma))
+            .get('/api/v1/membership/circles/7/identity-status')
+            .set('x-alcheme-locale', 'en')
+            .expect(200);
+
+        expect(response.body.currentLevel).toBe('Visitor');
+        expect(response.body.hint).toBe('You have sent 0 messages; 3 are required to become an Initiate.');
     });
 });

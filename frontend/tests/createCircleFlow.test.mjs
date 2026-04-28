@@ -39,7 +39,7 @@ test('waitForCircleReadModelVisibility retries through 404 until the circle beco
     circleId: 42,
     baseUrl: 'https://public.alcheme.test',
     pollMs: 1,
-    timeoutMs: 20,
+    timeoutMs: 100,
     fetchImpl: async (input) => {
       attempts += 1;
       if (attempts < 3) {

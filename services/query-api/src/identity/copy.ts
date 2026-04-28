@@ -1,4 +1,6 @@
 import { IdentityLevel, type IdentityThresholds } from './thresholds';
+import type { AppLocale } from '../i18n/locale';
+import { localizeIdentityReason } from './reasonLocalization';
 
 type IdentityReasonKey =
     | 'identity.message_threshold_promoted'
@@ -53,20 +55,44 @@ export function buildIdentityHint(input: {
     citationCount: number;
     reputationPercentile: number | null;
     latestEvaluationReason?: string | null;
+    locale: AppLocale;
 }): string {
+    const locale = input.locale;
     if (input.latestEvaluationReason) {
-        return input.latestEvaluationReason;
+        return localizeIdentityReason(input.latestEvaluationReason, locale);
     }
     if (input.currentLevel === IdentityLevel.Visitor) {
-        return buildVisitorEligibilityReason(input.messageCount, input.thresholds.initiateMessages);
+        return localizeIdentityReason(
+            buildVisitorEligibilityReason(input.messageCount, input.thresholds.initiateMessages),
+            locale,
+        );
     }
     if (input.currentLevel === IdentityLevel.Initiate) {
-        return buildInitiateEligibilityReason(input.citationCount, input.thresholds.memberCitations);
+        return localizeIdentityReason(
+            buildInitiateEligibilityReason(input.citationCount, input.thresholds.memberCitations),
+            locale,
+        );
     }
     if (input.currentLevel === IdentityLevel.Member) {
-        return buildMemberElderEligibilityReason(input.reputationPercentile, input.thresholds.elderPercentile);
+        return localizeIdentityReason(
+            buildMemberElderEligibilityReason(input.reputationPercentile, input.thresholds.elderPercentile),
+            locale,
+        );
     }
-    return '已处于长老层级，保持活跃可维持当前身份。';
+    return localizeIdentityReason('已处于长老层级，保持活跃可维持当前身份。', locale);
+}
+
+export function buildVisitorDustHint(locale: AppLocale): string {
+    if (locale === 'en') {
+        return 'Visitors can send dust messages, but they do not enter the formal settlement flow.';
+    }
+    if (locale === 'es') {
+        return 'Los visitantes pueden enviar mensajes efímeros, pero no entran en el flujo formal de asentamiento.';
+    }
+    if (locale === 'fr') {
+        return 'Les visiteurs peuvent envoyer des messages éphémères, mais ils n’entrent pas dans le flux formel de consolidation.';
+    }
+    return '游客可发烟尘消息，但不进入正式沉淀链路。';
 }
 
 export function buildCompletedIdentityTransitionReason(input: {
