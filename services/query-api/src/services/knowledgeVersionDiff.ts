@@ -1,4 +1,6 @@
 import { Prisma, type PrismaClient } from '@prisma/client';
+import { localizeQueryApiCopy } from '../i18n/copy';
+import { DEFAULT_LOCALE, type AppLocale } from '../i18n/locale';
 
 export interface KnowledgeVersionSnapshotView {
     knowledgeId: string;
@@ -116,8 +118,10 @@ export async function loadKnowledgeVersionDiff(
         knowledgeId: string;
         fromVersion: number;
         toVersion: number;
+        locale?: AppLocale;
     },
 ): Promise<KnowledgeVersionDiffView | null> {
+    const locale = input.locale ?? DEFAULT_LOCALE;
     const knowledgeId = String(input.knowledgeId || '').trim();
     if (!knowledgeId) return null;
 
@@ -198,31 +202,31 @@ export async function loadKnowledgeVersionDiff(
     const fieldChanges: KnowledgeVersionFieldChange[] = [];
     pushChange(fieldChanges, {
         field: 'eventType',
-        label: '事件类型',
+        label: localizeQueryApiCopy('knowledge.version.field.eventType', locale),
         fromValue: fromSnapshot.eventType,
         toValue: toSnapshot.eventType,
     });
     pushChange(fieldChanges, {
         field: 'actorHandle',
-        label: '执行者',
+        label: localizeQueryApiCopy('knowledge.version.field.actorHandle', locale),
         fromValue: fromSnapshot.actorHandle ?? fromSnapshot.actorPubkey,
         toValue: toSnapshot.actorHandle ?? toSnapshot.actorPubkey,
     });
     pushChange(fieldChanges, {
         field: 'contributorsCount',
-        label: '贡献者人数',
+        label: localizeQueryApiCopy('knowledge.version.field.contributorsCount', locale),
         fromValue: fromSnapshot.contributorsCount,
         toValue: toSnapshot.contributorsCount,
     });
     pushChange(fieldChanges, {
         field: 'contributorsRoot',
-        label: '贡献根',
+        label: localizeQueryApiCopy('knowledge.version.field.contributorsRoot', locale),
         fromValue: fromSnapshot.contributorsRoot,
         toValue: toSnapshot.contributorsRoot,
     });
     pushChange(fieldChanges, {
         field: 'sourceEventTimestamp',
-        label: '来源事件时间戳',
+        label: localizeQueryApiCopy('knowledge.version.field.sourceEventTimestamp', locale),
         fromValue: fromSnapshot.sourceEventTimestamp,
         toValue: toSnapshot.sourceEventTimestamp,
     });
@@ -231,10 +235,10 @@ export async function loadKnowledgeVersionDiff(
         .filter((field) => !fromSnapshot.hasContentSnapshot || !toSnapshot.hasContentSnapshot);
 
     const summary = unavailableFields.length > 0
-        ? '当前只能比较版本事件元数据；历史正文快照尚未入库。'
+        ? localizeQueryApiCopy('knowledge.version.summary.unavailableContentSnapshots', locale)
         : fieldChanges.length > 0
-            ? `当前可读到 ${fieldChanges.length} 处版本差异。`
-            : '两个版本在当前可读范围内没有差异。';
+            ? localizeQueryApiCopy('knowledge.version.summary.changedFields', locale, { count: fieldChanges.length })
+            : localizeQueryApiCopy('knowledge.version.summary.noChanges', locale);
 
     return {
         knowledgeId,

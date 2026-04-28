@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { Redis } from 'ioredis';
 import { loadKnowledgeVersionDiff } from '../services/knowledgeVersionDiff';
+import { resolveExpressRequestLocale } from '../i18n/request';
 
 export function crystalRouter(prisma: PrismaClient, redis: Redis): Router {
     const router = Router();
@@ -20,6 +21,7 @@ export function crystalRouter(prisma: PrismaClient, redis: Redis): Router {
                 knowledgeId,
                 fromVersion,
                 toVersion,
+                locale: resolveExpressRequestLocale(req),
             });
 
             if (!diff) {

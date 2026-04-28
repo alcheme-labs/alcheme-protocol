@@ -11,7 +11,11 @@ import {
     createPrismaGovernanceRuntimeStore,
 } from '../services/governance/runtime';
 import { resolveDraftLifecycleReadModel } from '../services/draftLifecycle/readModel';
-import { resolveDraftWorkflowPermission } from '../services/policy/draftWorkflowPermissions';
+import {
+    localizeDraftWorkflowPermissionDecision,
+    resolveDraftWorkflowPermission,
+} from '../services/policy/draftWorkflowPermissions';
+import { resolveExpressRequestLocale } from '../i18n/request';
 import {
     acceptRevisionDirectionProposal,
     createPrismaRevisionDirectionStore,
@@ -114,7 +118,7 @@ export function revisionDirectionRouter(prisma: PrismaClient, _redis: Redis): Ro
             if (!permission.allowed) {
                 return res.status(403).json({
                     error: 'revision_direction_permission_denied',
-                    message: permission.reason,
+                    message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                 });
             }
 
@@ -208,7 +212,7 @@ export function revisionDirectionRouter(prisma: PrismaClient, _redis: Redis): Ro
                 if (!permission.allowed) {
                     return res.status(403).json({
                         error: 'revision_direction_role_confirmation_required',
-                        message: permission.reason,
+                        message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                     });
                 }
             } else {
@@ -283,7 +287,7 @@ export function revisionDirectionRouter(prisma: PrismaClient, _redis: Redis): Ro
                 if (!permission.allowed) {
                     return res.status(403).json({
                         error: 'revision_direction_role_confirmation_required',
-                        message: permission.reason,
+                        message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                     });
                 }
             } else {

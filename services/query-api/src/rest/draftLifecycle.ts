@@ -28,7 +28,11 @@ import {
     DraftWorkflowStateError,
     getPersistedDraftWorkflowState,
 } from '../services/draftLifecycle/workflowState';
-import { resolveDraftWorkflowPermission } from '../services/policy/draftWorkflowPermissions';
+import {
+    localizeDraftWorkflowPermissionDecision,
+    resolveDraftWorkflowPermission,
+} from '../services/policy/draftWorkflowPermissions';
+import { resolveExpressRequestLocale } from '../i18n/request';
 
 function parsePositiveInt(value: unknown): number | null {
     const parsed = Number.parseInt(String(value ?? ''), 10);
@@ -136,7 +140,7 @@ export function draftLifecycleRouter(prisma: PrismaClient, _redis: Redis): Route
             if (!permission.allowed) {
                 return res.status(403).json({
                     error: 'draft_manual_review_permission_denied',
-                    message: permission.reason,
+                    message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                 });
             }
 
@@ -205,7 +209,7 @@ export function draftLifecycleRouter(prisma: PrismaClient, _redis: Redis): Route
             if (!permission.allowed) {
                 return res.status(403).json({
                     error: 'draft_review_advance_permission_denied',
-                    message: permission.reason,
+                    message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                 });
             }
 
@@ -288,7 +292,7 @@ export function draftLifecycleRouter(prisma: PrismaClient, _redis: Redis): Route
             if (!permission.allowed) {
                 return res.status(403).json({
                     error: 'draft_enter_crystallization_permission_denied',
-                    message: permission.reason,
+                    message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                 });
             }
             const actor = await prisma.user.findUnique({
@@ -371,7 +375,7 @@ export function draftLifecycleRouter(prisma: PrismaClient, _redis: Redis): Route
             if (!permission.allowed) {
                 return res.status(403).json({
                     error: 'draft_fail_crystallization_permission_denied',
-                    message: permission.reason,
+                    message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                 });
             }
 
@@ -445,7 +449,7 @@ export function draftLifecycleRouter(prisma: PrismaClient, _redis: Redis): Route
             if (!permission.allowed) {
                 return res.status(403).json({
                     error: 'draft_retry_crystallization_permission_denied',
-                    message: permission.reason,
+                    message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                 });
             }
             const actor = await prisma.user.findUnique({
@@ -528,7 +532,7 @@ export function draftLifecycleRouter(prisma: PrismaClient, _redis: Redis): Route
             if (!permission.allowed) {
                 return res.status(403).json({
                     error: 'draft_repair_crystallization_evidence_permission_denied',
-                    message: permission.reason,
+                    message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                 });
             }
 
@@ -588,7 +592,7 @@ export function draftLifecycleRouter(prisma: PrismaClient, _redis: Redis): Route
             if (!permission.allowed) {
                 return res.status(403).json({
                     error: 'draft_rollback_crystallization_permission_denied',
-                    message: permission.reason,
+                    message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                 });
             }
 
@@ -662,7 +666,7 @@ export function draftLifecycleRouter(prisma: PrismaClient, _redis: Redis): Route
             if (!permission.allowed) {
                 return res.status(403).json({
                     error: 'draft_archive_permission_denied',
-                    message: permission.reason,
+                    message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                 });
             }
             const actor = await prisma.user.findUnique({
@@ -763,7 +767,7 @@ export function draftLifecycleRouter(prisma: PrismaClient, _redis: Redis): Route
             if (!permission.allowed) {
                 return res.status(403).json({
                     error: 'draft_restore_permission_denied',
-                    message: permission.reason,
+                    message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                 });
             }
             const actor = await prisma.user.findUnique({

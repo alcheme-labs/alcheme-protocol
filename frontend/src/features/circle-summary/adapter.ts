@@ -54,6 +54,7 @@ export interface CircleSummaryGenerationMetadata {
     promptAsset: string;
     promptVersion: string;
     sourceDigest: string;
+    locale?: string;
 }
 
 export interface CircleSummarySnapshot {
@@ -511,6 +512,7 @@ function normalizeGenerationMetadata(value: unknown): CircleSummaryGenerationMet
     const promptAsset = asNullableString(root.promptAsset);
     const promptVersion = asNullableString(root.promptVersion);
     const sourceDigest = asNullableString(root.sourceDigest);
+    const locale = asNullableString(root.locale);
 
     if (!providerMode || !model || !promptAsset || !promptVersion || !sourceDigest) {
         return null;
@@ -522,6 +524,7 @@ function normalizeGenerationMetadata(value: unknown): CircleSummaryGenerationMet
         promptAsset,
         promptVersion,
         sourceDigest,
+        ...(locale ? {locale} : {}),
     };
 }
 

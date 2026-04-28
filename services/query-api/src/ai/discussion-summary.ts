@@ -1,6 +1,7 @@
 import { generateAiText } from './provider';
 import { buildAiSourceDigest, type AiGenerationMetadata } from './metadata';
 import { getPromptMetadata, getPromptSchema, getSystemPrompt } from './prompts/registry';
+import { localizeQueryApiCopy } from '../i18n/copy';
 
 export interface DiscussionSummaryMessage {
     senderHandle: string | null;
@@ -511,7 +512,7 @@ export async function summarizeDiscussionThread(
     });
     if (validMessages.length === 0) {
         return {
-            summary: '当前还没有可总结的讨论内容。',
+            summary: localizeQueryApiCopy('discussionSummary.noContent', 'en'),
             method: 'rule',
             generatedAt: new Date(),
             messageCount: 0,

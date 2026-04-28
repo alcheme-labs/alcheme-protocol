@@ -29,6 +29,14 @@ test('circle summary adapter normalizes persisted generation metadata instead of
     assert.match(adapterSource, /promptAsset/);
     assert.match(adapterSource, /promptVersion/);
     assert.match(adapterSource, /sourceDigest/);
+    assert.match(adapterSource, /locale/);
+});
+
+test('circle summary snapshot adapter preserves generated snapshot narrative instead of translating it at display time', () => {
+    assert.match(adapterSource, /issueMap: input\.snapshot\.issueMap,/);
+    assert.match(adapterSource, /timeline: input\.snapshot\.sedimentationTimeline,/);
+    assert.match(adapterSource, /openQuestions: input\.snapshot\.openQuestions,/);
+    assert.doesNotMatch(adapterSource, /canUseSnapshotNarrative/);
 });
 
 test('circle summary api keeps the existing synchronous snapshot contract and reads generation metadata from the route payload', () => {

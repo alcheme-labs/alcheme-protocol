@@ -19,6 +19,7 @@ import { loadCircleAgentsByPubkeys } from '../services/agents/runtime';
 import { resolveOwnedCrystalCount } from '../services/crystalEntitlements/runtime';
 import { resolveProjectedCircleSettings } from '../services/policy/settingsEnvelope';
 import { publishDiscussionRealtimeEvent } from '../services/discussion/realtime';
+import { localizeQueryApiCopy } from '../i18n/copy';
 
 // DateTime Scalar
 const dateTimeScalar = new GraphQLScalarType({
@@ -163,10 +164,10 @@ function stringifyCachePayload(value: unknown): string {
         typeof nestedValue === 'bigint' ? nestedValue.toString() : nestedValue);
 }
 
-function buildMemberActivityText(input: { kind: 'post' | 'draft' | 'crystal' }): string {
-    if (input.kind === 'draft') return '更新了一份草稿';
-    if (input.kind === 'crystal') return '结晶了一枚知识';
-    return '发布了一条动态';
+function buildMemberActivityText(input: { kind: 'post' | 'draft' | 'crystal'; locale: Context['locale'] }): string {
+    if (input.kind === 'draft') return localizeQueryApiCopy('graphql.activity.draft', input.locale);
+    if (input.kind === 'crystal') return localizeQueryApiCopy('graphql.activity.crystal', input.locale);
+    return localizeQueryApiCopy('graphql.activity.post', input.locale);
 }
 
 function normalizeNumericScore(value: Prisma.Decimal | number | string | null | undefined, fallback = 0): number {
@@ -494,7 +495,7 @@ export const resolvers = {
         followingFlow: async (
             _: any,
             { limit, offset }: { limit: number; offset: number },
-            { prisma, userId }: Context,
+            { prisma, userId, locale }: Context,
         ) => {
             if (!userId) return [];
             const resolvedLimit = Math.max(1, Math.min(limit ?? 20, 100));
@@ -540,7 +541,7 @@ export const resolvers = {
         publicFlow: async (
             _: any,
             { limit, offset }: { limit: number; offset: number },
-            { prisma }: Context,
+            { prisma, locale }: Context,
         ) => {
             const resolvedLimit = Math.max(1, Math.min(limit ?? 20, 50));
             const resolvedOffset = Math.max(0, offset ?? 0);
@@ -597,7 +598,9 @@ export const resolvers = {
                 id: `${row.kind.toLowerCase()}:${row.sourceId}`,
                 kind: row.kind,
                 sourceId: row.sourceId,
-                title: row.title || (row.kind === 'Discussion' ? '圈层讨论' : '知识结晶'),
+                title: row.title || (row.kind === 'Discussion'
+                    ? localizeQueryApiCopy('graphql.publicFlow.discussionTitle', locale)
+                    : localizeQueryApiCopy('graphql.publicFlow.crystalTitle', locale)),
                 excerpt: row.excerpt || row.title || '',
                 circleId: row.circleId,
                 circleName: row.circleName,
@@ -965,7 +968,7 @@ export const resolvers = {
         memberProfile: async (
             _: any,
             { circleId, userId }: { circleId: number; userId: number },
-            { prisma, userId: viewerUserId }: Context,
+            { prisma, userId: viewerUserId, locale }: Context,
         ) => {
             if (!viewerUserId) return null;
 
@@ -1103,12 +1106,13 @@ export const resolvers = {
                     type: String(post.status) === 'Draft' ? 'draft' : 'post',
                     text: buildMemberActivityText({
                         kind: String(post.status) === 'Draft' ? 'draft' : 'post',
+                        locale,
                     }),
                     createdAt: post.createdAt,
                 })),
                 ...recentKnowledge.map((knowledge: { createdAt: Date }) => ({
                     type: 'crystal',
-                    text: buildMemberActivityText({ kind: 'crystal' }),
+                    text: buildMemberActivityText({ kind: 'crystal', locale }),
                     createdAt: knowledge.createdAt,
                 })),
             ]
@@ -1876,7 +1880,7 @@ export const resolvers = {
         versionDiff: async (
             knowledge: any,
             { fromVersion, toVersion }: { fromVersion: number; toVersion: number },
-            { prisma }: Context,
+            { prisma, locale }: Context,
         ) => {
             const knowledgeId = typeof knowledge.knowledgeId === 'string' ? knowledge.knowledgeId.trim() : '';
             if (!knowledgeId) return null;
@@ -1884,6 +1888,7 @@ export const resolvers = {
                 knowledgeId,
                 fromVersion,
                 toVersion,
+                locale,
             });
         },
 
@@ -2075,7 +2080,7 @@ export const resolvers = {
                     workingCopyUpdatedAt?: string | Date | null;
                 };
             },
-            { prisma, userId }: Context,
+            { prisma, userId, locale }: Context,
         ) {
             if (!userId) throw new Error('Authentication required');
 
@@ -2094,6 +2099,7 @@ export const resolvers = {
                 suggestionId: input.suggestionId || null,
                 userId,
                 mode,
+                locale,
                 workingCopyHash: input.workingCopyHash || null,
                 workingCopyUpdatedAt: input.workingCopyUpdatedAt || null,
             });

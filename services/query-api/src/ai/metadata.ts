@@ -6,6 +6,7 @@ export interface AiGenerationMetadata {
     promptAsset: string;
     promptVersion: string;
     sourceDigest: string;
+    locale?: string;
 }
 
 function stableStringify(value: unknown): string {
@@ -46,6 +47,7 @@ export function normalizeAiGenerationMetadata(value: unknown): AiGenerationMetad
     const promptAsset = asString(root.promptAsset);
     const promptVersion = asString(root.promptVersion);
     const sourceDigest = asString(root.sourceDigest);
+    const locale = asString(root.locale);
 
     if (!providerMode || !model || !promptAsset || !promptVersion || !sourceDigest) {
         return null;
@@ -57,5 +59,6 @@ export function normalizeAiGenerationMetadata(value: unknown): AiGenerationMetad
         promptAsset,
         promptVersion,
         sourceDigest,
+        ...(locale ? { locale } : {}),
     };
 }

@@ -2,7 +2,12 @@ import type { Prisma, PrismaClient } from '@prisma/client';
 
 import { authorizeDraftAction } from '../membership/checks';
 import { updateDraftContentAndHeat } from '../heat/postHeat';
-import { resolveDraftWorkflowPermission } from '../policy/draftWorkflowPermissions';
+import {
+    localizeDraftWorkflowPermissionDecision,
+    resolveDraftWorkflowPermission,
+} from '../policy/draftWorkflowPermissions';
+import { localizeQueryApiCopy } from '../../i18n/copy';
+import { DEFAULT_LOCALE, type AppLocale } from '../../i18n/locale';
 import {
     applyDraftDiscussionThread,
     listDraftDiscussionThreads,
@@ -40,6 +45,7 @@ export interface AcceptGhostDraftInput {
     suggestionId?: string | null;
     userId: number | null | undefined;
     mode: GhostDraftAcceptanceMode;
+    locale?: AppLocale;
     workingCopyHash?: string | null;
     workingCopyUpdatedAt?: string | Date | null;
 }
@@ -91,13 +97,14 @@ async function ensureSuggestionAcceptancePermission(
     input: {
         circleId: number | null;
         userId: number;
+        locale: AppLocale;
     },
 ) {
     if (!Number.isFinite(Number(input.circleId)) || Number(input.circleId) <= 0) {
         throw new GhostDraftAcceptanceError({
             statusCode: 422,
             code: 'ghost_draft_circle_context_required',
-            message: 'ghost draft suggestion acceptance requires a circle-bound draft',
+            message: localizeQueryApiCopy('ghostDraft.circleContextRequired', input.locale),
         });
     }
 
@@ -110,7 +117,9 @@ async function ensureSuggestionAcceptancePermission(
         throw new GhostDraftAcceptanceError({
             statusCode: 403,
             code: 'ghost_draft_apply_permission_denied',
-            message: applyPermission.reason || 'issue application permission is required',
+            message: applyPermission.reasonCode
+                ? localizeDraftWorkflowPermissionDecision(applyPermission, input.locale)
+                : applyPermission.reason || localizeQueryApiCopy('ghostDraft.applyPermissionRequired', input.locale),
         });
     }
 
@@ -123,7 +132,9 @@ async function ensureSuggestionAcceptancePermission(
         throw new GhostDraftAcceptanceError({
             statusCode: 403,
             code: 'ghost_draft_accept_permission_denied',
-            message: resolvePermission.reason || 'issue acceptance permission is required',
+            message: resolvePermission.reasonCode
+                ? localizeDraftWorkflowPermissionDecision(resolvePermission, input.locale)
+                : resolvePermission.reason || localizeQueryApiCopy('ghostDraft.acceptPermissionRequired', input.locale),
         });
     }
 }
@@ -203,6 +214,7 @@ export async function acceptGhostDraftIntoWorkingCopy(
     prisma: PrismaLike,
     input: AcceptGhostDraftInput,
 ): Promise<GhostDraftAcceptanceView> {
+    const locale = input.locale ?? DEFAULT_LOCALE;
     const access = await authorizeDraftAction(prisma as any, {
         postId: input.draftPostId,
         userId: input.userId,
@@ -276,6 +288,7 @@ export async function acceptGhostDraftIntoWorkingCopy(
         await ensureSuggestionAcceptancePermission(prisma, {
             circleId: access.post?.circleId ?? null,
             userId: Number(input.userId),
+            locale,
         });
 
         const requestUpdatedAt = toDateOrNull(input.workingCopyUpdatedAt);

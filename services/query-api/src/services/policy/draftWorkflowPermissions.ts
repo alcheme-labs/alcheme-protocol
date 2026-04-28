@@ -7,6 +7,11 @@ import type {
     GovernanceRole,
 } from './types';
 import { resolveCirclePolicyProfile } from './profile';
+import {
+    localizeDraftWorkflowPermissionReason,
+    type DraftWorkflowPermissionReasonCode,
+} from '../../i18n/copy';
+import type { AppLocale } from '../../i18n/locale';
 
 type PrismaLike = PrismaClient | Prisma.TransactionClient;
 
@@ -26,6 +31,7 @@ export interface DraftWorkflowPermissionDecision {
     allowed: boolean;
     policy: DraftWorkflowPolicySnapshot;
     minRole: GovernanceRole | null;
+    reasonCode: DraftWorkflowPermissionReasonCode;
     reason: string;
 }
 
@@ -57,42 +63,47 @@ function actorRank(actor: CircleActorSnapshot): number {
     return 0;
 }
 
-function formatRoleLabel(role: GovernanceRole): string {
-    if (role === 'Owner') return '圈主';
-    if (role === 'Admin') return '管理员';
-    if (role === 'Moderator') return '主持人';
-    if (role === 'Elder') return '长老';
-    if (role === 'Member') return '成员';
-    return '初始成员';
-}
-
-function buildDeniedReason(action: DraftWorkflowAction, minRole: GovernanceRole | null): string {
-    const roleLabel = minRole ? formatRoleLabel(minRole) : '更高权限';
+function reasonCodeForDeniedAction(action: DraftWorkflowAction): DraftWorkflowPermissionReasonCode {
     if (action === 'create_issue') {
-        return `当前圈层策略要求至少 ${roleLabel} 才能提交问题单。`;
+        return 'role_required_create_issue';
     }
     if (action === 'followup_issue') {
-        return `当前圈层策略要求至少 ${roleLabel} 才能继续追加问题单。`;
+        return 'role_required_followup_issue';
     }
     if (action === 'withdraw_own_issue') {
-        return '当前圈层策略不允许在进入审议前撤回自己的问题单。';
+        return 'author_withdraw_disabled';
     }
     if (action === 'start_review' || action === 'accept_reject_issue') {
-        return `当前圈层策略要求至少 ${roleLabel} 才能发起或处理问题单审议。`;
+        return 'role_required_review_issue';
     }
     if (action === 'retag_issue') {
-        return `当前圈层策略要求至少 ${roleLabel} 才能调整问题类型。`;
+        return 'role_required_retag_issue';
     }
     if (action === 'apply_accepted_issue') {
-        return `当前圈层策略要求至少 ${roleLabel} 才能确认问题已写入正文。`;
+        return 'role_required_apply_issue';
     }
     if (action === 'end_drafting_early') {
-        return `当前圈层策略要求至少 ${roleLabel} 才能提前结束编辑并进入审阅。`;
+        return 'role_required_end_drafting_early';
     }
     if (action === 'advance_from_review') {
-        return `当前圈层策略要求至少 ${roleLabel} 才能结束本轮审阅并进入下一轮修订。`;
+        return 'role_required_advance_from_review';
     }
-    return `当前圈层策略要求至少 ${roleLabel} 才能发起结晶。`;
+    return 'role_required_enter_crystallization';
+}
+
+function buildDecision(input: {
+    allowed: boolean;
+    policy: DraftWorkflowPolicySnapshot;
+    minRole: GovernanceRole | null;
+    reasonCode: DraftWorkflowPermissionReasonCode;
+}): DraftWorkflowPermissionDecision {
+    return {
+        ...input,
+        reason: localizeDraftWorkflowPermissionReason({
+            reasonCode: input.reasonCode,
+            minRole: input.minRole,
+        }, 'en'),
+    };
 }
 
 async function loadActorSnapshot(
@@ -154,39 +165,51 @@ export async function resolveDraftWorkflowPermission(
             allowed: false,
             policy,
             minRole: null,
-            reason: '只有活跃圈层成员才能执行这个动作。',
+            reasonCode: 'inactive_member',
+            reason: localizeDraftWorkflowPermissionReason({
+                reasonCode: 'inactive_member',
+                minRole: null,
+            }, 'en'),
         };
     }
 
     if (input.action === 'withdraw_own_issue') {
         const allowed = Boolean(input.isThreadAuthor && policy.allowAuthorWithdrawBeforeReview);
-        return {
+        return buildDecision({
             allowed,
             policy,
             minRole: null,
-            reason: allowed
-                ? 'ok'
-                : buildDeniedReason(input.action, null),
-        };
+            reasonCode: allowed ? 'ok' : 'author_withdraw_disabled',
+        });
     }
 
     if (input.action === 'retag_issue' && !policy.allowModeratorRetagIssue) {
-        return {
+        return buildDecision({
             allowed: false,
             policy,
             minRole: policy.retagIssueMinRole,
-            reason: '当前圈层策略暂不允许在审议过程中调整问题类型。',
-        };
+            reasonCode: 'retag_disabled',
+        });
     }
 
     const minRole = resolveMinRole(policy, input.action);
     const allowed = minRole ? actorRank(actor) >= roleRank(minRole) : false;
-    return {
+    return buildDecision({
         allowed,
         policy,
         minRole,
-        reason: allowed ? 'ok' : buildDeniedReason(input.action, minRole),
-    };
+        reasonCode: allowed ? 'ok' : reasonCodeForDeniedAction(input.action),
+    });
+}
+
+export function localizeDraftWorkflowPermissionDecision(
+    decision: Pick<DraftWorkflowPermissionDecision, 'reasonCode' | 'minRole'>,
+    locale: AppLocale,
+): string {
+    return localizeDraftWorkflowPermissionReason({
+        reasonCode: decision.reasonCode,
+        minRole: decision.minRole,
+    }, locale);
 }
 
 export async function resolveCircleDraftWorkflowPolicy(

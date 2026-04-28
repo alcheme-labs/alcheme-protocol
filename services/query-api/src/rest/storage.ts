@@ -7,7 +7,12 @@ import {
     parseAuthUserIdFromRequest,
 } from '../services/membership/checks';
 import { computePolicyProfileDigest } from '../services/policy/digest';
-import { resolveDraftWorkflowPermission } from '../services/policy/draftWorkflowPermissions';
+import {
+    localizeDraftWorkflowPermissionDecision,
+    resolveDraftWorkflowPermission,
+} from '../services/policy/draftWorkflowPermissions';
+import { localizeQueryApiCopy } from '../i18n/copy';
+import { resolveExpressRequestLocale } from '../i18n/request';
 import { resolveDraftLifecycleReadModel } from '../services/draftLifecycle/readModel';
 import {
     buildPublicPolicyDigestSnapshot,
@@ -221,7 +226,7 @@ export function storageRouter(prisma: PrismaClient, _redis: Redis): Router {
             if (!permission.allowed) {
                 return res.status(403).json({
                     error: 'draft_crystallize_permission_denied',
-                    message: permission.reason,
+                    message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                 });
             }
             const lifecycle = await resolveDraftLifecycleReadModel(prisma, {
@@ -230,7 +235,7 @@ export function storageRouter(prisma: PrismaClient, _redis: Redis): Router {
             if (lifecycle.documentStatus !== 'crystallization_active') {
                 return res.status(409).json({
                     error: 'draft_not_ready_for_crystallization_execution',
-                    message: '请先发起结晶，进入结晶阶段后再执行结晶。',
+                    message: localizeQueryApiCopy('draft.crystallization.notReadyForExecution', resolveExpressRequestLocale(req)),
                 });
             }
 

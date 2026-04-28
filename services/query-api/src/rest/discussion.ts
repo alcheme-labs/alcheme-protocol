@@ -83,7 +83,13 @@ import {
     type DraftPermissionAction,
 } from '../services/membership/checks';
 import { sqlTimestampWithoutTimeZone } from '../utils/sqlTimestamp';
-import { resolveDraftWorkflowPermission } from '../services/policy/draftWorkflowPermissions';
+import {
+    localizeDraftWorkflowPermissionDecision,
+    resolveDraftWorkflowPermission,
+} from '../services/policy/draftWorkflowPermissions';
+import { localizeQueryApiCopy } from '../i18n/copy';
+import { resolveExpressRequestLocale } from '../i18n/request';
+import type { AppLocale } from '../i18n/locale';
 import {
     finalizeDraftLifecycleCrystallization,
     resolveDraftLifecycleReadModel,
@@ -533,10 +539,10 @@ function signDiscussionSessionToken(input: {
     return jwt.sign(payload, input.jwtSecret);
 }
 
-function formatSenderLabel(input: { handle?: string | null; pubkey?: string | null }): string {
+function formatSenderLabel(input: { handle?: string | null; pubkey?: string | null }, locale: AppLocale): string {
     if (input.handle && input.handle.trim()) return input.handle.trim();
     const pubkey = input.pubkey?.trim() || '';
-    if (!pubkey) return '某位成员';
+    if (!pubkey) return localizeQueryApiCopy('discussion.member.unknown', locale);
     if (pubkey.length <= 8) return pubkey;
     return `${pubkey.slice(0, 4)}...${pubkey.slice(-4)}`;
 }
@@ -735,9 +741,9 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
         };
     }
 
-    function buildForwardSnapshotText(text: string): string {
+    function buildForwardSnapshotText(text: string, locale: AppLocale): string {
         const normalized = normalizeDiscussionText(text).replace(/\s+/g, ' ').trim();
-        if (!normalized) return '原消息内容为空';
+        if (!normalized) return localizeQueryApiCopy('discussion.forward.emptySourceMessage', locale);
         if (normalized.length <= FORWARD_SNAPSHOT_MAX_LENGTH) {
             return normalized;
         }
@@ -990,6 +996,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
     async function finalizeCrystallizationLifecycleOrThrow(input: {
         draftPostId: number;
         actorUserId: number | null;
+        locale: AppLocale;
     }): Promise<void> {
         try {
             await finalizeDraftLifecycleCrystallization(prisma, input);
@@ -1019,7 +1026,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
             throw new CrystallizationBindingError(
                 'draft_lifecycle_finalize_failed',
                 500,
-                '结晶绑定已完成，但草稿生命周期未能收口，请稍后重试。',
+                localizeQueryApiCopy('draft.crystallization.lifecycleFinalizeFailed', input.locale),
             );
         }
     }
@@ -1286,7 +1293,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                     error: action === 'apply'
                         ? 'draft_discussion_apply_permission_denied'
                         : 'draft_discussion_resolve_permission_denied',
-                    message: permission.reason,
+                    message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                 });
                 return null;
             }
@@ -1303,7 +1310,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                     error: action === 'create'
                         ? 'draft_discussion_create_permission_denied'
                         : 'draft_discussion_followup_permission_denied',
-                    message: permission.reason,
+                    message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                 });
                 return null;
             }
@@ -2504,7 +2511,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
             if (!authUserId || !circleId) {
                 return res.status(403).json({
                     error: 'draft_crystallize_permission_denied',
-                    message: '缺少圈层上下文，无法登记结晶恢复记录。',
+                    message: localizeQueryApiCopy('draft.crystallization.missingCircleContextRegister', resolveExpressRequestLocale(req)),
                 });
             }
             const permission = await resolveDraftWorkflowPermission(prisma, {
@@ -2515,7 +2522,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
             if (!permission.allowed) {
                 return res.status(403).json({
                     error: 'draft_crystallize_permission_denied',
-                    message: permission.reason,
+                    message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                 });
             }
             const lifecycle = await resolveDraftLifecycleReadModel(prisma, {
@@ -2524,7 +2531,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
             if (lifecycle.documentStatus !== 'crystallization_active') {
                 return res.status(409).json({
                     error: 'draft_not_ready_for_crystallization_execution',
-                    message: '请先发起结晶，进入结晶阶段后再登记结晶恢复记录。',
+                    message: localizeQueryApiCopy('draft.crystallization.notReadyForAttemptRegistration', resolveExpressRequestLocale(req)),
                 });
             }
 
@@ -2581,7 +2588,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
             if (!authUserId || !circleId) {
                 return res.status(403).json({
                     error: 'draft_crystallize_permission_denied',
-                    message: '缺少圈层上下文，无法执行结晶绑定。',
+                    message: localizeQueryApiCopy('draft.crystallization.missingCircleContextBinding', resolveExpressRequestLocale(req)),
                 });
             }
             const permission = await resolveDraftWorkflowPermission(prisma, {
@@ -2592,7 +2599,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
             if (!permission.allowed) {
                 return res.status(403).json({
                     error: 'draft_crystallize_permission_denied',
-                    message: permission.reason,
+                    message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                 });
             }
             const lifecycle = await resolveDraftLifecycleReadModel(prisma, {
@@ -2601,7 +2608,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
             if (lifecycle.documentStatus !== 'crystallization_active') {
                 return res.status(409).json({
                     error: 'draft_not_ready_for_crystallization_execution',
-                    message: '请先发起结晶，进入结晶阶段后再执行结晶。',
+                    message: localizeQueryApiCopy('draft.crystallization.notReadyForExecution', resolveExpressRequestLocale(req)),
                 });
             }
             const policyProfileDigest = computePolicyProfileDigest(
@@ -2805,6 +2812,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                     await finalizeCrystallizationLifecycleOrThrow({
                         draftPostId: postId,
                         actorUserId: authUserId || null,
+                        locale: resolveExpressRequestLocale(req),
                     });
                     if (input.proofPackageHash) {
                         await markCrystallizationAttemptFinalized(prisma as any, {
@@ -3222,7 +3230,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
             if (!permission.allowed) {
                 return res.status(403).json({
                     error: 'draft_discussion_withdraw_permission_denied',
-                    message: permission.reason,
+                    message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                 });
             }
 
@@ -3277,7 +3285,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                 if (!permission.allowed) {
                     return res.status(403).json({
                         error: 'draft_discussion_retag_permission_denied',
-                        message: permission.reason,
+                        message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                     });
                 }
             }
@@ -3334,7 +3342,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                 if (!permission.allowed) {
                     return res.status(403).json({
                         error: 'draft_discussion_retag_permission_denied',
-                        message: permission.reason,
+                        message: localizeDraftWorkflowPermissionDecision(permission, resolveExpressRequestLocale(req)),
                     });
                 }
             }
@@ -3497,6 +3505,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                 generationId,
                 userId,
                 mode,
+                locale: resolveExpressRequestLocale(req),
                 workingCopyHash: typeof req.body?.workingCopyHash === 'string'
                     ? req.body.workingCopyHash
                     : null,
@@ -4047,7 +4056,8 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                 return res.status(403).json({ error: 'forward_same_or_lower_level_not_allowed' });
             }
 
-            const snapshotText = buildForwardSnapshotText(sourceRow.payloadText);
+            const locale = resolveExpressRequestLocale(req);
+            const snapshotText = buildForwardSnapshotText(sourceRow.payloadText, locale);
             const forwardedAt = new Date();
             const metadata = {
                 sourceEnvelopeId: sourceRow.envelopeId,
@@ -4205,7 +4215,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                 });
 
                 if (sourceAuthorUser && sourceAuthorUser.id !== authUser.id) {
-                    const senderLabel = formatSenderLabel(authUser);
+                    const senderLabel = formatSenderLabel(authUser, locale);
                     await tx.notification.create({
                         data: {
                             userId: sourceAuthorUser.id,

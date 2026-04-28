@@ -4,6 +4,7 @@ import type { Redis } from 'ioredis';
 
 import * as generatorService from '../services/circleSummary/generator';
 import * as snapshotService from '../services/circleSummary/snapshot';
+import { resolveExpressRequestLocale } from '../i18n/request';
 import {
     canViewCircleMembers,
     parseAuthUserIdFromRequest,
@@ -101,6 +102,7 @@ export function circleSummaryRouter(prisma: PrismaClient, _redis: Redis): Router
             const snapshot = await generatorService.ensureLatestCircleSummarySnapshot(prisma, {
                 circleId,
                 forceGenerate,
+                locale: resolveExpressRequestLocale(req),
             });
 
             return res.status(200).json({

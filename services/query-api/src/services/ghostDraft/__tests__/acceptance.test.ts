@@ -571,6 +571,7 @@ describe('ghost draft acceptance', () => {
                 allowed: true,
                 policy: {} as any,
                 minRole: null,
+                reasonCode: 'ok',
                 reason: 'ok',
             });
 
@@ -735,12 +736,14 @@ describe('ghost draft acceptance', () => {
                 allowed: false,
                 policy: {} as any,
                 minRole: 'Moderator',
+                reasonCode: 'role_required_apply_issue',
                 reason: 'Only moderators can apply accepted issues',
             })
             .mockResolvedValueOnce({
                 allowed: true,
                 policy: {} as any,
                 minRole: null,
+                reasonCode: 'ok',
                 reason: 'ok',
             });
 

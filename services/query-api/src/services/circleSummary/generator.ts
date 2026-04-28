@@ -4,6 +4,8 @@ import { loadGhostConfig } from '../../ai/ghost/config';
 import { loadCircleGhostSettingsPatch, resolveCircleGhostSettings } from '../../ai/ghost/circle-settings';
 import { buildAiSourceDigest, type AiGenerationMetadata } from '../../ai/metadata';
 import { generateAiText } from '../../ai/provider';
+import { localizeQueryApiCopy } from '../../i18n/copy';
+import { DEFAULT_LOCALE, type AppLocale } from '../../i18n/locale';
 import {
     loadLatestCircleSummarySnapshot,
     persistCircleSummarySnapshot,
@@ -64,11 +66,12 @@ interface EnsureLatestCircleSummarySnapshotInput {
     circleId: number;
     forceGenerate?: boolean;
     now?: Date;
+    locale?: AppLocale;
 }
 
-function formatShortDate(value: Date | null | undefined): string {
-    if (!(value instanceof Date)) return '时间待补';
-    return value.toLocaleDateString('zh-CN', {
+function formatShortDate(value: Date | null | undefined, locale: AppLocale): string {
+    if (!(value instanceof Date)) return localizeQueryApiCopy('circleSummary.timeTbd', locale);
+    return value.toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', {
         month: 'short',
         day: 'numeric',
     });
@@ -281,12 +284,14 @@ function buildProjectionMetadata(input: {
     outputs: SummaryOutputRow[];
     primaryDraft: SummaryDraftRow | null;
     threadStats: SummaryThreadStatsRow;
+    locale: AppLocale;
 }): AiGenerationMetadata {
     return {
         providerMode: 'projection',
         model: 'projection',
         promptAsset: 'circle-summary-projection',
         promptVersion: 'v1',
+        locale: input.locale,
         sourceDigest: buildAiSourceDigest({
             circleId: input.circleId,
             outputs: input.outputs.map((row) => ({
@@ -317,30 +322,54 @@ function buildCircleSummaryLlmPrompt(input: {
     primaryDraft: SummaryDraftRow | null;
     threadStats: SummaryThreadStatsRow;
     recentMessages: SummaryDiscussionMessageRow[];
+    locale: AppLocale;
 }): string {
+    const useChinese = input.locale === 'zh';
     const outputLines = input.outputs.slice(0, 6).map((row, index) => (
-        `${index + 1}. ${row.title} (v${row.version}, 引用 ${row.citationCount}, 草稿 ${row.sourceDraftPostId ?? '无'})`
+        useChinese
+            ? `${index + 1}. ${row.title} (v${row.version}, 引用 ${row.citationCount}, 草稿 ${row.sourceDraftPostId ?? '无'})`
+            : `${index + 1}. ${row.title} (v${row.version}, citations ${row.citationCount}, draft ${row.sourceDraftPostId ?? 'none'})`
     ));
     const messageLines = input.recentMessages
         .slice(-8)
         .map((row) => `[${row.createdAt.toISOString()}] ${row.senderHandle || row.senderPubkey}: ${(row.payloadText || '').trim()}`);
 
+    if (useChinese) {
+        return [
+            `圈层 ${input.circleId} 的正式总结快照正在生成。`,
+            '请输出 4 行中文纯文本，每行一个句子，不要 Markdown。',
+            '第 1 行：当前主线共识。',
+            '第 2 行：当前草稿基线或正文来源。',
+            '第 3 行：仍未解决的分歧。',
+            '第 4 行：下一步建议。',
+            `当前稳定输出数：${input.outputs.length}`,
+            `当前未关闭问题单：${input.threadStats.openThreadCount}/${input.threadStats.totalThreadCount}`,
+            input.primaryDraft
+                ? `主草稿：#${input.primaryDraft.draftPostId}，稳定版本 v${input.primaryDraft.currentSnapshotVersion}`
+                : '主草稿：暂无唯一基线',
+            '稳定输出：',
+            outputLines.length > 0 ? outputLines.join('\n') : '暂无稳定输出',
+            '最近讨论：',
+            messageLines.length > 0 ? messageLines.join('\n') : '暂无公开讨论',
+        ].join('\n');
+    }
+
     return [
-        `圈层 ${input.circleId} 的正式总结快照正在生成。`,
-        '请输出 4 行中文纯文本，每行一个句子，不要 Markdown。',
-        '第 1 行：当前主线共识。',
-        '第 2 行：当前草稿基线或正文来源。',
-        '第 3 行：仍未解决的分歧。',
-        '第 4 行：下一步建议。',
-        `当前稳定输出数：${input.outputs.length}`,
-        `当前未关闭问题单：${input.threadStats.openThreadCount}/${input.threadStats.totalThreadCount}`,
+        `A formal summary snapshot is being generated for circle ${input.circleId}.`,
+        'Return exactly 4 plain English sentences, one per line, with no Markdown.',
+        'Line 1: current mainline consensus.',
+        'Line 2: current draft baseline or body source.',
+        'Line 3: unresolved disagreements.',
+        'Line 4: recommended next step.',
+        `Stable output count: ${input.outputs.length}`,
+        `Open issue threads: ${input.threadStats.openThreadCount}/${input.threadStats.totalThreadCount}`,
         input.primaryDraft
-            ? `主草稿：#${input.primaryDraft.draftPostId}，稳定版本 v${input.primaryDraft.currentSnapshotVersion}`
-            : '主草稿：暂无唯一基线',
-        '稳定输出：',
-        outputLines.length > 0 ? outputLines.join('\n') : '暂无稳定输出',
-        '最近讨论：',
-        messageLines.length > 0 ? messageLines.join('\n') : '暂无公开讨论',
+            ? `Primary draft: #${input.primaryDraft.draftPostId}, stable version v${input.primaryDraft.currentSnapshotVersion}`
+            : 'Primary draft: no single baseline yet',
+        'Stable outputs:',
+        outputLines.length > 0 ? outputLines.join('\n') : 'No stable outputs yet',
+        'Recent discussion:',
+        messageLines.length > 0 ? messageLines.join('\n') : 'No public discussion yet',
     ].join('\n');
 }
 
@@ -375,6 +404,7 @@ async function buildCircleSummaryLlmOverlay(input: {
     primaryDraft: SummaryDraftRow | null;
     threadStats: SummaryThreadStatsRow;
     recentMessages: SummaryDiscussionMessageRow[];
+    locale: AppLocale;
 }): Promise<{ text: string; metadata: AiGenerationMetadata } | null> {
     try {
         const sourceDigest = buildAiSourceDigest({
@@ -415,7 +445,8 @@ async function buildCircleSummaryLlmOverlay(input: {
                 providerMode: generated.providerMode,
                 model: generated.model,
                 promptAsset: 'circle-summary-inline',
-                promptVersion: 'v1',
+                promptVersion: 'v2',
+                locale: input.locale,
                 sourceDigest,
             },
         };
@@ -431,9 +462,11 @@ export async function generateCircleSummarySnapshot(
         generatedAt?: Date;
         forceGenerate?: boolean;
         useLLM?: boolean;
+        locale?: AppLocale;
     },
 ): Promise<CircleSummarySnapshotPersistenceInput> {
     const generatedAt = input.generatedAt ?? new Date();
+    const locale = input.locale ?? DEFAULT_LOCALE;
     const outputs = await loadSummaryOutputs(prisma, input.circleId);
     const primaryDraft = await loadPrimaryDraft(prisma, input.circleId);
     const threadStats = await loadDraftThreadStats(prisma, primaryDraft?.draftPostId ?? null);
@@ -453,30 +486,38 @@ export async function generateCircleSummarySnapshot(
         outputs,
         primaryDraft,
         threadStats,
+        locale,
     });
 
     const projectionSnapshot: CircleSummarySnapshotPersistenceInput = {
         circleId: input.circleId,
         issueMap: [
             {
-                title: '先看这条已经站稳的结论',
+                title: localizeQueryApiCopy('circleSummary.issueMap.primaryTitle', locale),
                 body: primaryOutput
-                    ? `当前最清晰的沉淀焦点是“${primaryOutput.title}”，它已经成为这个圈层目前最适合先进入的认知入口。`
-                    : '当前还没有形成稳定的沉淀结果，因此这页先帮助你看清：哪些内容已开始聚焦，哪些仍在形成中。',
+                    ? localizeQueryApiCopy('circleSummary.issueMap.primaryBodyWithOutput', locale, {
+                        title: primaryOutput.title,
+                    })
+                    : localizeQueryApiCopy('circleSummary.issueMap.primaryBodyEmpty', locale),
                 emphasis: 'primary',
             },
             {
-                title: '再回看它基于哪份正文',
+                title: localizeQueryApiCopy('circleSummary.issueMap.draftTitle', locale),
                 body: primaryDraft
-                    ? `当前快照回到草稿 #${primaryDraft.draftPostId} 的 v${primaryDraft.currentSnapshotVersion} 稳定版本，继续理解这轮沉淀是怎么形成的。`
-                    : '当前还没有唯一的正文基线，因此先从已经沉淀出来的结论进入，不伪造草稿真相。',
+                    ? localizeQueryApiCopy('circleSummary.issueMap.draftBodyWithDraft', locale, {
+                        draftPostId: primaryDraft.draftPostId,
+                        version: primaryDraft.currentSnapshotVersion,
+                    })
+                    : localizeQueryApiCopy('circleSummary.issueMap.draftBodyEmpty', locale),
                 emphasis: 'secondary',
             },
             {
-                title: '还有哪些点仍在争论',
+                title: localizeQueryApiCopy('circleSummary.issueMap.conflictTitle', locale),
                 body: threadStats.openThreadCount > 0
-                    ? `当前还有 ${threadStats.openThreadCount} 条未关闭的问题单，说明这页总结仍保留继续修订的入口。`
-                    : '当前没有悬而未决的问题单，冲突上下文主要体现在不同沉淀分支之间。',
+                    ? localizeQueryApiCopy('circleSummary.issueMap.conflictBodyOpenThreads', locale, {
+                        count: threadStats.openThreadCount,
+                    })
+                    : localizeQueryApiCopy('circleSummary.issueMap.conflictBodyClosed', locale),
                 emphasis: 'muted',
             },
         ],
@@ -500,34 +541,56 @@ export async function generateCircleSummarySnapshot(
         viewpointBranches: outputs.map((row, index) => ({
             knowledgeId: row.knowledgeId,
             title: row.title,
-            routeLabel: index === 0 ? '主线入口' : `并行分支 ${index + 1}`,
+            routeLabel: index === 0
+                ? localizeQueryApiCopy('circleSummary.branch.primaryRoute', locale)
+                : localizeQueryApiCopy('circleSummary.branch.parallelRoute', locale, { index: index + 1 }),
             sourceDraftPostId: row.sourceDraftPostId,
             sourceBindingKind: row.sourceAnchorId ? 'snapshot' : 'unbound',
-            citationSummary: `总被引 ${row.citationCount} · 预览引用 ${row.outboundReferenceCount} / 预览被引 ${row.inboundReferenceCount}`,
-            createdAtLabel: formatShortDate(row.createdAt),
+            citationSummary: localizeQueryApiCopy('circleSummary.branch.citationSummary', locale, {
+                citations: row.citationCount,
+                outbound: row.outboundReferenceCount,
+                inbound: row.inboundReferenceCount,
+            }),
+            citationCount: row.citationCount,
+            contributorsCount: row.contributorsCount,
+            outboundReferenceCount: row.outboundReferenceCount,
+            inboundReferenceCount: row.inboundReferenceCount,
+            createdAt: row.createdAt.toISOString(),
+            sourceAnchorId: row.sourceAnchorId,
+            sourceSummaryHash: row.sourceSummaryHash,
+            sourceMessagesDigest: row.sourceMessagesDigest,
+            createdAtLabel: formatShortDate(row.createdAt, locale),
         })),
         factExplanationEmotionBreakdown: {
             facts: [
-                { label: '事实类讨论', value: factCount },
-                { label: '已结晶输出', value: outputs.length },
-                { label: '公开问题单', value: threadStats.totalThreadCount },
+                { label: localizeQueryApiCopy('circleSummary.breakdown.factDiscussions', locale), value: factCount },
+                { label: localizeQueryApiCopy('circleSummary.breakdown.crystallizedOutputs', locale), value: outputs.length },
+                { label: localizeQueryApiCopy('circleSummary.breakdown.publicIssues', locale), value: threadStats.totalThreadCount },
             ],
             explanations: [
                 {
-                    label: '解释类讨论',
+                    label: localizeQueryApiCopy('circleSummary.breakdown.explanationDiscussions', locale),
                     body: explanationCount > 0
-                        ? `最近 ready 讨论里有 ${explanationCount} 条被识别为解释型发言，当前总结优先吸收这些解释脉络。`
+                        ? localizeQueryApiCopy('circleSummary.breakdown.explanationBodyWithCount', locale, {
+                            count: explanationCount,
+                        })
                         : primaryOutput
-                            ? `当前总览优先从“${primaryOutput.title}”进入，再回到来源草稿与绑定证据。`
-                            : '当前还没有主线沉淀，因此总览保持探索态，不额外伪造稳定结论。',
+                            ? localizeQueryApiCopy('circleSummary.breakdown.explanationBodyWithOutput', locale, {
+                                title: primaryOutput.title,
+                            })
+                            : localizeQueryApiCopy('circleSummary.breakdown.explanationBodyEmpty', locale),
                 },
             ],
             emotions: [
                 {
-                    label: '总体氛围',
+                    label: localizeQueryApiCopy('circleSummary.breakdown.overallMood', locale),
                     value: emotionCount > 0
-                        ? `最近存在 ${emotionCount} 条情绪型讨论`
-                        : threadStats.openThreadCount > 0 ? '仍在对齐中' : '趋于收敛',
+                        ? localizeQueryApiCopy('circleSummary.breakdown.moodWithEmotions', locale, {
+                            count: emotionCount,
+                        })
+                        : threadStats.openThreadCount > 0
+                            ? localizeQueryApiCopy('circleSummary.breakdown.moodAligning', locale)
+                            : localizeQueryApiCopy('circleSummary.breakdown.moodConverging', locale),
                 },
             ],
         },
@@ -538,41 +601,56 @@ export async function generateCircleSummarySnapshot(
                     ? 'medium'
                     : 'low',
             notes: threadStats.openThreadCount > 0
-                ? [`仍有 ${threadStats.openThreadCount} 条问题单待关闭。`, emotionCount > 0 ? `最近有 ${emotionCount} 条情绪型讨论进入 ready 口径。` : '']
+                ? [
+                    localizeQueryApiCopy('circleSummary.conflict.openThreadsNote', locale, {
+                        count: threadStats.openThreadCount,
+                    }),
+                    emotionCount > 0
+                        ? localizeQueryApiCopy('circleSummary.conflict.emotionNote', locale, { count: emotionCount })
+                        : '',
+                ]
                     .filter(Boolean)
-                : [emotionCount > 0 ? `最近有 ${emotionCount} 条情绪型讨论进入 ready 口径。` : '当前没有未关闭的问题单。'],
+                : [emotionCount > 0
+                    ? localizeQueryApiCopy('circleSummary.conflict.emotionNote', locale, { count: emotionCount })
+                    : localizeQueryApiCopy('circleSummary.conflict.noOpenThreadsNote', locale)],
         },
         sedimentationTimeline: [
             ...(primaryDraft
                 ? [{
                     key: `draft-${primaryDraft.draftPostId}-v${primaryDraft.currentSnapshotVersion}`,
-                    title: `稳定草稿基线 v${primaryDraft.currentSnapshotVersion}`,
-                    summary: `当前总结以草稿 #${primaryDraft.draftPostId} 为可回溯正文来源。`,
-                    timeLabel: formatShortDate(primaryDraft.updatedAt),
+                    title: localizeQueryApiCopy('circleSummary.timeline.draftBaselineTitle', locale, {
+                        version: primaryDraft.currentSnapshotVersion,
+                    }),
+                    summary: localizeQueryApiCopy('circleSummary.timeline.draftBaselineSummary', locale, {
+                        draftPostId: primaryDraft.draftPostId,
+                    }),
+                    timeLabel: formatShortDate(primaryDraft.updatedAt, locale),
                 }]
                 : []),
             ...outputs.slice(0, 5).map((row) => ({
                 key: row.knowledgeId,
                 title: row.title,
                 summary: row.sourceAnchorId
-                    ? '已沉淀为知识结果，并保留正式绑定证据。'
-                    : '已沉淀为知识结果，但来源绑定仍待补齐。',
-                timeLabel: formatShortDate(row.bindingCreatedAt ?? row.createdAt),
+                    ? localizeQueryApiCopy('circleSummary.timeline.outputWithEvidence', locale)
+                    : localizeQueryApiCopy('circleSummary.timeline.outputMissingEvidence', locale),
+                timeLabel: formatShortDate(row.bindingCreatedAt ?? row.createdAt, locale),
             })),
         ],
         openQuestions: threadStats.openThreadCount > 0
             ? [{
-                title: '还有哪些问题未被沉淀？',
-                body: `当前还有 ${threadStats.openThreadCount} 条问题单未关闭，需要继续回到草稿与讨论上下文。`,
+                title: localizeQueryApiCopy('circleSummary.openQuestions.unsettledTitle', locale),
+                body: localizeQueryApiCopy('circleSummary.openQuestions.unsettledBody', locale, {
+                    count: threadStats.openThreadCount,
+                }),
             }]
             : outputs.length === 0
                 ? [{
-                    title: '何时形成第一条稳定输出？',
-                    body: '当前还没有结晶结果，需要继续推进草稿审阅与结晶。',
+                    title: localizeQueryApiCopy('circleSummary.openQuestions.firstOutputTitle', locale),
+                    body: localizeQueryApiCopy('circleSummary.openQuestions.firstOutputBody', locale),
                 }]
                 : [{
-                    title: '哪些分支值得继续扩展？',
-                    body: '当前已有稳定沉淀，下一步可结合引用关系和问题单继续扩展分支。',
+                    title: localizeQueryApiCopy('circleSummary.openQuestions.expandBranchesTitle', locale),
+                    body: localizeQueryApiCopy('circleSummary.openQuestions.expandBranchesBody', locale),
                 }],
         generatedAt,
         generatedBy: normalizeEffectiveGeneratedBy({
@@ -592,6 +670,7 @@ export async function generateCircleSummarySnapshot(
         primaryDraft,
         threadStats,
         recentMessages,
+        locale,
     });
     if (!llmOverlay) {
         return projectionSnapshot;
@@ -631,6 +710,7 @@ export async function ensureLatestCircleSummarySnapshot(
         generatedAt: input.now,
         forceGenerate,
         useLLM: effectiveGhostSettings.summaryUseLLM,
+        locale: input.locale,
     });
 
     return persistCircleSummarySnapshot(prisma, generated);
