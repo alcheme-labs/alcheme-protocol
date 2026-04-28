@@ -151,7 +151,7 @@ describe('membership identity-status route', () => {
         expect(response.body.hint).toBe('当前信誉位于前 30%（需进入前 10%）方可晋升为长老。');
     });
 
-    test('localizes visitor eligibility hint for requested English locale', async () => {
+    test('localizes non-member dust hint for requested English locale', async () => {
         const prisma = {
             circle: {
                 findUnique: jest.fn(async () => ({
@@ -179,6 +179,8 @@ describe('membership identity-status route', () => {
             .expect(200);
 
         expect(response.body.currentLevel).toBe('Visitor');
-        expect(response.body.hint).toBe('You have sent 0 messages; 3 are required to become an Initiate.');
+        expect(response.body.nextLevel).toBeNull();
+        expect(response.body.messagingMode).toBe('dust_only');
+        expect(response.body.hint).toBe('Visitors can send dust messages, but they do not enter the formal settlement flow.');
     });
 });

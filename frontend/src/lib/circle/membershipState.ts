@@ -98,10 +98,7 @@ export function deriveIdentityStatusFallbackMembershipSnapshot(input: {
         return input.snapshot;
     }
 
-    const indicatesFormalMembership = (
-        input.status.messagingMode === 'formal'
-        || input.status.currentLevel !== 'Visitor'
-    );
+    const indicatesFormalMembership = input.status.messagingMode === 'formal';
 
     if (!indicatesFormalMembership) {
         return input.snapshot;

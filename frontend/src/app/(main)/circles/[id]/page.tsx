@@ -1691,12 +1691,18 @@ export default function CircleDetailPage() {
             || activeCircleMembershipSnapshot.joinState === 'left'
         );
         if (shouldUseIdentityHint && activeCircleIdentityStatus?.hint) {
+            if (activeCircleIdentityStatus.messagingMode === 'dust_only') {
+                return joinCopy.hint.visitorDefault;
+            }
             return normalizeIdentityCopy(activeCircleIdentityStatus.hint);
         }
         return joinBannerState.hint;
-    }, [activeCircleIdentityStatus, activeCircleMembershipSnapshot, joinBannerState.hint]);
+    }, [activeCircleIdentityStatus, activeCircleMembershipSnapshot, joinBannerState.hint, joinCopy.hint.visitorDefault]);
     const plazaViewerStateHint = useMemo(() => {
         if (!activeCircleIdentityStatus?.hint || !activeCircleMembershipSnapshot) {
+            return null;
+        }
+        if (activeCircleIdentityStatus.messagingMode !== 'formal') {
             return null;
         }
         if (
@@ -1715,7 +1721,11 @@ export default function CircleDetailPage() {
         pendingMembershipHint: joinCopy.hint.pending,
     }), [activeCircleMembershipSnapshot?.joinState, joinBannerHint, joinCopy.hint.pending]);
     const identityProgressCard = useMemo(() => {
-        if (!activeCircleIdentityStatus || activeCircleMembershipSnapshot?.joinState !== 'joined') {
+        if (
+            !activeCircleIdentityStatus
+            || activeCircleIdentityStatus.messagingMode !== 'formal'
+            || activeCircleMembershipSnapshot?.joinState !== 'joined'
+        ) {
             return null;
         }
         const currentLabel = identityCopy.levelLabels[activeCircleIdentityStatus.currentLevel];
@@ -1732,6 +1742,7 @@ export default function CircleDetailPage() {
         setIdentityProgressExpanded(false);
     }, [activeDiscussionCircleId, activeCircleMembershipSnapshot?.joinState]);
     const identityTransitionNotice = useMemo(() => {
+        if (activeCircleIdentityStatus?.messagingMode !== 'formal') return null;
         const transition = activeCircleIdentityStatus?.recentTransition;
         const changedAt = transition?.changedAt;
         if (!transition || !changedAt) return null;
@@ -1741,8 +1752,14 @@ export default function CircleDetailPage() {
         const reason = normalizeIdentityCopy(transition.reason?.trim());
         const suffix = reason ? ` · ${reason}` : '';
         return `${from} → ${to} · ${formatRelativeTime(changedAt)}${suffix}`;
-    }, [activeCircleIdentityStatus?.recentTransition, formatRelativeTime, identityCopy.levelLabels]);
+    }, [
+        activeCircleIdentityStatus?.messagingMode,
+        activeCircleIdentityStatus?.recentTransition,
+        formatRelativeTime,
+        identityCopy.levelLabels,
+    ]);
     const identityHistoryRows = useMemo(() => {
+        if (activeCircleIdentityStatus?.messagingMode !== 'formal') return [] as string[];
         const rows = activeCircleIdentityStatus?.history || [];
         if (!Array.isArray(rows) || rows.length === 0) return [] as string[];
         return rows.slice(0, 3).map((row) => {
@@ -1751,13 +1768,25 @@ export default function CircleDetailPage() {
             const reason = normalizeIdentityCopy(row.reason?.trim());
             return `${from} → ${to} · ${formatRelativeTime(row.changedAt)}${reason ? ` · ${reason}` : ''}`;
         });
-    }, [activeCircleIdentityStatus?.history, formatRelativeTime, identityCopy.levelLabels]);
+    }, [
+        activeCircleIdentityStatus?.messagingMode,
+        activeCircleIdentityStatus?.history,
+        formatRelativeTime,
+        identityCopy.levelLabels,
+    ]);
     const activeIdentityTransitionStorageKey = useMemo(() => {
+        if (activeCircleIdentityStatus?.messagingMode !== 'formal') return null;
         const changedAt = activeCircleIdentityStatus?.recentTransition?.changedAt;
         if (!changedAt) return null;
         const viewerScope = sessionUser?.pubkey || walletPubkey || 'anonymous';
         return `alcheme_identity_transition_dismissed:${viewerScope}:${activeDiscussionCircleId}:${changedAt}`;
-    }, [activeCircleIdentityStatus?.recentTransition?.changedAt, activeDiscussionCircleId, sessionUser?.pubkey, walletPubkey]);
+    }, [
+        activeCircleIdentityStatus?.messagingMode,
+        activeCircleIdentityStatus?.recentTransition?.changedAt,
+        activeDiscussionCircleId,
+        sessionUser?.pubkey,
+        walletPubkey,
+    ]);
     useEffect(() => {
         if (!activeIdentityTransitionStorageKey) {
             setIdentityTransitionDismissed(false);

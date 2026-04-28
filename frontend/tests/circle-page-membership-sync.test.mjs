@@ -138,7 +138,7 @@ test('circle page refreshes route membership after identity session resolves', (
   assert.match(circlePageSource, /startMembershipRefresh\(\{\s*circleId,/s);
   assert.match(circlePageSource, /fetchSnapshot: fetchCircleMembershipState,/);
   assert.match(circlePageSource, /fetchStatus: fetchCircleIdentityStatus,/);
-  assert.match(circlePageSource, /\[\s*circleId,\s*publicKey,\s*identityState,\s*sessionUser\?\.id\s*\]/);
+  assert.match(circlePageSource, /\[\s*circleId,\s*publicKey,\s*identityState,\s*locale,\s*sessionUser\?\.id\s*\]/);
 });
 
 test('circle page clears stale route membership snapshots when refreshed state falls back to guest', () => {
@@ -155,7 +155,29 @@ test('circle page clears stale route membership snapshots when refreshed state f
 test('circle page still renders join banner fallback while membership snapshot is unavailable', () => {
   assert.match(
     circlePageSource,
-    /\{\(!activeCircleMembershipSnapshot \|\| activeCircleMembershipSnapshot\.joinState !== 'joined'\) && \(/,
+    /\{!activeCircleArchived && \(!activeCircleMembershipSnapshot \|\| activeCircleMembershipSnapshot\.joinState !== 'joined'\) && \(/,
+  );
+});
+
+test('circle page renders dust-only guest status as visitor dust copy, not formal identity progress', () => {
+  assert.match(
+    circlePageSource,
+    /if \(activeCircleIdentityStatus\.messagingMode === 'dust_only'\) \{\s*return joinCopy\.hint\.visitorDefault;\s*\}/s,
+  );
+});
+
+test('circle page only shows formal identity surfaces for formal identity status', () => {
+  assert.match(
+    circlePageSource,
+    /const plazaViewerStateHint = useMemo\(\(\) => \{[\s\S]*?activeCircleIdentityStatus\.messagingMode !== 'formal'[\s\S]*?return null;/,
+  );
+  assert.match(
+    circlePageSource,
+    /const identityProgressCard = useMemo\(\(\) => \{[\s\S]*?activeCircleIdentityStatus\.messagingMode !== 'formal'[\s\S]*?return null;/,
+  );
+  assert.match(
+    circlePageSource,
+    /const identityTransitionNotice = useMemo\(\(\) => \{[\s\S]*?activeCircleIdentityStatus\?\.messagingMode !== 'formal'[\s\S]*?return null;/,
   );
 });
 
@@ -305,9 +327,9 @@ test('identity-status fallback does not fabricate joined membership for dust-onl
       authenticated: true,
       circleId: 26,
       currentLevel: 'Visitor',
-      nextLevel: 'Initiate',
+      nextLevel: null,
       messagingMode: 'dust_only',
-      hint: 'Post 3 ephemeral messages to become an initiate.',
+      hint: 'Visitors can post ephemeral messages, but only members enter the formal archive.',
       thresholds: {
         initiateMessages: 3,
         memberCitations: 2,

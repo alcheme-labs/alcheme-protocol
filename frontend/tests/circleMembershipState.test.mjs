@@ -179,6 +179,40 @@ test('formal identity status does not override real pending membership gates', (
   assert.equal(resolved?.membership, null);
 });
 
+test('dust-only status never fabricates membership even if currentLevel is non-visitor', () => {
+  const resolved = deriveIdentityStatusFallbackMembershipSnapshot({
+    snapshot: null,
+    circleId: 1,
+    circleCreatedAt: '2026-03-02T10:00:00.000Z',
+    status: {
+      authenticated: true,
+      circleId: 1,
+      currentLevel: 'Initiate',
+      nextLevel: null,
+      messagingMode: 'dust_only',
+      hint: 'Visitors can send dust messages.',
+      thresholds: {
+        initiateMessages: 3,
+        memberCitations: 2,
+        elderPercentile: 10,
+        inactivityDays: 30,
+      },
+      transition: null,
+      recentTransition: null,
+      history: [],
+      progress: {
+        messageCount: 1,
+        citationCount: 0,
+        reputationScore: 0,
+        reputationPercentile: null,
+        daysSinceActive: null,
+      },
+    },
+  });
+
+  assert.equal(resolved, null);
+});
+
 test('creator fallback can trust the connected wallet pubkey when the graph proves the viewer owns the circle', () => {
   const resolved = deriveCreatorFallbackMembershipSnapshot({
     snapshot: null,
