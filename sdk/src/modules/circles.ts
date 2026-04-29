@@ -1188,8 +1188,7 @@ export class CirclesModule extends BaseModule<CircleManagerIdl> {
     contributorsCountBuffer.writeUInt16LE(input.contributorsCount, 0);
     const bindingVersionBuffer = Buffer.alloc(2);
     bindingVersionBuffer.writeUInt16LE(input.bindingVersion, 0);
-    const generatedAtBuffer = Buffer.alloc(8);
-    generatedAtBuffer.writeBigInt64LE(BigInt(input.generatedAt), 0);
+    const generatedAtBuffer = Buffer.from(new BN(input.generatedAt).toTwos(64).toArray("le", 8));
     const digest = sha256.array(Buffer.concat([
       domain,
       Buffer.from(input.proofPackageHash),

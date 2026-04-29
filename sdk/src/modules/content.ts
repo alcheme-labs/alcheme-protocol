@@ -870,19 +870,15 @@ export class ContentModule extends BaseModule<ContentManagerIdl> {
     }
 
     private toSignedI64LeBytes(value: unknown): Buffer {
-        const bytes = Buffer.alloc(8);
-        bytes.writeBigInt64LE(this.toBigInt(value));
-        return bytes;
+        return Buffer.from(new BN(this.toBigInt(value).toString()).toTwos(64).toArray("le", 8));
     }
 
     private toUnsignedU64LeBytes(value: unknown): Buffer {
-        const bytes = Buffer.alloc(8);
         const normalized = this.toBigInt(value);
         if (normalized < 0n) {
             throw new Error("u64 value must be non-negative");
         }
-        bytes.writeBigUInt64LE(normalized);
-        return bytes;
+        return Buffer.from(new BN(normalized.toString()).toArray("le", 8));
     }
 
     private toBigInt(value: unknown): bigint {

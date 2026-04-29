@@ -546,6 +546,29 @@ test('bindAndUpdateContributors allows issuerKeyId differing from provider witho
   assert.equal(calls[2].preInstructions.length, 1);
 });
 
+test('proof binding digest does not require Buffer BigInt write helpers', () => {
+  const originalWriteBigInt64LE = Buffer.prototype.writeBigInt64LE;
+  try {
+    Buffer.prototype.writeBigInt64LE = undefined;
+
+    const digest = CirclesModule.prototype.buildProofBindingDigest.call(
+      {},
+      {
+        sourceAnchorId: Array.from(Buffer.from('11'.repeat(32), 'hex')),
+        proofPackageHash: Array.from(Buffer.from('22'.repeat(32), 'hex')),
+        contributorsRoot: Array.from(Buffer.from('33'.repeat(32), 'hex')),
+        contributorsCount: 2,
+        bindingVersion: 1,
+        generatedAt: 1773403200,
+      },
+    );
+
+    assert.equal(digest.length, 32);
+  } finally {
+    Buffer.prototype.writeBigInt64LE = originalWriteBigInt64LE;
+  }
+});
+
 test('registerProofAttestor routes admin call to proof attestor registry PDA', async () => {
   const authority = new PublicKey('11111111111111111111111111111111');
   const attestor = new PublicKey('7wQmK7xZQ5e8ngz8qQjJvLwF4n7Xh8y5p9x8Vn4xS2Rv');
