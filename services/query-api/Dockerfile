@@ -50,8 +50,10 @@ COPY services/query-api/prisma ./prisma
 COPY services/query-api/prompts ./prompts
 COPY extensions/contribution-engine/extension.manifest.json ./extensions/contribution-engine/extension.manifest.json
 
-# Run as non-root user
-RUN chown -R node:node /app
+# Run as non-root user. Local private-content storage defaults under
+# /var/lib/alcheme in demo/prod, so prepare it before dropping privileges.
+RUN mkdir -p /var/lib/alcheme/private-content \
+    && chown -R node:node /app /var/lib/alcheme
 USER node
 
 EXPOSE 4000
