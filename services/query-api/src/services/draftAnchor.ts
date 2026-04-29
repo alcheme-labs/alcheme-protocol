@@ -107,6 +107,7 @@ export interface DraftAnchorProof {
     anchorIdMatchesPayloadHash: boolean;
     summaryHashMatches: boolean;
     messagesDigestMatches: boolean;
+    payloadEnvelopeMatches: boolean;
     memoContainsAnchor: boolean;
     memoContainsSummaryHash: boolean;
     memoContainsMessagesDigest: boolean;
@@ -122,6 +123,18 @@ export interface CreateDraftAnchorBatchInput {
     summaryText: string;
     summaryMethod: string;
     messages: DraftAnchorMessageInput[];
+}
+
+export class DraftAnchorRepairError extends Error {
+    code: string;
+    statusCode: number;
+
+    constructor(code: string, statusCode: number, message = code) {
+        super(message);
+        this.name = 'DraftAnchorRepairError';
+        this.code = code;
+        this.statusCode = statusCode;
+    }
 }
 
 type PrismaLike = PrismaClient | Prisma.TransactionClient;
@@ -142,6 +155,11 @@ interface DraftAnchorRuntimeConfig {
 
 function isSha256Hex(value: string): boolean {
     return /^[a-f0-9]{64}$/i.test(value);
+}
+
+function normalizeAnchorIdHex(value: string): string | null {
+    const normalized = String(value || '').trim().toLowerCase();
+    return isSha256Hex(normalized) ? normalized : null;
 }
 
 function parseBool(raw: string | undefined, fallback: boolean): boolean {
@@ -608,6 +626,16 @@ export async function getLatestDraftAnchorByPostId(
     prisma: PrismaLike,
     draftPostId: number,
 ): Promise<DraftAnchorRecord | null> {
+    const anchors = await getDraftAnchorsByPostId(prisma, draftPostId, 1);
+    return anchors[0] || null;
+}
+
+export async function getDraftAnchorsByPostId(
+    prisma: PrismaLike,
+    draftPostId: number,
+    limit = 20,
+): Promise<DraftAnchorRecord[]> {
+    const boundedLimit = Math.max(1, Math.min(parsePositiveInt(String(limit), 20), 100));
     const rows = await prisma.$queryRaw<DraftAnchorBatchRow[]>`
         SELECT
             anchor_id AS "anchorId",
@@ -634,10 +662,138 @@ export async function getLatestDraftAnchorByPostId(
         FROM discussion_draft_anchor_batches
         WHERE draft_post_id = ${draftPostId}
         ORDER BY created_at DESC
-        LIMIT 1
+        LIMIT ${boundedLimit}
     `;
-    const row = rows[0];
-    return row ? mapAnchorRow(row) : null;
+    return rows.map(mapAnchorRow);
+}
+
+function isDraftAnchorContentVerifiable(record: DraftAnchorRecord): boolean {
+    return verifyDraftAnchor({
+        ...record,
+        status: 'anchored',
+    }).verifiable;
+}
+
+function selectDraftAnchorRepairCandidate(anchors: DraftAnchorRecord[]): DraftAnchorRecord | null {
+    return anchors.find((anchor) => verifyDraftAnchor(anchor).verifiable)
+        || anchors.find((anchor) => (
+            anchor.status !== 'anchored'
+            && isDraftAnchorContentVerifiable(anchor)
+        ))
+        || null;
+}
+
+export async function repairDraftAnchorBatch(input: {
+    prisma: PrismaClient;
+    draftPostId: number;
+    anchorId?: string | null;
+}): Promise<DraftAnchorRecord> {
+    const config = loadDraftAnchorRuntimeConfig();
+    const requestedAnchorId = input.anchorId
+        ? normalizeAnchorIdHex(input.anchorId)
+        : null;
+    if (input.anchorId && !requestedAnchorId) {
+        throw new DraftAnchorRepairError(
+            'invalid_draft_anchor_id',
+            400,
+            'draft anchor id must be a 64-character hex string',
+        );
+    }
+
+    const anchor = requestedAnchorId
+        ? await findAnchorById(input.prisma, requestedAnchorId)
+        : selectDraftAnchorRepairCandidate(
+            await getDraftAnchorsByPostId(input.prisma, input.draftPostId, 20),
+        );
+
+    if (!anchor || anchor.draftPostId !== input.draftPostId) {
+        throw new DraftAnchorRepairError(
+            'draft_anchor_repair_candidate_not_found',
+            404,
+            'no discussion draft anchor repair candidate was found',
+        );
+    }
+
+    if (verifyDraftAnchor(anchor).verifiable) {
+        return anchor;
+    }
+
+    if (!isDraftAnchorContentVerifiable(anchor)) {
+        throw new DraftAnchorRepairError(
+            'draft_anchor_repair_payload_unverifiable',
+            422,
+            'discussion draft anchor payload is not internally verifiable',
+        );
+    }
+
+    const claimed = await claimAnchorForSubmission(input.prisma, {
+        anchorId: anchor.anchorId,
+        claimStaleSeconds: config.claimStaleSeconds,
+    });
+    if (!claimed) {
+        return (await findAnchorById(input.prisma, anchor.anchorId)) as DraftAnchorRecord;
+    }
+
+    if (!config.enabled) {
+        await updateAnchorStatus(input.prisma, {
+            anchorId: anchor.anchorId,
+            status: 'skipped',
+            errorMessage: 'DRAFT_ANCHOR_ENABLED=false',
+        });
+        return (await findAnchorById(input.prisma, anchor.anchorId)) as DraftAnchorRecord;
+    }
+
+    if (!config.writerEnabled) {
+        await updateAnchorStatus(input.prisma, {
+            anchorId: anchor.anchorId,
+            status: 'skipped',
+            errorMessage: 'DRAFT_ANCHOR_WRITER_ENABLED=false',
+        });
+        return (await findAnchorById(input.prisma, anchor.anchorId)) as DraftAnchorRecord;
+    }
+
+    if (config.signerMode === 'local' && !fs.existsSync(config.keypairPath)) {
+        await updateAnchorStatus(input.prisma, {
+            anchorId: anchor.anchorId,
+            status: 'skipped',
+            errorMessage: `anchor keypair not found: ${config.keypairPath}`,
+        });
+        return (await findAnchorById(input.prisma, anchor.anchorId)) as DraftAnchorRecord;
+    }
+
+    try {
+        const anchored = await submitMemoAnchorWithSigner({
+            config: {
+                mode: config.signerMode,
+                rpcUrl: config.rpcUrl,
+                commitment: config.commitment,
+                keypairPath: config.keypairPath,
+                externalUrl: config.signerUrl,
+                externalAuthToken: config.signerAuthToken,
+                externalTimeoutMs: config.signerTimeoutMs,
+                signerLabel: 'discussion_draft_anchor_repair',
+            },
+            memoText: anchor.memoText,
+            memoProgramId: MEMO_PROGRAM_ID,
+        });
+
+        await updateAnchorStatus(input.prisma, {
+            anchorId: anchor.anchorId,
+            status: 'anchored',
+            txSignature: anchored.signature,
+            txSlot: anchored.slot,
+            errorMessage: null,
+        });
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        await updateAnchorStatus(input.prisma, {
+            anchorId: anchor.anchorId,
+            status: 'failed',
+            errorMessage: message.slice(0, 500),
+        });
+    }
+
+    return (await findAnchorById(input.prisma, anchor.anchorId)) as DraftAnchorRecord;
 }
 
 export function verifyDraftAnchor(record: DraftAnchorRecord): DraftAnchorProof {
@@ -680,6 +836,7 @@ export function verifyDraftAnchor(record: DraftAnchorRecord): DraftAnchorProof {
         anchorIdMatchesPayloadHash,
         summaryHashMatches,
         messagesDigestMatches,
+        payloadEnvelopeMatches,
         memoContainsAnchor,
         memoContainsSummaryHash,
         memoContainsMessagesDigest,

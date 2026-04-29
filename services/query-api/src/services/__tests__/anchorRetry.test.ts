@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals';
 
 import { createCollabEditAnchorBatch } from '../collabEditAnchor';
-import { createDraftAnchorBatch } from '../draftAnchor';
+import { createDraftAnchorBatch, repairDraftAnchorBatch } from '../draftAnchor';
 import { submitMemoAnchorWithSigner } from '../anchorSigner';
 
 jest.mock('../anchorSigner', () => ({
@@ -25,8 +25,13 @@ function buildPrismaMock(table: 'collab' | 'draft') {
         $queryRaw: jest.fn(async (query: any, ...values: any[]) => {
             const sql = readSql(query);
             if (sql.includes('FROM collab_edit_anchor_batches') || sql.includes('FROM discussion_draft_anchor_batches')) {
+                if (!row) return [];
+                if (sql.includes('WHERE draft_post_id')) {
+                    const draftPostId = Number(values[0]);
+                    return row.draftPostId === draftPostId ? [row] : [];
+                }
                 const anchorId = String(values[0] || '');
-                return row && (!anchorId || row.anchorId === anchorId) ? [row] : [];
+                return !anchorId || row.anchorId === anchorId ? [row] : [];
             }
             if (sql.includes('UPDATE collab_edit_anchor_batches') || sql.includes('UPDATE discussion_draft_anchor_batches')) {
                 const anchorId = String(values[0]);
@@ -210,6 +215,50 @@ describe('anchor retry', () => {
         expect(retried.errorMessage).toBeNull();
         expect(getRow()?.status).toBe('anchored');
         expect(submitMemoAnchorWithSigner).toHaveBeenCalledTimes(1);
+    });
+
+    test('discussion draft anchor repair submits the existing memo for a skipped historical batch', async () => {
+        const { prisma, getRow } = buildPrismaMock('draft');
+        const input = {
+            prisma,
+            circleId: 7,
+            draftPostId: 42,
+            roomKey: 'circle:7',
+            triggerReason: 'focused_discussion',
+            summaryText: 'summary',
+            summaryMethod: 'rule',
+            messages: [{
+                envelopeId: 'env-1',
+                payloadHash: '3'.repeat(64),
+                lamport: BigInt(100),
+                senderPubkey: '11111111111111111111111111111112',
+                createdAt: new Date('2026-04-29T11:00:00.000Z'),
+                semanticScore: 0.8,
+                relevanceMethod: 'rule',
+            }],
+        };
+
+        process.env.DRAFT_ANCHOR_ENABLED = 'false';
+        const skipped = await createDraftAnchorBatch(input);
+        expect(skipped.status).toBe('skipped');
+
+        process.env.DRAFT_ANCHOR_ENABLED = 'true';
+        process.env.DRAFT_ANCHOR_WRITER_ENABLED = 'true';
+        const repaired = await repairDraftAnchorBatch({
+            prisma,
+            draftPostId: 42,
+        });
+
+        expect(repaired.status).toBe('anchored');
+        expect(repaired.errorMessage).toBeNull();
+        expect(getRow()?.status).toBe('anchored');
+        expect(submitMemoAnchorWithSigner).toHaveBeenCalledTimes(1);
+        expect(submitMemoAnchorWithSigner).toHaveBeenCalledWith(expect.objectContaining({
+            memoText: skipped.memoText,
+            config: expect.objectContaining({
+                signerLabel: 'discussion_draft_anchor_repair',
+            }),
+        }));
     });
 
     test('collab edit anchors inherit SOLANA_RPC_URL when no anchor-specific RPC is configured', async () => {

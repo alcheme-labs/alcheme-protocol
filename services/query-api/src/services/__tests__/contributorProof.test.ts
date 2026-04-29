@@ -2,6 +2,7 @@ import type { DraftAnchorCanonicalPayload } from '../draftAnchor';
 import {
     buildDraftContributorProof,
     loadDraftContributorProof,
+    selectVerifiableContributorProofAnchor,
     sortDraftContributorsCanonical,
 } from '../contributorProof';
 
@@ -112,6 +113,32 @@ describe('contributorProof', () => {
                 authorPubkey: '11111111111111111111111111111111',
             }),
         })).rejects.toThrow('draft_anchor_unverifiable');
+    });
+
+    test('selects the newest verifiable anchor when newer attempts are not usable', () => {
+        const payload = makeAnchorPayload();
+        const selected = selectVerifiableContributorProofAnchor([
+            {
+                anchorId: '1'.repeat(64),
+                payloadHash: '1'.repeat(64),
+                canonicalPayload: payload,
+                proof: { verifiable: false },
+            },
+            {
+                anchorId: '2'.repeat(64),
+                payloadHash: '2'.repeat(64),
+                canonicalPayload: payload,
+                proof: { verifiable: true },
+            },
+            {
+                anchorId: '3'.repeat(64),
+                payloadHash: '3'.repeat(64),
+                canonicalPayload: payload,
+                proof: { verifiable: true },
+            },
+        ]);
+
+        expect(selected?.anchorId).toBe('2'.repeat(64));
     });
 
     test('sorts contributors deterministically by role then pubkey', () => {

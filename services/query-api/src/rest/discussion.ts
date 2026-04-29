@@ -44,8 +44,10 @@ import {
     resolveCircleGhostSettings,
 } from '../ai/ghost/circle-settings';
 import {
+    DraftAnchorRepairError,
     getDraftAnchorById,
     getLatestDraftAnchorByPostId,
+    repairDraftAnchorBatch,
     verifyDraftAnchor,
 } from '../services/draftAnchor';
 import {
@@ -2203,6 +2205,42 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                 proof,
             });
         } catch (error) {
+            next(error);
+        }
+    });
+
+    router.post('/drafts/:postId/anchor/repair', async (req, res, next) => {
+        try {
+            const postId = parsePositiveInt(req.params.postId, NaN);
+            if (!Number.isFinite(postId)) {
+                return res.status(400).json({ error: 'invalid_post_id' });
+            }
+            const access = await ensureDraftAccessFromRequest(req, res, postId, 'edit');
+            if (!access) return;
+
+            const anchorId = typeof req.body?.anchorId === 'string'
+                ? req.body.anchorId
+                : null;
+            const anchor = await repairDraftAnchorBatch({
+                prisma,
+                draftPostId: postId,
+                anchorId,
+            });
+            const proof = verifyDraftAnchor(anchor);
+            return res.json({
+                ok: proof.verifiable,
+                mode: draftStrictBindingMode,
+                anchor,
+                proof,
+            });
+        } catch (error) {
+            if (error instanceof DraftAnchorRepairError) {
+                return res.status(error.statusCode).json({
+                    error: error.code,
+                    message: error.message,
+                    mode: draftStrictBindingMode,
+                });
+            }
             next(error);
         }
     });

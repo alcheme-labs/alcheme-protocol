@@ -2,8 +2,8 @@ import crypto from 'crypto';
 import { PublicKey } from '@solana/web3.js';
 import type { PrismaClient } from '@prisma/client';
 import {
+    getDraftAnchorsByPostId,
     getDraftAnchorById,
-    getLatestDraftAnchorByPostId,
     verifyDraftAnchor,
     type DraftAnchorCanonicalPayload,
 } from './draftAnchor';
@@ -59,7 +59,7 @@ export class DraftContributorProofError extends Error {
     }
 }
 
-interface LoadedAnchorForContributorProof {
+export interface LoadedAnchorForContributorProof {
     anchorId: string;
     payloadHash: string;
     canonicalPayload: DraftAnchorCanonicalPayload | null;
@@ -72,6 +72,12 @@ interface LoadedDraftPostForContributorProof {
     id: number;
     circleId: number | null;
     authorPubkey: string | null;
+}
+
+export function selectVerifiableContributorProofAnchor(
+    anchors: LoadedAnchorForContributorProof[],
+): LoadedAnchorForContributorProof | null {
+    return anchors.find((anchor) => anchor.canonicalPayload && anchor.proof.verifiable) || null;
 }
 
 function sha256Bytes(input: Uint8Array): Uint8Array {
@@ -327,17 +333,24 @@ export async function getDraftContributorProof(
     return loadDraftContributorProof({
         draftPostId,
         loadLatestAnchor: async (postId) => {
-            const anchor = requestedAnchorId
-                ? await getDraftAnchorById(prisma, requestedAnchorId)
-                : await getLatestDraftAnchorByPostId(prisma, postId);
-            if (!anchor) return null;
-            if (anchor.draftPostId !== postId) return null;
-            return {
+            if (requestedAnchorId) {
+                const anchor = await getDraftAnchorById(prisma, requestedAnchorId);
+                if (!anchor || anchor.draftPostId !== postId) return null;
+                return {
+                    anchorId: anchor.anchorId,
+                    payloadHash: anchor.payloadHash,
+                    canonicalPayload: anchor.canonicalPayload,
+                    proof: verifyDraftAnchor(anchor),
+                };
+            }
+
+            const anchors = await getDraftAnchorsByPostId(prisma, postId, 20);
+            return selectVerifiableContributorProofAnchor(anchors.map((anchor) => ({
                 anchorId: anchor.anchorId,
                 payloadHash: anchor.payloadHash,
                 canonicalPayload: anchor.canonicalPayload,
                 proof: verifyDraftAnchor(anchor),
-            };
+            })));
         },
         loadDraftPost: async (postId) => {
             const post = await prisma.post.findUnique({
