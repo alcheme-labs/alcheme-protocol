@@ -619,7 +619,6 @@ export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
                 const contentHash = await sha256Hex(document);
 
                 const upload = await uploadFinalDraftDocument({
-                    baseUrl,
                     draftPostId,
                     title,
                     document,

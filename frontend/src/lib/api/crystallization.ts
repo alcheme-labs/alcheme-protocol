@@ -1,4 +1,5 @@
 import { apiFetch } from '@/lib/api/fetch';
+import { resolveNodeRoute } from '@/lib/api/nodeRouting';
 
 export interface StorageUploadPayload {
   circleId: number;
@@ -6,13 +7,13 @@ export interface StorageUploadPayload {
 }
 
 export async function uploadFinalDraftDocument(input: {
-  baseUrl: string;
   draftPostId: number;
   title: string;
   document: string;
 }): Promise<StorageUploadPayload> {
+  const route = await resolveNodeRoute('discussion_runtime');
   const response = await apiFetch(
-    `${input.baseUrl}/api/v1/storage/drafts/${input.draftPostId}/final-document`,
+    `${route.urlBase}/api/v1/storage/drafts/${input.draftPostId}/final-document`,
     {
       method: 'POST',
       credentials: 'include',

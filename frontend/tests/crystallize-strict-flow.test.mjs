@@ -6,6 +6,10 @@ const hookSource = readFileSync(
     new URL('../src/hooks/useCrystallizeDraft.ts', import.meta.url),
     'utf8',
 );
+const crystallizationApiSource = readFileSync(
+    new URL('../src/lib/api/crystallization.ts', import.meta.url),
+    'utf8',
+);
 
 function assertIncreasingOrder(source, checkpoints) {
     let lastIndex = -1;
@@ -47,4 +51,9 @@ test('strict crystallization flow clamps knowledge title and description by byte
     assert.match(hookSource, /const KNOWLEDGE_DESCRIPTION_MAX_BYTES = 256;/);
     assert.match(hookSource, /title: buildKnowledgeTitle\(title\)/);
     assert.doesNotMatch(hookSource, /return normalized\.slice\(0,\s*180\)/);
+});
+
+test('final document storage upload is routed through the private discussion sidecar', () => {
+    assert.match(crystallizationApiSource, /resolveNodeRoute\('discussion_runtime'\)/);
+    assert.doesNotMatch(crystallizationApiSource, /input\.baseUrl}\/api\/v1\/storage/);
 });
