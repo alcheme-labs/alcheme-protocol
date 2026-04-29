@@ -164,4 +164,32 @@ describe('discussion initial draft generator', () => {
             dataBoundary: 'private_plaintext',
         }));
     });
+
+    test('classifies provider timeouts with a specific retryable error code', async () => {
+        const prisma = {
+            $queryRaw: jest.fn(async () => [
+                createSourceRow({
+                    envelopeId: 'env_a',
+                    payloadText: 'A source message that should become a draft.',
+                }),
+            ]),
+        } as any;
+        const timeoutError = Object.assign(new Error('builtin ai text request timed out after 15000ms'), {
+            code: 'provider_timeout',
+        });
+        (generateAiTextMock as any).mockRejectedValue(timeoutError);
+
+        await expect(generateInitialDiscussionDraft(prisma, {
+            circleId: 7,
+            circleName: 'Knowledge Circle',
+            circleDescription: null,
+            sourceMessageIds: ['env_a'],
+        })).rejects.toMatchObject({
+            code: 'initial_draft_generation_timeout',
+            retryable: true,
+            diagnostics: expect.objectContaining({
+                providerErrorCode: 'provider_timeout',
+            }),
+        } satisfies Partial<DiscussionInitialDraftError>);
+    });
 });

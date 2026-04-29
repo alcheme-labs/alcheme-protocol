@@ -7,10 +7,18 @@ import { fileURLToPath } from 'node:url';
 const filePath = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(filePath), '..', '..');
 const scriptPath = path.join(repoRoot, 'scripts', 'start-local-stack.sh');
+const rootEnvExamplePath = path.join(repoRoot, '.env.example');
+const queryApiEnvExamplePath = path.join(repoRoot, 'services', 'query-api', '.env.example');
+const dockerComposePath = path.join(repoRoot, 'docker-compose.yml');
 
 function readScript() {
   assert.equal(fs.existsSync(scriptPath), true, `missing file: ${scriptPath}`);
   return fs.readFileSync(scriptPath, 'utf8');
+}
+
+function readRepoFile(file) {
+  assert.equal(fs.existsSync(file), true, `missing file: ${file}`);
+  return fs.readFileSync(file, 'utf8');
 }
 
 test('start-local-stack defines AI gateway env defaults for query-api runtime', () => {
@@ -21,7 +29,13 @@ test('start-local-stack defines AI gateway env defaults for query-api runtime', 
   assert.match(source, /AI_BUILTIN_TEXT_API="\$\{AI_BUILTIN_TEXT_API:-chat_completions\}"/);
   assert.match(source, /NEW_API_URL="\$\{NEW_API_URL:-\}"/);
   assert.match(source, /NEW_API_KEY="\$\{NEW_API_KEY:-\}"/);
+  assert.match(source, /NEW_API_TIMEOUT_MS="\$\{NEW_API_TIMEOUT_MS:-\$\{AI_GATEWAY_TIMEOUT_MS:-15000\}\}"/);
+  assert.match(source, /AI_GATEWAY_TIMEOUT_MS="\$\{AI_GATEWAY_TIMEOUT_MS:-\$NEW_API_TIMEOUT_MS\}"/);
   assert.match(source, /AI_EXTERNAL_URL="\$\{AI_EXTERNAL_URL:-\}"/);
+  assert.match(source, /DISCUSSION_INITIAL_DRAFT_MODEL="\$\{DISCUSSION_INITIAL_DRAFT_MODEL:-\}"/);
+  assert.match(source, /DRAFT_LIFECYCLE_ANCHOR_LOOKUP_ATTEMPTS="\$\{DRAFT_LIFECYCLE_ANCHOR_LOOKUP_ATTEMPTS:-30\}"/);
+  assert.match(source, /DRAFT_LIFECYCLE_ANCHOR_LOOKUP_DELAY_MS="\$\{DRAFT_LIFECYCLE_ANCHOR_LOOKUP_DELAY_MS:-1000\}"/);
+  assert.match(source, /DRAFT_LIFECYCLE_ANCHOR_RPC_TIMEOUT_MS="\$\{DRAFT_LIFECYCLE_ANCHOR_RPC_TIMEOUT_MS:-5000\}"/);
 });
 
 test('start-local-stack loads dev env defaults without overriding explicit shell exports', () => {
@@ -58,7 +72,14 @@ test('start-local-stack forwards AI env vars into the query-api process env', ()
   assert.match(source, /AI_BUILTIN_TEXT_API=\\?"\$AI_BUILTIN_TEXT_API\\?"/);
   assert.match(source, /NEW_API_URL=\\?"\$NEW_API_URL\\?"/);
   assert.match(source, /NEW_API_KEY=\\?"\$NEW_API_KEY\\?"/);
+  assert.match(source, /NEW_API_TIMEOUT_MS=\\?"\$NEW_API_TIMEOUT_MS\\?"/);
+  assert.match(source, /AI_GATEWAY_TIMEOUT_MS=\\?"\$AI_GATEWAY_TIMEOUT_MS\\?"/);
   assert.match(source, /AI_EXTERNAL_URL=\\?"\$AI_EXTERNAL_URL\\?"/);
+  assert.match(source, /CONTENT_PROGRAM_ID=\\?"\$CONTENT_PROGRAM_ID\\?"/);
+  assert.match(source, /DISCUSSION_INITIAL_DRAFT_MODEL=\\?"\$DISCUSSION_INITIAL_DRAFT_MODEL\\?"/);
+  assert.match(source, /DRAFT_LIFECYCLE_ANCHOR_LOOKUP_ATTEMPTS=\\?"\$DRAFT_LIFECYCLE_ANCHOR_LOOKUP_ATTEMPTS\\?"/);
+  assert.match(source, /DRAFT_LIFECYCLE_ANCHOR_LOOKUP_DELAY_MS=\\?"\$DRAFT_LIFECYCLE_ANCHOR_LOOKUP_DELAY_MS\\?"/);
+  assert.match(source, /DRAFT_LIFECYCLE_ANCHOR_RPC_TIMEOUT_MS=\\?"\$DRAFT_LIFECYCLE_ANCHOR_RPC_TIMEOUT_MS\\?"/);
 });
 
 test('start-local-stack derives and forwards membership bridge issuer defaults for local join finalization', () => {
@@ -79,4 +100,31 @@ test('start-local-stack runs an optional AI smoke check after query-api starts',
   assert.match(source, /run_ai_smoke_check_optional\(\)/);
   assert.match(source, /tsx scripts\/ai-smoke-check\.ts/);
   assert.match(source, /ai-smoke-check\.log/);
+  assert.match(source, /DISCUSSION_INITIAL_DRAFT_MODEL=\\?"\$DISCUSSION_INITIAL_DRAFT_MODEL\\?"/);
+});
+
+test('repo env examples document AI gateway and draft lifecycle anchor knobs', () => {
+  const rootEnv = readRepoFile(rootEnvExamplePath);
+  const queryApiEnv = readRepoFile(queryApiEnvExamplePath);
+
+  for (const source of [rootEnv, queryApiEnv]) {
+    assert.match(source, /NEW_API_TIMEOUT_MS=15000/);
+    assert.match(source, /AI_GATEWAY_TIMEOUT_MS=15000/);
+    assert.match(source, /DISCUSSION_INITIAL_DRAFT_MODEL=llama3\.1:8b/);
+    assert.match(source, /DRAFT_LIFECYCLE_ANCHOR_LOOKUP_ATTEMPTS=30/);
+    assert.match(source, /DRAFT_LIFECYCLE_ANCHOR_LOOKUP_DELAY_MS=1000/);
+    assert.match(source, /DRAFT_LIFECYCLE_ANCHOR_RPC_TIMEOUT_MS=5000/);
+  }
+});
+
+test('docker-compose forwards AI gateway and anchor verification env to query-api', () => {
+  const source = readRepoFile(dockerComposePath);
+
+  assert.match(source, /NEW_API_TIMEOUT_MS: \$\{NEW_API_TIMEOUT_MS:-15000\}/);
+  assert.match(source, /AI_GATEWAY_TIMEOUT_MS: \$\{AI_GATEWAY_TIMEOUT_MS:-15000\}/);
+  assert.match(source, /DISCUSSION_INITIAL_DRAFT_MODEL: \$\{DISCUSSION_INITIAL_DRAFT_MODEL:-\}/);
+  assert.match(source, /CONTENT_PROGRAM_ID: \$\{CONTENT_PROGRAM_ID:-\$\{NEXT_PUBLIC_CONTENT_PROGRAM_ID:-\}\}/);
+  assert.match(source, /DRAFT_LIFECYCLE_ANCHOR_LOOKUP_ATTEMPTS: \$\{DRAFT_LIFECYCLE_ANCHOR_LOOKUP_ATTEMPTS:-30\}/);
+  assert.match(source, /DRAFT_LIFECYCLE_ANCHOR_LOOKUP_DELAY_MS: \$\{DRAFT_LIFECYCLE_ANCHOR_LOOKUP_DELAY_MS:-1000\}/);
+  assert.match(source, /DRAFT_LIFECYCLE_ANCHOR_RPC_TIMEOUT_MS: \$\{DRAFT_LIFECYCLE_ANCHOR_RPC_TIMEOUT_MS:-5000\}/);
 });

@@ -409,6 +409,22 @@ function buildMetadata(input: {
     };
 }
 
+function getProviderErrorCode(error: unknown): string | null {
+    if (!error || typeof error !== 'object') return null;
+    const code = (error as Record<string, unknown>).code;
+    return typeof code === 'string' && code.trim() ? code.trim() : null;
+}
+
+function isInitialDraftGenerationTimeout(error: unknown): boolean {
+    if (getProviderErrorCode(error) === 'provider_timeout') return true;
+    const name = error && typeof error === 'object'
+        ? (error as Record<string, unknown>).name
+        : null;
+    if (name === 'AbortError') return true;
+    const message = error instanceof Error ? error.message : String(error || '');
+    return /\b(timeout|timed out|aborted)\b/i.test(message);
+}
+
 export async function generateInitialDiscussionDraft(
     prisma: PrismaLike,
     input: GenerateInitialDiscussionDraftInput,
@@ -444,11 +460,15 @@ export async function generateInitialDiscussionDraft(
             dataBoundary: 'private_plaintext',
         });
     } catch (error) {
+        const providerErrorCode = getProviderErrorCode(error);
         throw new DiscussionInitialDraftError({
-            code: 'initial_draft_generation_failed',
+            code: isInitialDraftGenerationTimeout(error)
+                ? 'initial_draft_generation_timeout'
+                : 'initial_draft_generation_failed',
             message: error instanceof Error ? error.message : String(error || ''),
             diagnostics: {
                 sourceDigest,
+                providerErrorCode,
             },
         });
     }

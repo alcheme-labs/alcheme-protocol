@@ -105,6 +105,16 @@ function isProviderRateLimitMessage(message: string): boolean {
     return /\b(rate limit|rpm limit|too many requests)\b/i.test(message);
 }
 
+function getErrorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : String(error || '');
+}
+
+function isTimeoutError(error: unknown): boolean {
+    const record = error && typeof error === 'object' ? error as Record<string, unknown> : {};
+    if (record.code === 'provider_timeout' || record.name === 'AbortError') return true;
+    return /\b(timeout|timed out|aborted)\b/i.test(getErrorMessage(error));
+}
+
 function buildBuiltinEmbeddingError(status: number, message: string): Error {
     if ((status === 403 || status === 429) && isProviderRateLimitMessage(message)) {
         return new AiProviderError(message, {
@@ -246,14 +256,26 @@ export async function generateAiText(
         };
     }
 
-    const result = await generateText({
-        model: getBuiltinTextModel(modelId),
-        system: input.systemPrompt ?? undefined,
-        prompt: input.userPrompt,
-        temperature: input.temperature ?? 0.1,
-        maxOutputTokens: input.maxOutputTokens ?? 400,
-        output: buildStructuredOutput(input.responseFormat),
-    });
+    const timeoutMs = getGatewayTimeoutMs();
+    let result;
+    try {
+        result = await generateText({
+            model: getBuiltinTextModel(modelId),
+            system: input.systemPrompt ?? undefined,
+            prompt: input.userPrompt,
+            temperature: input.temperature ?? 0.1,
+            maxOutputTokens: input.maxOutputTokens ?? 400,
+            output: buildStructuredOutput(input.responseFormat),
+            timeout: timeoutMs,
+        });
+    } catch (error) {
+        if (isTimeoutError(error)) {
+            throw new AiProviderError(`builtin ai text request timed out after ${timeoutMs}ms`, {
+                code: 'provider_timeout',
+            });
+        }
+        throw error;
+    }
 
     return {
         text: String(result.text || '').trim(),

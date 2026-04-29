@@ -41,6 +41,7 @@ describe('builtin ai provider text api selection', () => {
     const originalBuiltinTextApi = serviceConfig.ai.builtinTextApi;
     const originalGatewayUrl = serviceConfig.ai.gatewayUrl;
     const originalGatewayKey = serviceConfig.ai.gatewayKey;
+    const originalGatewayTimeoutMs = serviceConfig.ai.gatewayTimeoutMs;
     const originalScoringModel = process.env.SCORING_MODEL;
     const originalSummaryModel = process.env.DISCUSSION_SUMMARY_MODEL;
 
@@ -50,6 +51,7 @@ describe('builtin ai provider text api selection', () => {
         serviceConfig.ai.builtinTextApi = 'chat_completions';
         serviceConfig.ai.gatewayUrl = 'https://gateway.example/v1';
         serviceConfig.ai.gatewayKey = 'gateway-secret';
+        serviceConfig.ai.gatewayTimeoutMs = 4321;
         process.env.SCORING_MODEL = 'score-model';
         process.env.DISCUSSION_SUMMARY_MODEL = 'summary-model';
         (mockGenerateText as any).mockResolvedValue({
@@ -62,6 +64,7 @@ describe('builtin ai provider text api selection', () => {
         serviceConfig.ai.builtinTextApi = originalBuiltinTextApi;
         serviceConfig.ai.gatewayUrl = originalGatewayUrl;
         serviceConfig.ai.gatewayKey = originalGatewayKey;
+        serviceConfig.ai.gatewayTimeoutMs = originalGatewayTimeoutMs;
         if (originalScoringModel === undefined) {
             delete process.env.SCORING_MODEL;
         } else {
@@ -93,6 +96,17 @@ describe('builtin ai provider text api selection', () => {
             providerMode: 'builtin',
             model: 'summary-model',
         });
+    });
+
+    test('passes the configured gateway timeout to builtin text generation', async () => {
+        await generateAiText({
+            task: 'discussion-summary',
+            userPrompt: 'Return exactly: OK',
+        });
+
+        expect(mockGenerateText).toHaveBeenCalledWith(expect.objectContaining({
+            timeout: 4321,
+        }));
     });
 
     test('uses responses model selection when AI_BUILTIN_TEXT_API=responses', async () => {
