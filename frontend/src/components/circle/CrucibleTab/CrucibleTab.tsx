@@ -199,6 +199,11 @@ function CrucibleTab({
     const [insertReferenceRequest, setInsertReferenceRequest] = useState<KnowledgeReferenceInsertRequest | null>(null);
     const [draftWorkspaceStatuses, setDraftWorkspaceStatuses] = useState<Record<number, WorkspaceDraftLifecycleStatus>>({});
     const draftLifecycleRequestRef = useRef(0);
+    const draftLifecycleRef = useRef<DraftLifecycleReadModel | null>(null);
+    const setDraftLifecycleSnapshot = useCallback((nextLifecycle: DraftLifecycleReadModel | null) => {
+        draftLifecycleRef.current = nextLifecycle;
+        setDraftLifecycle(nextLifecycle);
+    }, []);
     const draftWorkspaceStatusRequestRef = useRef(0);
     const sourceMaterialsRequestRef = useRef(0);
     const discussionSurfaceSyncRef = useRef<Promise<void> | null>(null);
@@ -531,7 +536,7 @@ function CrucibleTab({
     const refreshDraftLifecycle = useCallback(async (): Promise<void> => {
         if (!selectedDraftPostId || !Number.isFinite(selectedDraftPostId)) {
             draftLifecycleRequestRef.current += 1;
-            setDraftLifecycle(null);
+            setDraftLifecycleSnapshot(null);
             setDraftLifecycleError(null);
             setDraftLifecycleLoading(false);
             return;
@@ -539,24 +544,32 @@ function CrucibleTab({
 
         const requestId = draftLifecycleRequestRef.current + 1;
         draftLifecycleRequestRef.current = requestId;
-        setDraftLifecycleLoading(true);
+        const hasLifecycleSnapshot = draftLifecycleRef.current?.draftPostId === selectedDraftPostId;
+        if (!hasLifecycleSnapshot && draftLifecycleRef.current) {
+            setDraftLifecycleSnapshot(null);
+        }
+        setDraftLifecycleLoading(!hasLifecycleSnapshot);
         setDraftLifecycleError(null);
         try {
             const lifecycle = await fetchDraftLifecycle({
                 draftPostId: selectedDraftPostId,
             });
             if (draftLifecycleRequestRef.current !== requestId) return;
-            setDraftLifecycle(lifecycle);
+            setDraftLifecycleSnapshot(lifecycle);
         } catch (error) {
             if (draftLifecycleRequestRef.current !== requestId) return;
             const message = error instanceof Error ? error.message : t('errors.loadDraftLifecycle');
-            setDraftLifecycle(null);
-            setDraftLifecycleError(message);
+            if (!hasLifecycleSnapshot) {
+                setDraftLifecycleSnapshot(null);
+                setDraftLifecycleError(message);
+            } else {
+                console.warn('refresh draft lifecycle failed:', error);
+            }
         } finally {
             if (draftLifecycleRequestRef.current !== requestId) return;
             setDraftLifecycleLoading(false);
         }
-    }, [selectedDraftPostId, t]);
+    }, [selectedDraftPostId, setDraftLifecycleSnapshot, t]);
 
     const refreshDraftDiscussions = useCallback(async (): Promise<void> => {
         if (!selectedDraftPostId || !Number.isFinite(selectedDraftPostId)) {
@@ -602,7 +615,7 @@ function CrucibleTab({
                 setDisplayHeat(Math.max(0, payload.heatScore));
             }
             if (payload.updatedAt && draftLifecycle) {
-                setDraftLifecycle({
+                setDraftLifecycleSnapshot({
                     ...draftLifecycle,
                     workingCopy: {
                         ...draftLifecycle.workingCopy,
@@ -626,7 +639,7 @@ function CrucibleTab({
             }
             return null;
         }
-    }, [draftLifecycle, loadDraftReferenceLinks, t]);
+    }, [draftLifecycle, loadDraftReferenceLinks, setDraftLifecycleSnapshot, t]);
 
     const syncDraftSurfaceFromLifecycle = useCallback((
         lifecycle: DraftLifecycleReadModel,
@@ -634,7 +647,7 @@ function CrucibleTab({
             replaceLiveDoc?: boolean;
         },
     ) => {
-        setDraftLifecycle(lifecycle);
+        setDraftLifecycleSnapshot(lifecycle);
 
         const nextWorkingCopy = String(lifecycle.workingCopy?.workingCopyContent || '');
         if (!nextWorkingCopy.trim()) return;
@@ -649,7 +662,7 @@ function CrucibleTab({
                 content: nextWorkingCopy,
             });
         }
-    }, []);
+    }, [setDraftLifecycleSnapshot]);
 
     const handleGhostDraftApplied = useCallback(async (input: {
         draftText: string;
@@ -673,7 +686,7 @@ function CrucibleTab({
         setSelectedDraftContent(normalized);
         setDisplayHeat(Math.max(0, Number(input.heatScore || 0)));
         if (draftLifecycle) {
-            setDraftLifecycle({
+            setDraftLifecycleSnapshot({
                 ...draftLifecycle,
                 workingCopy: {
                     ...draftLifecycle.workingCopy,
@@ -710,7 +723,7 @@ function CrucibleTab({
                 });
             }
         }
-    }, [draftLifecycle]);
+    }, [draftLifecycle, setDraftLifecycleSnapshot]);
 
     const clearNoticeTimer = useCallback(() => {
         if (noticeTimerRef.current !== null) {
@@ -793,7 +806,7 @@ function CrucibleTab({
                     throw error;
                 }
             }
-            setDraftLifecycle(lifecycle);
+            setDraftLifecycleSnapshot(lifecycle);
             await refreshDraftDiscussions();
             setNotice({
                 type: 'success',
@@ -811,6 +824,7 @@ function CrucibleTab({
         presentDraftLifecycleActionError,
         refreshDraftDiscussions,
         selectedDraftPostId,
+        setDraftLifecycleSnapshot,
         t,
     ]);
 
@@ -891,7 +905,7 @@ function CrucibleTab({
                 anchorSignature,
                 policyProfileDigest: draftLifecycle.policyProfileDigest,
             });
-            setDraftLifecycle(lifecycle);
+            setDraftLifecycleSnapshot(lifecycle);
             await refreshDraftDiscussions();
             setNotice({
                 type: 'success',
@@ -910,6 +924,7 @@ function CrucibleTab({
         refreshDraftDiscussions,
         selectedDraftPostId,
         sdk,
+        setDraftLifecycleSnapshot,
         t,
     ]);
 
@@ -933,7 +948,7 @@ function CrucibleTab({
                 anchorSignature,
                 policyProfileDigest: draftLifecycle.policyProfileDigest,
             });
-            setDraftLifecycle(lifecycle);
+            setDraftLifecycleSnapshot(lifecycle);
             await refreshDraftDiscussions();
             setNotice({
                 type: 'success',
@@ -952,6 +967,7 @@ function CrucibleTab({
         refreshDraftDiscussions,
         selectedDraftPostId,
         sdk,
+        setDraftLifecycleSnapshot,
         t,
     ]);
 
@@ -967,7 +983,7 @@ function CrucibleTab({
             const lifecycle = await rollbackDraftLifecycleCrystallizationRequest({
                 draftPostId: selectedDraftPostId,
             });
-            setDraftLifecycle(lifecycle);
+            setDraftLifecycleSnapshot(lifecycle);
             await refreshDraftDiscussions();
             setNotice({
                 type: 'success',
@@ -984,6 +1000,7 @@ function CrucibleTab({
         presentDraftLifecycleActionError,
         refreshDraftDiscussions,
         selectedDraftPostId,
+        setDraftLifecycleSnapshot,
         t,
     ]);
 
@@ -1014,7 +1031,7 @@ function CrucibleTab({
                 anchorSignature,
                 policyProfileDigest: draftLifecycle.policyProfileDigest,
             });
-            setDraftLifecycle(lifecycle);
+            setDraftLifecycleSnapshot(lifecycle);
             await refreshDraftDiscussions();
             setNotice({
                 type: 'success',
@@ -1034,6 +1051,7 @@ function CrucibleTab({
         refreshDraftDiscussions,
         sdk,
         selectedDraftPostId,
+        setDraftLifecycleSnapshot,
         t,
     ]);
 
@@ -1057,7 +1075,7 @@ function CrucibleTab({
                 anchorSignature,
                 policyProfileDigest: draftLifecycle.policyProfileDigest,
             });
-            setDraftLifecycle(lifecycle);
+            setDraftLifecycleSnapshot(lifecycle);
             await refreshDraftDiscussions();
             setNotice({
                 type: 'success',
@@ -1076,6 +1094,7 @@ function CrucibleTab({
         refreshDraftDiscussions,
         sdk,
         selectedDraftPostId,
+        setDraftLifecycleSnapshot,
         t,
     ]);
 
@@ -1283,14 +1302,14 @@ function CrucibleTab({
             setDiscussionError(null);
             setDiscussionLoading(false);
             setDiscussionBusy(false);
-            setDraftLifecycle(null);
+            setDraftLifecycleSnapshot(null);
             setDraftLifecycleError(null);
             setDraftLifecycleLoading(false);
             return;
         }
 
         void syncDraftDiscussionSurface();
-    }, [selectedDraftPostId, syncDraftDiscussionSurface]);
+    }, [selectedDraftPostId, setDraftLifecycleSnapshot, syncDraftDiscussionSurface]);
 
     useEffect(() => {
         if (!selectedDraftPostId || !Number.isFinite(selectedDraftPostId)) return;
@@ -1919,7 +1938,7 @@ function CrucibleTab({
                 {selectedDraftContentReady && (
                     <div className={styles.editorMainGrid}>
                         <section className={styles.editorPrimary}>
-                            {draftLifecycleLoading && (
+                            {draftLifecycleLoading && !draftLifecycle && (
                                 <div className={styles.crystallizeNotice} role="status">
                                     {t('loading.draftLifecycle')}
                                 </div>

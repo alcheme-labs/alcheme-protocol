@@ -30,6 +30,10 @@ const plazaTabSource = readFileSync(
     new URL('../src/components/circle/PlazaTab/PlazaTab.tsx', import.meta.url),
     'utf8',
 );
+const draftRuntimeApiSource = readFileSync(
+    new URL('../src/lib/api/draftRuntime.ts', import.meta.url),
+    'utf8',
+);
 
 test('CollaborativeEditor disables immediate SSR render to avoid hydration mismatch', () => {
     assert.match(collaborativeEditorSource, /immediatelyRender:\s*false/);
@@ -44,15 +48,15 @@ test('CollaborativeEditor seeds editor content when Yjs doc is initially empty',
 
 test('CrucibleTab includes credentials when reading draft content', () => {
     assert.match(
-        crucibleTabSource,
-        /\/api\/v1\/discussion\/drafts\/\$\{selectedDraftPostId\}\/content[\s\S]*credentials:\s*'include'/,
+        draftRuntimeApiSource,
+        /\/api\/v1\/discussion\/drafts\/\$\{draftPostId\}\/content[\s\S]*credentials:\s*'include'/,
     );
 });
 
 test('CrucibleTab includes credentials when writing draft content', () => {
     assert.match(
-        crucibleTabSource,
-        /\/api\/v1\/discussion\/drafts\/\$\{postId\}\/content[\s\S]*method:\s*'POST'[\s\S]*credentials:\s*'include'/,
+        draftRuntimeApiSource,
+        /\/api\/v1\/discussion\/drafts\/\$\{draftPostId\}\/content[\s\S]*method:\s*'POST'[\s\S]*credentials:\s*'include'/,
     );
 });
 
@@ -81,6 +85,14 @@ test('CrucibleTab drives crystallization from the lifecycle header action', () =
     assert.match(crucibleTabSource, /useCrystallizeDraft/);
     assert.match(crucibleTabSource, /showExecuteCrystallizationAction=/);
     assert.match(crucibleTabSource, /executeCrystallizationPending=\{crystallizing\}/);
+});
+
+test('CrucibleTab keeps lifecycle polling as a background refresh after the first snapshot', () => {
+    assert.match(crucibleTabSource, /const draftLifecycleRef = useRef<DraftLifecycleReadModel \| null>\(null\);/);
+    assert.match(crucibleTabSource, /const hasLifecycleSnapshot = draftLifecycleRef\.current\?\.draftPostId === selectedDraftPostId;/);
+    assert.match(crucibleTabSource, /setDraftLifecycleLoading\(!hasLifecycleSnapshot\);/);
+    assert.match(crucibleTabSource, /draftLifecycleLoading && !draftLifecycle/);
+    assert.doesNotMatch(crucibleTabSource, /catch \(error\) \{[\s\S]{0,240}setDraftLifecycle\(null\);[\s\S]{0,240}setDraftLifecycleError\(message\);/);
 });
 
 test('Crucible lifecycle buttons only show wait cursor for true pending states, not generic disabled states', () => {
