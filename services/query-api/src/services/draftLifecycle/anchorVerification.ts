@@ -3,6 +3,9 @@ import bs58 from 'bs58';
 const ENTER_DRAFT_CRYSTALLIZATION_DISCRIMINATOR = Buffer.from([92, 212, 147, 210, 46, 24, 57, 164]);
 const ARCHIVE_DRAFT_LIFECYCLE_DISCRIMINATOR = Buffer.from([144, 73, 185, 174, 105, 18, 156, 186]);
 const RESTORE_DRAFT_LIFECYCLE_DISCRIMINATOR = Buffer.from([230, 49, 121, 211, 206, 153, 97, 103]);
+const DEFAULT_ANCHOR_LOOKUP_ATTEMPTS = 12;
+const DEFAULT_ANCHOR_LOOKUP_DELAY_MS = 1000;
+const DEFAULT_ANCHOR_RPC_TIMEOUT_MS = 5000;
 
 type DraftLifecycleMilestoneAction = 'entered_crystallization' | 'archived' | 'restored';
 type AnchorVerificationResult = { ok: boolean; reason?: string };
@@ -95,10 +98,47 @@ function decodeInstructionData(data: unknown): Buffer | null {
     }
 }
 
-async function fetchTransactionFromRpc(signature: string): Promise<any | null> {
-    const rpcUrl = process.env.SOLANA_RPC_URL || process.env.RPC_URL;
-    if (!rpcUrl) return null;
-    const timeoutMs = Math.max(1000, Number(process.env.GHOST_SETTINGS_RPC_TIMEOUT_MS || '5000'));
+function parseBoundedInt(value: unknown, fallback: number, min: number, max: number): number {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return fallback;
+    return Math.min(max, Math.max(min, Math.floor(parsed)));
+}
+
+function getAnchorLookupConfig() {
+    const timeoutFallback = parseBoundedInt(
+        process.env.GHOST_SETTINGS_RPC_TIMEOUT_MS,
+        DEFAULT_ANCHOR_RPC_TIMEOUT_MS,
+        1000,
+        60000,
+    );
+    return {
+        attempts: parseBoundedInt(
+            process.env.DRAFT_LIFECYCLE_ANCHOR_LOOKUP_ATTEMPTS,
+            DEFAULT_ANCHOR_LOOKUP_ATTEMPTS,
+            1,
+            60,
+        ),
+        delayMs: parseBoundedInt(
+            process.env.DRAFT_LIFECYCLE_ANCHOR_LOOKUP_DELAY_MS,
+            DEFAULT_ANCHOR_LOOKUP_DELAY_MS,
+            0,
+            10000,
+        ),
+        timeoutMs: parseBoundedInt(
+            process.env.DRAFT_LIFECYCLE_ANCHOR_RPC_TIMEOUT_MS,
+            timeoutFallback,
+            1000,
+            60000,
+        ),
+    };
+}
+
+function wait(ms: number): Promise<void> {
+    if (ms <= 0) return Promise.resolve();
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchTransactionOnce(rpcUrl: string, signature: string, timeoutMs: number): Promise<any | null> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -114,7 +154,7 @@ async function fetchTransactionFromRpc(signature: string): Promise<any | null> {
                     {
                         encoding: 'jsonParsed',
                         maxSupportedTransactionVersion: 0,
-                        commitment: 'finalized',
+                        commitment: 'confirmed',
                     },
                 ],
             }),
@@ -128,6 +168,22 @@ async function fetchTransactionFromRpc(signature: string): Promise<any | null> {
     } finally {
         clearTimeout(timer);
     }
+}
+
+async function fetchTransactionFromRpc(signature: string): Promise<any | null> {
+    const rpcUrl = process.env.SOLANA_RPC_URL || process.env.RPC_URL;
+    if (!rpcUrl) return null;
+    const { attempts, delayMs, timeoutMs } = getAnchorLookupConfig();
+
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+        const tx = await fetchTransactionOnce(rpcUrl, signature, timeoutMs);
+        if (tx) return tx;
+        if (attempt < attempts) {
+            await wait(delayMs);
+        }
+    }
+
+    return null;
 }
 
 function getLifecycleDiscriminator(action: DraftLifecycleMilestoneAction): Buffer {

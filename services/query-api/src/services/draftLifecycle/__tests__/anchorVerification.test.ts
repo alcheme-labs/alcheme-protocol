@@ -65,9 +65,12 @@ describe('draft lifecycle anchor verification', () => {
         jest.restoreAllMocks();
         delete process.env.NEXT_PUBLIC_CONTENT_PROGRAM_ID;
         delete process.env.SOLANA_RPC_URL;
+        delete process.env.DRAFT_LIFECYCLE_ANCHOR_LOOKUP_ATTEMPTS;
+        delete process.env.DRAFT_LIFECYCLE_ANCHOR_LOOKUP_DELAY_MS;
+        delete process.env.DRAFT_LIFECYCLE_ANCHOR_RPC_TIMEOUT_MS;
     });
 
-    test('accepts a finalized crystallization milestone transaction for the same actor, draft, and digest', async () => {
+    test('accepts a confirmed crystallization milestone transaction for the same actor, draft, and digest', async () => {
         const fetchSpy = jest.fn<any>(async () => ({
             ok: true,
             json: async () => buildRpcPayload(),
@@ -84,7 +87,30 @@ describe('draft lifecycle anchor verification', () => {
         expect(result).toEqual({ ok: true });
         const requestInit = fetchSpy.mock.calls[0]?.[1] as RequestInit | undefined;
         const body = JSON.parse(String(requestInit?.body || '{}'));
-        expect(body.params?.[1]?.commitment).toBe('finalized');
+        expect(body.params?.[1]?.commitment).toBe('confirmed');
+    });
+
+    test('retries transaction lookup before returning anchor_tx_not_found', async () => {
+        process.env.DRAFT_LIFECYCLE_ANCHOR_LOOKUP_ATTEMPTS = '3';
+        process.env.DRAFT_LIFECYCLE_ANCHOR_LOOKUP_DELAY_MS = '1';
+        const fetchSpy = jest.fn<any>(async () => ({
+            ok: true,
+            json: async () => ({ result: null }),
+        }));
+        (global as any).fetch = fetchSpy;
+
+        const result = await verifyEnterDraftLifecycleCrystallizationAnchor({
+            actorPubkey: 'Actor111111111111111111111111111111111111111',
+            anchorSignature: '5'.repeat(88),
+            draftPostId: 42,
+            policyProfileDigest: 'a'.repeat(64),
+        });
+
+        expect(result).toEqual({
+            ok: false,
+            reason: 'anchor_tx_not_found',
+        });
+        expect(fetchSpy).toHaveBeenCalledTimes(3);
     });
 
     test('rejects transactions whose instruction digest does not match the submitted public digest', async () => {
