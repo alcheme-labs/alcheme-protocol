@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { PublicKey } from '@solana/web3.js';
 
 import { waitForIndexedSlot, waitForSignatureSlot } from '@/lib/api/sync';
 import {
@@ -303,6 +304,13 @@ async function bindCrystallizedKnowledge(input: {
     }
 
     throw new Error('crystallization binding failed');
+}
+
+function shouldSubmitContributorBinding(attempt: {
+    status: string;
+} | null): boolean {
+    if (!attempt) return true;
+    return attempt.status === 'submitted' || attempt.status === 'binding_pending';
 }
 
 function extractWarning(input: {
@@ -651,12 +659,16 @@ export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
                 }
 
                 let knowledgePdaBase58 = resumableAttempt?.knowledgeOnChainAddress || '';
+                let knowledgePdaForBinding = resumableAttempt
+                    ? new PublicKey(resumableAttempt.knowledgeOnChainAddress)
+                    : null;
                 let knowledgeTxSignature = resumableAttempt ? 'resumed' : '';
                 let contributorsTxSignature = resumableAttempt ? 'resumed' : '';
                 let fullyIndexed = false;
 
                 if (!resumableAttempt) {
                     const knowledgePda = await sdk.circles.predictNextKnowledgePda(upload.circleId);
+                    knowledgePdaForBinding = knowledgePda;
                     knowledgePdaBase58 = knowledgePda.toBase58();
                     knowledgeTxSignature = await sdk.circles.submitKnowledge({
                         circleId: upload.circleId,
@@ -679,10 +691,18 @@ export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
                             'crystallization attempt already exists for a different knowledge address',
                         );
                     }
+                }
 
+                if (shouldSubmitContributorBinding(resumableAttempt)) {
+                    if (!knowledgePdaForBinding) {
+                        throw createCrystallizationError(
+                            'crystallization_attempt_conflict',
+                            'missing knowledge address for contributor binding',
+                        );
+                    }
                     contributorsTxSignature = await sdk.circles.bindAndUpdateContributors({
                         circleId: upload.circleId,
-                        knowledgePda,
+                        knowledgePda: knowledgePdaForBinding,
                         sourceAnchorId: proofPackage.sourceAnchorId,
                         proofPackageHash: proofPackage.proofPackageHash,
                         contributorsRoot: proofPackage.root,
@@ -694,13 +714,17 @@ export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
                     });
 
                     const [knowledgeSlot, contributorsSlot] = await Promise.all([
-                        waitForSignatureSlot(sdk.connection, knowledgeTxSignature),
+                        knowledgeTxSignature === 'resumed'
+                            ? Promise.resolve(null)
+                            : waitForSignatureSlot(sdk.connection, knowledgeTxSignature),
                         waitForSignatureSlot(sdk.connection, contributorsTxSignature),
                     ]);
 
                     const targetSlot = Math.max(knowledgeSlot || 0, contributorsSlot || 0);
                     const indexWait = targetSlot > 0 ? await waitForIndexedSlot(targetSlot) : null;
                     fullyIndexed = indexWait?.ok ?? false;
+                } else {
+                    fullyIndexed = true;
                 }
 
                 await bindCrystallizedKnowledge({

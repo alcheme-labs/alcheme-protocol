@@ -38,16 +38,29 @@ test('useCrystallizeDraft registers the submitted K_new before contributor bindi
     ]);
 });
 
-test('useCrystallizeDraft skips submitKnowledge and contributor binding when a matching attempt exists', () => {
-    const guardedBlockMatch = hookSource.match(/if \(!resumableAttempt\) \{([\s\S]*?)\n\s*\}\n\s*\n\s*await bindCrystallizedKnowledge/);
-    assert.ok(guardedBlockMatch, 'missing resumableAttempt guard around chain submission');
-    const guardedBlock = guardedBlockMatch[1];
+test('useCrystallizeDraft skips submitKnowledge when a matching attempt exists', () => {
+    const guardStart = hookSource.indexOf('if (!resumableAttempt) {');
+    const bindingGuardStart = hookSource.indexOf('if (shouldSubmitContributorBinding(resumableAttempt)) {');
+    assert.ok(guardStart >= 0, 'missing resumableAttempt guard around knowledge submission');
+    assert.ok(bindingGuardStart > guardStart, 'contributor binding guard should follow knowledge submission guard');
+    const guardedBlock = hookSource.slice(guardStart, bindingGuardStart);
     assert.match(guardedBlock, /sdk\.circles\.predictNextKnowledgePda/);
     assert.match(guardedBlock, /sdk\.circles\.submitKnowledge/);
-    assert.match(guardedBlock, /sdk\.circles\.bindAndUpdateContributors/);
+    assert.doesNotMatch(guardedBlock, /sdk\.circles\.bindAndUpdateContributors/);
     assert.match(hookSource, /knowledgePdaBase58 = resumableAttempt\?\.knowledgeOnChainAddress \|\| '';/);
     assert.match(hookSource, /knowledgeTxSignature = resumableAttempt \? 'resumed' : '';/);
-    assert.match(hookSource, /contributorsTxSignature = resumableAttempt \? 'resumed' : '';/);
+});
+
+test('useCrystallizeDraft resumes contributor binding for binding-pending attempts', () => {
+    assert.match(hookSource, /function shouldSubmitContributorBinding/);
+    assert.match(hookSource, /attempt\.status === 'submitted'/);
+    assert.match(hookSource, /attempt\.status === 'binding_pending'/);
+    assert.match(hookSource, /if \(shouldSubmitContributorBinding\(resumableAttempt\)\) \{/);
+    assertIncreasingOrder(hookSource, [
+        'const registeredAttempt = await registerDraftCrystallizationAttempt({',
+        'if (shouldSubmitContributorBinding(resumableAttempt)) {',
+        'contributorsTxSignature = await sdk.circles.bindAndUpdateContributors({',
+    ]);
 });
 
 test('useCrystallizeDraft resumes binding with existing K_new address for the same proof package hash', () => {
