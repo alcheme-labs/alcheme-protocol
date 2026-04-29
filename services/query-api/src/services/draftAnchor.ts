@@ -246,7 +246,12 @@ function loadDraftAnchorRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Dra
                 120000,
             ),
         ),
-        rpcUrl: String(env.DRAFT_ANCHOR_RPC_URL || env.RPC_ENDPOINT || 'http://127.0.0.1:8899').trim(),
+        rpcUrl: String(
+            env.DRAFT_ANCHOR_RPC_URL
+            || env.SOLANA_RPC_URL
+            || env.RPC_ENDPOINT
+            || 'http://127.0.0.1:8899',
+        ).trim(),
         commitment,
         keypairPath,
         memoPrefix: String(env.DRAFT_ANCHOR_MEMO_PREFIX || DEFAULT_MEMO_PREFIX).trim() || DEFAULT_MEMO_PREFIX,
@@ -475,50 +480,52 @@ export async function createDraftAnchorBatch(
     });
 
     const existing = await findAnchorById(input.prisma, anchorId);
-    if (existing) return existing;
+    if (existing?.status === 'anchored') return existing;
 
-    const payloadJson = JSON.stringify(canonicalPayload);
-    await input.prisma.$executeRaw`
-        INSERT INTO discussion_draft_anchor_batches (
-            anchor_id,
-            circle_id,
-            draft_post_id,
-            room_key,
-            trigger_reason,
-            summary_hash,
-            messages_digest,
-            payload_hash,
-            canonical_payload,
-            message_count,
-            from_lamport,
-            to_lamport,
-            chain,
-            memo_text,
-            status,
-            created_at,
-            updated_at
-        )
-        VALUES (
-            ${anchorId},
-            ${input.circleId},
-            ${input.draftPostId},
-            ${input.roomKey},
-            ${input.triggerReason},
-            ${summaryHash},
-            ${messagesDigest},
-            ${payloadHash},
-            ${payloadJson}::jsonb,
-            ${payloadMessages.length},
-            ${BigInt(fromLamport)},
-            ${BigInt(toLamport)},
-            'solana',
-            ${memoText},
-            'pending',
-            NOW(),
-            NOW()
-        )
-        ON CONFLICT (anchor_id) DO NOTHING
-    `;
+    if (!existing) {
+        const payloadJson = JSON.stringify(canonicalPayload);
+        await input.prisma.$executeRaw`
+            INSERT INTO discussion_draft_anchor_batches (
+                anchor_id,
+                circle_id,
+                draft_post_id,
+                room_key,
+                trigger_reason,
+                summary_hash,
+                messages_digest,
+                payload_hash,
+                canonical_payload,
+                message_count,
+                from_lamport,
+                to_lamport,
+                chain,
+                memo_text,
+                status,
+                created_at,
+                updated_at
+            )
+            VALUES (
+                ${anchorId},
+                ${input.circleId},
+                ${input.draftPostId},
+                ${input.roomKey},
+                ${input.triggerReason},
+                ${summaryHash},
+                ${messagesDigest},
+                ${payloadHash},
+                ${payloadJson}::jsonb,
+                ${payloadMessages.length},
+                ${BigInt(fromLamport)},
+                ${BigInt(toLamport)},
+                'solana',
+                ${memoText},
+                'pending',
+                NOW(),
+                NOW()
+            )
+            ON CONFLICT (anchor_id) DO NOTHING
+        `;
+    }
 
     const claimed = await claimAnchorForSubmission(input.prisma, {
         anchorId,

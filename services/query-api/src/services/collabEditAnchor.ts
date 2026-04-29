@@ -240,6 +240,7 @@ function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): CollabEditAnch
         rpcUrl: String(
             env.COLLAB_EDIT_ANCHOR_RPC_URL
             || env.DRAFT_ANCHOR_RPC_URL
+            || env.SOLANA_RPC_URL
             || env.RPC_ENDPOINT
             || 'http://127.0.0.1:8899',
         ).trim(),
@@ -467,47 +468,49 @@ export async function createCollabEditAnchorBatch(
     });
 
     const existing = await findByAnchorId(input.prisma, anchorId);
-    if (existing) return existing;
+    if (existing?.status === 'anchored') return existing;
 
-    await input.prisma.$executeRaw`
-        INSERT INTO collab_edit_anchor_batches (
-            anchor_id,
-            draft_post_id,
-            circle_id,
-            room_key,
-            from_seq,
-            to_seq,
-            update_count,
-            updates_digest,
-            snapshot_hash,
-            payload_hash,
-            canonical_payload,
-            chain,
-            memo_text,
-            status,
-            created_at,
-            updated_at
-        )
-        VALUES (
-            ${anchorId},
-            ${input.draftPostId},
-            ${input.circleId},
-            ${input.roomKey},
-            ${BigInt(fromSeq)},
-            ${BigInt(toSeq)},
-            ${payloadUpdates.length},
-            ${updatesDigest},
-            ${input.snapshotHash},
-            ${payloadHash},
-            ${JSON.stringify(canonicalPayload)}::jsonb,
-            'solana',
-            ${memoText},
-            'pending',
-            NOW(),
-            NOW()
-        )
-        ON CONFLICT (anchor_id) DO NOTHING
-    `;
+    if (!existing) {
+        await input.prisma.$executeRaw`
+            INSERT INTO collab_edit_anchor_batches (
+                anchor_id,
+                draft_post_id,
+                circle_id,
+                room_key,
+                from_seq,
+                to_seq,
+                update_count,
+                updates_digest,
+                snapshot_hash,
+                payload_hash,
+                canonical_payload,
+                chain,
+                memo_text,
+                status,
+                created_at,
+                updated_at
+            )
+            VALUES (
+                ${anchorId},
+                ${input.draftPostId},
+                ${input.circleId},
+                ${input.roomKey},
+                ${BigInt(fromSeq)},
+                ${BigInt(toSeq)},
+                ${payloadUpdates.length},
+                ${updatesDigest},
+                ${input.snapshotHash},
+                ${payloadHash},
+                ${JSON.stringify(canonicalPayload)}::jsonb,
+                'solana',
+                ${memoText},
+                'pending',
+                NOW(),
+                NOW()
+            )
+            ON CONFLICT (anchor_id) DO NOTHING
+        `;
+    }
 
     const claimed = await claimAnchorForSubmission(input.prisma, {
         anchorId,
