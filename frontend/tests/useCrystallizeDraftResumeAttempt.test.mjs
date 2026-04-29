@@ -63,6 +63,19 @@ test('useCrystallizeDraft resumes contributor binding for binding-pending attemp
     ]);
 });
 
+test('useCrystallizeDraft treats existing knowledge binding PDA as idempotent recovery', () => {
+    assert.match(hookSource, /function isExistingKnowledgeBindingAccountError/);
+    assert.match(hookSource, /expectedKnowledgeBindingPda\.toBase58\(\)/);
+    assert.match(hookSource, /sdk\.pda\.findKnowledgeBindingPda\(knowledgePdaForBinding\)/);
+    assertIncreasingOrder(hookSource, [
+        'const expectedKnowledgeBindingPda = sdk.pda.findKnowledgeBindingPda(knowledgePdaForBinding);',
+        'contributorsTxSignature = await sdk.circles.bindAndUpdateContributors({',
+        'if (!isExistingKnowledgeBindingAccountError(error, expectedKnowledgeBindingPda)) {',
+        "contributorsTxSignature = 'existing_binding';",
+        'await bindCrystallizedKnowledge({',
+    ]);
+});
+
 test('useCrystallizeDraft resumes binding with existing K_new address for the same proof package hash', () => {
     assert.match(
         hookSource,

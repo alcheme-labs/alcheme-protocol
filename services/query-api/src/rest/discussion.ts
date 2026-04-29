@@ -2880,7 +2880,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                 }
             };
 
-            const syncCrystalAssetsAfterFinalization = async (knowledgeId: string) => {
+            const syncCrystalAssetsForKnowledge = async (knowledgeId: string) => {
                 const entitlementSync = await upsertCrystalEntitlementsForKnowledge(prisma as any, {
                     knowledgePublicId: knowledgeId,
                 });
@@ -2946,10 +2946,10 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                         knowledgeId: atomicResult.synced.knowledgeId,
                         attemptStatus: currentCrystallizationAttemptStatus,
                     });
+                    await syncCrystalAssetsForKnowledge(atomicResult.synced.knowledgeId);
                     await finalizeLifecycleAndAttempt({
                         proofPackageHash: atomicResult.persistedIssuance.proofPackageHash,
                     });
-                    await syncCrystalAssetsAfterFinalization(atomicResult.synced.knowledgeId);
 
                     return res.json({
                         ok: true,
@@ -3097,10 +3097,10 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                     knowledgeId: binding.knowledgeId,
                     attemptStatus: currentCrystallizationAttemptStatus,
                 });
+                await syncCrystalAssetsForKnowledge(binding.knowledgeId);
                 await finalizeLifecycleAndAttempt({
                     proofPackageHash: persisted.proofPackageHash,
                 });
-                await syncCrystalAssetsAfterFinalization(binding.knowledgeId);
             } catch (error) {
                 if (error instanceof DraftReferenceMaterializationError) {
                     throw error;

@@ -313,6 +313,20 @@ function shouldSubmitContributorBinding(attempt: {
     return attempt.status === 'submitted' || attempt.status === 'binding_pending';
 }
 
+function isExistingKnowledgeBindingAccountError(error: unknown, expectedKnowledgeBindingPda: PublicKey): boolean {
+    const message = error instanceof Error ? error.message : String(error || '');
+    const normalized = message.toLowerCase();
+    if (
+        !normalized.includes('already in use')
+        && !normalized.includes('already exists')
+        && !normalized.includes('account already initialized')
+    ) {
+        return false;
+    }
+    return message.includes(expectedKnowledgeBindingPda.toBase58())
+        || normalized.includes('knowledge_binding');
+}
+
 function extractWarning(input: {
     warning?: {
         code?: string;
@@ -700,29 +714,38 @@ export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
                             'missing knowledge address for contributor binding',
                         );
                     }
-                    contributorsTxSignature = await sdk.circles.bindAndUpdateContributors({
-                        circleId: upload.circleId,
-                        knowledgePda: knowledgePdaForBinding,
-                        sourceAnchorId: proofPackage.sourceAnchorId,
-                        proofPackageHash: proofPackage.proofPackageHash,
-                        contributorsRoot: proofPackage.root,
-                        contributorsCount: proofPackage.count,
-                        bindingVersion: proofPackage.bindingVersion,
-                        generatedAt: proofPackage.generatedAt,
-                        issuerKeyId: proofPackage.issuerKeyId,
-                        issuedSignature: proofPackage.issuedSignature,
-                    });
+                    const expectedKnowledgeBindingPda = sdk.pda.findKnowledgeBindingPda(knowledgePdaForBinding);
+                    try {
+                        contributorsTxSignature = await sdk.circles.bindAndUpdateContributors({
+                            circleId: upload.circleId,
+                            knowledgePda: knowledgePdaForBinding,
+                            sourceAnchorId: proofPackage.sourceAnchorId,
+                            proofPackageHash: proofPackage.proofPackageHash,
+                            contributorsRoot: proofPackage.root,
+                            contributorsCount: proofPackage.count,
+                            bindingVersion: proofPackage.bindingVersion,
+                            generatedAt: proofPackage.generatedAt,
+                            issuerKeyId: proofPackage.issuerKeyId,
+                            issuedSignature: proofPackage.issuedSignature,
+                        });
 
-                    const [knowledgeSlot, contributorsSlot] = await Promise.all([
-                        knowledgeTxSignature === 'resumed'
-                            ? Promise.resolve(null)
-                            : waitForSignatureSlot(sdk.connection, knowledgeTxSignature),
-                        waitForSignatureSlot(sdk.connection, contributorsTxSignature),
-                    ]);
+                        const [knowledgeSlot, contributorsSlot] = await Promise.all([
+                            knowledgeTxSignature === 'resumed'
+                                ? Promise.resolve(null)
+                                : waitForSignatureSlot(sdk.connection, knowledgeTxSignature),
+                            waitForSignatureSlot(sdk.connection, contributorsTxSignature),
+                        ]);
 
-                    const targetSlot = Math.max(knowledgeSlot || 0, contributorsSlot || 0);
-                    const indexWait = targetSlot > 0 ? await waitForIndexedSlot(targetSlot) : null;
-                    fullyIndexed = indexWait?.ok ?? false;
+                        const targetSlot = Math.max(knowledgeSlot || 0, contributorsSlot || 0);
+                        const indexWait = targetSlot > 0 ? await waitForIndexedSlot(targetSlot) : null;
+                        fullyIndexed = indexWait?.ok ?? false;
+                    } catch (error) {
+                        if (!isExistingKnowledgeBindingAccountError(error, expectedKnowledgeBindingPda)) {
+                            throw error;
+                        }
+                        contributorsTxSignature = 'existing_binding';
+                        fullyIndexed = false;
+                    }
                 } else {
                     fullyIndexed = true;
                 }

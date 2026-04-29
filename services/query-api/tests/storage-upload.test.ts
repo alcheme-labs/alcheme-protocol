@@ -67,7 +67,12 @@ function getFinalDocumentHandler(router: Router) {
     if (!layer?.route?.stack?.[0]?.handle) {
         throw new Error('storage final-document route handler not found');
     }
-    return layer.route.stack[0].handle;
+    const handle = layer.route.stack[0].handle;
+    return (req: any, res: any, next: any) => {
+        req.header = req.header || (() => undefined);
+        req.get = req.get || req.header;
+        return handle(req, res, next);
+    };
 }
 
 function createMockResponse() {

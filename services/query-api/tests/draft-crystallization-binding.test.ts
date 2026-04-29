@@ -150,6 +150,18 @@ function createPrismaMock() {
         identityLevel: 'Member',
     };
     let policyRow: any = null;
+    let crystallizationAttempt = {
+        id: BigInt(1),
+        draftPostId: 42,
+        proofPackageHash: '9'.repeat(64),
+        knowledgeId: null as string | null,
+        knowledgeOnChainAddress: '5x62odtFr3qup81zNr4p8XxBWKzxjuqwiNjiJbXHCTJH',
+        status: 'binding_pending',
+        failureCode: null as string | null,
+        failureMessage: null as string | null,
+        createdAt: new Date('2026-03-13T12:00:00.000Z'),
+        updatedAt: new Date('2026-03-13T12:00:00.000Z'),
+    };
     const deleteMany = jest.fn<() => Promise<any>>().mockResolvedValue({ count: 0 });
     const createMany = jest.fn<() => Promise<any>>().mockResolvedValue({ count: 1 });
     const prisma: any = {
@@ -218,6 +230,26 @@ function createPrismaMock() {
                     contributorsCount: 1,
                 }];
             }
+            if (queryText.includes('INSERT INTO draft_crystallization_attempts')) {
+                crystallizationAttempt = {
+                    ...crystallizationAttempt,
+                    status: 'binding_pending',
+                    updatedAt: new Date('2026-03-13T12:00:01.000Z'),
+                };
+                return [crystallizationAttempt];
+            }
+            if (queryText.includes('UPDATE draft_crystallization_attempts')) {
+                crystallizationAttempt = {
+                    ...crystallizationAttempt,
+                    knowledgeId: 'knowledge-9',
+                    status: 'binding_synced',
+                    updatedAt: new Date('2026-03-13T12:00:02.000Z'),
+                };
+                return [crystallizationAttempt];
+            }
+            if (queryText.includes('FROM draft_crystallization_attempts')) {
+                return [crystallizationAttempt];
+            }
             if (queryText.includes('FROM circle_policy_profiles')) {
                 return policyRow ? [policyRow] : [];
             }
@@ -233,7 +265,12 @@ function getRouteHandler(router: Router, path: string) {
     if (!layer?.route?.stack?.[0]?.handle) {
         throw new Error(`discussion route handler not found: ${path}`);
     }
-    return layer.route.stack[0].handle;
+    const handle = layer.route.stack[0].handle;
+    return (req: any, res: any, next: any) => {
+        req.header = req.header || (() => undefined);
+        req.get = req.get || req.header;
+        return handle(req, res, next);
+    };
 }
 
 function createMockResponse() {
