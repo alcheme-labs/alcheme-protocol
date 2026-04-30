@@ -3,9 +3,7 @@ import crypto from 'crypto';
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
     ExtensionType,
-    LENGTH_SIZE,
     TOKEN_2022_PROGRAM_ID,
-    TYPE_SIZE,
     createAssociatedTokenAccountIdempotentInstruction,
     createInitializeMintInstruction,
     createInitializeMetadataPointerInstruction,
@@ -13,13 +11,9 @@ import {
     createMintToInstruction,
     getAssociatedTokenAddressSync,
     getMintLen,
+    tokenMetadataInitializeWithRentTransfer,
+    tokenMetadataUpdateFieldWithRentTransfer,
 } from '@solana/spl-token';
-import {
-    createInitializeInstruction as createInitializeTokenMetadataInstruction,
-    createUpdateFieldInstruction as createUpdateTokenMetadataFieldInstruction,
-    pack as packTokenMetadata,
-    type TokenMetadata,
-} from '@solana/spl-token-metadata';
 import {
     Connection,
     Keypair,
@@ -219,17 +213,9 @@ function createToken2022LocalCrystalMintAdapter(config: CrystalMintRuntimeConfig
             ExtensionType.MetadataPointer,
             ...(input.nonTransferable ? [ExtensionType.NonTransferable] : []),
         ];
-        const tokenMetadata: TokenMetadata = {
-            updateAuthority: authority.publicKey,
-            mint: mint.publicKey,
-            name: truncateMetadataText(input.name, 64),
-            symbol: truncateMetadataText(input.symbol, 10),
-            uri: input.metadataUri,
-            additionalMetadata: input.additionalMetadata,
-        };
-        const mintLength = getMintLen(extensions);
-        const metadataLength = TYPE_SIZE + LENGTH_SIZE + packTokenMetadata(tokenMetadata).length;
-        const accountLength = mintLength + metadataLength;
+        const name = truncateMetadataText(input.name, 64);
+        const symbol = truncateMetadataText(input.symbol, 10);
+        const accountLength = getMintLen(extensions);
         const lamports = await connection.getMinimumBalanceForRentExemption(accountLength);
         const ownerAta = getAssociatedTokenAddressSync(
             mint.publicKey,
@@ -271,35 +257,38 @@ function createToken2022LocalCrystalMintAdapter(config: CrystalMintRuntimeConfig
                 authority.publicKey,
                 TOKEN_2022_PROGRAM_ID,
             ),
-            createInitializeTokenMetadataInstruction({
-                programId: TOKEN_2022_PROGRAM_ID,
-                metadata: mint.publicKey,
-                updateAuthority: authority.publicKey,
-                mint: mint.publicKey,
-                mintAuthority: authority.publicKey,
-                name: tokenMetadata.name,
-                symbol: tokenMetadata.symbol,
-                uri: input.metadataUri,
-            }),
         );
 
         await sendAndConfirmTransaction(connection, initTransaction, [authority, mint], {
             commitment: 'confirmed',
         });
 
+        await tokenMetadataInitializeWithRentTransfer(
+            connection,
+            authority,
+            mint.publicKey,
+            authority.publicKey,
+            authority,
+            name,
+            symbol,
+            input.metadataUri,
+            [],
+            { commitment: 'confirmed' },
+            TOKEN_2022_PROGRAM_ID,
+        );
+
         for (const [field, value] of input.additionalMetadata) {
-            const metadataTransaction = new Transaction().add(
-                createUpdateTokenMetadataFieldInstruction({
-                    programId: TOKEN_2022_PROGRAM_ID,
-                    metadata: mint.publicKey,
-                    updateAuthority: authority.publicKey,
-                    field,
-                    value,
-                }),
+            await tokenMetadataUpdateFieldWithRentTransfer(
+                connection,
+                authority,
+                mint.publicKey,
+                authority,
+                field,
+                value,
+                [],
+                { commitment: 'confirmed' },
+                TOKEN_2022_PROGRAM_ID,
             );
-            await sendAndConfirmTransaction(connection, metadataTransaction, [authority], {
-                commitment: 'confirmed',
-            });
         }
 
         const mintTransaction = new Transaction().add(

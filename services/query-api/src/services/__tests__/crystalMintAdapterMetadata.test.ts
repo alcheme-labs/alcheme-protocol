@@ -10,26 +10,28 @@ const source = readFileSync(
 describe('Token-2022 crystal mint metadata wiring', () => {
     test('initializes token metadata on the mint account before minting supply', () => {
         expect(source).toContain('createInitializeMetadataPointerInstruction');
-        expect(source).toContain('createInitializeTokenMetadataInstruction');
-        expect(source).toContain('createUpdateTokenMetadataFieldInstruction');
-        expect(source).toContain('packTokenMetadata');
-        expect(source).toContain('TYPE_SIZE + LENGTH_SIZE + packTokenMetadata(tokenMetadata).length');
-        expect(source).toContain('metadata: mint.publicKey');
-        expect(source).toContain('uri: input.metadataUri');
+        expect(source).toContain('tokenMetadataInitializeWithRentTransfer');
+        expect(source).toContain('tokenMetadataUpdateFieldWithRentTransfer');
+        expect(source).toContain('const accountLength = getMintLen(extensions)');
+        expect(source).toContain('mint.publicKey');
+        expect(source).toContain('input.metadataUri');
     });
 
-    test('keeps additional metadata field updates out of the mint initialization transaction', () => {
+    test('keeps variable metadata writes out of the mint initialization transaction', () => {
         const initStart = source.indexOf('const initTransaction = new Transaction().add(');
         const initSend = source.indexOf('sendAndConfirmTransaction(connection, initTransaction');
-        const updateLoop = source.indexOf('for (const [field, value] of input.additionalMetadata)');
+        const metadataInit = source.indexOf('await tokenMetadataInitializeWithRentTransfer(');
+        const updateLoop = source.indexOf('await tokenMetadataUpdateFieldWithRentTransfer(');
         const mintTransaction = source.indexOf('const mintTransaction = new Transaction().add(');
 
         expect(initStart).toBeGreaterThanOrEqual(0);
         expect(initSend).toBeGreaterThan(initStart);
-        expect(updateLoop).toBeGreaterThan(initSend);
+        expect(metadataInit).toBeGreaterThan(initSend);
+        expect(updateLoop).toBeGreaterThan(metadataInit);
         expect(mintTransaction).toBeGreaterThan(updateLoop);
 
         const initBlock = source.slice(initStart, initSend);
-        expect(initBlock).not.toContain('createUpdateTokenMetadataFieldInstruction');
+        expect(initBlock).not.toContain('tokenMetadataInitializeWithRentTransfer');
+        expect(initBlock).not.toContain('tokenMetadataUpdateFieldWithRentTransfer');
     });
 });
