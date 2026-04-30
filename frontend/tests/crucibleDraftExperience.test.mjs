@@ -127,7 +127,11 @@ test('PlazaTab refreshes drafts before opening crucible after candidate draft cr
 test('Crystallize success notice requires on-chain binding and contributor update completion', () => {
     assert.match(
         crystallizeDraftHookSource,
-        /链上绑定\s*\+\s*contributors 更新均成功/,
+        /t\('crystallization\.notices\.successIndexed'\)/,
+    );
+    assert.match(
+        crystallizeDraftHookSource,
+        /t\('crystallization\.notices\.successIndexPending'\)/,
     );
 });
 
@@ -138,7 +142,7 @@ test('useCrystallizeDraft surfaces collaboration-evidence preparation instead of
     );
     assert.match(
         crystallizeDraftHookSource,
-        /正在准备草稿协作证据/,
+        /t\('crystallization\.notices\.evidencePreparing'\)/,
     );
     assert.match(
         crystallizeDraftHookSource,
@@ -146,7 +150,7 @@ test('useCrystallizeDraft surfaces collaboration-evidence preparation instead of
     );
     assert.match(
         crystallizeDraftHookSource,
-        /草稿协作证据已准备好，请再次运行结晶/,
+        /t\('crystallization\.notices\.evidenceReady'\)/,
     );
     assert.match(
         crystallizeDraftHookSource,
@@ -155,5 +159,13 @@ test('useCrystallizeDraft surfaces collaboration-evidence preparation instead of
     assert.doesNotMatch(
         crystallizeDraftHookSource,
         /await repairDraftLifecycleCrystallizationEvidence\(\{ draftPostId \}\);[\s\S]*strictInputs = await loadStrictInputs\(\);/,
+    );
+});
+
+test('useCrystallizeDraft keeps user-facing crystallization notices in i18n messages', () => {
+    assert.match(crystallizeDraftHookSource, /const t = useI18n\('CrucibleTab'\);/);
+    assert.doesNotMatch(
+        crystallizeDraftHookSource,
+        /当前身份无法发起结晶|请先连接钱包|缺少草稿上下文|草稿标题为空|草稿正文为空|正在准备草稿协作证据|链上绑定|结晶失败，请稍后重试/,
     );
 });

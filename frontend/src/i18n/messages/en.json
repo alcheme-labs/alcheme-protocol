@@ -2924,6 +2924,30 @@
       "issueTemporaryEditGrantSuccess": "Temporary edit access granted.",
       "revokeTemporaryEditGrantSuccess": "Temporary edit access revoked."
     },
+    "crystallization": {
+      "errors": {
+        "permission": "Your current role cannot crystallize this draft.",
+        "walletRequired": "Connect your wallet before crystallizing.",
+        "missingDraftContext": "Draft context is missing, so crystallization cannot start.",
+        "missingTitle": "Add a draft title before crystallizing.",
+        "missingContent": "Add draft content before crystallizing.",
+        "strictFallback": "Crystallization failed. Please try again later.",
+        "diagnostics": {
+          "draftAnchorNotFinal": "The draft anchor is not finalized yet, so crystallization is temporarily unavailable.",
+          "draftAnchorUnverifiable": "The draft anchor proof cannot be verified, so crystallization is temporarily unavailable.",
+          "contributionSyncRequired": "The contribution snapshot is not synced yet. Please try again shortly.",
+          "proofBindingRequired": "The contributor proof package is not ready, so crystallization binding cannot run.",
+          "knowledgeCircleMismatch": "The draft and knowledge circle do not match, so this crystallization was blocked.",
+          "crystallizationAttemptConflict": "An existing crystallization recovery record was found. Run crystallization again to resume the same on-chain knowledge."
+        }
+      },
+      "notices": {
+        "evidencePreparing": "Preparing draft collaboration evidence…",
+        "evidenceReady": "Draft collaboration evidence is ready. Run crystallization again.",
+        "successIndexed": "On-chain binding and contributor update completed.",
+        "successIndexPending": "On-chain binding and contributor update completed. Indexing will catch up shortly."
+      }
+    },
     "fallback": {
       "unknownMember": "Unknown member",
       "untitledDraft": "Untitled draft"

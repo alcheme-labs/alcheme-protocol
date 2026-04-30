@@ -2924,6 +2924,30 @@
       "issueTemporaryEditGrantSuccess": "Accès temporaire accordé.",
       "revokeTemporaryEditGrantSuccess": "Accès temporaire révoqué."
     },
+    "crystallization": {
+      "errors": {
+        "permission": "Votre rôle actuel ne permet pas de cristalliser ce brouillon.",
+        "walletRequired": "Connectez votre wallet avant de cristalliser.",
+        "missingDraftContext": "Le contexte du brouillon est manquant, la cristallisation ne peut donc pas démarrer.",
+        "missingTitle": "Ajoutez un titre au brouillon avant de cristalliser.",
+        "missingContent": "Ajoutez du contenu au brouillon avant de cristalliser.",
+        "strictFallback": "La cristallisation a échoué. Réessayez plus tard.",
+        "diagnostics": {
+          "draftAnchorNotFinal": "L’ancre du brouillon n’est pas encore finalisée, la cristallisation est donc temporairement indisponible.",
+          "draftAnchorUnverifiable": "La preuve d’ancre du brouillon ne peut pas être vérifiée, la cristallisation est donc temporairement indisponible.",
+          "contributionSyncRequired": "L’instantané des contributions n’est pas encore synchronisé. Réessayez dans un instant.",
+          "proofBindingRequired": "Le paquet de preuve des contributeurs n’est pas prêt, le lien de cristallisation ne peut donc pas s’exécuter.",
+          "knowledgeCircleMismatch": "Le brouillon et le cercle de connaissance ne correspondent pas, cette cristallisation a donc été bloquée.",
+          "crystallizationAttemptConflict": "Un enregistrement de récupération de cristallisation existe déjà. Relancez la cristallisation pour reprendre la même connaissance on-chain."
+        }
+      },
+      "notices": {
+        "evidencePreparing": "Préparation de la preuve de collaboration du brouillon…",
+        "evidenceReady": "La preuve de collaboration du brouillon est prête. Relancez la cristallisation.",
+        "successIndexed": "Le lien on-chain et la mise à jour des contributeurs sont terminés.",
+        "successIndexPending": "Le lien on-chain et la mise à jour des contributeurs sont terminés. L’indexation se synchronisera sous peu."
+      }
+    },
     "fallback": {
       "unknownMember": "Membre inconnu",
       "untitledDraft": "Brouillon sans titre"

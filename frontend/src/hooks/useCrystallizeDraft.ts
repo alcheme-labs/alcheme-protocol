@@ -18,6 +18,7 @@ import {
 } from '@/lib/api/draftWorkingCopy';
 import { uploadFinalDraftDocument } from '@/lib/api/crystallization';
 import { sanitizeCrystalReferenceMarkersForDisplay } from '@/lib/crystal/referenceMarkerText';
+import { useI18n } from '@/i18n/useI18n';
 import { useAlchemeSDK } from './useAlchemeSDK';
 
 type NoticeType = 'success' | 'error';
@@ -108,14 +109,16 @@ type CrystallizationDiagnosticCode =
     | 'knowledge_circle_mismatch'
     | 'crystallization_attempt_conflict';
 
-const STRICT_DIAGNOSTIC_COPY: Record<CrystallizationDiagnosticCode, string> = {
-    draft_anchor_not_final: '草稿锚定尚未完成，暂不可结晶。',
-    draft_anchor_unverifiable: '草稿锚定证明不可验证，暂不可结晶。',
-    contribution_sync_required: '贡献快照尚未同步，请稍后重试。',
-    proof_binding_required: '贡献证明包未就绪，无法执行结晶绑定。',
-    knowledge_circle_mismatch: '草稿与知识圈层不一致，已阻断本次结晶。',
-    crystallization_attempt_conflict: '检测到已有结晶恢复记录，请重新执行以恢复同一个链上知识。',
+const STRICT_DIAGNOSTIC_KEYS: Record<CrystallizationDiagnosticCode, string> = {
+    draft_anchor_not_final: 'crystallization.errors.diagnostics.draftAnchorNotFinal',
+    draft_anchor_unverifiable: 'crystallization.errors.diagnostics.draftAnchorUnverifiable',
+    contribution_sync_required: 'crystallization.errors.diagnostics.contributionSyncRequired',
+    proof_binding_required: 'crystallization.errors.diagnostics.proofBindingRequired',
+    knowledge_circle_mismatch: 'crystallization.errors.diagnostics.knowledgeCircleMismatch',
+    crystallization_attempt_conflict: 'crystallization.errors.diagnostics.crystallizationAttemptConflict',
 };
+
+type CrystallizeDraftTranslator = ReturnType<typeof useI18n>;
 
 function createCrystallizationError(code: CrystallizationDiagnosticCode, message: string): Error & {
     code: CrystallizationDiagnosticCode;
@@ -162,7 +165,7 @@ function shouldRepairCrystallizationEvidence(error: unknown): boolean {
         || rawCode === 'draft_anchor_snapshot_mismatch';
 }
 
-function resolveStrictErrorMessage(error: unknown, fallback: string): {
+function resolveStrictErrorMessage(error: unknown, fallback: string, t: CrystallizeDraftTranslator): {
     code: CrystallizationDiagnosticCode | 'unknown';
     message: string;
 } {
@@ -171,7 +174,7 @@ function resolveStrictErrorMessage(error: unknown, fallback: string): {
     if (code) {
         return {
             code,
-            message: STRICT_DIAGNOSTIC_COPY[code],
+            message: t(STRICT_DIAGNOSTIC_KEYS[code]),
         };
     }
     return {
@@ -182,7 +185,7 @@ function resolveStrictErrorMessage(error: unknown, fallback: string): {
 
 async function sha256Hex(input: string): Promise<string> {
     if (!globalThis.crypto?.subtle) {
-        throw new Error('当前环境不支持 SHA-256 计算');
+        throw new Error('SHA-256 is not available in this browser environment');
     }
     const bytes = new TextEncoder().encode(input);
     const payload = new ArrayBuffer(bytes.byteLength);
@@ -392,7 +395,7 @@ function assertStrictReadiness(response: {
     if (!response.ready || extractWarning(response)) {
         throw toStrictError(
             'draft_anchor_not_final',
-            '草稿尚未满足 strict 结晶条件（锚定未完成或不可验证）',
+            'Draft is not ready for strict crystallization because its anchor is incomplete or unverifiable',
             response,
         );
     }
@@ -531,6 +534,7 @@ function selectMatchingResumableCrystallizationAttempt(
 
 export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
     const sdk = useAlchemeSDK();
+    const t = useI18n('CrucibleTab');
     const baseUrl = useMemo(() => getQueryApiBaseUrl(), []);
     const [loading, setLoading] = useState(false);
     const [notice, setNotice] = useState<CrystallizeNotice | null>(null);
@@ -564,28 +568,28 @@ export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
 
         const run = (async () => {
             if (!options.enabled) {
-                showNotice('error', '当前身份无法发起结晶。');
+                showNotice('error', t('crystallization.errors.permission'));
                 return null;
             }
             if (!sdk) {
-                showNotice('error', '请先连接钱包。');
+                showNotice('error', t('crystallization.errors.walletRequired'));
                 return null;
             }
 
             const draftPostId = options.draftPostId;
             if (!draftPostId || !Number.isFinite(draftPostId)) {
-                showNotice('error', '缺少草稿上下文，无法发起结晶。');
+                showNotice('error', t('crystallization.errors.missingDraftContext'));
                 return null;
             }
 
             const title = options.title.trim();
             const content = options.content.trim();
             if (!title) {
-                showNotice('error', '草稿标题为空，无法发起结晶。');
+                showNotice('error', t('crystallization.errors.missingTitle'));
                 return null;
             }
             if (!content) {
-                showNotice('error', '草稿正文为空，无法发起结晶。');
+                showNotice('error', t('crystallization.errors.missingContent'));
                 return null;
             }
 
@@ -620,10 +624,10 @@ export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
                     clearNoticeTimer();
                     setNotice({
                         type: 'success',
-                        text: '正在准备草稿协作证据…',
+                        text: t('crystallization.notices.evidencePreparing'),
                     });
                     await repairDraftLifecycleCrystallizationEvidence({ draftPostId });
-                    showNotice('success', '草稿协作证据已准备好，请再次运行结晶。');
+                    showNotice('success', t('crystallization.notices.evidenceReady'));
                     return null;
                 }
                 const { proof, proofPackage } = strictInputs;
@@ -768,8 +772,8 @@ export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
                 showNotice(
                     'success',
                     fullyIndexed
-                        ? '链上绑定 + contributors 更新均成功。'
-                        : '链上绑定 + contributors 更新已完成，索引同步稍后完成。',
+                        ? t('crystallization.notices.successIndexed')
+                        : t('crystallization.notices.successIndexPending'),
                 );
 
                 return {
@@ -788,7 +792,7 @@ export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
                         console.warn('[crystallize][fail_lifecycle_sync]', lifecycleError);
                     }
                 }
-                const normalized = resolveStrictErrorMessage(error, '结晶失败，请稍后重试。');
+                const normalized = resolveStrictErrorMessage(error, t('crystallization.errors.strictFallback'), t);
                 console.warn('[crystallize][strict_failure]', {
                     draftPostId: options.draftPostId,
                     code: normalized.code,
@@ -815,6 +819,7 @@ export function useCrystallizeDraft(options: UseCrystallizeDraftOptions) {
         options.title,
         sdk,
         showNotice,
+        t,
     ]);
 
     return {

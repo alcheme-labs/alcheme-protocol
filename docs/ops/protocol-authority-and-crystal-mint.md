@@ -1,6 +1,6 @@
 # Protocol Authority and Crystal Mint Operations
 
-_Last updated: 2026-04-28_
+_Last updated: 2026-04-30_
 
 This runbook records the current wallet/authority facts for Alcheme protocol operations. It is intentionally about operational boundaries, not private key values. Never commit real secrets or production keypairs.
 
@@ -38,6 +38,10 @@ These are current implementation facts, not necessarily the desired final shape.
 - If `CRYSTAL_MINT_RPC_URL` and `CRYSTAL_MINT_AUTHORITY_SECRET` are both present, query-api uses `token2022_local` minting.
 - If either is missing outside production, query-api falls back to `mock_chain` minting.
 - In production, missing real mint credentials throws `crystal_mint_credentials_required`.
+- `CRYSTAL_METADATA_BASE_URL` must be a public query-api base URL when using `token2022_local`. If it is empty, query-api falls back to inline `data:application/json;base64,...` metadata URIs. Real Token-2022 metadata transactions can exceed the legacy transaction size limit with inline JSON and fail with errors such as `The value of "offset" is out of range`.
+- `CRYSTAL_METADATA_BASE_URL` should point at the public REST base, for example `https://demo.alcheme.site/api/v1`. The minted URLs are:
+  - `${CRYSTAL_METADATA_BASE_URL}/crystals/<knowledgeId>/master.json`
+  - `${CRYSTAL_METADATA_BASE_URL}/crystals/<knowledgeId>/receipts/<ownerPubkey>.json`
 - `scripts/start-local-stack.sh` defaults `CRYSTAL_MINT_RPC_URL` to the local `$RPC_URL`.
 - `scripts/start-local-stack.sh` currently leaves `CRYSTAL_MINT_AUTHORITY_SECRET` empty unless explicitly provided.
 - Existing mock-minted rows are not automatically reminted after real credentials are added. The asset job skips rows that are already `mintStatus = minted` with an address.
@@ -104,6 +108,85 @@ SOLANA_KEYGEN_BIN=/path/to/solana-keygen
 - Do not run destructive cleanup commands such as `git clean -fdx` on the server if local `deploy/demo` config or keys are present.
 - If the server uses a server-local deployment env file, keep mint/reference authority values there or in the server's secret manager.
 - Prefer one server-local protocol signer for demo unless there is a specific reason to split authorities.
+- Demo deploy commands that need local anchor signing must include both compose files:
+
+```bash
+docker compose \
+  -f deploy/demo/docker-compose.devnet.yml \
+  -f deploy/demo/docker-compose.anchor-local.override.yml \
+  --env-file deploy/demo/.env.demo ...
+```
+
+Do not verify or recreate query-api with only `docker-compose.devnet.yml`; that can omit the signer key mount even when the env values look correct.
+
+### Demo Required Env Checklist
+
+The following fields must be present in the server-local `deploy/demo/.env.demo` or equivalent secret source for the current demo crystallization and Token-2022 mint path.
+
+| Field | Required for | Expected demo value / note |
+| --- | --- | --- |
+| `CRYSTAL_MINT_RPC_URL` | Token-2022 master NFT and receipt minting | Devnet RPC, for example `https://api.devnet.solana.com`. |
+| `CRYSTAL_MINT_AUTHORITY_SECRET` | Token-2022 mint authority | Secret only. Store server-local, never in git. |
+| `CRYSTAL_METADATA_BASE_URL` | Public NFT metadata URI | `https://demo.alcheme.site/api/v1`. Must not be empty when `token2022_local` is active. |
+| `CRYSTAL_MASTER_OWNER_PUBKEY` | Optional master NFT owner override | Usually empty; query-api falls back to the crystal author owner. |
+| `DRAFT_PROOF_ISSUER_KEY_ID` | Contributor proof package verification | Public key id of the registered/expected proof issuer. |
+| `ANCHOR_SIGNER_MODE` | Draft/collab anchor signing | `local` for the current demo local keypair flow. |
+| `SOLANA_KEYPAIR_PATH` | Shared local signer path | `/run/alcheme/demo-anchor-signer.json` in containers. |
+| `DRAFT_ANCHOR_KEYPAIR_PATH` | Draft anchor local signer | `/run/alcheme/demo-anchor-signer.json`; must be mounted readable. |
+| `COLLAB_EDIT_ANCHOR_KEYPAIR_PATH` | Collaboration edit anchor local signer | `/run/alcheme/demo-anchor-signer.json`; must be mounted readable. |
+| `DRAFT_ANCHOR_ENABLED` | Discussion draft anchor writing | `true`. |
+| `DRAFT_ANCHOR_WRITER_ENABLED` | Discussion draft anchor writer | `true`. |
+| `DRAFT_ANCHOR_RPC_URL` | Discussion draft anchor RPC | Devnet RPC. |
+| `COLLAB_EDIT_ANCHOR_ENABLED` | Collaboration edit anchor writing | `true`. |
+| `COLLAB_EDIT_ANCHOR_WRITER_ENABLED` | Collaboration edit anchor writer | `true`. |
+| `COLLAB_EDIT_ANCHOR_RPC_URL` | Collaboration edit anchor RPC | Devnet RPC. |
+| `DRAFT_LIFECYCLE_ANCHOR_LOOKUP_ATTEMPTS` | Devnet transaction lookup retry window | `30` is the current demo baseline. |
+| `STORAGE_UPLOAD_MODE` | Private final-document storage bridge | `local` for current demo. |
+| `PRIVATE_CONTENT_STORE_ROOT` | Local private content storage root | Must be writable by the `node` user in the sidecar. The rendered sidecar config may intentionally use `/var/lib/alcheme/private-content` even if `.env.demo` has a different local fallback. |
+
+### Demo Verification Commands
+
+After deploy/recreate, verify rendered config, runtime env, mounted signer key, loaded query-api config, and public metadata routes before testing crystallization in the browser.
+
+```bash
+cd /opt/alcheme-protocol
+
+docker compose \
+  -f deploy/demo/docker-compose.devnet.yml \
+  -f deploy/demo/docker-compose.anchor-local.override.yml \
+  --env-file deploy/demo/.env.demo exec -T query-api-sidecar node - <<'NODE'
+const { loadCrystalMintRuntimeConfig } = require('./dist/config/services');
+const c = loadCrystalMintRuntimeConfig();
+console.log({
+  adapterMode: c.adapterMode,
+  rpcUrl: c.rpcUrl,
+  hasAuthoritySecret: Boolean(c.authoritySecret),
+  masterOwnerPubkey: c.masterOwnerPubkey,
+  metadataBaseUrl: c.metadataBaseUrl,
+});
+NODE
+
+for svc in query-api-public query-api-sidecar; do
+  echo "==== $svc ===="
+  docker compose \
+    -f deploy/demo/docker-compose.devnet.yml \
+    -f deploy/demo/docker-compose.anchor-local.override.yml \
+    --env-file deploy/demo/.env.demo exec -T "$svc" sh -lc '
+      for f in "$SOLANA_KEYPAIR_PATH" "$DRAFT_ANCHOR_KEYPAIR_PATH" "$COLLAB_EDIT_ANCHOR_KEYPAIR_PATH"; do
+        [ -n "$f" ] && { printf "%s " "$f"; test -r "$f" && echo readable || echo missing; }
+      done
+    '
+done
+```
+
+For a known crystal:
+
+```bash
+KNOWLEDGE_ID='<knowledge_public_id>'
+curl -fsS "https://demo.alcheme.site/api/v1/crystals/$KNOWLEDGE_ID/master.json" | jq .
+```
+
+If this route 404s or `metadataBaseUrl` is `null`, do not retry minting yet. Fix the code/config first.
 
 ## Handling Existing Demo Assets
 
@@ -116,6 +199,74 @@ Operational choices:
 3. Create a new crystal after real mint config is active.
 
 Do not silently present existing `mock_chain_*` rows as real NFT assets.
+
+If a real Token-2022 mint failed before `CRYSTAL_METADATA_BASE_URL` was configured, first deploy the metadata route and verify `master.json`, then reset/requeue that knowledge item:
+
+```bash
+cd /opt/alcheme-protocol
+
+KNOWLEDGE_ID='<knowledge_public_id>'
+
+docker compose \
+  -f deploy/demo/docker-compose.devnet.yml \
+  -f deploy/demo/docker-compose.anchor-local.override.yml \
+  --env-file deploy/demo/.env.demo exec -T postgres sh -lc \
+  'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1' <<SQL
+WITH target AS (
+  SELECT id, knowledge_id, circle_id
+  FROM knowledge
+  WHERE knowledge_id = '$KNOWLEDGE_ID'
+),
+reset_asset AS (
+  UPDATE crystal_assets
+  SET mint_status = 'pending',
+      last_error = NULL,
+      updated_at = NOW()
+  WHERE knowledge_row_id IN (SELECT id FROM target)
+  RETURNING id
+)
+INSERT INTO ai_jobs (
+  job_type,
+  dedupe_key,
+  scope_type,
+  scope_circle_id,
+  status,
+  attempts,
+  max_attempts,
+  available_at,
+  payload_json,
+  created_at,
+  updated_at
+)
+SELECT
+  'crystal_asset_issue',
+  'crystal-asset-issue:' || id,
+  'circle',
+  circle_id,
+  'queued',
+  0,
+  3,
+  NOW(),
+  jsonb_build_object('knowledgeRowId', id, 'knowledgePublicId', knowledge_id),
+  NOW(),
+  NOW()
+FROM target
+ON CONFLICT (dedupe_key) DO UPDATE
+SET status = 'queued',
+    attempts = 0,
+    available_at = NOW(),
+    claimed_at = NULL,
+    completed_at = NULL,
+    worker_id = NULL,
+    claim_token = NULL,
+    result_json = NULL,
+    last_error_code = NULL,
+    last_error_message = NULL,
+    payload_json = EXCLUDED.payload_json,
+    updated_at = NOW()
+RETURNING id, job_type, status, attempts, payload_json;
+SQL
+```
 
 ## Recommended Follow-Up Implementation
 

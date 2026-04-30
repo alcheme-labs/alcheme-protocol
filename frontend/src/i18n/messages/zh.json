@@ -2924,6 +2924,30 @@
       "issueTemporaryEditGrantSuccess": "已授予临时编辑权限。",
       "revokeTemporaryEditGrantSuccess": "已撤销临时编辑权限。"
     },
+    "crystallization": {
+      "errors": {
+        "permission": "当前身份无法发起结晶。",
+        "walletRequired": "请先连接钱包，再执行结晶。",
+        "missingDraftContext": "缺少草稿上下文，无法发起结晶。",
+        "missingTitle": "草稿标题为空，无法发起结晶。",
+        "missingContent": "草稿正文为空，无法发起结晶。",
+        "strictFallback": "结晶失败，请稍后重试。",
+        "diagnostics": {
+          "draftAnchorNotFinal": "草稿锚定尚未完成，暂不可结晶。",
+          "draftAnchorUnverifiable": "草稿锚定证明不可验证，暂不可结晶。",
+          "contributionSyncRequired": "贡献快照尚未同步，请稍后重试。",
+          "proofBindingRequired": "贡献证明包未就绪，无法执行结晶绑定。",
+          "knowledgeCircleMismatch": "草稿与知识圈层不一致，已阻断本次结晶。",
+          "crystallizationAttemptConflict": "检测到已有结晶恢复记录，请重新执行以恢复同一个链上知识。"
+        }
+      },
+      "notices": {
+        "evidencePreparing": "正在准备草稿协作证据…",
+        "evidenceReady": "草稿协作证据已准备好，请再次运行结晶。",
+        "successIndexed": "链上绑定和贡献者更新已完成。",
+        "successIndexPending": "链上绑定和贡献者更新已完成，索引同步稍后完成。"
+      }
+    },
     "fallback": {
       "unknownMember": "未知成员",
       "untitledDraft": "未命名草稿"

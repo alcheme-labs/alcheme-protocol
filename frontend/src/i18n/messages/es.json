@@ -2924,6 +2924,30 @@
       "issueTemporaryEditGrantSuccess": "Acceso temporal concedido.",
       "revokeTemporaryEditGrantSuccess": "Acceso temporal revocado."
     },
+    "crystallization": {
+      "errors": {
+        "permission": "Tu rol actual no puede cristalizar este borrador.",
+        "walletRequired": "Conecta tu wallet antes de cristalizar.",
+        "missingDraftContext": "Falta el contexto del borrador, así que la cristalización no puede empezar.",
+        "missingTitle": "Añade un título antes de cristalizar.",
+        "missingContent": "Añade contenido antes de cristalizar.",
+        "strictFallback": "La cristalización falló. Inténtalo de nuevo más tarde.",
+        "diagnostics": {
+          "draftAnchorNotFinal": "El ancla del borrador aún no está finalizada, así que la cristalización no está disponible temporalmente.",
+          "draftAnchorUnverifiable": "La prueba del ancla del borrador no se puede verificar, así que la cristalización no está disponible temporalmente.",
+          "contributionSyncRequired": "La instantánea de contribuciones aún no está sincronizada. Inténtalo de nuevo en breve.",
+          "proofBindingRequired": "El paquete de prueba de contribuyentes no está listo, así que no se puede ejecutar el enlace de cristalización.",
+          "knowledgeCircleMismatch": "El borrador y el círculo de conocimiento no coinciden, así que esta cristalización fue bloqueada.",
+          "crystallizationAttemptConflict": "Se encontró un registro de recuperación de cristalización existente. Ejecuta la cristalización de nuevo para reanudar el mismo conocimiento on-chain."
+        }
+      },
+      "notices": {
+        "evidencePreparing": "Preparando la evidencia de colaboración del borrador…",
+        "evidenceReady": "La evidencia de colaboración del borrador está lista. Ejecuta la cristalización de nuevo.",
+        "successIndexed": "El enlace on-chain y la actualización de contribuyentes se completaron.",
+        "successIndexPending": "El enlace on-chain y la actualización de contribuyentes se completaron. La indexación se pondrá al día en breve."
+      }
+    },
     "fallback": {
       "unknownMember": "Miembro desconocido",
       "untitledDraft": "Borrador sin título"
