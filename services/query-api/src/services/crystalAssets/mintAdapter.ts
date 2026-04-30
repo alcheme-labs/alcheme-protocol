@@ -238,7 +238,7 @@ function createToken2022LocalCrystalMintAdapter(config: CrystalMintRuntimeConfig
             TOKEN_2022_PROGRAM_ID,
             ASSOCIATED_TOKEN_PROGRAM_ID,
         );
-        const transaction = new Transaction().add(
+        const initTransaction = new Transaction().add(
             SystemProgram.createAccount({
                 fromPubkey: authority.publicKey,
                 newAccountPubkey: mint.publicKey,
@@ -255,7 +255,7 @@ function createToken2022LocalCrystalMintAdapter(config: CrystalMintRuntimeConfig
         );
 
         if (input.nonTransferable) {
-            transaction.add(
+            initTransaction.add(
                 createInitializeNonTransferableMintInstruction(
                     mint.publicKey,
                     TOKEN_2022_PROGRAM_ID,
@@ -263,7 +263,7 @@ function createToken2022LocalCrystalMintAdapter(config: CrystalMintRuntimeConfig
             );
         }
 
-        transaction.add(
+        initTransaction.add(
             createInitializeMintInstruction(
                 mint.publicKey,
                 0,
@@ -281,13 +281,28 @@ function createToken2022LocalCrystalMintAdapter(config: CrystalMintRuntimeConfig
                 symbol: tokenMetadata.symbol,
                 uri: input.metadataUri,
             }),
-            ...input.additionalMetadata.map(([field, value]) => createUpdateTokenMetadataFieldInstruction({
-                programId: TOKEN_2022_PROGRAM_ID,
-                metadata: mint.publicKey,
-                updateAuthority: authority.publicKey,
-                field,
-                value,
-            })),
+        );
+
+        await sendAndConfirmTransaction(connection, initTransaction, [authority, mint], {
+            commitment: 'confirmed',
+        });
+
+        for (const [field, value] of input.additionalMetadata) {
+            const metadataTransaction = new Transaction().add(
+                createUpdateTokenMetadataFieldInstruction({
+                    programId: TOKEN_2022_PROGRAM_ID,
+                    metadata: mint.publicKey,
+                    updateAuthority: authority.publicKey,
+                    field,
+                    value,
+                }),
+            );
+            await sendAndConfirmTransaction(connection, metadataTransaction, [authority], {
+                commitment: 'confirmed',
+            });
+        }
+
+        const mintTransaction = new Transaction().add(
             createAssociatedTokenAccountIdempotentInstruction(
                 authority.publicKey,
                 ownerAta,
@@ -306,7 +321,7 @@ function createToken2022LocalCrystalMintAdapter(config: CrystalMintRuntimeConfig
             ),
         );
 
-        await sendAndConfirmTransaction(connection, transaction, [authority, mint], {
+        await sendAndConfirmTransaction(connection, mintTransaction, [authority], {
             commitment: 'confirmed',
         });
 

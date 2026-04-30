@@ -17,4 +17,19 @@ describe('Token-2022 crystal mint metadata wiring', () => {
         expect(source).toContain('metadata: mint.publicKey');
         expect(source).toContain('uri: input.metadataUri');
     });
+
+    test('keeps additional metadata field updates out of the mint initialization transaction', () => {
+        const initStart = source.indexOf('const initTransaction = new Transaction().add(');
+        const initSend = source.indexOf('sendAndConfirmTransaction(connection, initTransaction');
+        const updateLoop = source.indexOf('for (const [field, value] of input.additionalMetadata)');
+        const mintTransaction = source.indexOf('const mintTransaction = new Transaction().add(');
+
+        expect(initStart).toBeGreaterThanOrEqual(0);
+        expect(initSend).toBeGreaterThan(initStart);
+        expect(updateLoop).toBeGreaterThan(initSend);
+        expect(mintTransaction).toBeGreaterThan(updateLoop);
+
+        const initBlock = source.slice(initStart, initSend);
+        expect(initBlock).not.toContain('createUpdateTokenMetadataFieldInstruction');
+    });
 });
