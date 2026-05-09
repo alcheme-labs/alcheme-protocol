@@ -1,5 +1,10 @@
 {
+  "name": "alcheme-protocol",
+  "private": true,
   "license": "Apache-2.0",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
@@ -24,6 +29,8 @@
     "measure:create-quote-v2-cost": "ts-node scripts/measure/create-quote-v2-cost.ts",
     "measure:draft-anchor-cost": "ts-node scripts/measure/draft-anchor-cost.ts",
     "measure:crystal-asset-issuance-cost": "ts-node scripts/measure/crystal-asset-issuance-cost.ts",
+    "build:game-chat-react": "npm --workspace @alcheme/game-chat-react run build",
+    "typecheck:game-chat-react": "npm --workspace @alcheme/game-chat-react run typecheck",
     "build": "anchor build",
     "deploy:localnet": "anchor deploy --provider.cluster localnet",
     "deploy:devnet": "anchor deploy --provider.cluster devnet",
