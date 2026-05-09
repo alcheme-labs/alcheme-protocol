@@ -12,6 +12,7 @@ export interface AppRoomClaimPayload {
   externalAppId: string;
   roomType: string;
   externalRoomId: string;
+  transcriptionMode?: string;
   walletPubkeys?: string[];
   roles?: Record<string, string>;
   expiresAt: string;
@@ -66,6 +67,13 @@ export function createAppRoomClaim(payload: AppRoomClaimPayload): {
         externalAppId: payload.externalAppId,
         roomType: normalizeRoomType(payload.roomType),
         externalRoomId: payload.externalRoomId,
+        ...(payload.transcriptionMode
+          ? {
+              transcriptionMode: normalizeTranscriptionMode(
+                payload.transcriptionMode,
+              ),
+            }
+          : {}),
         walletPubkeys: payload.walletPubkeys ?? [],
         ...(payload.roles ? { roles: payload.roles } : {}),
         expiresAt: payload.expiresAt,
@@ -91,19 +99,19 @@ export async function resolveCommunicationRoom(
     ? await loadActiveExternalApp(prisma, input.externalAppId)
     : null;
 
-  if (externalApp) {
-    verifyAppRoomClaim({
-      externalApp,
-      claim: input.appRoomClaim,
-      expected: {
-        externalAppId: externalApp.id,
-        roomType,
-        externalRoomId: input.externalRoomId ?? "",
-        walletPubkey: input.walletPubkey ?? null,
-      },
-      now,
-    });
-  }
+  const verifiedClaim = externalApp
+    ? verifyAppRoomClaim({
+        externalApp,
+        claim: input.appRoomClaim,
+        expected: {
+          externalAppId: externalApp.id,
+          roomType,
+          externalRoomId: input.externalRoomId ?? "",
+          walletPubkey: input.walletPubkey ?? null,
+        },
+        now,
+      })
+    : null;
 
   const roomKey = buildRoomKeyForInput(input, roomType);
   const expiresAt =
@@ -111,7 +119,10 @@ export async function resolveCommunicationRoom(
       ? new Date(now.getTime() + input.ttlSec * 1000)
       : null;
   const knowledgeMode = input.knowledgeMode ?? defaultKnowledgeMode(roomType);
-  const transcriptionMode = input.transcriptionMode ?? "off";
+  const transcriptionMode = resolveTranscriptionMode({
+    requested: input.transcriptionMode,
+    verifiedClaim,
+  });
   const retentionPolicy =
     input.retentionPolicy ?? defaultRetentionPolicy(roomType);
 
@@ -299,6 +310,29 @@ function defaultKnowledgeMode(roomType: string): string {
     return "recap";
   }
   return "off";
+}
+
+function normalizeTranscriptionMode(raw: unknown): string {
+  const normalized = String(raw || "")
+    .trim()
+    .toLowerCase();
+  if (normalized === "live_caption") return "live_caption";
+  if (normalized === "transcript") return "transcript";
+  if (normalized === "recap") return "recap";
+  if (normalized === "full") return "full";
+  return "off";
+}
+
+function resolveTranscriptionMode(input: {
+  requested?: string | null;
+  verifiedClaim: AppRoomClaimPayload | null;
+}): string {
+  const requested = normalizeTranscriptionMode(input.requested);
+  if (requested === "off") return "off";
+  const claimed = normalizeTranscriptionMode(
+    input.verifiedClaim?.transcriptionMode,
+  );
+  return claimed === requested ? requested : "off";
 }
 
 function defaultRetentionPolicy(roomType: string): string {

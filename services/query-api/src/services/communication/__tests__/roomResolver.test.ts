@@ -132,6 +132,74 @@ describe("resolveCommunicationRoom", () => {
     );
   });
 
+  test("keeps transcription off unless the signed app claim authorizes the requested mode", async () => {
+    const keyPair = nacl.sign.keyPair();
+    const baseClaim = buildSignedClaim(
+      {
+        externalAppId: "example-web3-game",
+        roomType: "dungeon",
+        externalRoomId: "run-8791",
+        walletPubkeys: [WALLET],
+        expiresAt: "2026-05-08T12:05:00.000Z",
+        nonce: "claim-no-transcription",
+      },
+      keyPair,
+    );
+    const prisma = buildPrismaMock({
+      externalApp: {
+        findUnique: jest.fn(async () => ({
+          id: "example-web3-game",
+          status: "active",
+          serverPublicKey: baseClaim.serverPublicKey,
+          claimAuthMode: "server_ed25519",
+        })),
+      },
+    });
+
+    const unsafeRequest = await resolveCommunicationRoom(
+      prisma,
+      {
+        externalAppId: "example-web3-game",
+        roomType: "dungeon",
+        externalRoomId: "run-8791",
+        transcriptionMode: "full",
+        appRoomClaim: baseClaim.claim,
+        walletPubkey: WALLET,
+      },
+      { now: NOW },
+    );
+
+    expect(unsafeRequest.transcriptionMode).toBe("off");
+
+    const authorizedClaim = buildSignedClaim(
+      {
+        externalAppId: "example-web3-game",
+        roomType: "dungeon",
+        externalRoomId: "run-8791",
+        transcriptionMode: "recap",
+        walletPubkeys: [WALLET],
+        expiresAt: "2026-05-08T12:05:00.000Z",
+        nonce: "claim-recap",
+      },
+      keyPair,
+    );
+
+    const authorizedRequest = await resolveCommunicationRoom(
+      prisma,
+      {
+        externalAppId: "example-web3-game",
+        roomType: "dungeon",
+        externalRoomId: "run-8791",
+        transcriptionMode: "recap",
+        appRoomClaim: authorizedClaim.claim,
+        walletPubkey: WALLET,
+      },
+      { now: NOW },
+    );
+
+    expect(authorizedRequest.transcriptionMode).toBe("recap");
+  });
+
   test("rejects missing parent circles before upserting", async () => {
     const prisma = buildPrismaMock({
       circle: {

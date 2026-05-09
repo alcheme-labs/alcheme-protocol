@@ -14,12 +14,13 @@ Implemented:
 - Send voice clip messages by referencing externally stored audio.
 - Create voice sessions and issue provider join tokens.
 - Use LiveKit through a provider adapter when voice is enabled.
+- Run opt-in voice transcription/recap services behind `transcriptionMode`.
 - Keep temporary rooms off chain.
 
 Not implemented in this slice:
 
 - React UI kit.
-- Transcription, recap, or knowledge capture.
+- Browser/provider transcription capture UI.
 - Auto draft creation from game chat or voice.
 - Auto crystallization from game chat or voice.
 - On-chain temporary room or voice state.
@@ -369,6 +370,27 @@ The voice client requires an injected provider client. For browsers, that
 provider client should wrap `livekit-client`. Query-api never imports browser
 media code.
 
+## Optional Transcription And Recap
+
+Transcription is off by default. A room can only resolve to `live_caption`,
+`transcript`, `recap`, or `full` when the server-signed `appRoomClaim` authorizes
+the requested `transcriptionMode`; client-side request bodies alone are
+downgraded to `off`.
+
+The implemented service boundary is:
+
+- `off`: no transcript, no recap, no draft source.
+- `live_caption`: runtime captions only; query-api does not persist segments.
+- `transcript` / `full`: transcript segments may be stored as
+  `communication_messages` with `messageKind = voice_transcript`.
+- `recap`: only the final recap is stored on `VoiceSession.metadata.voiceRecap`.
+- `full`: can create a `SourceMaterial` marked by metadata as review-required;
+  it does not create a draft or crystal.
+
+V1 recap is rule-based and does not send voice transcript plaintext to an AI
+provider. Future model-backed recap must use an explicit private-content AI
+boundary.
+
 ## Route Boundaries
 
 Public-safe:
@@ -387,6 +409,11 @@ Sidecar or moderator-gated:
 - delete/tombstone message
 - mute/kick/end voice session
 - LiveKit provider webhook
+
+Not yet exposed as a public route:
+
+- provider transcript ingest and recap job enqueue; the current implementation is
+  a service/worker boundary, not a browser API
 
 Forbidden in this integration slice:
 
@@ -408,5 +435,5 @@ Before calling an integration complete:
 - frontend typecheck still passes if frontend code changed
 - `npm run check:covenant` passes
 - no contract or Anchor program files changed
-- `transcriptionMode` remains `off` unless a later opt-in phase explicitly
-  changes it
+- `transcriptionMode` remains `off` unless a server-signed app claim explicitly
+  authorizes a non-off mode
