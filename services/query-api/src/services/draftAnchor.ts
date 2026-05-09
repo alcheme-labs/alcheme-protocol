@@ -1,18 +1,28 @@
-import crypto from 'crypto';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { Prisma, PrismaClient } from '@prisma/client';
-import {
-    Commitment,
-    PublicKey,
-} from '@solana/web3.js';
+import type { Commitment } from '@solana/web3.js';
 import {
     AnchorSignerMode,
-    submitMemoAnchorWithSigner,
 } from './anchorSigner';
+import {
+    buildDraftAnchorMessagesDigest,
+    buildDraftAnchorProofPackage,
+    normalizeDraftAnchorText,
+    sha256Hex,
+    stableStringify,
+} from './settlement/proofPackage';
+import { SolanaMemoSettlementAdapter } from './settlement/solanaAdapter';
+import type {
+    DraftAnchorCanonicalPayload,
+    DraftAnchorMessagePayload,
+} from './settlement/types';
+export type {
+    DraftAnchorCanonicalPayload,
+    DraftAnchorMessagePayload,
+} from './settlement/types';
 
-const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
 const DEFAULT_MEMO_PREFIX = 'alcheme-draft-anchor:v1:';
 
 export type DraftAnchorStatus = 'pending' | 'anchoring' | 'anchored' | 'failed' | 'skipped';
@@ -25,33 +35,6 @@ export interface DraftAnchorMessageInput {
     createdAt: Date;
     semanticScore: number;
     relevanceMethod: string;
-}
-
-interface DraftAnchorMessagePayload {
-    envelopeId: string;
-    payloadHash: string;
-    lamport: string;
-    senderPubkey: string;
-    createdAt: string;
-    semanticScore: number;
-    relevanceMethod: string;
-}
-
-export interface DraftAnchorCanonicalPayload {
-    version: 1;
-    anchorType: 'discussion_draft_trigger';
-    roomKey: string;
-    circleId: number;
-    draftPostId: number;
-    triggerReason: string;
-    summaryMethod: string;
-    summaryHash: string;
-    messagesDigest: string;
-    messageCount: number;
-    fromLamport: string;
-    toLamport: string;
-    generatedAt: string;
-    messages: DraftAnchorMessagePayload[];
 }
 
 interface DraftAnchorBatchRow {
@@ -181,38 +164,6 @@ function parseSignerMode(raw: string | undefined): AnchorSignerMode {
     return normalized === 'external' ? 'external' : 'local';
 }
 
-function normalizeText(input: string): string {
-    return String(input || '').replace(/\s+/g, ' ').trim();
-}
-
-function sha256Hex(input: string): string {
-    return crypto.createHash('sha256').update(input).digest('hex');
-}
-
-function stableSortValue(input: unknown): unknown {
-    if (Array.isArray(input)) {
-        return input.map(stableSortValue);
-    }
-    if (input && typeof input === 'object') {
-        const record = input as Record<string, unknown>;
-        const sorted: Record<string, unknown> = {};
-        Object.keys(record)
-            .sort()
-            .forEach((key) => {
-                const value = record[key];
-                if (value !== undefined) {
-                    sorted[key] = stableSortValue(value);
-                }
-            });
-        return sorted;
-    }
-    return input;
-}
-
-function stableStringify(input: unknown): string {
-    return JSON.stringify(stableSortValue(input));
-}
-
 function expandHomePath(inputPath: string): string {
     if (!inputPath.startsWith('~/')) return inputPath;
     return path.join(os.homedir(), inputPath.slice(2));
@@ -274,51 +225,6 @@ function loadDraftAnchorRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Dra
         keypairPath,
         memoPrefix: String(env.DRAFT_ANCHOR_MEMO_PREFIX || DEFAULT_MEMO_PREFIX).trim() || DEFAULT_MEMO_PREFIX,
     };
-}
-
-function buildMessagesDigest(messages: DraftAnchorMessagePayload[]): string {
-    const compact = messages.map((item) => `${item.lamport}:${item.envelopeId}:${item.payloadHash}`);
-    return sha256Hex(compact.join('|'));
-}
-
-function buildMemoText(input: {
-    memoPrefix: string;
-    anchorId: string;
-    summaryHash: string;
-    messagesDigest: string;
-    circleId: number;
-    draftPostId: number;
-    messageCount: number;
-    fromLamport: string;
-    toLamport: string;
-}): string {
-    const jsonMemo = `${input.memoPrefix}${stableStringify({
-        anchorId: input.anchorId,
-        circleId: input.circleId,
-        draftPostId: input.draftPostId,
-        fromLamport: input.fromLamport,
-        messageCount: input.messageCount,
-        messagesDigest: input.messagesDigest,
-        summaryHash: input.summaryHash,
-        toLamport: input.toLamport,
-        v: 1,
-    })}`;
-
-    if (Buffer.byteLength(jsonMemo, 'utf8') <= 512) {
-        return jsonMemo;
-    }
-
-    return [
-        input.memoPrefix,
-        input.anchorId,
-        input.summaryHash,
-        input.messagesDigest,
-        String(input.circleId),
-        String(input.draftPostId),
-        String(input.messageCount),
-        input.fromLamport,
-        input.toLamport,
-    ].join(':');
 }
 
 function parseCanonicalPayload(raw: unknown): DraftAnchorCanonicalPayload | null {
@@ -412,6 +318,16 @@ async function updateAnchorStatus(prisma: PrismaClient, input: {
     `;
 }
 
+function parseSlotBigInt(value: string | null): bigint | null {
+    if (!value) return null;
+    try {
+        const parsed = BigInt(value);
+        return parsed >= 0n ? parsed : null;
+    } catch {
+        return null;
+    }
+}
+
 async function claimAnchorForSubmission(prisma: PrismaClient, input: {
     anchorId: string;
     claimStaleSeconds: number;
@@ -462,8 +378,8 @@ export async function createDraftAnchorBatch(
 
     const fromLamport = payloadMessages[0].lamport;
     const toLamport = payloadMessages[payloadMessages.length - 1].lamport;
-    const summaryHash = sha256Hex(normalizeText(input.summaryText));
-    const messagesDigest = buildMessagesDigest(payloadMessages);
+    const summaryHash = sha256Hex(normalizeDraftAnchorText(input.summaryText));
+    const messagesDigest = buildDraftAnchorMessagesDigest(payloadMessages);
 
     const canonicalPayload: DraftAnchorCanonicalPayload = {
         version: 1,
@@ -482,20 +398,13 @@ export async function createDraftAnchorBatch(
         messages: payloadMessages,
     };
 
-    const canonicalJson = stableStringify(canonicalPayload);
-    const payloadHash = sha256Hex(canonicalJson);
-    const anchorId = payloadHash;
-    const memoText = buildMemoText({
+    const proofPackage = buildDraftAnchorProofPackage({
+        payload: canonicalPayload,
         memoPrefix: config.memoPrefix,
-        anchorId,
-        summaryHash,
-        messagesDigest,
-        circleId: input.circleId,
-        draftPostId: input.draftPostId,
-        messageCount: payloadMessages.length,
-        fromLamport,
-        toLamport,
     });
+    const payloadHash = proofPackage.payloadHash;
+    const anchorId = proofPackage.anchorId;
+    const memoText = proofPackage.memoText;
 
     const existing = await findAnchorById(input.prisma, anchorId);
     if (existing?.status === 'anchored') return existing;
@@ -581,8 +490,11 @@ export async function createDraftAnchorBatch(
     }
 
     try {
-        const anchored = await submitMemoAnchorWithSigner({
-            config: {
+        const settlementAdapter = new SolanaMemoSettlementAdapter();
+        const anchored = await settlementAdapter.submitAnchor({
+            anchorPayload: proofPackage.anchorPayload,
+            memoText,
+            signerConfig: {
                 mode: config.signerMode,
                 rpcUrl: config.rpcUrl,
                 commitment: config.commitment,
@@ -592,15 +504,13 @@ export async function createDraftAnchorBatch(
                 externalTimeoutMs: config.signerTimeoutMs,
                 signerLabel: 'discussion_draft_anchor',
             },
-            memoText,
-            memoProgramId: MEMO_PROGRAM_ID,
         });
 
         await updateAnchorStatus(input.prisma, {
             anchorId,
             status: 'anchored',
-            txSignature: anchored.signature,
-            txSlot: anchored.slot,
+            txSignature: anchored.settlementTxId,
+            txSlot: parseSlotBigInt(anchored.slotOrHeight),
             errorMessage: null,
         });
     } catch (error) {
@@ -762,8 +672,22 @@ export async function repairDraftAnchorBatch(input: {
     }
 
     try {
-        const anchored = await submitMemoAnchorWithSigner({
-            config: {
+        if (!anchor.canonicalPayload) {
+            throw new DraftAnchorRepairError(
+                'draft_anchor_repair_payload_unverifiable',
+                422,
+                'discussion draft anchor payload is not internally verifiable',
+            );
+        }
+        const proofPackage = buildDraftAnchorProofPackage({
+            payload: anchor.canonicalPayload,
+            memoPrefix: config.memoPrefix,
+        });
+        const settlementAdapter = new SolanaMemoSettlementAdapter();
+        const anchored = await settlementAdapter.submitAnchor({
+            anchorPayload: proofPackage.anchorPayload,
+            memoText: anchor.memoText,
+            signerConfig: {
                 mode: config.signerMode,
                 rpcUrl: config.rpcUrl,
                 commitment: config.commitment,
@@ -773,15 +697,13 @@ export async function repairDraftAnchorBatch(input: {
                 externalTimeoutMs: config.signerTimeoutMs,
                 signerLabel: 'discussion_draft_anchor_repair',
             },
-            memoText: anchor.memoText,
-            memoProgramId: MEMO_PROGRAM_ID,
         });
 
         await updateAnchorStatus(input.prisma, {
             anchorId: anchor.anchorId,
             status: 'anchored',
-            txSignature: anchored.signature,
-            txSlot: anchored.slot,
+            txSignature: anchored.settlementTxId,
+            txSlot: parseSlotBigInt(anchored.slotOrHeight),
             errorMessage: null,
         });
     } catch (error) {
@@ -800,7 +722,7 @@ export function verifyDraftAnchor(record: DraftAnchorRecord): DraftAnchorProof {
     const payload = record.canonicalPayload;
     const canonicalJson = payload ? stableStringify(payload) : null;
     const recomputedPayloadHash = canonicalJson ? sha256Hex(canonicalJson) : null;
-    const recomputedMessagesDigest = payload?.messages ? buildMessagesDigest(payload.messages) : null;
+    const recomputedMessagesDigest = payload?.messages ? buildDraftAnchorMessagesDigest(payload.messages) : null;
     const payloadHashMatches =
         Boolean(recomputedPayloadHash)
         && isSha256Hex(record.payloadHash)

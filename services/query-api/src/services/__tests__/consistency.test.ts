@@ -78,6 +78,24 @@ describe('loadConsistencyStatus', () => {
         expect(status.indexedSlot).toBe(456020690);
         expect(status.slotLag).toBe(5);
         expect(status.stale).toBe(false);
+        expect(status.settlement).toMatchObject({
+            adapterId: 'solana-l1',
+            chainFamily: 'svm',
+            settlementLayer: 'solana-l1',
+            chainId: 'localnet',
+            readCommitment: 'confirmed',
+            indexedSlot: '456020690',
+            headSlot: '456020695',
+            slotLag: 5,
+            finality: {
+                status: 'indexed',
+                commitment: 'confirmed',
+                indexed: true,
+                final: false,
+            },
+            stale: false,
+            source: 'sync_checkpoint_plus_runtime_state',
+        });
         expect(status.alerts.indexerLagWarning).toBe(false);
         expect(status.alerts.indexerLagCritical).toBe(false);
     });
@@ -106,6 +124,13 @@ describe('loadConsistencyStatus', () => {
         expect(status.indexedSlot).toBe(456009812);
         expect(status.slotLag).toBe(10883);
         expect(status.stale).toBe(true);
+        expect(status.settlement.finality).toMatchObject({
+            status: 'pending',
+            commitment: 'confirmed',
+            indexed: false,
+            final: false,
+            reason: 'settlement_checkpoint_stale',
+        });
         expect(status.alerts.indexerLagWarning).toBe(true);
         expect(status.alerts.indexerLagCritical).toBe(true);
     });

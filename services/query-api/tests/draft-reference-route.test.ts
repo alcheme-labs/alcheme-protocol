@@ -45,6 +45,9 @@ describe('draft reference route', () => {
                 sourceBlockId: 'paragraph:0',
                 crystalName: 'Seed Crystal',
                 crystalBlockAnchor: 'anchor-1',
+                sourceKnowledgeId: 'K-1',
+                sourceOnChainAddress: 'CrystalAddress111111111111111111111111111111',
+                resolutionStatus: 'resolved',
                 status: 'parsed',
             },
         ]);

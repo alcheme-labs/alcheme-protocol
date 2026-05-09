@@ -127,6 +127,7 @@ describe('circle summary route', () => {
         expect(ensureSpy).toHaveBeenCalledWith(expect.anything(), {
             circleId: 7,
             forceGenerate: false,
+            locale: 'en',
         });
         expect(res.payload.snapshot.version).toBe(2);
         expect(res.payload.snapshot.generationMetadata).toMatchObject({
@@ -160,6 +161,7 @@ describe('circle summary route', () => {
         expect(ensureSpy).toHaveBeenCalledWith(expect.anything(), {
             circleId: 7,
             forceGenerate: true,
+            locale: 'en',
         });
         expect(res.payload.snapshot.generatedBy).toBe('user_requested');
         expect(res.payload.snapshot.generationMetadata.providerMode).toBe('projection');

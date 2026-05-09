@@ -42,6 +42,28 @@ describe('ghost draft streaming', () => {
                     threadRoot: null,
                 })),
             },
+            $queryRaw: jest.fn<() => Promise<any>>()
+                .mockResolvedValueOnce([{
+                    id: BigInt(1),
+                    draftPostId: 42,
+                    targetType: 'paragraph',
+                    targetRef: 'paragraph:0',
+                    targetVersion: 1,
+                    issueType: 'question_and_supplement',
+                    state: 'open',
+                    createdBy: 7,
+                    createdAt: new Date('2026-03-20T10:00:00.000Z'),
+                    updatedAt: new Date('2026-03-20T10:00:00.000Z'),
+                }])
+                .mockResolvedValueOnce([])
+                .mockResolvedValueOnce([])
+                .mockResolvedValueOnce([{
+                    id: BigInt(10),
+                    authorId: 7,
+                    messageType: 'comment',
+                    content: 'Please clarify the opening paragraph.',
+                    createdAt: new Date('2026-03-20T10:01:00.000Z'),
+                }]),
         } as any;
 
         const result = await streamGhostDraft(prisma, 42);

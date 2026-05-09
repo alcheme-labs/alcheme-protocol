@@ -28,6 +28,12 @@ const template: DraftLifecycleTemplateSnapshot = {
     reviewEntryMode: 'auto_or_manual',
 };
 
+function parseSqlTimestampValue(value: unknown): Date | null {
+    if (value instanceof Date) return value;
+    if (typeof value !== 'string' || !value.trim()) return null;
+    return new Date(`${value.replace(' ', 'T')}Z`);
+}
+
 function createPrismaWithWorkflowState(rowOverrides: Record<string, unknown> = {}) {
     let workflowStateRow: any = {
         draftPostId: 42,
@@ -103,7 +109,7 @@ function createPrismaWithWorkflowState(rowOverrides: Record<string, unknown> = {
                 && sql.includes("review_entry_mode <> 'manual_only'")
                 && sql.includes('drafting_ends_at <=')
             ) {
-                const now = new Date(query?.values?.[0] || new Date());
+                const now = parseSqlTimestampValue(query?.values?.[0]) || new Date();
                 const limit = Number(query?.values?.[1] || 100);
                 if (
                     workflowStateRow
@@ -121,7 +127,7 @@ function createPrismaWithWorkflowState(rowOverrides: Record<string, unknown> = {
                 && sql.includes("document_status = 'review'")
                 && sql.includes('review_window_expired_at IS NULL')
             ) {
-                const now = new Date(query?.values?.[0] || new Date());
+                const now = parseSqlTimestampValue(query?.values?.[0]) || new Date();
                 const limit = Number(query?.values?.[1] || 100);
                 if (
                     workflowStateRow
@@ -151,14 +157,16 @@ function createPrismaWithWorkflowState(rowOverrides: Record<string, unknown> = {
             }
             if (sql.includes('UPDATE draft_workflow_state')) {
                 if (sql.includes('review_window_expired_at =') && sql.includes("transition_mode = 'review_window_elapsed'")) {
-                    const draftPostId = Number(values[2]);
+                    const draftPostId = Number(values.find((value: unknown) =>
+                        Number(value) === Number(workflowStateRow?.draftPostId)));
                     if (!workflowStateRow || workflowStateRow.draftPostId !== draftPostId) return 0;
                     if (workflowStateRow.documentStatus !== 'review') return 0;
                     workflowStateRow = {
                         ...workflowStateRow,
-                        reviewWindowExpiredAt: values[0],
+                        reviewWindowExpiredAt: parseSqlTimestampValue(values[0]),
                         transitionMode: 'review_window_elapsed',
-                        lastTransitionAt: values[1],
+                        lastTransitionAt: parseSqlTimestampValue(values[1]),
+                        updatedAt: parseSqlTimestampValue(values[2]),
                     };
                     return 1;
                 }
@@ -215,17 +223,17 @@ function createPrismaWithWorkflowState(rowOverrides: Record<string, unknown> = {
                         ...workflowStateRow,
                         documentStatus: 'drafting',
                         currentRound: Number(workflowStateRow.currentRound || 1) + 1,
-                        draftingStartedAt: values[0],
-                        draftingEndsAt: values[1],
+                        draftingStartedAt: parseSqlTimestampValue(values[0]),
+                        draftingEndsAt: parseSqlTimestampValue(values[1]),
                         reviewStartedAt: null,
                         reviewEndsAt: null,
                         reviewWindowExpiredAt: null,
                         crystallizationPolicyProfileDigest: values[5],
                         crystallizationAnchorSignature: values[6],
                         transitionMode: 'manual_extend',
-                        lastTransitionAt: values[7],
+                        lastTransitionAt: parseSqlTimestampValue(values[7]),
                         lastTransitionBy: values[8],
-                        updatedAt: values[7],
+                        updatedAt: parseSqlTimestampValue(values[9]),
                     };
                     return 1;
                 }
@@ -247,9 +255,9 @@ function createPrismaWithWorkflowState(rowOverrides: Record<string, unknown> = {
                         crystallizationPolicyProfileDigest: values[3],
                         crystallizationAnchorSignature: values[4],
                         transitionMode: 'archived',
-                        lastTransitionAt: values[5],
+                        lastTransitionAt: parseSqlTimestampValue(values[5]),
                         lastTransitionBy: values[6],
-                        updatedAt: values[5],
+                        updatedAt: parseSqlTimestampValue(values[7]),
                     };
                     return 1;
                 }
@@ -259,9 +267,9 @@ function createPrismaWithWorkflowState(rowOverrides: Record<string, unknown> = {
                         ...workflowStateRow,
                         documentStatus: 'crystallized',
                         transitionMode: 'crystallization_succeeded',
-                        lastTransitionAt: values[0],
+                        lastTransitionAt: parseSqlTimestampValue(values[0]),
                         lastTransitionBy: values[1],
-                        updatedAt: values[0],
+                        updatedAt: parseSqlTimestampValue(values[2]),
                     };
                     return 1;
                 }
@@ -271,9 +279,9 @@ function createPrismaWithWorkflowState(rowOverrides: Record<string, unknown> = {
                         ...workflowStateRow,
                         documentStatus: 'crystallization_failed',
                         transitionMode: 'crystallization_failed',
-                        lastTransitionAt: values[0],
+                        lastTransitionAt: parseSqlTimestampValue(values[0]),
                         lastTransitionBy: values[1],
-                        updatedAt: values[0],
+                        updatedAt: parseSqlTimestampValue(values[2]),
                     };
                     return 1;
                 }
@@ -282,15 +290,15 @@ function createPrismaWithWorkflowState(rowOverrides: Record<string, unknown> = {
                     workflowStateRow = {
                         ...workflowStateRow,
                         documentStatus: 'review',
-                        reviewStartedAt: values[0],
-                        reviewEndsAt: values[1],
-                        reviewWindowExpiredAt: values[2],
+                        reviewStartedAt: parseSqlTimestampValue(values[0]),
+                        reviewEndsAt: parseSqlTimestampValue(values[1]),
+                        reviewWindowExpiredAt: parseSqlTimestampValue(values[2]),
                         crystallizationPolicyProfileDigest: values[3],
                         crystallizationAnchorSignature: values[4],
                         transitionMode: 'rollback_to_review',
-                        lastTransitionAt: values[5],
+                        lastTransitionAt: parseSqlTimestampValue(values[5]),
                         lastTransitionBy: values[6],
-                        updatedAt: values[5],
+                        updatedAt: parseSqlTimestampValue(values[7]),
                     };
                     return 1;
                 }
@@ -308,9 +316,9 @@ function createPrismaWithWorkflowState(rowOverrides: Record<string, unknown> = {
                         crystallizationPolicyProfileDigest: values[1],
                         crystallizationAnchorSignature: values[2],
                         transitionMode: 'enter_crystallization',
-                        lastTransitionAt: values[3],
+                        lastTransitionAt: parseSqlTimestampValue(values[3]),
                         lastTransitionBy: values[4],
-                        updatedAt: values[3],
+                        updatedAt: parseSqlTimestampValue(values[5]),
                     };
                     return 1;
                 }
@@ -320,13 +328,13 @@ function createPrismaWithWorkflowState(rowOverrides: Record<string, unknown> = {
                         ...workflowStateRow,
                         documentStatus: 'review',
                         currentSnapshotVersion: values[0],
-                        reviewStartedAt: values[1],
-                        reviewEndsAt: values[2],
-                        reviewWindowExpiredAt: values[3],
+                        reviewStartedAt: parseSqlTimestampValue(values[1]),
+                        reviewEndsAt: parseSqlTimestampValue(values[2]),
+                        reviewWindowExpiredAt: parseSqlTimestampValue(values[3]),
                         transitionMode: values[4],
-                        lastTransitionAt: values[5],
+                        lastTransitionAt: parseSqlTimestampValue(values[5]),
                         lastTransitionBy: values[6],
-                        updatedAt: values[5],
+                        updatedAt: parseSqlTimestampValue(values[7]),
                     };
                     return 1;
                 }

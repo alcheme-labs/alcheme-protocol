@@ -102,7 +102,7 @@ describe('knowledge version diff route', () => {
                 knowledgeId: 'K-1',
                 fromVersion: 1,
                 toVersion: 3,
-                summary: '当前只能比较版本事件元数据；历史正文快照尚未入库。',
+                summary: 'Only version-event metadata can be compared for now; historical body snapshots are not stored yet.',
             },
         });
     });

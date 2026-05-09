@@ -50,6 +50,9 @@ describe('GraphQL memberProfile follow state fields', () => {
             follow: {
                 findFirst: jest.fn<() => Promise<any>>().mockResolvedValue({ followerId: 88 }),
             },
+            crystalEntitlement: {
+                count: jest.fn<() => Promise<number>>().mockResolvedValue(0),
+            },
         } as any;
 
         const result = await (resolvers as any).Query.memberProfile(
@@ -110,6 +113,9 @@ describe('GraphQL memberProfile follow state fields', () => {
             },
             follow: {
                 findFirst: followFindFirst,
+            },
+            crystalEntitlement: {
+                count: jest.fn<() => Promise<number>>().mockResolvedValue(0),
             },
         } as any;
 

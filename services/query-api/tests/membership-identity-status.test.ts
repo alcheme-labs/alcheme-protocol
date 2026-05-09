@@ -55,7 +55,7 @@ describe('membership identity status route', () => {
             authenticated: false,
             circleId: 7,
             currentLevel: 'Visitor',
-            nextLevel: 'Initiate',
+            nextLevel: null,
             messagingMode: 'dust_only',
         });
         expect(next).not.toHaveBeenCalled();
@@ -99,7 +99,7 @@ describe('membership identity status route', () => {
             authenticated: true,
             circleId: 7,
             currentLevel: 'Visitor',
-            nextLevel: 'Initiate',
+            nextLevel: null,
             messagingMode: 'dust_only',
             progress: {
                 messageCount: 3,

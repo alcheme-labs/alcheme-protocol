@@ -92,6 +92,10 @@ export async function createApp(options: CreateAppOptions = {}): Promise<QueryAp
             res.setHeader('X-Alcheme-Read-Commitment', status.readCommitment);
             res.setHeader('X-Alcheme-Indexed-Slot', String(status.indexedSlot));
             res.setHeader('X-Alcheme-Consistency-Stale', status.stale ? '1' : '0');
+            if (status.settlement) {
+                res.setHeader('X-Alcheme-Settlement-Adapter', status.settlement.adapterId);
+                res.setHeader('X-Alcheme-Settlement-Chain-Family', status.settlement.chainFamily);
+            }
         } catch (error) {
             console.warn('Failed to attach consistency headers:', error);
         }

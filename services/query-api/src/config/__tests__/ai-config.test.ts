@@ -58,6 +58,7 @@ describe('ai config', () => {
         expect(config).toEqual({
             scoring: 'score-model',
             ghostDraft: 'draft-model',
+            discussionInitialDraft: 'draft-model',
             discussionSummary: 'summary-model',
             discussionTrigger: 'trigger-model',
             embedding: 'embed-model',

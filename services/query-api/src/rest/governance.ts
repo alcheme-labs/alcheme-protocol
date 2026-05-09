@@ -4,6 +4,12 @@ import type { PrismaClient } from '@prisma/client';
 import type { Redis } from 'ioredis';
 import { normalizeGovernanceActionType } from '../services/governance/actionTypes';
 import {
+    buildGovernanceAuditAnchorPackage,
+    buildGovernanceAuditDigestSet,
+    type GovernanceAuditDigestSet,
+    type GovernanceAuditAnchorPackage,
+} from '../services/governance/auditAnchor';
+import {
     createPrismaGovernanceEngineStore,
     recordExecutionReceipt,
 } from '../services/governance/policyEngine';
@@ -200,6 +206,90 @@ export function governanceRouter(prisma: PrismaClient, _redis: Redis): Router {
         } catch (error) {
             res.status(400).json({
                 error: error instanceof Error ? error.message : 'governance_execution_receipt_record_failed',
+            });
+        }
+    });
+
+    router.get('/requests/:requestId/audit', async (req, res) => {
+        try {
+            const requestId = asRequiredString(req.params.requestId);
+            if (!requestId) {
+                res.status(400).json({ error: 'invalid_governance_request_id' });
+                return;
+            }
+            const request = await prisma.governanceRequest.findUnique({
+                where: { id: requestId },
+                include: {
+                    policyVersionRecord: {
+                        select: {
+                            configDigest: true,
+                        },
+                    },
+                    snapshot: true,
+                    signals: {
+                        orderBy: { createdAt: 'asc' },
+                    },
+                    decision: true,
+                    receipts: {
+                        orderBy: { executedAt: 'asc' },
+                    },
+                },
+            }) as unknown as (null | {
+                id: string;
+                policyId: string;
+                policyVersionId: string;
+                policyVersion: number;
+                ruleId: string;
+                scopeType: string;
+                scopeRef: string;
+                actionType: string;
+                targetType: string;
+                targetRef: string;
+                payload: Record<string, unknown>;
+                idempotencyKey: string;
+                proposerPubkey: string;
+                state: string;
+                openedAt: Date;
+                expiresAt: Date | null;
+                policyVersionRecord?: { configDigest?: string | null } | null;
+                snapshot?: { sourceDigest?: string | null } | null;
+                signals?: Array<any>;
+                decision?: { decisionDigest?: string | null } | null;
+                receipts?: Array<any>;
+            });
+            if (!request) {
+                res.status(404).json({ error: 'governance_request_not_found' });
+                return;
+            }
+
+            const digestSet: GovernanceAuditDigestSet = buildGovernanceAuditDigestSet({
+                request,
+                snapshot: request.snapshot ?? null,
+                signals: request.signals ?? [],
+                decision: request.decision ?? null,
+                receipts: request.receipts ?? [],
+            });
+            const anchorPackage: GovernanceAuditAnchorPackage = buildGovernanceAuditAnchorPackage({
+                request,
+                digestSet,
+            });
+
+            res.json({
+                audit: {
+                    requestId,
+                    digestSet,
+                    anchorPayload: anchorPackage.anchorPayload,
+                    memoText: anchorPackage.memoText,
+                    settlement: {
+                        adapterId: 'solana-l1',
+                        chainFamily: 'svm',
+                        submissionStatus: 'not_submitted',
+                    },
+                },
+            });
+        } catch (error) {
+            res.status(400).json({
+                error: error instanceof Error ? error.message : 'governance_audit_lookup_failed',
             });
         }
     });

@@ -2,6 +2,8 @@ import os from 'os';
 import type { PrismaClient } from '@prisma/client';
 import { DISCUSSION_STREAM_KEY } from './offchainDiscussion';
 import { parseOffchainPeerUrls } from './offchainPeerSync';
+import { buildSolanaSettlementCheckpoint } from './settlement/solanaAdapter';
+import type { SettlementCheckpoint } from './settlement/types';
 import { getConfiguredCollabStorageInfo } from '../collab/persistence';
 
 export interface ConsistencyCheckpoint {
@@ -34,6 +36,7 @@ export interface ConsistencyStatus {
         lastError: string | null;
         stale: boolean;
     }>;
+    settlement: SettlementCheckpoint;
     collab: {
         transportMode: 'builtin' | 'external';
         storagePolicy: 'trusted_private' | 'ephemeral_public' | 'external_service';
@@ -365,6 +368,16 @@ export async function loadConsistencyStatus(prisma: PrismaClient): Promise<Consi
         ? true
         : (checkpointStale || lagStale || (offchainRequired && ((offchain?.stale ?? true) || peerSyncStale)));
 
+    const generatedAt = new Date().toISOString();
+    const settlement = buildSolanaSettlementCheckpoint({
+        readCommitment,
+        indexedSlot,
+        headSlot,
+        slotLag,
+        stale: finalStale,
+        generatedAt,
+    });
+
     return {
         indexerId,
         readCommitment,
@@ -372,10 +385,11 @@ export async function loadConsistencyStatus(prisma: PrismaClient): Promise<Consi
         headSlot,
         slotLag,
         stale: finalStale,
-        generatedAt: new Date().toISOString(),
+        generatedAt,
         checkpoints,
         offchain,
         offchainPeers,
+        settlement,
         collab: {
             transportMode: collabTransportMode,
             storagePolicy: collabStorage.storagePolicy,

@@ -176,17 +176,17 @@ describe('GraphQL memberProfile resolver', () => {
         expect(result.recentActivity).toEqual([
             {
                 type: 'post',
-                text: '发布了一条动态',
+                text: 'Published an update',
                 createdAt: new Date('2026-02-27T12:00:00.000Z'),
             },
             {
                 type: 'crystal',
-                text: '结晶了一枚知识',
+                text: 'Crystallized knowledge',
                 createdAt: new Date('2026-02-27T11:00:00.000Z'),
             },
             {
                 type: 'draft',
-                text: '更新了一份草稿',
+                text: 'Updated a draft',
                 createdAt: new Date('2026-02-27T10:00:00.000Z'),
             },
         ]);

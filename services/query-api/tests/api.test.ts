@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals';
+import request from 'supertest';
 
 import { createApp, type QueryApiAppContext } from '../src/app';
 
@@ -73,6 +74,25 @@ describe('Query API - app baseline smoke', () => {
             checkpoints: [],
             offchain: null,
             offchainPeers: [],
+            settlement: {
+                adapterId: 'solana-l1',
+                chainFamily: 'svm',
+                settlementLayer: 'solana-l1',
+                chainId: 'localnet',
+                readCommitment: 'confirmed',
+                indexedSlot: '123',
+                headSlot: '123',
+                slotLag: 0,
+                finality: {
+                    status: 'indexed',
+                    commitment: 'confirmed',
+                    indexed: true,
+                    final: false,
+                },
+                stale: false,
+                generatedAt: new Date('2026-03-25T00:00:00.000Z').toISOString(),
+                source: 'sync_checkpoint_plus_runtime_state',
+            },
             alerts: {
                 indexerLagWarning: false,
                 indexerLagCritical: false,
@@ -100,6 +120,24 @@ describe('Query API - app baseline smoke', () => {
 
         expect(routePaths).toContain('/health');
         expect(routePaths).toContain('/sync/status');
+    });
+
+    test('/sync/status exposes settlement checkpoint without breaking consistency headers', async () => {
+        const response = await request(appContext.app)
+            .get('/sync/status')
+            .expect(200);
+
+        expect(response.body.settlement).toMatchObject({
+            adapterId: 'solana-l1',
+            chainFamily: 'svm',
+            settlementLayer: 'solana-l1',
+            indexedSlot: '123',
+            source: 'sync_checkpoint_plus_runtime_state',
+        });
+        expect(response.headers['x-alcheme-indexed-slot']).toBe('123');
+        expect(response.headers['x-alcheme-read-commitment']).toBe('confirmed');
+        expect(response.headers['x-alcheme-settlement-adapter']).toBe('solana-l1');
+        expect(response.headers['x-alcheme-settlement-chain-family']).toBe('svm');
     });
 
     test('createApp mounts the REST router and GraphQL middleware', () => {

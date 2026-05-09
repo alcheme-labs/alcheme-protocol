@@ -166,7 +166,7 @@ describe('Knowledge.versionTimeline resolver', () => {
                 hasContentSnapshot: true,
                 title: 'Latest crystal title',
             },
-            summary: '当前只能比较版本事件元数据；历史正文快照尚未入库。',
+            summary: 'Only version-event metadata can be compared for now; historical body snapshots are not stored yet.',
         });
         expect(result.fieldChanges).toEqual(expect.arrayContaining([
             expect.objectContaining({

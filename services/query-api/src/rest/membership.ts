@@ -408,8 +408,9 @@ export function membershipRouter(prisma: PrismaClient, redis: Redis): Router {
                 return res.status(400).json({ error: 'invalid_circle_id' });
             }
             const locale = resolveRequestLocale({
-                requestedLocale: (req.query.locale as string | string[] | undefined) ?? req.header('x-alcheme-locale'),
-                acceptLanguage: req.headers['accept-language'],
+                requestedLocale: (req.query?.locale as string | string[] | undefined)
+                    ?? (typeof req.header === 'function' ? req.header('x-alcheme-locale') : undefined),
+                acceptLanguage: req.headers?.['accept-language'],
             });
 
             const circle = await prisma.circle.findUnique({
