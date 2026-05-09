@@ -2,11 +2,8 @@ import { strict as assert } from "node:assert";
 import fs from "fs";
 import path from "path";
 import { describe, it } from "@jest/globals";
-import { fileURLToPath } from "url";
 
-const THIS_FILE = fileURLToPath(import.meta.url);
-const THIS_DIR = path.dirname(THIS_FILE);
-const ROOT = path.resolve(THIS_DIR, "..");
+const ROOT = path.resolve(__dirname, "..");
 const CONTENT_MODULE = fs.readFileSync(path.join(ROOT, "src/modules/content.ts"), "utf8");
 const CONTENT_IDL = fs.readFileSync(path.join(ROOT, "src/idl/content_manager.json"), "utf8");
 

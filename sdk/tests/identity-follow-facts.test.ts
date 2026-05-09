@@ -2,11 +2,9 @@ import { strict as assert } from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it } from '@jest/globals';
-import { fileURLToPath } from 'node:url';
 
 describe('Task2 RED: SDK follow fact surface', () => {
-  const filePath = fileURLToPath(import.meta.url);
-  const repoRoot = path.resolve(path.dirname(filePath), '..', '..');
+  const repoRoot = path.resolve(__dirname, '..', '..');
   const identityModulePath = path.join(repoRoot, 'sdk/src/modules/identity.ts');
   const accessModulePath = path.join(repoRoot, 'sdk/src/modules/access.ts');
   const pdaPath = path.join(repoRoot, 'sdk/src/utils/pda.ts');

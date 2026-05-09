@@ -1,12 +1,9 @@
 import { strict as assert } from "node:assert";
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { describe, it } from "@jest/globals";
 
-const THIS_FILE = fileURLToPath(import.meta.url);
-const THIS_DIR = path.dirname(THIS_FILE);
-const ROOT = path.resolve(THIS_DIR, "..");
+const ROOT = path.resolve(__dirname, "..");
 
 function read(relativePath: string): string {
   return fs.readFileSync(path.join(ROOT, relativePath), "utf8");

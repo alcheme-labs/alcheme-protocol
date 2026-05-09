@@ -15,7 +15,10 @@ const CIRCLES_PROGRAM = new PublicKey("4sisPMeR1uY1wd6XKazN9VsXpXB764WeYYh14EDsu
 
 function buildUpdateContentAnchorV2Mock(
   options: { signature?: string; error?: Error },
-  calls: Record<string, unknown[]>
+  calls: {
+    updateContentAnchorV2: unknown[][];
+    updateContentAnchorV2Accounts: unknown[];
+  }
 ) {
   return (...args: unknown[]) => {
     calls.updateContentAnchorV2.push(args);
@@ -36,7 +39,10 @@ function buildUpdateContentAnchorV2Mock(
 }
 
 function buildFakeModule(config: { signature?: string; error?: Error }) {
-  const calls: Record<string, unknown[]> = {
+  const calls: {
+    updateContentAnchorV2: unknown[][];
+    updateContentAnchorV2Accounts: unknown[];
+  } = {
     updateContentAnchorV2: [],
     updateContentAnchorV2Accounts: [],
   };

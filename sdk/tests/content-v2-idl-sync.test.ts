@@ -1,7 +1,6 @@
 import { strict as assert } from "node:assert";
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { describe, it } from "@jest/globals";
 
 type IdlInstruction = {
@@ -14,8 +13,7 @@ type IdlLike = {
 };
 
 function readIdl(relativePath: string): IdlLike {
-  const here = path.dirname(fileURLToPath(import.meta.url));
-  const root = path.resolve(here, "..", "..");
+  const root = path.resolve(__dirname, "..", "..");
   return JSON.parse(fs.readFileSync(path.join(root, relativePath), "utf8")) as IdlLike;
 }
 
