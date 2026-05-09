@@ -26,16 +26,32 @@ export interface CommunicationSessionBootstrapPayload {
   nonce: string;
 }
 
-export interface CommunicationMessageSigningPayload {
-  v: 1;
-  roomKey: string;
-  senderPubkey: string;
-  messageKind: "plain";
-  text: string;
-  clientTimestamp: string;
-  nonce: string;
-  prevEnvelopeId: string | null;
-}
+export type CommunicationMessageKind = "plain" | "voice_clip";
+
+export type CommunicationMessageSigningPayload =
+  | {
+      v: 1;
+      roomKey: string;
+      senderPubkey: string;
+      messageKind: "plain";
+      text: string;
+      clientTimestamp: string;
+      nonce: string;
+      prevEnvelopeId: string | null;
+    }
+  | {
+      v: 1;
+      roomKey: string;
+      senderPubkey: string;
+      messageKind: "voice_clip";
+      text: string | null;
+      storageUri: string;
+      durationMs: number;
+      fileSizeBytes: number;
+      clientTimestamp: string;
+      nonce: string;
+      prevEnvelopeId: string | null;
+    };
 
 interface CommunicationSessionRow {
   sessionId: string;
@@ -71,11 +87,36 @@ interface CommunicationMessageRow {
   updatedAt: Date;
 }
 
+type NormalizedMessage =
+  | {
+      messageKind: "plain";
+      text: string;
+      storageUri: null;
+      durationMs: null;
+      fileSizeBytes: null;
+      metadata: Record<string, unknown> | null;
+    }
+  | {
+      messageKind: "voice_clip";
+      text: string | null;
+      storageUri: string;
+      durationMs: number;
+      fileSizeBytes: number;
+      metadata: Record<string, unknown> | null;
+    };
+
+type NormalizedMessageResult =
+  | { ok: true; message: NormalizedMessage }
+  | { ok: false; status: number; error: string };
+
 const DEFAULT_SESSION_TTL_SEC = 60 * 60;
 const MAX_SESSION_TTL_SEC = 24 * 60 * 60;
 const MAX_MESSAGE_LIMIT = 200;
 const DEFAULT_MESSAGE_LIMIT = 80;
 const MAX_TEXT_LENGTH = 4_000;
+const DEFAULT_MAX_VOICE_CLIP_DURATION_MS = 5 * 60 * 1000;
+const DEFAULT_MAX_VOICE_CLIP_BYTES = 25 * 1024 * 1024;
+const MAX_STORAGE_URI_LENGTH = 2_048;
 
 export function buildCommunicationSessionBootstrapMessage(
   payload: CommunicationSessionBootstrapPayload,
@@ -434,12 +475,15 @@ export function communicationRouter(
         return sendSessionError(res, sessionAuth);
       }
 
-      const text = normalizeMessageText(req.body?.text);
-      if (!text) {
-        return res.status(400).json({ error: "missing_message_text" });
+      const messageKind = parseMessageKind(req.body?.messageKind);
+      if (!messageKind) {
+        return res.status(400).json({ error: "unsupported_message_kind" });
       }
-      if (text.length > MAX_TEXT_LENGTH) {
-        return res.status(413).json({ error: "message_too_large" });
+      const normalizedMessage = normalizeIncomingMessage(req.body, messageKind);
+      if (!normalizedMessage.ok) {
+        return res
+          .status(normalizedMessage.status)
+          .json({ error: normalizedMessage.error });
       }
 
       const senderPubkey =
@@ -471,16 +515,14 @@ export function communicationRouter(
       const clientTimestampIso = clientTimestamp.toISOString();
       const nonce = stringOrUndefined(req.body?.nonce) ?? randomNonce();
       const prevEnvelopeId = stringOrNull(req.body?.prevEnvelopeId);
-      const payload: CommunicationMessageSigningPayload = {
-        v: 1,
+      const payload = buildMessageSigningPayload({
         roomKey,
         senderPubkey,
-        messageKind: "plain",
-        text,
-        clientTimestamp: clientTimestampIso,
+        message: normalizedMessage.message,
+        clientTimestampIso,
         nonce,
         prevEnvelopeId,
-      };
+      });
       const canonicalSignedMessage =
         buildCommunicationMessageSigningMessage(payload);
       const signedMessage =
@@ -501,13 +543,15 @@ export function communicationRouter(
 
       const senderHandle =
         stringOrUndefined(req.body?.senderHandle)?.slice(0, 32) ?? null;
-      const metadata = plainObjectOrNull(req.body?.metadata);
+      const metadata = normalizedMessage.message.metadata;
       const payloadHash = computeCommunicationPayloadHash({
         roomKey,
         senderPubkey,
-        messageKind: "plain",
-        text,
+        messageKind: normalizedMessage.message.messageKind,
+        text: normalizedMessage.message.text,
         metadata,
+        storageUri: normalizedMessage.message.storageUri,
+        durationMs: normalizedMessage.message.durationMs,
       });
       const envelopeId = computeCommunicationEnvelopeId({
         roomKey,
@@ -525,9 +569,11 @@ export function communicationRouter(
           roomKey,
           senderPubkey,
           senderHandle,
-          messageKind: "plain",
-          payloadText: text,
+          messageKind: normalizedMessage.message.messageKind,
+          payloadText: normalizedMessage.message.text,
           payloadHash,
+          storageUri: normalizedMessage.message.storageUri,
+          durationMs: normalizedMessage.message.durationMs,
           metadata: jsonObjectOrUndefined(metadata),
           signature,
           signedMessage,
@@ -972,6 +1018,195 @@ function jsonObjectOrUndefined(
 function normalizeMessageText(value: unknown): string {
   if (typeof value !== "string") return "";
   return value.replace(/\r\n/g, "\n").trim();
+}
+
+function parseMessageKind(value: unknown): CommunicationMessageKind | null {
+  const normalized =
+    typeof value === "string" ? value.trim().toLowerCase() : "plain";
+  if (!normalized || normalized === "plain") return "plain";
+  if (normalized === "voice_clip") return "voice_clip";
+  return null;
+}
+
+function normalizeIncomingMessage(
+  body: unknown,
+  messageKind: CommunicationMessageKind,
+): NormalizedMessageResult {
+  const record = body && typeof body === "object" ? (body as any) : {};
+  if (messageKind === "plain") {
+    const text = normalizeMessageText(record.text);
+    if (!text) return { ok: false, status: 400, error: "missing_message_text" };
+    if (text.length > MAX_TEXT_LENGTH) {
+      return { ok: false, status: 413, error: "message_too_large" };
+    }
+    return {
+      ok: true,
+      message: {
+        messageKind,
+        text,
+        storageUri: null,
+        durationMs: null,
+        fileSizeBytes: null,
+        metadata: plainObjectOrNull(record.metadata),
+      },
+    };
+  }
+
+  const limits = getVoiceClipLimits();
+  const storageUri = stringOrUndefined(record.storageUri);
+  if (!storageUri) {
+    return { ok: false, status: 400, error: "missing_storage_uri" };
+  }
+  const storageUriDecision = validateVoiceClipStorageUri(storageUri);
+  if (storageUriDecision) return storageUriDecision;
+
+  if (
+    stringOrUndefined(record.voiceSessionId) ||
+    stringOrUndefined(record.providerRoomId)
+  ) {
+    return {
+      ok: false,
+      status: 400,
+      error: "voice_clip_realtime_source_forbidden",
+    };
+  }
+
+  const durationMs = optionalPositiveInt(record.durationMs);
+  if (!durationMs) {
+    return { ok: false, status: 400, error: "missing_duration_ms" };
+  }
+  if (durationMs > limits.maxDurationMs) {
+    return { ok: false, status: 413, error: "voice_clip_duration_too_large" };
+  }
+
+  const fileSizeBytes = optionalPositiveInt(record.fileSizeBytes);
+  if (fileSizeBytes === null) {
+    return { ok: false, status: 400, error: "missing_file_size_bytes" };
+  }
+  if (fileSizeBytes > limits.maxFileSizeBytes) {
+    return { ok: false, status: 413, error: "voice_clip_file_too_large" };
+  }
+
+  const text = normalizeMessageText(record.payloadText ?? record.text);
+  if (text.length > MAX_TEXT_LENGTH) {
+    return { ok: false, status: 413, error: "message_too_large" };
+  }
+
+  return {
+    ok: true,
+    message: {
+      messageKind,
+      text: text || null,
+      storageUri,
+      durationMs,
+      fileSizeBytes,
+      metadata: mergeVoiceClipMetadata(
+        plainObjectOrNull(record.metadata),
+        fileSizeBytes,
+      ),
+    },
+  };
+}
+
+function buildMessageSigningPayload(input: {
+  roomKey: string;
+  senderPubkey: string;
+  message: NormalizedMessage;
+  clientTimestampIso: string;
+  nonce: string;
+  prevEnvelopeId: string | null;
+}): CommunicationMessageSigningPayload {
+  if (input.message.messageKind === "plain") {
+    return {
+      v: 1,
+      roomKey: input.roomKey,
+      senderPubkey: input.senderPubkey,
+      messageKind: "plain",
+      text: input.message.text,
+      clientTimestamp: input.clientTimestampIso,
+      nonce: input.nonce,
+      prevEnvelopeId: input.prevEnvelopeId,
+    };
+  }
+
+  return {
+    v: 1,
+    roomKey: input.roomKey,
+    senderPubkey: input.senderPubkey,
+    messageKind: "voice_clip",
+    text: input.message.text,
+    storageUri: input.message.storageUri,
+    durationMs: input.message.durationMs,
+    fileSizeBytes: input.message.fileSizeBytes,
+    clientTimestamp: input.clientTimestampIso,
+    nonce: input.nonce,
+    prevEnvelopeId: input.prevEnvelopeId,
+  };
+}
+
+function validateVoiceClipStorageUri(
+  storageUri: string,
+): { ok: false; status: number; error: string } | null {
+  if (storageUri.length > MAX_STORAGE_URI_LENGTH) {
+    return { ok: false, status: 413, error: "storage_uri_too_large" };
+  }
+  if (/^(livekit|webrtc|voice-session):\/\//i.test(storageUri)) {
+    return {
+      ok: false,
+      status: 400,
+      error: "voice_clip_realtime_source_forbidden",
+    };
+  }
+  try {
+    const parsed = new URL(storageUri);
+    if (!["https:", "ipfs:", "ar:", "s3:"].includes(parsed.protocol)) {
+      return { ok: false, status: 400, error: "unsupported_storage_uri" };
+    }
+  } catch {
+    return { ok: false, status: 400, error: "invalid_storage_uri" };
+  }
+  return null;
+}
+
+function mergeVoiceClipMetadata(
+  metadata: Record<string, unknown> | null,
+  fileSizeBytes: number,
+): Record<string, unknown> | null {
+  return {
+    ...(metadata ?? {}),
+    voiceClip: {
+      ...(plainObjectOrNull(metadata?.voiceClip) ?? {}),
+      fileSizeBytes,
+    },
+  };
+}
+
+function getVoiceClipLimits(): {
+  maxDurationMs: number;
+  maxFileSizeBytes: number;
+} {
+  return {
+    maxDurationMs: parseBoundedEnvInt(
+      "COMMUNICATION_VOICE_CLIP_MAX_DURATION_MS",
+      DEFAULT_MAX_VOICE_CLIP_DURATION_MS,
+      { min: 1_000, max: 30 * 60 * 1000 },
+    ),
+    maxFileSizeBytes: parseBoundedEnvInt(
+      "COMMUNICATION_VOICE_CLIP_MAX_BYTES",
+      DEFAULT_MAX_VOICE_CLIP_BYTES,
+      { min: 1_024, max: 250 * 1024 * 1024 },
+    ),
+  };
+}
+
+function parseBoundedEnvInt(
+  key: string,
+  fallback: number,
+  input: { min: number; max: number },
+): number {
+  const parsed = optionalPositiveInt(process.env[key]);
+  if (!parsed) return fallback;
+  return Math.max(input.min, Math.min(parsed, input.max));
 }
 
 function randomNonce(): string {

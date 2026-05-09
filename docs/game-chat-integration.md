@@ -11,6 +11,7 @@ Implemented:
 - Resolve communication rooms for circles, direct rooms, and external game rooms.
 - Create wallet-signed communication sessions.
 - Send, list, and stream signed text messages.
+- Send voice clip messages by referencing externally stored audio.
 - Create voice sessions and issue provider join tokens.
 - Use LiveKit through a provider adapter when voice is enabled.
 - Keep temporary rooms off chain.
@@ -18,7 +19,6 @@ Implemented:
 Not implemented in this slice:
 
 - React UI kit.
-- Voice clips.
 - Transcription, recap, or knowledge capture.
 - Auto draft creation from game chat or voice.
 - Auto crystallization from game chat or voice.
@@ -76,6 +76,8 @@ LIVEKIT_API_KEY=...
 LIVEKIT_API_SECRET=...
 VOICE_DEFAULT_TTL_SEC=7200
 VOICE_TOKEN_TTL_SEC=900
+COMMUNICATION_VOICE_CLIP_MAX_DURATION_MS=300000
+COMMUNICATION_VOICE_CLIP_MAX_BYTES=26214400
 ```
 
 `VOICE_PUBLIC_URL` is public. `LIVEKIT_API_KEY` and `LIVEKIT_API_SECRET` must stay
@@ -251,7 +253,37 @@ Content-Type: application/json
 Messages are stored as signed envelopes with payload hashes. They do not create
 Plaza discussion posts, drafts, crystals, or on-chain writes.
 
-### 5. List Or Stream Text
+### 5. Send Voice Clip
+
+Voice clips are chat messages that reference already-stored audio. They are not
+recorded from an active room call and must not use LiveKit/WebRTC session URIs.
+
+```http
+POST /api/v1/communication/rooms/:roomKey/messages
+Authorization: Bearer <communicationAccessToken>
+Content-Type: application/json
+```
+
+```json
+{
+  "senderPubkey": "<player wallet>",
+  "messageKind": "voice_clip",
+  "storageUri": "https://cdn.example.test/clips/clip-1.webm",
+  "durationMs": 4200,
+  "fileSizeBytes": 8192,
+  "payloadText": "optional fallback caption",
+  "clientTimestamp": "<iso timestamp>",
+  "nonce": "<nonce>",
+  "signedMessage": "<voice clip signing payload>"
+}
+```
+
+`storageUri` supports stable external storage such as HTTPS, IPFS, Arweave, or S3
+URIs. Query-api stores `storageUri`, `durationMs`, optional `payloadText`, and a
+payload hash; it does not store raw audio bytes. `fileSizeBytes` is required so
+query-api can enforce `COMMUNICATION_VOICE_CLIP_MAX_BYTES`.
+
+### 6. List Or Stream Messages
 
 ```http
 GET /api/v1/communication/rooms/:roomKey/messages?afterLamport=0
@@ -265,7 +297,7 @@ Authorization: Bearer <communicationAccessToken>
 
 The stream route emits server-sent events for room messages.
 
-### 6. Join Voice
+### 7. Join Voice
 
 Create or reuse a voice session:
 
@@ -320,6 +352,13 @@ const session = await chat.createCommunicationSession({
 
 await chat.sendRoomMessage(room.roomKey, {
   text: "wait, pulling next pack",
+});
+
+await chat.sendRoomVoiceClip(room.roomKey, {
+  storageUri: "https://cdn.example.test/clips/clip-1.webm",
+  durationMs: 4200,
+  fileSizeBytes: 8192,
+  payloadText: "optional fallback caption",
 });
 
 voice.setCommunicationSession(room.roomKey, session.communicationAccessToken);

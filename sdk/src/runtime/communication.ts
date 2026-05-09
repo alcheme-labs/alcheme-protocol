@@ -45,6 +45,19 @@ export interface CommunicationMessageInput {
   sessionToken?: string;
 }
 
+export interface CommunicationVoiceClipInput {
+  storageUri: string;
+  durationMs: number;
+  fileSizeBytes: number;
+  payloadText?: string;
+  senderHandle?: string;
+  metadata?: Record<string, unknown>;
+  clientTimestamp?: string;
+  nonce?: string;
+  prevEnvelopeId?: string | null;
+  sessionToken?: string;
+}
+
 export interface ListRoomMessagesInput {
   afterLamport?: number;
   afterMessageId?: string;
@@ -64,16 +77,30 @@ export interface CommunicationSessionBootstrapPayload {
   nonce: string;
 }
 
-export interface CommunicationMessageSigningPayload {
-  v: 1;
-  roomKey: string;
-  senderPubkey: string;
-  messageKind: "plain";
-  text: string;
-  clientTimestamp: string;
-  nonce: string;
-  prevEnvelopeId: string | null;
-}
+export type CommunicationMessageSigningPayload =
+  | {
+      v: 1;
+      roomKey: string;
+      senderPubkey: string;
+      messageKind: "plain";
+      text: string;
+      clientTimestamp: string;
+      nonce: string;
+      prevEnvelopeId: string | null;
+    }
+  | {
+      v: 1;
+      roomKey: string;
+      senderPubkey: string;
+      messageKind: "voice_clip";
+      text: string | null;
+      storageUri: string;
+      durationMs: number;
+      fileSizeBytes: number;
+      clientTimestamp: string;
+      nonce: string;
+      prevEnvelopeId: string | null;
+    };
 
 export interface RoomMessageSubscription {
   close(): void;
@@ -199,6 +226,60 @@ export class AlchemeGameChatClient {
           senderPubkey: this.wallet.publicKey,
           senderHandle: input.senderHandle,
           text,
+          metadata: input.metadata,
+          clientTimestamp,
+          nonce,
+          prevEnvelopeId: input.prevEnvelopeId ?? null,
+          signedMessage,
+          signature,
+        },
+      },
+    );
+    return response.message;
+  }
+
+  async sendRoomVoiceClip(
+    roomKey: string,
+    input: CommunicationVoiceClipInput,
+  ): Promise<any> {
+    const sessionToken = input.sessionToken ?? this.roomSessions.get(roomKey);
+    const clientTimestamp = input.clientTimestamp ?? new Date().toISOString();
+    const nonce = input.nonce ?? randomNonce();
+    const payloadText = input.payloadText
+      ? input.payloadText.replace(/\r\n/g, "\n").trim()
+      : null;
+    const payload: CommunicationMessageSigningPayload = {
+      v: 1,
+      roomKey,
+      senderPubkey: this.wallet.publicKey,
+      messageKind: "voice_clip",
+      text: payloadText,
+      storageUri: input.storageUri,
+      durationMs: input.durationMs,
+      fileSizeBytes: input.fileSizeBytes,
+      clientTimestamp,
+      nonce,
+      prevEnvelopeId: input.prevEnvelopeId ?? null,
+    };
+    const signedMessage = buildCommunicationMessageSigningMessage(payload);
+    const signature = sessionToken
+      ? undefined
+      : await this.signToBase64(signedMessage);
+    const response = await this.fetchJson<{ message: any }>(
+      `/communication/rooms/${encodeURIComponent(roomKey)}/messages`,
+      {
+        method: "POST",
+        headers: sessionToken
+          ? { Authorization: `Bearer ${sessionToken}` }
+          : undefined,
+        body: {
+          senderPubkey: this.wallet.publicKey,
+          senderHandle: input.senderHandle,
+          messageKind: "voice_clip",
+          storageUri: input.storageUri,
+          durationMs: input.durationMs,
+          fileSizeBytes: input.fileSizeBytes,
+          payloadText,
           metadata: input.metadata,
           clientTimestamp,
           nonce,

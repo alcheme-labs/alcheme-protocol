@@ -35,7 +35,7 @@ Game server:
 1. Ask the game server for an `appRoomClaim`.
 2. Resolve or create the communication room.
 3. Create a wallet-signed communication session.
-4. Send/list/stream text.
+4. Send/list/stream text and optional voice clip messages.
 5. Pass the communication session token to the voice client.
 6. Join voice through an injected provider client.
 

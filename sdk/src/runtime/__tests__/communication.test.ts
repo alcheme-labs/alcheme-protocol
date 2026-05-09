@@ -137,6 +137,70 @@ describe("communication runtime client", () => {
     });
   });
 
+  test("sends voice clip messages through the headless client", async () => {
+    const calls: Array<{ url: string; init: RequestInit }> = [];
+    const fetchImpl = jest.fn(async (url: string, init: RequestInit = {}) => {
+      calls.push({ url, init });
+      return jsonResponse({
+        message: {
+          envelopeId: "clip-1",
+          roomKey: ROOM_KEY,
+          messageKind: "voice_clip",
+          storageUri: "https://cdn.example.test/clips/clip-1.webm",
+          durationMs: 4200,
+          lamport: 1,
+        },
+      });
+    });
+    const wallet: WalletSigner = {
+      publicKey: WALLET,
+      signMessage: jest.fn(async () => new Uint8Array([1, 2, 3])),
+    };
+    const client = createAlchemeGameChatClient({
+      apiBaseUrl: "https://api.example.test/api/v1",
+      wallet,
+      fetch: fetchImpl as any,
+    });
+    client.setCommunicationSession(ROOM_KEY, "session-token");
+
+    await client.sendRoomVoiceClip(ROOM_KEY, {
+      storageUri: "https://cdn.example.test/clips/clip-1.webm",
+      durationMs: 4200,
+      fileSizeBytes: 8192,
+      payloadText: "fallback caption",
+      clientTimestamp: "2026-05-08T12:00:02.000Z",
+      nonce: "clip-1",
+    });
+
+    const body = JSON.parse(String(calls[0].init.body));
+    expect(body).toMatchObject({
+      senderPubkey: WALLET,
+      messageKind: "voice_clip",
+      storageUri: "https://cdn.example.test/clips/clip-1.webm",
+      durationMs: 4200,
+      fileSizeBytes: 8192,
+      payloadText: "fallback caption",
+    });
+    expect(body.signedMessage).toBe(
+      buildCommunicationMessageSigningMessage({
+        v: 1,
+        roomKey: ROOM_KEY,
+        senderPubkey: WALLET,
+        messageKind: "voice_clip",
+        text: "fallback caption",
+        storageUri: "https://cdn.example.test/clips/clip-1.webm",
+        durationMs: 4200,
+        fileSizeBytes: 8192,
+        clientTimestamp: "2026-05-08T12:00:02.000Z",
+        nonce: "clip-1",
+        prevEnvelopeId: null,
+      }),
+    );
+    expect(calls[0].init.headers).toMatchObject({
+      Authorization: "Bearer session-token",
+    });
+  });
+
   test("subscribes to room messages with cursor and bearer token headers", async () => {
     const fetchImpl = jest.fn(async () =>
       sseResponse(

@@ -102,6 +102,14 @@ async function main() {
     senderHandle: "player-1",
   });
 
+  await chat.sendRoomVoiceClip(room.roomKey, {
+    storageUri: "https://cdn.example.test/clips/clip-1.webm",
+    durationMs: 4200,
+    fileSizeBytes: 8192,
+    payloadText: "optional fallback caption",
+    senderHandle: "player-1",
+  });
+
   const recentMessages = await chat.listRoomMessages(room.roomKey, {
     afterLamport: 0,
     limit: 20,
