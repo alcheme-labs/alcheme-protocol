@@ -14,6 +14,8 @@ import { crystalRouter } from "./crystals";
 import { notificationRouter } from "./notifications";
 import { aiRouter } from "./ai";
 import { discussionRouter } from "./discussion";
+import { communicationRouter } from "./communication";
+import { voiceRouter } from "./voice";
 import { authRouter } from "./auth";
 import { membershipRouter } from "./membership";
 import { storageRouter } from "./storage";
@@ -36,9 +38,12 @@ import { discussionAdminRouter } from "./discussionAdmin";
 export function restRouter(prisma: PrismaClient, redis: Redis): Router {
   const router = Router();
   const sidecarRouteMatchers: Array<{
-    route: Extract<NodeApiSurface, "auth_session" | "source_materials" | "seeded" | "discussion_runtime" | "ghost_draft_private">;
+    route: Extract<NodeApiSurface, "auth_session" | "source_materials" | "seeded" | "discussion_runtime" | "ghost_draft_private" | "communication_sidecar" | "voice_provider_webhook">;
     pattern: RegExp;
   }> = [
+    { route: "communication_sidecar", pattern: /^\/communication\/rooms\/[^/]+\/end(?:\/|$)/ },
+    { route: "communication_sidecar", pattern: /^\/communication\/messages\/[^/]+(?:\/|$)/ },
+    { route: "voice_provider_webhook", pattern: /^\/voice\/providers(?:\/|$)/ },
     { route: "auth_session", pattern: /^\/auth\/session(?:\/|$)/ },
     { route: "ghost_draft_private", pattern: /^\/ai\/ghost-drafts(?:\/|$)/ },
     { route: "discussion_runtime", pattern: /^\/discussion\/drafts(?:\/|$)/ },
@@ -80,6 +85,8 @@ export function restRouter(prisma: PrismaClient, redis: Redis): Router {
   router.use("/ai", aiRouter(prisma, redis));
   router.use("/ai-jobs", aiJobsRouter(prisma, redis));
   router.use("/discussion", discussionRouter(prisma, redis));
+  router.use("/communication", communicationRouter(prisma, redis));
+  router.use("/voice", voiceRouter(prisma, redis));
   router.use("/discussion/admin", discussionAdminRouter(prisma, redis));
   router.use("/storage", storageRouter(prisma, redis));
   router.use("/extensions", extensionRouter(prisma, redis));

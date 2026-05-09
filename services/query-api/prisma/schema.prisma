@@ -815,6 +815,159 @@ model DiscussionSession {
   @@map("discussion_sessions")
 }
 
+model ExternalApp {
+  id              String   @id @map("id") @db.VarChar(64)
+  name            String   @db.VarChar(128)
+  ownerPubkey     String   @map("owner_pubkey") @db.VarChar(44)
+  status          String   @default("active") @db.VarChar(16)
+  serverPublicKey String?  @map("server_public_key") @db.VarChar(128)
+  claimAuthMode   String   @default("server_ed25519") @map("claim_auth_mode") @db.VarChar(32)
+  allowedOrigins  Json?    @map("allowed_origins")
+  config          Json?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
+
+  rooms CommunicationRoom[]
+
+  @@map("external_apps")
+}
+
+model CommunicationRoom {
+  id                String    @id @db.VarChar(96)
+  roomKey           String    @unique @map("room_key") @db.VarChar(96)
+  externalAppId     String?   @map("external_app_id") @db.VarChar(64)
+  parentCircleId    Int?      @map("parent_circle_id")
+  roomType          String    @map("room_type") @db.VarChar(32)
+  externalRoomId    String?   @map("external_room_id") @db.VarChar(128)
+  lifecycleStatus   String    @default("active") @map("lifecycle_status") @db.VarChar(16)
+  knowledgeMode     String    @default("off") @map("knowledge_mode") @db.VarChar(16)
+  transcriptionMode String    @default("off") @map("transcription_mode") @db.VarChar(16)
+  retentionPolicy   String    @default("ephemeral") @map("retention_policy") @db.VarChar(32)
+  createdByPubkey   String?   @map("created_by_pubkey") @db.VarChar(44)
+  expiresAt         DateTime? @map("expires_at")
+  endedAt           DateTime? @map("ended_at")
+  metadata          Json?
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  externalApp ExternalApp?              @relation(fields: [externalAppId], references: [id], onDelete: SetNull)
+  members     CommunicationRoomMember[]
+  voiceSessions VoiceSession[]
+
+  @@index([externalAppId, externalRoomId])
+  @@index([parentCircleId])
+  @@index([roomType, lifecycleStatus])
+  @@index([expiresAt])
+  @@map("communication_rooms")
+}
+
+model CommunicationRoomMember {
+  roomKey      String    @map("room_key") @db.VarChar(96)
+  walletPubkey String    @map("wallet_pubkey") @db.VarChar(44)
+  role         String    @default("member") @db.VarChar(16)
+  canSpeak     Boolean   @default(true) @map("can_speak")
+  muted        Boolean   @default(false)
+  banned       Boolean   @default(false)
+  joinedAt     DateTime  @default(now()) @map("joined_at")
+  leftAt       DateTime? @map("left_at")
+
+  room CommunicationRoom @relation(fields: [roomKey], references: [roomKey], onDelete: Cascade)
+
+  @@id([roomKey, walletPubkey])
+  @@index([walletPubkey])
+  @@index([roomKey, role])
+  @@map("communication_room_members")
+}
+
+model CommunicationSession {
+  sessionId    String    @id @map("session_id") @db.VarChar(64)
+  walletPubkey String    @map("wallet_pubkey") @db.VarChar(44)
+  scopeType    String    @map("scope_type") @db.VarChar(16)
+  scopeRef     String    @map("scope_ref") @db.VarChar(128)
+  issuedAt     DateTime  @default(now()) @map("issued_at")
+  expiresAt    DateTime  @map("expires_at")
+  revoked      Boolean   @default(false)
+  lastSeenAt   DateTime? @map("last_seen_at")
+  clientMeta   Json?     @map("client_meta")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([walletPubkey])
+  @@index([scopeType, scopeRef])
+  @@index([expiresAt])
+  @@map("communication_sessions")
+}
+
+model CommunicationMessage {
+  id                BigInt    @id @default(autoincrement())
+  envelopeId        String    @unique @map("envelope_id") @db.VarChar(96)
+  roomKey           String    @map("room_key") @db.VarChar(96)
+  senderPubkey      String    @map("sender_pubkey") @db.VarChar(44)
+  senderHandle      String?   @map("sender_handle") @db.VarChar(32)
+  messageKind       String    @default("plain") @map("message_kind") @db.VarChar(32)
+  payloadText       String?   @map("payload_text")
+  payloadHash       String    @map("payload_hash") @db.Char(64)
+  storageUri        String?   @map("storage_uri")
+  durationMs        Int?      @map("duration_ms")
+  metadata          Json?
+  signature         String?   @db.VarChar(512)
+  signedMessage     String    @map("signed_message")
+  signatureVerified Boolean   @default(false) @map("signature_verified")
+  authMode          String    @default("session_token") @map("auth_mode") @db.VarChar(32)
+  sessionId         String?   @map("session_id") @db.VarChar(64)
+  clientTimestamp   DateTime  @map("client_timestamp")
+  lamport           BigInt    @default(autoincrement())
+  prevEnvelopeId    String?   @map("prev_envelope_id") @db.VarChar(96)
+  deleted           Boolean   @default(false)
+  expiresAt         DateTime? @map("expires_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([roomKey, lamport(sort: Desc)])
+  @@index([senderPubkey, lamport(sort: Desc)])
+  @@index([expiresAt])
+  @@map("communication_messages")
+}
+
+model VoiceSession {
+  id              String    @id @db.VarChar(96)
+  roomKey         String    @map("room_key") @db.VarChar(96)
+  provider        String    @default("livekit") @db.VarChar(24)
+  providerRoomId  String    @map("provider_room_id") @db.VarChar(128)
+  status          String    @default("active") @db.VarChar(16)
+  createdByPubkey String    @map("created_by_pubkey") @db.VarChar(44)
+  startedAt       DateTime  @default(now()) @map("started_at")
+  endedAt         DateTime? @map("ended_at")
+  expiresAt       DateTime? @map("expires_at")
+  metadata        Json?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  room         CommunicationRoom  @relation(fields: [roomKey], references: [roomKey], onDelete: Cascade)
+  participants VoiceParticipant[]
+
+  @@index([roomKey, status])
+  @@index([provider, providerRoomId])
+  @@index([expiresAt])
+  @@map("voice_sessions")
+}
+
+model VoiceParticipant {
+  sessionId        String    @map("session_id") @db.VarChar(96)
+  walletPubkey     String    @map("wallet_pubkey") @db.VarChar(44)
+  role             String    @default("speaker") @db.VarChar(16)
+  joinedAt         DateTime? @map("joined_at")
+  leftAt           DateTime? @map("left_at")
+  mutedBySelf      Boolean   @default(false) @map("muted_by_self")
+  mutedByModerator Boolean   @default(false) @map("muted_by_moderator")
+
+  session VoiceSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@id([sessionId, walletPubkey])
+  @@index([walletPubkey])
+  @@map("voice_participants")
+}
+
 model DraftDiscussionThread {
   id            BigInt   @id @default(autoincrement())
   draftPostId   Int      @map("draft_post_id")
@@ -1016,6 +1169,150 @@ model GovernanceVote {
   @@index([proposalId, createdAt(sort: Desc)])
   @@index([voterUserId, createdAt(sort: Desc)])
   @@map("governance_votes")
+}
+
+model GovernancePolicy {
+  id              String   @id @db.VarChar(96)
+  scopeType       String   @map("scope_type") @db.VarChar(32)
+  scopeRef        String   @map("scope_ref") @db.VarChar(128)
+  status          String   @default("active") @db.VarChar(16)
+  activeVersion   Int?     @map("active_version")
+  createdByPubkey String?  @map("created_by_pubkey") @db.VarChar(44)
+  metadata        Json?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
+
+  versions GovernancePolicyVersion[]
+  requests GovernanceRequest[]
+
+  @@index([scopeType, scopeRef, status])
+  @@map("governance_policies")
+}
+
+model GovernancePolicyVersion {
+  id              String    @id @db.VarChar(96)
+  policyId        String    @map("policy_id") @db.VarChar(96)
+  version         Int
+  status          String    @default("draft") @db.VarChar(16)
+  rules           Json
+  configDigest    String    @map("config_digest") @db.Char(64)
+  activatedAt     DateTime? @map("activated_at")
+  createdByPubkey String?   @map("created_by_pubkey") @db.VarChar(44)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  policy   GovernancePolicy    @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  requests GovernanceRequest[]
+
+  @@unique([policyId, version])
+  @@index([policyId, status])
+  @@map("governance_policy_versions")
+}
+
+model GovernanceRequest {
+  id                String    @id @db.VarChar(96)
+  policyId          String    @map("policy_id") @db.VarChar(96)
+  policyVersionId   String    @map("policy_version_id") @db.VarChar(96)
+  policyVersion     Int       @map("policy_version")
+  ruleId            String    @map("rule_id") @db.VarChar(96)
+  scopeType         String    @map("scope_type") @db.VarChar(32)
+  scopeRef          String    @map("scope_ref") @db.VarChar(128)
+  actionType        String    @map("action_type") @db.VarChar(96)
+  targetType        String    @map("target_type") @db.VarChar(64)
+  targetRef         String    @map("target_ref") @db.VarChar(128)
+  payload           Json
+  idempotencyKey    String    @map("idempotency_key") @db.VarChar(128)
+  proposerPubkey    String    @map("proposer_pubkey") @db.VarChar(44)
+  state             String    @default("active") @db.VarChar(24)
+  openedAt          DateTime  @default(now()) @map("opened_at")
+  expiresAt         DateTime? @map("expires_at")
+  resolvedAt        DateTime? @map("resolved_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  policy              GovernancePolicy        @relation(fields: [policyId], references: [id], onDelete: Restrict)
+  policyVersionRecord GovernancePolicyVersion @relation(fields: [policyVersionId], references: [id], onDelete: Restrict)
+  signals       GovernanceSignal[]
+  snapshot      GovernanceSnapshot?
+  decision      GovernanceDecision?
+  receipts      GovernanceExecutionReceipt[]
+
+  @@unique([scopeType, scopeRef, actionType, idempotencyKey])
+  @@index([policyId, state, openedAt(sort: Desc)])
+  @@index([scopeType, scopeRef, state])
+  @@index([targetType, targetRef])
+  @@map("governance_requests")
+}
+
+model GovernanceSignal {
+  id          String   @id @db.VarChar(96)
+  requestId   String   @map("request_id") @db.VarChar(96)
+  signalType  String   @map("signal_type") @db.VarChar(32)
+  actorPubkey String?  @map("actor_pubkey") @db.VarChar(44)
+  value       String   @db.VarChar(32)
+  weight      String   @default("1") @db.VarChar(64)
+  evidence    Json?
+  signature   String?  @db.VarChar(512)
+  signedMessage String? @map("signed_message")
+  externalClaimNonce String? @map("external_claim_nonce") @db.VarChar(128)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  request GovernanceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@unique([requestId, actorPubkey, signalType])
+  @@unique([externalClaimNonce])
+  @@index([requestId, createdAt])
+  @@index([actorPubkey, createdAt(sort: Desc)])
+  @@map("governance_signals")
+}
+
+model GovernanceSnapshot {
+  id             String   @id @db.VarChar(96)
+  requestId      String   @unique @map("request_id") @db.VarChar(96)
+  eligibleActors Json     @map("eligible_actors")
+  sourceDigest   String   @map("source_digest") @db.Char(64)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  request GovernanceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@map("governance_snapshots")
+}
+
+model GovernanceDecision {
+  requestId       String    @id @map("request_id") @db.VarChar(96)
+  decision        String    @db.VarChar(24)
+  reason          String    @db.VarChar(128)
+  tally           Json
+  decidedAt       DateTime  @map("decided_at")
+  executableFrom  DateTime? @map("executable_from")
+  executableUntil DateTime? @map("executable_until")
+  decisionDigest  String    @map("decision_digest") @db.Char(64)
+  issuerSignature String?   @map("issuer_signature") @db.VarChar(512)
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  request GovernanceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@unique([decisionDigest])
+  @@map("governance_decisions")
+}
+
+model GovernanceExecutionReceipt {
+  id              String   @id @db.VarChar(96)
+  requestId       String   @map("request_id") @db.VarChar(96)
+  actionType      String   @map("action_type") @db.VarChar(96)
+  executorModule  String   @map("executor_module") @db.VarChar(64)
+  executionStatus String   @map("execution_status") @db.VarChar(24)
+  executionRef    String?  @map("execution_ref") @db.VarChar(128)
+  errorCode       String?  @map("error_code") @db.VarChar(64)
+  idempotencyKey  String   @map("idempotency_key") @db.VarChar(128)
+  executedAt      DateTime @map("executed_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  request GovernanceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@unique([requestId, executorModule, idempotencyKey])
+  @@index([actionType, executedAt(sort: Desc)])
+  @@map("governance_execution_receipts")
 }
 
 model ForkDeclaration {

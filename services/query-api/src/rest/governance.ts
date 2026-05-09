@@ -4,6 +4,10 @@ import type { PrismaClient } from '@prisma/client';
 import type { Redis } from 'ioredis';
 import { normalizeGovernanceActionType } from '../services/governance/actionTypes';
 import {
+    createPrismaGovernanceEngineStore,
+    recordExecutionReceipt,
+} from '../services/governance/policyEngine';
+import {
     createGovernanceProposal,
     createPrismaGovernanceRuntimeStore,
     markGovernanceProposalExecution,
@@ -31,6 +35,11 @@ function asOptionalString(value: unknown): string | null {
     if (typeof value !== 'string') return null;
     const normalized = value.trim();
     return normalized.length > 0 ? normalized : null;
+}
+
+function asRequiredString(value: unknown): string | null {
+    const normalized = asOptionalString(value);
+    return normalized && normalized.length > 0 ? normalized : null;
 }
 
 function normalizeVote(value: unknown): 'approve' | 'reject' | 'abstain' | null {
@@ -151,6 +160,46 @@ export function governanceRouter(prisma: PrismaClient, _redis: Redis): Router {
         } catch (error) {
             res.status(400).json({
                 error: error instanceof Error ? error.message : 'governance_proposal_execute_failed',
+            });
+        }
+    });
+
+    router.post('/requests/:requestId/execution-receipts', async (req, res) => {
+        try {
+            const requestId = asRequiredString(req.params.requestId);
+            const actionType = asRequiredString(req.body?.actionType);
+            const executorModule = asRequiredString(req.body?.executorModule);
+            const executionStatus = asRequiredString(req.body?.executionStatus);
+            const idempotencyKey = asRequiredString(req.body?.idempotencyKey);
+            if (
+                !requestId
+                || !actionType
+                || !executorModule
+                || !idempotencyKey
+                || !['executed', 'failed', 'skipped'].includes(executionStatus ?? '')
+            ) {
+                res.status(400).json({ error: 'invalid_governance_execution_receipt_input' });
+                return;
+            }
+
+            const receipt = await recordExecutionReceipt(
+                createPrismaGovernanceEngineStore(prisma),
+                {
+                    id: asOptionalString(req.body?.id) ?? randomUUID(),
+                    requestId,
+                    actionType,
+                    executorModule,
+                    executionStatus: executionStatus as 'executed' | 'failed' | 'skipped',
+                    executionRef: asOptionalString(req.body?.executionRef),
+                    errorCode: asOptionalString(req.body?.errorCode),
+                    idempotencyKey,
+                    executedAt: new Date(),
+                },
+            );
+            res.status(201).json({ receipt });
+        } catch (error) {
+            res.status(400).json({
+                error: error instanceof Error ? error.message : 'governance_execution_receipt_record_failed',
             });
         }
     });

@@ -36,6 +36,10 @@ export type NodeApiSurface =
     | 'circle_agents'
     | 'posts_bind'
     | 'sync_status'
+    | 'communication_runtime'
+    | 'communication_sidecar'
+    | 'voice_runtime'
+    | 'voice_provider_webhook'
     | 'auth_session'
     | 'source_materials'
     | 'seeded'
@@ -212,8 +216,12 @@ export function loadNodeRuntimeConfig(): QueryApiRuntimeConfig {
         'circle_agents',
         'posts_bind',
         'sync_status',
+        'communication_runtime',
+        'voice_runtime',
     ];
     const sidecarOwnedApis: NodeApiSurface[] = [
+        'communication_sidecar',
+        'voice_provider_webhook',
         'auth_session',
         'source_materials',
         'seeded',
