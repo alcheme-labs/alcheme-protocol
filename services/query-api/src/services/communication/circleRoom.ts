@@ -7,6 +7,7 @@ import {
   type VoiceSpeakerLimitStrategy,
   type VoiceSpeakerPolicy,
 } from "../../config/voice";
+import { withRoomCapabilitiesMetadata } from "./capabilities";
 import { canModerateRoom } from "./permissions";
 import { resolveCommunicationRoom } from "./roomResolver";
 
@@ -204,7 +205,7 @@ function mergeCircleRoomVoiceMetadata(
       source: "room_metadata",
     });
   }
-  return metadata;
+  return withRoomCapabilitiesMetadata(metadata, "circle");
 }
 
 function normalizeRequestedVoicePolicy(

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Response, Router } from 'express';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { Redis } from 'ioredis';
 import crypto from 'crypto';
@@ -115,6 +115,10 @@ import {
 } from '../services/discussion/forwardingPolicy';
 import { prepareStructuredDiscussionWriteMetadata } from '../services/discussion/systemNoticeSeam';
 import { extractStructuredDiscussionMetadata } from '../services/discussion/structuredMessageMetadata';
+import {
+    PlazaDiscussionCapabilityError,
+    resolvePlazaDiscussionContextForWrite,
+} from '../services/discussion/plazaRoomCapability';
 import {
     buildDiscussionRealtimeChannel,
     parseDiscussionRealtimePayload,
@@ -3789,6 +3793,13 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                         : 'unsigned_local';
             const sessionId = sessionAuth.session?.sessionId || null;
 
+            await resolvePlazaDiscussionContextForWrite(prisma as any, {
+                circleId,
+                walletPubkey: senderPubkey,
+                activeCircleMember: isActiveMember,
+                now: clientTimestamp,
+            });
+
             const payloadHash = sha256Hex(text);
             const envelopeId = computeDiscussionEnvelopeId({
                 roomKey,
@@ -3997,6 +4008,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                 message: mapRowToDto(inserted),
             });
         } catch (error) {
+            if (sendPlazaDiscussionCapabilityError(res, error)) return;
             next(error);
         }
     });
@@ -4093,6 +4105,13 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                 }
                 return res.status(403).json({ error: 'forward_same_or_lower_level_not_allowed' });
             }
+
+            await resolvePlazaDiscussionContextForWrite(prisma as any, {
+                circleId: targetCircle.id,
+                walletPubkey: authUser.pubkey,
+                activeCircleMember: true,
+                now: new Date(),
+            });
 
             const locale = resolveExpressRequestLocale(req);
             const snapshotText = buildForwardSnapshotText(sourceRow.payloadText, locale);
@@ -4290,6 +4309,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                 message: mapRowToDto(inserted),
             });
         } catch (error) {
+            if (sendPlazaDiscussionCapabilityError(res, error)) return;
             next(error);
         }
     });
@@ -4420,6 +4440,13 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                         ? 'wallet_per_message'
                         : 'unsigned_local';
             const sessionId = sessionAuth.session?.sessionId || null;
+
+            await resolvePlazaDiscussionContextForWrite(prisma as any, {
+                circleId: knowledge.circleId,
+                walletPubkey: senderPubkey,
+                activeCircleMember: true,
+                now: clientTimestamp,
+            });
 
             const payloadHash = sha256Hex(text);
             const envelopeId = computeDiscussionEnvelopeId({
@@ -4574,6 +4601,7 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
                 message: mapRowToDto(inserted),
             });
         } catch (error) {
+            if (sendPlazaDiscussionCapabilityError(res, error)) return;
             next(error);
         }
     });
@@ -4798,4 +4826,16 @@ export function discussionRouter(prisma: PrismaClient, redis: Redis): Router {
     });
 
     return router;
+}
+
+function sendPlazaDiscussionCapabilityError(
+    res: Response,
+    error: unknown,
+): boolean {
+    if (!(error instanceof PlazaDiscussionCapabilityError)) return false;
+    res.status(error.statusCode).json({
+        error: error.code,
+        message: error.message,
+    });
+    return true;
 }

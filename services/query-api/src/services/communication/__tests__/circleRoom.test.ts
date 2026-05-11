@@ -89,6 +89,17 @@ describe("ensureCircleCommunicationRoom", () => {
           overflowStrategy: "listen_only",
           source: "room_metadata",
         },
+        capabilities: {
+          textChat: true,
+          voice: true,
+          voiceClip: true,
+          transcriptRecap: false,
+          plazaDiscussion: true,
+          aiSummary: true,
+          draftGeneration: true,
+          crystallization: true,
+          governance: true,
+        },
       },
     });
     expect(result.member).toMatchObject({
@@ -118,7 +129,7 @@ describe("ensureCircleCommunicationRoom", () => {
             overflowStrategy: "moderated_queue",
             source: "room_metadata",
           },
-          capabilities: { plazaDiscussion: true },
+          capabilities: { plazaDiscussion: true, draftGeneration: false },
           custom: "keep",
         },
         expiresAt: null,
@@ -140,7 +151,17 @@ describe("ensureCircleCommunicationRoom", () => {
         overflowStrategy: "moderated_queue",
         source: "room_metadata",
       },
-      capabilities: { plazaDiscussion: true },
+      capabilities: {
+        textChat: true,
+        voice: true,
+        voiceClip: true,
+        transcriptRecap: false,
+        plazaDiscussion: true,
+        aiSummary: true,
+        draftGeneration: false,
+        crystallization: true,
+        governance: true,
+      },
       custom: "keep",
     });
   });

@@ -2,6 +2,7 @@ import bs58 from "bs58";
 import nacl from "tweetnacl";
 
 import { normalizeVoiceSpeakerPolicy } from "../../config/voice";
+import { withRoomCapabilitiesMetadata } from "./capabilities";
 import { buildCommunicationRoomKey, normalizeRoomType } from "./roomScope";
 
 export interface AppRoomClaim {
@@ -142,7 +143,16 @@ export async function resolveCommunicationRoom(
     roomType,
     trustedFirstPartyMetadata: input.trustedFirstPartyMetadata === true,
     verifiedClaim,
+    transcriptionMode,
   });
+  const metadataUpdate = shouldPersistRoomMetadataUpdate({
+    inputMetadata: input.metadata,
+    trustedFirstPartyMetadata: input.trustedFirstPartyMetadata === true,
+    verifiedClaim,
+    transcriptionMode,
+  })
+    ? metadata
+    : undefined;
 
   return prisma.communicationRoom.upsert({
     where: { roomKey },
@@ -164,7 +174,7 @@ export async function resolveCommunicationRoom(
     update: {
       lifecycleStatus: "active",
       expiresAt,
-      metadata: metadata ?? undefined,
+      metadata: metadataUpdate,
     },
   });
 }
@@ -358,6 +368,7 @@ function buildRoomMetadata(input: {
   roomType: string;
   trustedFirstPartyMetadata: boolean;
   verifiedClaim: AppRoomClaimPayload | null;
+  transcriptionMode: string;
 }): Record<string, unknown> | null {
   const metadata =
     input.inputMetadata &&
@@ -380,7 +391,36 @@ function buildRoomMetadata(input: {
     );
   }
 
-  return Object.keys(metadata).length > 0 ? metadata : null;
+  const normalizedMetadata = withRoomCapabilitiesMetadata(
+    metadata,
+    input.roomType,
+    { rejectUnknown: !input.trustedFirstPartyMetadata },
+  );
+  if (normalizeTranscriptionMode(input.transcriptionMode) !== "off") {
+    normalizedMetadata.capabilities = {
+      ...(normalizedMetadata.capabilities as Record<string, unknown>),
+      transcriptRecap: true,
+    };
+  }
+  return normalizedMetadata;
+}
+
+function shouldPersistRoomMetadataUpdate(input: {
+  inputMetadata?: Record<string, unknown> | null;
+  trustedFirstPartyMetadata: boolean;
+  verifiedClaim: AppRoomClaimPayload | null;
+  transcriptionMode: string;
+}): boolean {
+  const hasExplicitMetadata =
+    input.inputMetadata &&
+    typeof input.inputMetadata === "object" &&
+    !Array.isArray(input.inputMetadata);
+  return Boolean(
+    hasExplicitMetadata ||
+      input.trustedFirstPartyMetadata ||
+      input.verifiedClaim?.voicePolicy ||
+      normalizeTranscriptionMode(input.transcriptionMode) !== "off",
+  );
 }
 
 function normalizeClaimVoicePolicy(raw: unknown) {

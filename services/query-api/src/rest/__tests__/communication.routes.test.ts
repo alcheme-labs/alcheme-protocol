@@ -405,6 +405,44 @@ describe("communication routes", () => {
     expect(prisma.communicationRoom.upsert).not.toHaveBeenCalled();
   });
 
+  test("rejects unknown room capability metadata from generic room resolve input", async () => {
+    const appClaim = buildSignedAppClaim({
+      externalAppId: "example-web3-game",
+      roomType: "dungeon",
+      externalRoomId: "run-8791",
+      walletPubkeys: [WALLET],
+      expiresAt: "2099-05-08T12:05:00.000Z",
+      nonce: "claim-unknown-capability",
+    });
+    const prisma = buildPrismaMock(appClaim.serverPublicKey);
+    const app = buildApp(prisma, buildRedisMock());
+
+    await request(app)
+      .post("/api/v1/communication/rooms/resolve")
+      .send({
+        externalAppId: "example-web3-game",
+        roomType: "dungeon",
+        externalRoomId: "run-8791",
+        walletPubkey: WALLET,
+        appRoomClaim: appClaim.claim,
+        metadata: {
+          capabilities: {
+            plazaDiscussion: false,
+            teleportDrafts: true,
+          },
+        },
+      })
+      .expect(400)
+      .expect((response) => {
+        expect(response.body).toEqual({
+          error: "unknown_room_capability",
+          capability: "teleportDrafts",
+        });
+      });
+
+    expect(prisma.communicationRoom.upsert).not.toHaveBeenCalled();
+  });
+
   test("lets circle managers update room voice policy while preserving metadata", async () => {
     const appClaim = buildSignedAppClaim({
       externalAppId: "example-web3-game",
@@ -452,7 +490,17 @@ describe("communication routes", () => {
       .expect(200);
 
     expect(response.body.room.metadata).toMatchObject({
-      capabilities: { plazaDiscussion: true },
+      capabilities: {
+        textChat: true,
+        voice: true,
+        voiceClip: true,
+        transcriptRecap: false,
+        plazaDiscussion: true,
+        aiSummary: true,
+        draftGeneration: true,
+        crystallization: true,
+        governance: true,
+      },
       custom: "preserve",
       voicePolicy: {
         maxSpeakers: 100,
@@ -465,7 +513,17 @@ describe("communication routes", () => {
         where: { roomKey: "circle:130" },
         data: expect.objectContaining({
           metadata: expect.objectContaining({
-            capabilities: { plazaDiscussion: true },
+            capabilities: {
+              textChat: true,
+              voice: true,
+              voiceClip: true,
+              transcriptRecap: false,
+              plazaDiscussion: true,
+              aiSummary: true,
+              draftGeneration: true,
+              crystallization: true,
+              governance: true,
+            },
             custom: "preserve",
             voicePolicy: expect.objectContaining({
               maxSpeakers: 100,

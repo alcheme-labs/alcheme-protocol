@@ -165,6 +165,37 @@ Supported room types currently include:
 circle, custom, direct, dungeon, guild, party, world
 ```
 
+## Room Capabilities
+
+`CommunicationRoom` is the runtime container. Plaza is a first-party capability
+bundle carried by `circle:<circleId>` rooms; Room does not inherit Plaza.
+
+Circle room capabilities default to Plaza-aware behavior:
+
+- text chat and voice enabled
+- voice clip references enabled
+- Plaza discussion enabled
+- AI summary, draft generation, crystallization, and governance enabled through
+  the existing review-gated Plaza paths
+
+External game rooms default to generic runtime behavior:
+
+- text chat and voice enabled
+- Plaza discussion disabled
+- AI summary, draft generation, crystallization, and governance disabled
+- voice clips disabled unless a future signed capability design enables them
+
+The storage split is intentional:
+
+```text
+Plaza circle discussion: circle_discussion_messages
+External/arbitrary room chat: communication_messages
+```
+
+Do not migrate Plaza discussion storage into `communication_messages` without the
+separate message-unification gate described in
+`docs/architecture/room-capability-carrier.md`.
+
 ## External App Registration
 
 External game rooms require an `ExternalApp` row before claim verification can

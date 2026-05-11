@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-import { Router } from "express";
+import { Router, type Response } from "express";
 import type { Prisma, PrismaClient } from "@prisma/client";
 import type { Redis } from "ioredis";
 
@@ -9,6 +9,7 @@ import {
   ensureCircleCommunicationRoom,
   updateCircleRoomVoicePolicy,
 } from "../services/communication/circleRoom";
+import { RoomCapabilityMetadataError } from "../services/communication/capabilities";
 import { resolveCommunicationRoom } from "../services/communication/roomResolver";
 import {
   buildCommunicationSessionBootstrapMessage,
@@ -185,6 +186,7 @@ export function communicationRouter(
         room: mapRoom(room),
       });
     } catch (error) {
+      if (sendRoomCapabilityMetadataError(res, error)) return;
       next(error);
     }
   });
@@ -1258,6 +1260,18 @@ function parseBoundedEnvInt(
 
 function randomNonce(): string {
   return crypto.randomBytes(16).toString("hex");
+}
+
+function sendRoomCapabilityMetadataError(
+  res: Response,
+  error: unknown,
+): boolean {
+  if (!(error instanceof RoomCapabilityMetadataError)) return false;
+  res.status(error.statusCode).json({
+    error: error.code,
+    capability: error.capability,
+  });
+  return true;
 }
 
 function computeCommunicationEnvelopeId(input: {

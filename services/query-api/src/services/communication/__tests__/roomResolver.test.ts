@@ -96,11 +96,29 @@ describe("resolveCommunicationRoom", () => {
     expect(first.roomKey).toBe("external:example-web3-game:dungeon:run-8791");
     expect(second.roomKey).toBe(first.roomKey);
     expect(first.knowledgeMode).toBe("off");
+    expect(first.metadata).toEqual({
+      capabilities: {
+        textChat: true,
+        voice: true,
+        voiceClip: false,
+        transcriptRecap: false,
+        plazaDiscussion: false,
+        aiSummary: false,
+        draftGeneration: false,
+        crystallization: false,
+        governance: false,
+      },
+    });
     expect(prisma.communicationRoom.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { roomKey: first.roomKey },
       }),
     );
+    const firstUpsert = prisma.communicationRoom.upsert.mock.calls[0][0] as any;
+    const secondUpsert = prisma.communicationRoom.upsert.mock.calls[1][0] as any;
+    expect(firstUpsert.create.metadata).toEqual(first.metadata);
+    expect(firstUpsert.update.metadata).toBeUndefined();
+    expect(secondUpsert.update.metadata).toBeUndefined();
   });
 
   test("reuses circle room keys and defaults knowledge capture to full", async () => {
@@ -121,6 +139,19 @@ describe("resolveCommunicationRoom", () => {
       roomType: "circle",
       parentCircleId: 130,
       knowledgeMode: "full",
+      metadata: {
+        capabilities: {
+          textChat: true,
+          voice: true,
+          voiceClip: true,
+          transcriptRecap: false,
+          plazaDiscussion: true,
+          aiSummary: true,
+          draftGeneration: true,
+          crystallization: true,
+          governance: true,
+        },
+      },
     });
     expect(prisma.communicationRoom.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -152,7 +183,20 @@ describe("resolveCommunicationRoom", () => {
       { now: NOW },
     );
 
-    expect(room.metadata).toEqual({ custom: "keep" });
+    expect(room.metadata).toEqual({
+      custom: "keep",
+      capabilities: {
+        textChat: true,
+        voice: true,
+        voiceClip: true,
+        transcriptRecap: false,
+        plazaDiscussion: true,
+        aiSummary: true,
+        draftGeneration: true,
+        crystallization: true,
+        governance: true,
+      },
+    });
   });
 
   test("keeps circle voice policy metadata only for trusted first-party room callers", async () => {
@@ -181,6 +225,17 @@ describe("resolveCommunicationRoom", () => {
         maxSpeakers: 8,
         overflowStrategy: "queue",
         source: "room_metadata",
+      },
+      capabilities: {
+        textChat: true,
+        voice: true,
+        voiceClip: true,
+        transcriptRecap: false,
+        plazaDiscussion: true,
+        aiSummary: true,
+        draftGeneration: true,
+        crystallization: true,
+        governance: true,
       },
     });
   });
@@ -223,6 +278,7 @@ describe("resolveCommunicationRoom", () => {
     );
 
     expect(unsafeRequest.transcriptionMode).toBe("off");
+    expect(unsafeRequest.metadata.capabilities.transcriptRecap).toBe(false);
 
     const authorizedClaim = buildSignedClaim(
       {
@@ -251,6 +307,9 @@ describe("resolveCommunicationRoom", () => {
     );
 
     expect(authorizedRequest.transcriptionMode).toBe("recap");
+    expect(authorizedRequest.metadata.capabilities.transcriptRecap).toBe(true);
+    const authorizedUpsert = prisma.communicationRoom.upsert.mock.calls[1][0] as any;
+    expect(authorizedUpsert.update.metadata.capabilities.transcriptRecap).toBe(true);
   });
 
   test("persists only the signed room voice policy for external app rooms", async () => {
@@ -302,6 +361,17 @@ describe("resolveCommunicationRoom", () => {
         overflowStrategy: "moderated_queue",
         moderatorRoles: ["host", "moderator"],
         source: "app_room_claim",
+      },
+      capabilities: {
+        textChat: true,
+        voice: true,
+        voiceClip: false,
+        transcriptRecap: false,
+        plazaDiscussion: false,
+        aiSummary: false,
+        draftGeneration: false,
+        crystallization: false,
+        governance: false,
       },
     });
   });
