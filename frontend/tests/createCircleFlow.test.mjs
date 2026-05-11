@@ -111,6 +111,22 @@ test('useCreateCircle gates partial creation on message signing and waits for ci
   assert.match(source, /waitForCircleReadModelVisibility/);
 });
 
+test('useCreateCircle surfaces post-create sync problems as completion notices', () => {
+  const source = read(hookPath);
+  const completionNoticeCall = (key) =>
+    new RegExp(`addCompletionNotice\\(\\s*t\\(["']${key}["']\\)\\s*\\)`);
+
+  assert.match(source, completionNoticeCall('errors\\.metadataSyncFailed'));
+  assert.match(source, completionNoticeCall('errors\\.genesisModeSyncFailed'));
+  assert.match(source, completionNoticeCall('errors\\.joinPolicySyncFailed'));
+  assert.match(source, completionNoticeCall('errors\\.postCreateSyncPending'));
+  assert.match(source, completionNoticeCall('errors\\.postCreateSyncFailed'));
+  assert.doesNotMatch(
+    source,
+    /setError\(\s*\(prev\)\s*=>\s*appendCreateCircleNotice\(\s*prev,\s*t\(["']errors\.postCreateSyncPending["']\)\s*\)\s*\)/,
+  );
+});
+
 test('create-circle read-model lag notice is elevated outside the closing sheet', () => {
   const hookSource = read(hookPath);
   const sheetSource = read(sheetPath);

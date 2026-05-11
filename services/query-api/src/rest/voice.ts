@@ -7,7 +7,10 @@ import { WebhookReceiver } from "livekit-server-sdk";
 
 import {
   loadVoiceRuntimeConfig,
+  normalizeVoiceSpeakerPolicy,
   type VoiceRuntimeConfig,
+  type VoiceSpeakerLimitStrategy,
+  type VoiceSpeakerPolicy,
 } from "../config/voice";
 import {
   canJoinVoice,
@@ -46,8 +49,36 @@ interface VoiceSessionRow {
   endedAt?: Date | null;
   expiresAt?: Date | null;
   metadata?: unknown;
+  room?: {
+    metadata?: unknown;
+  } | null;
   createdAt: Date;
   updatedAt: Date;
+}
+
+interface VoiceParticipantRow {
+  sessionId: string;
+  walletPubkey: string;
+  role: string;
+  joinedAt?: Date | null;
+  leftAt?: Date | null;
+  mutedByModerator?: boolean | null;
+}
+
+interface SpeakerLimitDecision {
+  canPublishAudio: boolean;
+  activeSpeakerCount: number | null;
+  maxSpeakers: number;
+  platformMaxSpeakersPerSession: number;
+  reason:
+    | "speaker_limit_reached"
+    | "speaker_queue_waiting"
+    | "speaker_approval_required"
+    | null;
+  queuePosition: number | null;
+  role: "speaker" | "listener" | "queued";
+  strategy: VoiceSpeakerLimitStrategy;
+  source: VoiceSpeakerPolicy["source"];
 }
 
 export function voiceRouter(
@@ -144,7 +175,7 @@ export function voiceRouter(
         roomKey: voiceSession.roomKey,
         walletPubkey: sessionAuth.session.walletPubkey,
       });
-      const canPublishAudio = joinDecision.allowed;
+      const requestedCanPublishAudio = joinDecision.allowed;
       if (
         !joinDecision.allowed &&
         joinDecision.reason !== "member_muted" &&
@@ -152,6 +183,28 @@ export function voiceRouter(
       ) {
         return sendPermissionDecision(res, joinDecision);
       }
+      const speakerLimit = await evaluateSpeakerLimit(
+        prisma,
+        voiceSession,
+        sessionAuth.session.walletPubkey,
+        requestedCanPublishAudio,
+        config,
+        now(),
+      );
+      if (
+        speakerLimit.reason === "speaker_limit_reached" &&
+        speakerLimit.strategy === "deny"
+      ) {
+        return res.status(429).json({
+          error: "voice_speaker_limit_reached",
+          activeSpeakerCount: speakerLimit.activeSpeakerCount,
+          maxSpeakers: speakerLimit.maxSpeakers,
+          platformMaxSpeakersPerSession:
+            speakerLimit.platformMaxSpeakersPerSession,
+          strategy: speakerLimit.strategy,
+        });
+      }
+      const canPublishAudio = speakerLimit.canPublishAudio;
 
       await prisma.voiceParticipant.upsert({
         where: {
@@ -163,12 +216,12 @@ export function voiceRouter(
         create: {
           sessionId: voiceSession.id,
           walletPubkey: sessionAuth.session.walletPubkey,
-          role: canPublishAudio ? "speaker" : "listener",
+          role: speakerLimit.role,
           joinedAt: now(),
           mutedByModerator: !canPublishAudio,
         },
         update: {
-          role: canPublishAudio ? "speaker" : "listener",
+          role: speakerLimit.role,
           leftAt: null,
           mutedByModerator: !canPublishAudio,
         },
@@ -184,11 +237,204 @@ export function voiceRouter(
         ttlSec: config.tokenTtlSec,
       });
 
-      res.json({ ok: true, token });
+      res.json({
+        ok: true,
+        token,
+        policy: {
+          permission: joinDecision.reason,
+          speakerLimit: {
+            reason: speakerLimit.reason,
+            activeSpeakerCount: speakerLimit.activeSpeakerCount,
+            maxSpeakers: speakerLimit.maxSpeakers,
+            platformMaxSpeakersPerSession:
+              speakerLimit.platformMaxSpeakersPerSession,
+            strategy: speakerLimit.strategy,
+            source: speakerLimit.source,
+            queuePosition: speakerLimit.queuePosition,
+          },
+        },
+      });
     } catch (error) {
       next(error);
     }
   });
+
+  router.post(
+    "/sessions/:sessionId/speakers/:walletPubkey/approve",
+    async (req, res, next) => {
+      try {
+        if (!provider || !config.enabled) {
+          return res.status(503).json({ error: "voice_provider_disabled" });
+        }
+        const voiceSession = await loadActiveVoiceSession(
+          prisma,
+          parseRouteValue(req.params.sessionId),
+          now(),
+        );
+        if (!voiceSession) {
+          return res.status(404).json({ error: "voice_session_not_found" });
+        }
+        const sessionAuth = await authenticateCommunicationSession(
+          prisma,
+          req,
+          voiceSession.roomKey,
+          now(),
+        );
+        if (!sessionAuth.ok) return sendSessionError(res, sessionAuth);
+
+        const policy = resolveVoiceSpeakerPolicy(voiceSession, config);
+        const canModerate = await canModerateVoiceSession(prisma, {
+          roomKey: voiceSession.roomKey,
+          walletPubkey: sessionAuth.session.walletPubkey,
+          policy,
+        });
+        if (!canModerate) {
+          return res
+            .status(403)
+            .json({ error: "voice_moderator_permission_required" });
+        }
+
+        const walletPubkey = parseRouteValue(req.params.walletPubkey);
+        if (!walletPubkey) {
+          return res.status(400).json({ error: "missing_wallet_pubkey" });
+        }
+        const activeSpeakerCount = await prisma.voiceParticipant.count({
+          where: {
+            sessionId: voiceSession.id,
+            role: "speaker",
+            leftAt: null,
+            mutedByModerator: false,
+            walletPubkey: { not: walletPubkey },
+          },
+        });
+        if (activeSpeakerCount >= policy.maxSpeakers) {
+          return res.status(409).json({
+            error: "voice_speaker_limit_reached",
+            activeSpeakerCount,
+            maxSpeakers: policy.maxSpeakers,
+            strategy: policy.overflowStrategy,
+          });
+        }
+
+        await prisma.voiceParticipant.upsert({
+          where: {
+            sessionId_walletPubkey: {
+              sessionId: voiceSession.id,
+              walletPubkey,
+            },
+          },
+          create: {
+            sessionId: voiceSession.id,
+            walletPubkey,
+            role: "speaker",
+            joinedAt: now(),
+            leftAt: null,
+            mutedBySelf: false,
+            mutedByModerator: false,
+          },
+          update: {
+            role: "speaker",
+            leftAt: null,
+            mutedByModerator: false,
+          },
+        });
+        await provider.muteParticipant({
+          providerRoomId: voiceSession.providerRoomId,
+          walletPubkey,
+          muted: false,
+        });
+
+        res.json({
+          ok: true,
+          sessionId: voiceSession.id,
+          walletPubkey,
+          role: "speaker",
+          activeSpeakerCount: activeSpeakerCount + 1,
+          maxSpeakers: policy.maxSpeakers,
+        });
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
+
+  router.post(
+    "/sessions/:sessionId/speakers/:walletPubkey/deny",
+    async (req, res, next) => {
+      try {
+        if (!provider || !config.enabled) {
+          return res.status(503).json({ error: "voice_provider_disabled" });
+        }
+        const voiceSession = await loadActiveVoiceSession(
+          prisma,
+          parseRouteValue(req.params.sessionId),
+          now(),
+        );
+        if (!voiceSession) {
+          return res.status(404).json({ error: "voice_session_not_found" });
+        }
+        const sessionAuth = await authenticateCommunicationSession(
+          prisma,
+          req,
+          voiceSession.roomKey,
+          now(),
+        );
+        if (!sessionAuth.ok) return sendSessionError(res, sessionAuth);
+
+        const policy = resolveVoiceSpeakerPolicy(voiceSession, config);
+        const canModerate = await canModerateVoiceSession(prisma, {
+          roomKey: voiceSession.roomKey,
+          walletPubkey: sessionAuth.session.walletPubkey,
+          policy,
+        });
+        if (!canModerate) {
+          return res
+            .status(403)
+            .json({ error: "voice_moderator_permission_required" });
+        }
+
+        const walletPubkey = parseRouteValue(req.params.walletPubkey);
+        if (!walletPubkey) {
+          return res.status(400).json({ error: "missing_wallet_pubkey" });
+        }
+        await prisma.voiceParticipant.upsert({
+          where: {
+            sessionId_walletPubkey: {
+              sessionId: voiceSession.id,
+              walletPubkey,
+            },
+          },
+          create: {
+            sessionId: voiceSession.id,
+            walletPubkey,
+            role: "listener",
+            joinedAt: null,
+            leftAt: null,
+            mutedBySelf: false,
+            mutedByModerator: true,
+          },
+          update: {
+            role: "listener",
+            mutedByModerator: true,
+          },
+        });
+        await provider.muteParticipant({
+          providerRoomId: voiceSession.providerRoomId,
+          walletPubkey,
+          muted: true,
+        });
+
+        res.json({
+          ok: true,
+          sessionId: voiceSession.id,
+          walletPubkey,
+          role: "listener",
+        });
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
 
   router.post("/sessions/:sessionId/mute", async (req, res, next) => {
     try {
@@ -393,7 +639,10 @@ async function decodeLiveKitWebhookEvent(
   if (Buffer.isBuffer(req.body)) {
     const body = req.body.toString("utf8");
     const authHeader = req.get("Authorization");
-    if (config.livekitApiKey && config.livekitApiSecret && authHeader) {
+    if (config.livekitApiKey && config.livekitApiSecret) {
+      if (!authHeader) {
+        throw new Error("voice webhook authorization required");
+      }
       const receiver = new WebhookReceiver(
         config.livekitApiKey,
         config.livekitApiSecret,
@@ -401,6 +650,10 @@ async function decodeLiveKitWebhookEvent(
       return (await receiver.receive(body, authHeader)) as LiveKitWebhookEvent;
     }
     return JSON.parse(body) as LiveKitWebhookEvent;
+  }
+
+  if (config.livekitApiKey && config.livekitApiSecret) {
+    throw new Error("voice webhook authorization requires raw body");
   }
 
   if (req.body && typeof req.body === "object") {
@@ -569,6 +822,224 @@ async function authenticateCommunicationSession(
   return { ok: true, session };
 }
 
+async function evaluateSpeakerLimit(
+  prisma: VoicePrisma,
+  voiceSession: VoiceSessionRow,
+  walletPubkey: string,
+  requestedCanPublishAudio: boolean,
+  config: VoiceRuntimeConfig,
+  now: Date,
+): Promise<SpeakerLimitDecision> {
+  const policy = resolveVoiceSpeakerPolicy(voiceSession, config);
+  if (!requestedCanPublishAudio) {
+    return {
+      canPublishAudio: false,
+      activeSpeakerCount: null,
+      maxSpeakers: policy.maxSpeakers,
+      platformMaxSpeakersPerSession: config.platformMaxSpeakersPerSession,
+      reason: null,
+      queuePosition: null,
+      role: "listener",
+      strategy: policy.overflowStrategy,
+      source: policy.source,
+    };
+  }
+
+  const existingParticipant = (await prisma.voiceParticipant.findUnique({
+    where: {
+      sessionId_walletPubkey: {
+        sessionId: voiceSession.id,
+        walletPubkey,
+      },
+    },
+  })) as VoiceParticipantRow | null;
+
+  const activeSpeakerCount = await prisma.voiceParticipant.count({
+    where: {
+      sessionId: voiceSession.id,
+      role: "speaker",
+      leftAt: null,
+      mutedByModerator: false,
+      walletPubkey: { not: walletPubkey },
+    },
+  });
+
+  if (policy.overflowStrategy === "moderated_queue") {
+    if (
+      existingParticipant?.role === "speaker" &&
+      existingParticipant.mutedByModerator !== true &&
+      activeSpeakerCount < policy.maxSpeakers
+    ) {
+      return {
+        canPublishAudio: true,
+        activeSpeakerCount,
+        maxSpeakers: policy.maxSpeakers,
+        platformMaxSpeakersPerSession: config.platformMaxSpeakersPerSession,
+        reason: null,
+        queuePosition: null,
+        role: "speaker",
+        strategy: policy.overflowStrategy,
+        source: policy.source,
+      };
+    }
+    const queuePosition = await evaluateQueuePosition(
+      prisma,
+      voiceSession.id,
+      walletPubkey,
+      existingParticipant,
+      now,
+    );
+    return {
+      canPublishAudio: false,
+      activeSpeakerCount,
+      maxSpeakers: policy.maxSpeakers,
+      platformMaxSpeakersPerSession: config.platformMaxSpeakersPerSession,
+      reason: "speaker_approval_required",
+      queuePosition: queuePosition.position,
+      role: "queued",
+      strategy: policy.overflowStrategy,
+      source: policy.source,
+    };
+  }
+
+  if (policy.overflowStrategy === "queue") {
+    const queuePosition = await evaluateQueuePosition(
+      prisma,
+      voiceSession.id,
+      walletPubkey,
+      existingParticipant,
+      now,
+    );
+    if (
+      activeSpeakerCount >= policy.maxSpeakers ||
+      queuePosition.position > 1
+    ) {
+      return {
+        canPublishAudio: false,
+        activeSpeakerCount,
+        maxSpeakers: policy.maxSpeakers,
+        platformMaxSpeakersPerSession: config.platformMaxSpeakersPerSession,
+        reason:
+          activeSpeakerCount >= policy.maxSpeakers
+            ? "speaker_limit_reached"
+            : "speaker_queue_waiting",
+        queuePosition: queuePosition.position,
+        role: "queued",
+        strategy: policy.overflowStrategy,
+        source: policy.source,
+      };
+    }
+  }
+
+  if (activeSpeakerCount >= policy.maxSpeakers) {
+    return {
+      canPublishAudio: false,
+      activeSpeakerCount,
+      maxSpeakers: policy.maxSpeakers,
+      platformMaxSpeakersPerSession: config.platformMaxSpeakersPerSession,
+      reason: "speaker_limit_reached",
+      queuePosition: null,
+      role: "listener",
+      strategy: policy.overflowStrategy,
+      source: policy.source,
+    };
+  }
+
+  return {
+    canPublishAudio: true,
+    activeSpeakerCount,
+    maxSpeakers: policy.maxSpeakers,
+    platformMaxSpeakersPerSession: config.platformMaxSpeakersPerSession,
+    reason: null,
+    queuePosition: null,
+    role: "speaker",
+    strategy: policy.overflowStrategy,
+    source: policy.source,
+  };
+}
+
+async function evaluateQueuePosition(
+  prisma: VoicePrisma,
+  sessionId: string,
+  walletPubkey: string,
+  existingParticipant: VoiceParticipantRow | null,
+  now: Date,
+): Promise<{ position: number }> {
+  const queuedAt =
+    existingParticipant?.role === "queued" && existingParticipant.joinedAt
+      ? existingParticipant.joinedAt
+      : now;
+  const queuedAhead = await prisma.voiceParticipant.count({
+    where: {
+      sessionId,
+      role: "queued",
+      leftAt: null,
+      joinedAt: { lt: queuedAt },
+      walletPubkey: { not: walletPubkey },
+    },
+  });
+  return { position: queuedAhead + 1 };
+}
+
+function resolveVoiceSpeakerPolicy(
+  voiceSession: VoiceSessionRow,
+  config: VoiceRuntimeConfig,
+): VoiceSpeakerPolicy {
+  const roomPolicy = readRoomVoicePolicy(voiceSession.room?.metadata);
+  if (roomPolicy) {
+    return normalizeVoiceSpeakerPolicy(roomPolicy, {
+      fallbackMaxSpeakers: config.defaultMaxSpeakersPerSession,
+      platformMaxSpeakers: config.platformMaxSpeakersPerSession,
+      fallbackStrategy: config.speakerLimitStrategy,
+      source: "room_metadata",
+    });
+  }
+
+  return normalizeVoiceSpeakerPolicy(null, {
+    fallbackMaxSpeakers: config.defaultMaxSpeakersPerSession,
+    platformMaxSpeakers: config.platformMaxSpeakersPerSession,
+    fallbackStrategy: config.speakerLimitStrategy,
+    source: "runtime_default",
+  });
+}
+
+function readRoomVoicePolicy(metadata: unknown): unknown | null {
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
+    return null;
+  }
+  const record = metadata as Record<string, unknown>;
+  return record.voicePolicy ?? null;
+}
+
+async function canModerateVoiceSession(
+  prisma: VoicePrisma,
+  input: {
+    roomKey: string;
+    walletPubkey: string;
+    policy: VoiceSpeakerPolicy;
+  },
+): Promise<boolean> {
+  const roomModeration = await canModerateRoom(prisma, {
+    roomKey: input.roomKey,
+    walletPubkey: input.walletPubkey,
+  });
+  if (roomModeration.allowed) return true;
+
+  const member = await prisma.communicationRoomMember.findUnique({
+    where: {
+      roomKey_walletPubkey: {
+        roomKey: input.roomKey,
+        walletPubkey: input.walletPubkey,
+      },
+    },
+  });
+  const role =
+    member && !member.leftAt && typeof member.role === "string"
+      ? member.role.trim().toLowerCase()
+      : "";
+  return !!role && input.policy.moderatorRoles.includes(role);
+}
+
 async function loadActiveVoiceSession(
   prisma: VoicePrisma,
   sessionId: string,
@@ -576,6 +1047,13 @@ async function loadActiveVoiceSession(
 ): Promise<VoiceSessionRow | null> {
   const session = await prisma.voiceSession.findUnique({
     where: { id: sessionId },
+    include: {
+      room: {
+        select: {
+          metadata: true,
+        },
+      },
+    },
   });
   if (!session) return null;
   if (session.status === "ended" || session.status === "failed") return null;

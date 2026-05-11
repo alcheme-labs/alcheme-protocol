@@ -60,6 +60,9 @@ function buildPrismaMock(overrides: Record<string, unknown> = {}) {
         ...update,
       })),
     },
+    user: {
+      findUnique: jest.fn(async () => null),
+    },
     circleMember: {
       findUnique: jest.fn(async () => null),
     },
@@ -101,21 +104,30 @@ describe("communication permissions", () => {
         { roomKey: ROOM_KEY, walletPubkey: WALLET },
         { now: NOW },
       ),
-    ).resolves.toMatchObject({ allowed: true, reason: "room_member" });
+    ).resolves.toMatchObject({
+      allowed: true,
+      reason: "room_member",
+    });
     await expect(
       canWriteRoom(
         prisma,
         { roomKey: ROOM_KEY, walletPubkey: WALLET },
         { now: NOW },
       ),
-    ).resolves.toMatchObject({ allowed: false, reason: "member_muted" });
+    ).resolves.toMatchObject({
+      allowed: false,
+      reason: "member_muted",
+    });
     await expect(
       canJoinVoice(
         prisma,
         { roomKey: ROOM_KEY, walletPubkey: WALLET },
         { now: NOW },
       ),
-    ).resolves.toMatchObject({ allowed: false, reason: "member_muted" });
+    ).resolves.toMatchObject({
+      allowed: false,
+      reason: "member_muted",
+    });
   });
 
   test("blocks banned members from read, write, and moderation paths", async () => {
@@ -134,21 +146,30 @@ describe("communication permissions", () => {
         { roomKey: ROOM_KEY, walletPubkey: WALLET },
         { now: NOW },
       ),
-    ).resolves.toMatchObject({ allowed: false, reason: "member_banned" });
+    ).resolves.toMatchObject({
+      allowed: false,
+      reason: "member_banned",
+    });
     await expect(
       canWriteRoom(
         prisma,
         { roomKey: ROOM_KEY, walletPubkey: WALLET },
         { now: NOW },
       ),
-    ).resolves.toMatchObject({ allowed: false, reason: "member_banned" });
+    ).resolves.toMatchObject({
+      allowed: false,
+      reason: "member_banned",
+    });
     await expect(
       canModerateRoom(
         prisma,
         { roomKey: ROOM_KEY, walletPubkey: WALLET },
         { now: NOW },
       ),
-    ).resolves.toMatchObject({ allowed: false, reason: "member_banned" });
+    ).resolves.toMatchObject({
+      allowed: false,
+      reason: "member_banned",
+    });
   });
 
   test("lets active circle members use circle-backed rooms without duplicating Plaza state", async () => {
@@ -182,21 +203,95 @@ describe("communication permissions", () => {
         { roomKey: "circle:130", walletPubkey: WALLET, userId: 7 },
         { now: NOW },
       ),
-    ).resolves.toMatchObject({ allowed: true, reason: "circle_member" });
+    ).resolves.toMatchObject({
+      allowed: true,
+      reason: "circle_member",
+    });
     await expect(
       canWriteRoom(
         prisma,
         { roomKey: "circle:130", walletPubkey: WALLET, userId: 7 },
         { now: NOW },
       ),
-    ).resolves.toMatchObject({ allowed: true, reason: "circle_member" });
+    ).resolves.toMatchObject({
+      allowed: true,
+      reason: "circle_member",
+    });
     await expect(
       canModerateRoom(
         prisma,
         { roomKey: "circle:130", walletPubkey: WALLET, userId: 7 },
         { now: NOW },
       ),
-    ).resolves.toMatchObject({ allowed: true, reason: "circle_manager" });
+    ).resolves.toMatchObject({
+      allowed: true,
+      reason: "circle_manager",
+    });
+  });
+
+  test("resolves circle membership from wallet pubkey for session-authenticated REST access", async () => {
+    const prisma = buildPrismaMock({
+      communicationRoom: {
+        findUnique: jest.fn(async () =>
+          activeRoom({
+            roomKey: "circle:130",
+            roomType: "circle",
+            externalAppId: null,
+            parentCircleId: 130,
+            externalRoomId: null,
+          }),
+        ),
+      },
+      communicationRoomMember: {
+        findUnique: jest.fn(async () => null),
+        upsert: jest.fn(),
+      },
+      user: {
+        findUnique: jest.fn(async () => ({ id: 7 })),
+      },
+      circleMember: {
+        findUnique: jest.fn(async () => ({
+          status: MemberStatus.Active,
+          role: MemberRole.Admin,
+        })),
+      },
+    });
+
+    await expect(
+      canReadRoom(
+        prisma,
+        { roomKey: "circle:130", walletPubkey: WALLET },
+        { now: NOW },
+      ),
+    ).resolves.toMatchObject({
+      allowed: true,
+      reason: "circle_member",
+    });
+    await expect(
+      canWriteRoom(
+        prisma,
+        { roomKey: "circle:130", walletPubkey: WALLET },
+        { now: NOW },
+      ),
+    ).resolves.toMatchObject({
+      allowed: true,
+      reason: "circle_member",
+    });
+    await expect(
+      canModerateRoom(
+        prisma,
+        { roomKey: "circle:130", walletPubkey: WALLET },
+        { now: NOW },
+      ),
+    ).resolves.toMatchObject({
+      allowed: true,
+      reason: "circle_manager",
+    });
+
+    expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      where: { pubkey: WALLET },
+      select: { id: true },
+    });
   });
 
   test("upserts external room members only with a valid server-signed member claim", async () => {

@@ -2037,6 +2037,20 @@
         "hint": "这些标注只代表作者意图，系统语义筛选以后端分析结果为准。"
       }
     },
+    "voice": {
+      "join": "加入语音",
+      "joining": "正在加入语音…",
+      "connected": "语音已连接",
+      "listenOnly": "语音已连接 · 仅收听",
+      "leaving": "正在离开语音…",
+      "mute": "关闭麦克风",
+      "unmute": "打开麦克风",
+      "leave": "离开语音",
+      "participantCount": "{count} 人语音中",
+      "walletRequired": "连接钱包后可加入语音。",
+      "membershipRequired": "加入当前圈层后可使用语音。",
+      "joinFailed": "加入语音失败。"
+    },
     "errors": {
       "walletRequired": "请先连接钱包后再发送消息",
       "syncFailed": "同步讨论消息失败",
@@ -2397,14 +2411,14 @@
     "members": {
       "directoryTitle": "成员目录",
       "title": "成员 ({count})",
-        "actions": {
-          "setCurator": "设为策展人",
-          "unsetCurator": "取消策展人",
-          "remove": "移除成员",
-          "invite": "邀请成员",
-          "leave": "离开圈层"
-        }
-      },
+      "actions": {
+        "setCurator": "设为策展人",
+        "unsetCurator": "取消策展人",
+        "remove": "移除成员",
+        "invite": "邀请成员",
+        "leave": "离开圈层"
+      }
+    },
     "danger": {
       "deleteCircle": "解散此圈层"
     },

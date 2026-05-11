@@ -2037,6 +2037,20 @@
         "hint": "Ces annotations reflètent uniquement l’intention de l’auteur. Le filtrage du système suit l’analyse sémantique du backend."
       }
     },
+    "voice": {
+      "join": "Rejoindre la voix",
+      "joining": "Connexion à la voix…",
+      "connected": "Voix connectée",
+      "listenOnly": "Voix connectée · écoute seule",
+      "leaving": "Sortie de la voix…",
+      "mute": "Couper le micro",
+      "unmute": "Activer le micro",
+      "leave": "Quitter la voix",
+      "participantCount": "{count} en vocal",
+      "walletRequired": "Connectez votre wallet pour rejoindre la voix.",
+      "membershipRequired": "Rejoignez ce cercle avant d’utiliser la voix.",
+      "joinFailed": "Impossible de rejoindre la voix."
+    },
     "errors": {
       "walletRequired": "Connectez votre wallet avant d’envoyer un message.",
       "syncFailed": "Impossible de synchroniser les messages de la discussion.",
@@ -2397,14 +2411,14 @@
     "members": {
       "directoryTitle": "Annuaire des membres",
       "title": "Membres ({count})",
-        "actions": {
-          "setCurator": "Nommer curateur",
-          "unsetCurator": "Retirer le rôle de curateur",
-          "remove": "Retirer le membre",
-          "invite": "Inviter des membres",
-          "leave": "Quitter le cercle"
-        }
-      },
+      "actions": {
+        "setCurator": "Nommer curateur",
+        "unsetCurator": "Retirer le rôle de curateur",
+        "remove": "Retirer le membre",
+        "invite": "Inviter des membres",
+        "leave": "Quitter le cercle"
+      }
+    },
     "danger": {
       "deleteCircle": "Dissoudre ce cercle"
     },

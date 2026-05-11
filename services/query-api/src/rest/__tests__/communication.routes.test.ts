@@ -3,7 +3,14 @@ import { EventEmitter } from "events";
 
 import express from "express";
 import request from "supertest";
-import { describe, expect, jest, test } from "@jest/globals";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  jest,
+  test,
+} from "@jest/globals";
 import bs58 from "bs58";
 import nacl from "tweetnacl";
 
@@ -126,6 +133,9 @@ function buildPrismaMock(serverPublicKey: string) {
         return next;
       }),
     },
+    user: {
+      findUnique: jest.fn(async () => null),
+    },
     circleMember: {
       findUnique: jest.fn(async () => null),
     },
@@ -196,6 +206,15 @@ function buildPrismaMock(serverPublicKey: string) {
 }
 
 describe("communication routes", () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(NOW);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   test("resolves an external room, writes, reads, and streams messages without creating circles", async () => {
     const appClaim = buildSignedAppClaim({
       externalAppId: "example-web3-game",
@@ -354,5 +373,135 @@ describe("communication routes", () => {
         )
         .digest("hex"),
     );
+  });
+
+  test("rejects stale session bootstrap signatures instead of issuing reusable room tokens", async () => {
+    const appClaim = buildSignedAppClaim({
+      externalAppId: "example-web3-game",
+      roomType: "dungeon",
+      externalRoomId: "run-8791",
+      walletPubkeys: [WALLET],
+      roles: { [WALLET]: "speaker" },
+      expiresAt: "2099-05-08T12:05:00.000Z",
+      nonce: "claim-1",
+    });
+    const prisma = buildPrismaMock(appClaim.serverPublicKey);
+    const redis = buildRedisMock();
+    const app = buildApp(prisma, redis);
+
+    await request(app)
+      .post("/api/v1/communication/rooms/resolve")
+      .send({
+        externalAppId: "example-web3-game",
+        roomType: "dungeon",
+        externalRoomId: "run-8791",
+        parentCircleId: 130,
+        walletPubkey: WALLET,
+        appRoomClaim: appClaim.claim,
+      })
+      .expect(201);
+    await request(app)
+      .post(
+        `/api/v1/communication/rooms/${encodeURIComponent(ROOM_KEY)}/members`,
+      )
+      .send({ walletPubkey: WALLET, appRoomClaim: appClaim.claim })
+      .expect(200);
+
+    const staleTimestamp = new Date(
+      NOW.getTime() - 16 * 60 * 1000,
+    ).toISOString();
+    const sessionPayload = {
+      v: 1 as const,
+      action: "communication_session_init" as const,
+      walletPubkey: WALLET,
+      scopeType: "room" as const,
+      scopeRef: ROOM_KEY,
+      clientTimestamp: staleTimestamp,
+      nonce: "stale-session-1",
+    };
+    const sessionMessage =
+      buildCommunicationSessionBootstrapMessage(sessionPayload);
+
+    const response = await request(app)
+      .post("/api/v1/communication/sessions")
+      .send({
+        walletPubkey: WALLET,
+        roomKey: ROOM_KEY,
+        clientTimestamp: staleTimestamp,
+        nonce: "stale-session-1",
+        signedMessage: sessionMessage,
+        signature: signBase64(sessionMessage, WALLET_KEYPAIR.secretKey),
+      })
+      .expect(401);
+
+    expect(response.body.error).toBe("signed_timestamp_out_of_window");
+    expect(prisma.communicationSession.create).not.toHaveBeenCalled();
+  });
+
+  test("rejects stale wallet-signed room messages before accepting per-message auth", async () => {
+    const appClaim = buildSignedAppClaim({
+      externalAppId: "example-web3-game",
+      roomType: "dungeon",
+      externalRoomId: "run-8791",
+      walletPubkeys: [WALLET],
+      roles: { [WALLET]: "speaker" },
+      expiresAt: "2099-05-08T12:05:00.000Z",
+      nonce: "claim-1",
+    });
+    const prisma = buildPrismaMock(appClaim.serverPublicKey);
+    const redis = buildRedisMock();
+    const app = buildApp(prisma, redis);
+
+    await request(app)
+      .post("/api/v1/communication/rooms/resolve")
+      .send({
+        externalAppId: "example-web3-game",
+        roomType: "dungeon",
+        externalRoomId: "run-8791",
+        parentCircleId: 130,
+        walletPubkey: WALLET,
+        appRoomClaim: appClaim.claim,
+      })
+      .expect(201);
+    await request(app)
+      .post(
+        `/api/v1/communication/rooms/${encodeURIComponent(ROOM_KEY)}/members`,
+      )
+      .send({ walletPubkey: WALLET, appRoomClaim: appClaim.claim })
+      .expect(200);
+
+    const text = "old packet";
+    const staleTimestamp = new Date(
+      NOW.getTime() - 16 * 60 * 1000,
+    ).toISOString();
+    const messagePayload = {
+      v: 1 as const,
+      roomKey: ROOM_KEY,
+      senderPubkey: WALLET,
+      messageKind: "plain" as const,
+      text,
+      clientTimestamp: staleTimestamp,
+      nonce: "stale-message-1",
+      prevEnvelopeId: null,
+    };
+    const signedMessage =
+      buildCommunicationMessageSigningMessage(messagePayload);
+
+    const response = await request(app)
+      .post(
+        `/api/v1/communication/rooms/${encodeURIComponent(ROOM_KEY)}/messages`,
+      )
+      .send({
+        senderPubkey: WALLET,
+        text,
+        clientTimestamp: staleTimestamp,
+        nonce: "stale-message-1",
+        signedMessage,
+        signature: signBase64(signedMessage, WALLET_KEYPAIR.secretKey),
+      })
+      .expect(401);
+
+    expect(response.body.error).toBe("signed_timestamp_out_of_window");
+    expect(prisma.communicationMessage.create).not.toHaveBeenCalled();
   });
 });

@@ -1,6 +1,13 @@
 import express from "express";
 import request from "supertest";
-import { describe, expect, jest, test } from "@jest/globals";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  jest,
+  test,
+} from "@jest/globals";
 
 import {
   buildCommunicationMessageSigningMessage,
@@ -84,6 +91,9 @@ function buildPrismaMock() {
       findUnique: jest.fn(async () => member),
       upsert: jest.fn(),
     },
+    user: {
+      findUnique: jest.fn(async () => null),
+    },
     circleMember: {
       findUnique: jest.fn(async () => null),
     },
@@ -134,6 +144,15 @@ function voiceClipSignedMessage(input: {
 }
 
 describe("communication voice clip messages", () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(NOW);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   test("stores a voice clip as a communication message without reusing live voice sessions", async () => {
     const prisma = buildPrismaMock();
     const redis = buildRedisMock();

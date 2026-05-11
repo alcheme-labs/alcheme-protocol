@@ -77,12 +77,61 @@ LIVEKIT_API_KEY=...
 LIVEKIT_API_SECRET=...
 VOICE_DEFAULT_TTL_SEC=7200
 VOICE_TOKEN_TTL_SEC=900
+VOICE_PLATFORM_MAX_SPEAKERS_PER_SESSION=100
+VOICE_DEFAULT_MAX_SPEAKERS_PER_SESSION=16
+VOICE_SPEAKER_LIMIT_STRATEGY=listen_only
 COMMUNICATION_VOICE_CLIP_MAX_DURATION_MS=300000
 COMMUNICATION_VOICE_CLIP_MAX_BYTES=26214400
 ```
 
 `VOICE_PUBLIC_URL` is public. `LIVEKIT_API_KEY` and `LIVEKIT_API_SECRET` must stay
 server-side.
+
+Voice speaker limits have two layers:
+
+- `VOICE_PLATFORM_MAX_SPEAKERS_PER_SESSION` is the platform hard cap. The local
+  default is `100`, matching the current LiveKit Build-plan participant
+  concurrency and per-participant audio subscription scale instead of treating
+  `16` as a technical ceiling.
+- `VOICE_DEFAULT_MAX_SPEAKERS_PER_SESSION` is the fallback room speaker slot
+  count when a room does not provide its own policy. The default is `16`, meant
+  as a conservative interactive voice-room default for party/guild/gameplay
+  rooms, not as the system maximum.
+- `VOICE_MAX_SPEAKERS_PER_SESSION` is still accepted as a legacy alias for the
+  default room speaker slot count.
+
+`VOICE_SPEAKER_LIMIT_STRATEGY` controls overflow behavior:
+
+- `listen_only` (default): extra participants can join and listen, but receive a
+  subscribe-only token with `canPublishAudio=false`.
+- `deny`: extra participants are rejected with
+  `voice_speaker_limit_reached` / HTTP `429`.
+- `queue`: extra participants join as listeners with `role=queued`. When speaker
+  slots open, token issuance promotes the earliest queued wallet first, so new
+  callers cannot skip the queue.
+- `moderated_queue`: participants request the mic and stay listen-only with
+  `role=queued` until a room voice moderator approves them. This is the right
+  default for guild halls, public lobbies, AMAs, teaching rooms, or any room
+  where speaking order needs active control.
+
+External game rooms can set room-specific policy through the server-signed
+`appRoomClaim.voicePolicy`. Effective speaker slots are always clamped to the
+platform hard cap. Unsigned `metadata.voicePolicy` in the browser request is
+ignored for external rooms.
+
+Recommended defaults:
+
+- squad / party chat: `4..8` speaker slots
+- dungeon / match room: `8..16` speaker slots
+- guild / large lobby: `16..32` speaker slots, usually with `queue`
+- hosted event / public hall: `8..24` speaker slots with `moderated_queue`
+- open world / very large scene: split by proximity, party, or channel instead
+  of running every player as an active microphone publisher in one room
+
+`moderated_queue` is still a voice runtime policy, not the governance module
+itself. The voice runtime owns the queue and provider permissions; governance or
+room roles can be used as an authorization source for who may approve, reject, or
+lower speakers.
 
 ## Room Model
 
@@ -148,6 +197,11 @@ Payload fields:
   "externalRoomId": "run-8791",
   "walletPubkeys": ["<player wallet>"],
   "roles": { "<player wallet>": "member" },
+  "voicePolicy": {
+    "maxSpeakers": 16,
+    "overflowStrategy": "queue",
+    "moderatorRoles": ["owner", "moderator", "host"]
+  },
   "expiresAt": "2026-05-09T18:00:00.000Z",
   "nonce": "unique-server-nonce"
 }
@@ -155,6 +209,10 @@ Payload fields:
 
 The wallet being resolved or synced must appear in `walletPubkeys`. Room-wide
 claims without wallet scope are rejected for member sync.
+
+`voicePolicy` is optional. When present, it is copied into room metadata only
+after the app-room claim signature, room identity, expiry, nonce, and wallet
+scope pass verification.
 
 ## API Flow
 
@@ -326,6 +384,24 @@ Content-Type: application/json
 Muted members can receive subscribe-only tokens. Banned members are rejected
 before any provider token is issued.
 
+For `moderated_queue`, ordinary members receive a subscribe-only token with
+`policy.speakerLimit.reason = "speaker_approval_required"` and
+`role=queued`. Voice moderators approve or reject queued wallets through the
+voice-session moderation routes:
+
+```http
+POST /api/v1/voice/sessions/:sessionId/speakers/:walletPubkey/approve
+Authorization: Bearer <moderator communicationAccessToken>
+```
+
+```http
+POST /api/v1/voice/sessions/:sessionId/speakers/:walletPubkey/deny
+Authorization: Bearer <moderator communicationAccessToken>
+```
+
+Approval promotes the target wallet to `role=speaker` only if a speaker slot is
+available. Rejection leaves the target as listen-only.
+
 ## SDK Flow
 
 The SDK exports:
@@ -437,3 +513,5 @@ Before calling an integration complete:
 - no contract or Anchor program files changed
 - `transcriptionMode` remains `off` unless a server-signed app claim explicitly
   authorizes a non-off mode
+- external room `voicePolicy` comes from a verified server-signed app claim, and
+  effective speaker slots never exceed `VOICE_PLATFORM_MAX_SPEAKERS_PER_SESSION`

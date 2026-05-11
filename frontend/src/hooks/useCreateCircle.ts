@@ -621,7 +621,7 @@ export function useCreateCircle(): UseCreateCircleReturn {
                         });
                     } catch (anchorError) {
                         console.warn('[useCreateCircle] anchor fork failed', anchorError);
-                        setError((prev) => appendCreateCircleNotice(prev, t('errors.forkAnchorSyncFailed')));
+                        addCompletionNotice(t('errors.forkAnchorSyncFailed'));
                     }
                 }
 
@@ -675,7 +675,7 @@ export function useCreateCircle(): UseCreateCircleReturn {
                             });
                         } catch (metadataError) {
                             console.warn('[useCreateCircle] sync circle metadata failed', metadataError);
-                            setError((prev) => appendCreateCircleNotice(prev, t('errors.metadataSyncFailed')));
+                            addCompletionNotice(t('errors.metadataSyncFailed'));
                         }
                     }
 
@@ -696,7 +696,7 @@ export function useCreateCircle(): UseCreateCircleReturn {
                             });
                         } catch (ghostError) {
                             console.warn('[useCreateCircle] save ghost settings failed', ghostError);
-                            setError((prev) => appendCreateCircleNotice(prev, t('errors.ghostSettingsSyncFailed')));
+                            addCompletionNotice(t('errors.ghostSettingsSyncFailed'));
                         }
                     }
 
@@ -721,7 +721,7 @@ export function useCreateCircle(): UseCreateCircleReturn {
                         }
                     } catch (genesisError) {
                         console.warn('[useCreateCircle] sync genesis mode failed', genesisError);
-                        setError((prev) => appendCreateCircleNotice(prev, t('errors.genesisModeSyncFailed')));
+                        addCompletionNotice(t('errors.genesisModeSyncFailed'));
                     }
 
                     if (options.genesisMode === 'SEEDED' && Array.isArray(options.seededSources) && options.seededSources.length > 0) {
@@ -732,7 +732,7 @@ export function useCreateCircle(): UseCreateCircleReturn {
                             });
                         } catch (seededError) {
                             console.warn('[useCreateCircle] sync seeded sources failed', seededError);
-                            setError((prev) => appendCreateCircleNotice(prev, t('errors.seededSourcesSyncFailed')));
+                            addCompletionNotice(t('errors.seededSourcesSyncFailed'));
                         }
                     }
 
@@ -751,7 +751,7 @@ export function useCreateCircle(): UseCreateCircleReturn {
                         });
                     } catch (policyError) {
                         console.warn('[useCreateCircle] sync join policy failed', policyError);
-                        setError((prev) => appendCreateCircleNotice(prev, t('errors.joinPolicySyncFailed')));
+                        addCompletionNotice(t('errors.joinPolicySyncFailed'));
                     }
 
                     if (options.draftLifecycleTemplate) {
@@ -767,7 +767,7 @@ export function useCreateCircle(): UseCreateCircleReturn {
                             });
                         } catch (policyError) {
                             console.warn('[useCreateCircle] sync draft lifecycle template failed', policyError);
-                            setError((prev) => appendCreateCircleNotice(prev, t('errors.draftLifecycleSyncFailed')));
+                            addCompletionNotice(t('errors.draftLifecycleSyncFailed'));
                         }
                     }
 
@@ -784,7 +784,7 @@ export function useCreateCircle(): UseCreateCircleReturn {
                             });
                         } catch (policyError) {
                             console.warn('[useCreateCircle] sync draft workflow policy failed', policyError);
-                            setError((prev) => appendCreateCircleNotice(prev, t('errors.workflowPolicySyncFailed')));
+                            addCompletionNotice(t('errors.workflowPolicySyncFailed'));
                         }
                     }
                 };
@@ -796,10 +796,10 @@ export function useCreateCircle(): UseCreateCircleReturn {
 
                 if (postCreateSyncResult.status === 'timeout') {
                     console.warn('[useCreateCircle] post-create settings sync timed out');
-                    setError((prev) => appendCreateCircleNotice(prev, t('errors.postCreateSyncPending')));
+                    addCompletionNotice(t('errors.postCreateSyncPending'));
                 } else if (postCreateSyncResult.status === 'failed') {
                     console.warn('[useCreateCircle] post-create settings sync failed', postCreateSyncResult.error);
-                    setError((prev) => appendCreateCircleNotice(prev, t('errors.postCreateSyncFailed')));
+                    addCompletionNotice(t('errors.postCreateSyncFailed'));
                 }
 
                 return {

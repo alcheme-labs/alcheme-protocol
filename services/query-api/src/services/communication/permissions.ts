@@ -55,6 +55,10 @@ interface CircleMemberRecord {
   role: MemberRole | string;
 }
 
+interface UserRecord {
+  id: number;
+}
+
 interface CommunicationPermissionPrisma {
   communicationRoom: {
     findUnique(input: unknown): Promise<CommunicationRoomRecord | null>;
@@ -62,6 +66,9 @@ interface CommunicationPermissionPrisma {
   communicationRoomMember: {
     findUnique(input: unknown): Promise<CommunicationRoomMemberRecord | null>;
     upsert(input: unknown): Promise<CommunicationRoomMemberRecord>;
+  };
+  user: {
+    findUnique(input: unknown): Promise<UserRecord | null>;
   };
   circleMember: {
     findUnique(input: unknown): Promise<CircleMemberRecord | null>;
@@ -78,6 +85,8 @@ interface PermissionContext {
 const ROOM_MEMBER_ROLES = new Set([
   "owner",
   "moderator",
+  "host",
+  "party_leader",
   "speaker",
   "listener",
   "member",
@@ -234,23 +243,45 @@ async function loadPermissionContext(
           },
         })
       : Promise.resolve(null),
-    room.parentCircleId && input.userId
-      ? prisma.circleMember.findUnique({
-          where: {
-            circleId_userId: {
-              circleId: room.parentCircleId,
-              userId: input.userId,
-            },
-          },
-          select: {
-            status: true,
-            role: true,
-          },
-        })
-      : Promise.resolve(null),
+    loadCircleMember(prisma, room, input),
   ]);
 
   return { room, member, circleMember, now };
+}
+
+async function loadCircleMember(
+  prisma: CommunicationPermissionPrisma,
+  room: CommunicationRoomRecord,
+  input: CommunicationPermissionInput,
+): Promise<CircleMemberRecord | null> {
+  if (!room.parentCircleId) return null;
+  const userId = input.userId ?? (await resolveUserIdByWallet(prisma, input));
+  if (!userId) return null;
+
+  return prisma.circleMember.findUnique({
+    where: {
+      circleId_userId: {
+        circleId: room.parentCircleId,
+        userId,
+      },
+    },
+    select: {
+      status: true,
+      role: true,
+    },
+  });
+}
+
+async function resolveUserIdByWallet(
+  prisma: CommunicationPermissionPrisma,
+  input: CommunicationPermissionInput,
+): Promise<number | null> {
+  if (!input.walletPubkey) return null;
+  const user = await prisma.user.findUnique({
+    where: { pubkey: input.walletPubkey },
+    select: { id: true },
+  });
+  return user?.id ?? null;
 }
 
 function loadRoom(

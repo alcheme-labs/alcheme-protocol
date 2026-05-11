@@ -200,6 +200,59 @@ describe("resolveCommunicationRoom", () => {
     expect(authorizedRequest.transcriptionMode).toBe("recap");
   });
 
+  test("persists only the signed room voice policy for external app rooms", async () => {
+    const { claim, serverPublicKey } = buildSignedClaim({
+      externalAppId: "example-web3-game",
+      roomType: "dungeon",
+      externalRoomId: "run-8791",
+      walletPubkeys: [WALLET],
+      voicePolicy: {
+        maxSpeakers: 12,
+        overflowStrategy: "moderated_queue",
+        moderatorRoles: ["host", "moderator"],
+      },
+      expiresAt: "2026-05-08T12:05:00.000Z",
+      nonce: "claim-voice-policy",
+    });
+    const prisma = buildPrismaMock({
+      externalApp: {
+        findUnique: jest.fn(async () => ({
+          id: "example-web3-game",
+          status: "active",
+          serverPublicKey,
+          claimAuthMode: "server_ed25519",
+        })),
+      },
+    });
+
+    const room = await resolveCommunicationRoom(
+      prisma,
+      {
+        externalAppId: "example-web3-game",
+        roomType: "dungeon",
+        externalRoomId: "run-8791",
+        appRoomClaim: claim,
+        walletPubkey: WALLET,
+        metadata: {
+          voicePolicy: {
+            maxSpeakers: 99,
+            overflowStrategy: "deny",
+          },
+        },
+      },
+      { now: NOW },
+    );
+
+    expect(room.metadata).toEqual({
+      voicePolicy: {
+        maxSpeakers: 12,
+        overflowStrategy: "moderated_queue",
+        moderatorRoles: ["host", "moderator"],
+        source: "app_room_claim",
+      },
+    });
+  });
+
   test("rejects missing parent circles before upserting", async () => {
     const prisma = buildPrismaMock({
       circle: {

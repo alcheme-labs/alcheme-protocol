@@ -15,7 +15,7 @@
     "mobile:sync": "node ./scripts/mobile-shell.mjs sync",
     "start": "next start",
     "mobile:url": "node ./scripts/print-mobile-lan-url.mjs",
-    "test:ci": "node --test tests/useAlchemeSDKStatic.test.mjs tests/nodeRouting.test.mjs tests/mobileShellConfig.test.mjs tests/mobileShellCommands.test.mjs tests/nativePhantomWalletAdapterStatic.test.mjs tests/nextStaticAlias.test.mjs",
+    "test:ci": "node --test tests/useAlchemeSDKStatic.test.mjs tests/nodeRouting.test.mjs tests/mobileShellConfig.test.mjs tests/mobileShellCommands.test.mjs tests/nativePhantomWalletAdapterStatic.test.mjs tests/nextStaticAlias.test.mjs tests/plazaVoiceEntry.test.mjs",
     "test:e2e": "playwright test",
     "test:e2e:smoke": "playwright test --grep @smoke"
   },
@@ -41,6 +41,7 @@
     "bs58": "^5.0.0",
     "framer-motion": "^12.34.0",
     "graphql": "^16.12.0",
+    "livekit-client": "^2.18.9",
     "lucide-react": "^0.563.0",
     "next": "16.1.6",
     "next-intl": "^4.9.0",

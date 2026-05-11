@@ -1733,6 +1733,133 @@
     cursor: not-allowed;
 }
 
+.composerVoiceBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(199, 168, 107, 0.22);
+    background: rgba(199, 168, 107, 0.08);
+    color: var(--color-accent-gold);
+    cursor: pointer;
+    transition: background-color var(--motion-fast) var(--easing-standard),
+        border-color var(--motion-fast) var(--easing-standard),
+        color var(--motion-fast) var(--easing-standard),
+        transform 220ms var(--easing-standard);
+}
+
+.composerVoiceBtnActive {
+    background: rgba(199, 168, 107, 0.18);
+    border-color: rgba(199, 168, 107, 0.42);
+    color: #f2d18a;
+}
+
+.composerVoiceBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.composerVoiceBtn:active:not(:disabled) {
+    transform: scale(0.96);
+}
+
+.composerVoiceSpinner {
+    animation: composerVoiceSpin 900ms linear infinite;
+}
+
+.composerVoiceDock {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    min-height: 38px;
+    margin-bottom: var(--space-2);
+    padding: 7px 9px;
+    border-radius: 12px;
+    border: 1px solid rgba(199, 168, 107, 0.16);
+    background: rgba(199, 168, 107, 0.07);
+}
+
+.composerVoiceState {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.composerVoiceIndicator {
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: #f87171;
+    box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.1);
+}
+
+.composerVoiceIndicatorActive {
+    background: #4ade80;
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.1);
+}
+
+.composerVoiceText {
+    min-width: 0;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.composerVoiceMeta {
+    flex-shrink: 0;
+    color: var(--color-text-tertiary);
+    font-size: 11px;
+    line-height: 1.2;
+}
+
+.composerVoiceControls {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.composerVoiceControlBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(199, 168, 107, 0.2);
+    background: rgba(18, 22, 20, 0.42);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: border-color var(--motion-fast) var(--easing-standard),
+        color var(--motion-fast) var(--easing-standard),
+        transform 220ms var(--easing-standard);
+}
+
+.composerVoiceControlBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.composerVoiceControlBtn:active:not(:disabled) {
+    transform: scale(0.96);
+}
+
+@keyframes composerVoiceSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 /* ── Expandable Panel (WeChat-style) ── */
 .composerPanel {
     overflow: hidden;
@@ -2115,6 +2242,16 @@
 
     .discussionMetaRow {
         gap: 4px 10px;
+    }
+
+    .composerVoiceDock {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .composerVoiceControls {
+        align-self: flex-end;
     }
 
     .composerOps {

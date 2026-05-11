@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { useMutation } from '@apollo/client/react';
-import { Smile, Paperclip, AtSign, SendHorizonal, CornerDownLeft, Copy, Trash2, Compass, Rss, Plus, X, ChevronUp, ChevronDown, FileEdit } from 'lucide-react';
+import { Smile, Paperclip, AtSign, SendHorizonal, CornerDownLeft, Copy, Trash2, Compass, Rss, Plus, X, ChevronUp, ChevronDown, FileEdit, Mic, MicOff, PhoneOff, Loader2 } from 'lucide-react';
 
 import HighlightButton from '@/components/circle/HighlightButton';
 import MessageActionSheet from '@/components/circle/MessageActionSheet/MessageActionSheet';
@@ -35,6 +35,13 @@ import {
     sendDiscussionMessage,
     tombstoneDiscussionMessage,
 } from '@/lib/api/discussion';
+import { createCommunicationSession } from '@/lib/api/communication';
+import { createVoiceSession, createVoiceToken } from '@/lib/api/voice';
+import {
+    createLiveKitBrowserVoiceProvider,
+    type LiveKitBrowserVoiceConnection,
+    type LiveKitBrowserVoiceProvider,
+} from '@/lib/voice/livekitClient';
 import {
     runWithDiscussionSessionRecovery,
     type DiscussionSessionTokenOptions,
@@ -66,6 +73,15 @@ const REPLY_PREVIEW_MAX_LENGTH = 64;
 const COMPOSER_HINT_AUTO_HIDE_MS = 40_000;
 const DISCUSSION_SYNC_LIMIT = 120;
 const MANUAL_DRAFT_SOURCE_LIMIT = 16;
+
+type VoiceStatus = 'idle' | 'joining' | 'connected' | 'leaving' | 'error';
+
+interface CachedCommunicationVoiceSession {
+    roomKey: string;
+    walletPubkey: string;
+    communicationAccessToken: string;
+    expiresAt: string;
+}
 
 function messageMatchesContentFilters(
     message: PlazaMessage,
@@ -210,6 +226,12 @@ function PlazaTab({
     const [discussionLoading, setDiscussionLoading] = useState(false);
     const [discussionError, setDiscussionError] = useState<string | null>(null);
     const [discussionSession, setDiscussionSession] = useState<DiscussionSessionState | null>(null);
+    const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>('idle');
+    const [voiceError, setVoiceError] = useState<string | null>(null);
+    const [voiceMuted, setVoiceMuted] = useState(false);
+    const [voiceCanPublishAudio, setVoiceCanPublishAudio] = useState(true);
+    const [voiceParticipantCount, setVoiceParticipantCount] = useState(0);
+    const [activeVoiceSessionId, setActiveVoiceSessionId] = useState<string | null>(null);
     const [lastEnvelopeId, setLastEnvelopeId] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<DiscussionViewMode>('all');
     const [showPanel, setShowPanel] = useState(false);
@@ -236,6 +258,9 @@ function PlazaTab({
     const touchStartPos = useRef<Map<number, { x: number; y: number }>>(new Map());
     const sessionBootstrapRef = useRef<Promise<string | null> | null>(null);
     const discussionRealtimeSubscriptionRef = useRef<DiscussionRealtimeSubscription | null>(null);
+    const voiceConnectionRef = useRef<LiveKitBrowserVoiceConnection | null>(null);
+    const voiceProviderRef = useRef<LiveKitBrowserVoiceProvider | null>(null);
+    const communicationVoiceSessionRef = useRef<CachedCommunicationVoiceSession | null>(null);
     const localMessagesRef = useRef<PlazaMessage[]>(messages);
     const shouldFollowLatestRef = useRef(true);
     const previousMessageCountRef = useRef(messages.length);
@@ -292,6 +317,10 @@ function PlazaTab({
     const discussionSessionStorageKey = useMemo(
         () => (walletPubkey ? `alcheme_discussion_session_${walletPubkey}` : null),
         [walletPubkey],
+    );
+    const communicationRoomKey = useMemo(
+        () => `circle:${discussionCircleId}`,
+        [discussionCircleId],
     );
 
     const revealDimmedMessage = useCallback((msgId: number) => {
@@ -450,6 +479,186 @@ function PlazaTab({
         useSessionTokenAuth,
         walletPubkey,
     ]);
+
+    const getVoiceProvider = useCallback((): LiveKitBrowserVoiceProvider => {
+        if (!voiceProviderRef.current) {
+            voiceProviderRef.current = createLiveKitBrowserVoiceProvider();
+        }
+        return voiceProviderRef.current;
+    }, []);
+
+    const updateVoiceParticipantCount = useCallback(() => {
+        const participants = voiceConnectionRef.current?.getParticipants() ?? [];
+        setVoiceParticipantCount(participants.length);
+    }, []);
+
+    const ensureCommunicationVoiceSessionToken = useCallback(async (): Promise<string> => {
+        if (!walletPubkey) {
+            throw new Error(t('voice.walletRequired'));
+        }
+        if (!viewerJoined) {
+            throw new Error(t('voice.membershipRequired'));
+        }
+        const current = communicationVoiceSessionRef.current;
+        const expiresAtMs = current ? Date.parse(current.expiresAt) : 0;
+        if (
+            current
+            && current.walletPubkey === walletPubkey
+            && current.roomKey === communicationRoomKey
+            && Number.isFinite(expiresAtMs)
+            && expiresAtMs - Date.now() > 60_000
+        ) {
+            return current.communicationAccessToken;
+        }
+
+        const created = await createCommunicationSession({
+            walletPubkey,
+            roomKey: communicationRoomKey,
+            signMessage,
+            clientMeta: {
+                circleId: discussionCircleId,
+                source: 'frontend_plaza_voice',
+                userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
+            },
+        });
+        const nextSession: CachedCommunicationVoiceSession = {
+            roomKey: created.scopeRef,
+            walletPubkey: created.walletPubkey,
+            communicationAccessToken: created.communicationAccessToken,
+            expiresAt: created.expiresAt,
+        };
+        communicationVoiceSessionRef.current = nextSession;
+        return nextSession.communicationAccessToken;
+    }, [
+        communicationRoomKey,
+        discussionCircleId,
+        signMessage,
+        t,
+        viewerJoined,
+        walletPubkey,
+    ]);
+
+    const handleLeaveVoice = useCallback(async () => {
+        const currentConnection = voiceConnectionRef.current;
+        if (!currentConnection) {
+            setVoiceStatus('idle');
+            setVoiceError(null);
+            setVoiceMuted(false);
+            setVoiceCanPublishAudio(true);
+            setVoiceParticipantCount(0);
+            setActiveVoiceSessionId(null);
+            return;
+        }
+
+        setVoiceStatus('leaving');
+        try {
+            await currentConnection.leave();
+        } finally {
+            if (voiceConnectionRef.current === currentConnection) {
+                voiceConnectionRef.current = null;
+            }
+            setVoiceStatus('idle');
+            setVoiceError(null);
+            setVoiceMuted(false);
+            setVoiceCanPublishAudio(true);
+            setVoiceParticipantCount(0);
+            setActiveVoiceSessionId(null);
+        }
+    }, []);
+
+    const handleJoinVoice = useCallback(async () => {
+        if (voiceStatus === 'joining' || voiceStatus === 'leaving' || voiceConnectionRef.current) {
+            return;
+        }
+        setVoiceStatus('joining');
+        setVoiceError(null);
+        try {
+            const communicationSessionToken = await ensureCommunicationVoiceSessionToken();
+            const voiceSession = await createVoiceSession({
+                roomKey: communicationRoomKey,
+                communicationSessionToken,
+                metadata: {
+                    circleId: discussionCircleId,
+                    source: 'frontend_plaza',
+                },
+            });
+            const token = await createVoiceToken({
+                voiceSessionId: voiceSession.id,
+                communicationSessionToken,
+            });
+            const connection = await getVoiceProvider().join({
+                ...token,
+                onParticipantsChanged: updateVoiceParticipantCount,
+            });
+
+            voiceConnectionRef.current = connection;
+            setActiveVoiceSessionId(voiceSession.id);
+            setVoiceCanPublishAudio(token.canPublishAudio);
+            setVoiceMuted(!token.canPublishAudio);
+            setVoiceStatus('connected');
+            setShowPanel(false);
+            setVoiceParticipantCount(connection.getParticipants().length);
+        } catch (error) {
+            const failedConnection = voiceConnectionRef.current;
+            voiceConnectionRef.current = null;
+            if (failedConnection) {
+                await failedConnection.leave().catch(() => undefined);
+            }
+            setVoiceStatus('error');
+            setVoiceParticipantCount(0);
+            setActiveVoiceSessionId(null);
+            setVoiceCanPublishAudio(true);
+            setVoiceMuted(false);
+            setVoiceError(error instanceof Error ? error.message : t('voice.joinFailed'));
+        }
+    }, [
+        communicationRoomKey,
+        discussionCircleId,
+        ensureCommunicationVoiceSessionToken,
+        getVoiceProvider,
+        t,
+        updateVoiceParticipantCount,
+        voiceStatus,
+    ]);
+
+    const handleToggleVoiceMute = useCallback(async () => {
+        const currentConnection = voiceConnectionRef.current;
+        if (!currentConnection) {
+            await handleJoinVoice();
+            return;
+        }
+        if (!voiceCanPublishAudio) {
+            return;
+        }
+        const nextMuted = !voiceMuted;
+        await currentConnection.setMicrophoneMuted(nextMuted);
+        setVoiceMuted(nextMuted);
+        updateVoiceParticipantCount();
+    }, [
+        handleJoinVoice,
+        updateVoiceParticipantCount,
+        voiceCanPublishAudio,
+        voiceMuted,
+    ]);
+
+    useEffect(() => {
+        return () => {
+            const currentConnection = voiceConnectionRef.current;
+            voiceConnectionRef.current = null;
+            communicationVoiceSessionRef.current = null;
+            void currentConnection?.leave();
+        };
+    }, [communicationRoomKey, walletPubkey]);
+
+    useEffect(() => {
+        communicationVoiceSessionRef.current = null;
+        setVoiceStatus('idle');
+        setVoiceError(null);
+        setVoiceMuted(false);
+        setVoiceCanPublishAudio(true);
+        setVoiceParticipantCount(0);
+        setActiveVoiceSessionId(null);
+    }, [communicationRoomKey, walletPubkey]);
 
     useEffect(() => {
         // Intentionally only react to circle changes. `messages` prop is re-created
@@ -1405,6 +1614,39 @@ function PlazaTab({
         '❤️', '👀', '🙌', '💪', '🤝', '📝', '⚡', '🌟',
         '😅', '🎉', '💎', '🧠', '🚀', '📚', '🔧', '✅',
     ];
+    const voiceConnected = voiceStatus === 'connected';
+    const voiceBusy = voiceStatus === 'joining' || voiceStatus === 'leaving';
+    const voiceDisplayError = voiceError === 'wallet_signature_required'
+        ? t('voice.walletRequired')
+        : voiceError === 'member_not_found' || voiceError === 'room_member_not_found'
+            ? t('voice.membershipRequired')
+            : voiceError;
+    const voicePrimaryLabel = !walletPubkey
+        ? t('voice.walletRequired')
+        : !viewerJoined
+            ? t('voice.membershipRequired')
+            : voiceStatus === 'joining'
+                ? t('voice.joining')
+                : voiceStatus === 'leaving'
+                    ? t('voice.leaving')
+                    : voiceConnected
+                        ? voiceMuted
+                            ? t('voice.unmute')
+                            : t('voice.mute')
+                        : t('voice.join');
+    const voicePrimaryDisabled = voiceBusy
+        || !walletPubkey
+        || (!voiceConnected && !viewerJoined)
+        || (voiceConnected && !voiceCanPublishAudio);
+    const voiceDockMessage = voiceStatus === 'joining'
+        ? t('voice.joining')
+        : voiceStatus === 'leaving'
+            ? t('voice.leaving')
+            : voiceConnected
+                ? voiceCanPublishAudio
+                    ? t('voice.connected')
+                    : t('voice.listenOnly')
+                : voiceDisplayError || t('voice.joinFailed');
 
     return (
         <div className={styles.plazaChat}>
@@ -1891,6 +2133,45 @@ function PlazaTab({
                         ))}
                     </div>
                 )}
+                {(voiceStatus !== 'idle' || voiceError) && (
+                    <div className={styles.composerVoiceDock}>
+                        <div className={styles.composerVoiceState}>
+                            <span
+                                className={`${styles.composerVoiceIndicator} ${voiceConnected ? styles.composerVoiceIndicatorActive : ''}`}
+                                aria-hidden="true"
+                            />
+                            <span className={styles.composerVoiceText}>{voiceDockMessage}</span>
+                            {voiceConnected && (
+                                <span className={styles.composerVoiceMeta}>
+                                    {t('voice.participantCount', {count: Math.max(voiceParticipantCount, 1)})}
+                                </span>
+                            )}
+                        </div>
+                        {voiceConnected && (
+                            <div className={styles.composerVoiceControls}>
+                                <button
+                                    type="button"
+                                    className={styles.composerVoiceControlBtn}
+                                    onClick={handleToggleVoiceMute}
+                                    disabled={!voiceCanPublishAudio}
+                                    aria-label={voiceMuted ? t('voice.unmute') : t('voice.mute')}
+                                    title={!voiceCanPublishAudio ? t('voice.listenOnly') : undefined}
+                                >
+                                    {voiceMuted ? <MicOff size={15} /> : <Mic size={15} />}
+                                </button>
+                                <button
+                                    type="button"
+                                    className={styles.composerVoiceControlBtn}
+                                    onClick={handleLeaveVoice}
+                                    aria-label={t('voice.leave')}
+                                    title={activeVoiceSessionId || undefined}
+                                >
+                                    <PhoneOff size={15} />
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
                 {/* Input Row: textarea + action button */}
                 <div className={styles.composerRow}>
                     <textarea
@@ -1912,6 +2193,22 @@ function PlazaTab({
                         disabled={!walletPubkey}
                         rows={1}
                     />
+                    <button
+                        className={`${styles.composerVoiceBtn} ${voiceConnected ? styles.composerVoiceBtnActive : ''}`}
+                        onClick={voiceConnected ? handleToggleVoiceMute : handleJoinVoice}
+                        type="button"
+                        disabled={voicePrimaryDisabled}
+                        aria-label={voicePrimaryLabel}
+                        title={voicePrimaryLabel}
+                    >
+                        {voiceStatus === 'joining' || voiceStatus === 'leaving' ? (
+                            <Loader2 className={styles.composerVoiceSpinner} size={18} />
+                        ) : voiceConnected && voiceMuted ? (
+                            <MicOff size={18} />
+                        ) : (
+                            <Mic size={18} />
+                        )}
+                    </button>
                     {chatInput.trim() ? (
                         <button
                             className={styles.composerSendBtn}
@@ -1947,6 +2244,22 @@ function PlazaTab({
                         >
                             {/* Operation Row */}
                             <div className={styles.composerOps}>
+                                <button
+                                    className={styles.composerOpBtn}
+                                    type="button"
+                                    onClick={voiceConnected ? handleToggleVoiceMute : handleJoinVoice}
+                                    disabled={voicePrimaryDisabled}
+                                    title={voicePrimaryLabel}
+                                >
+                                    {voiceStatus === 'joining' || voiceStatus === 'leaving' ? (
+                                        <Loader2 className={styles.composerVoiceSpinner} size={22} />
+                                    ) : voiceConnected && voiceMuted ? (
+                                        <MicOff size={22} />
+                                    ) : (
+                                        <Mic size={22} />
+                                    )}
+                                    <span>{voiceConnected ? voicePrimaryLabel : t('voice.join')}</span>
+                                </button>
                                 <button
                                     className={styles.composerOpBtn}
                                     onClick={() => setShowEmojiGrid((prev) => !prev)}

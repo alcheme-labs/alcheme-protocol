@@ -1,6 +1,7 @@
 import bs58 from "bs58";
 import nacl from "tweetnacl";
 
+import { normalizeVoiceSpeakerPolicy } from "../../config/voice";
 import { buildCommunicationRoomKey, normalizeRoomType } from "./roomScope";
 
 export interface AppRoomClaim {
@@ -13,6 +14,11 @@ export interface AppRoomClaimPayload {
   roomType: string;
   externalRoomId: string;
   transcriptionMode?: string;
+  voicePolicy?: {
+    maxSpeakers?: number;
+    overflowStrategy?: string;
+    moderatorRoles?: string[];
+  };
   walletPubkeys?: string[];
   roles?: Record<string, string>;
   expiresAt: string;
@@ -74,6 +80,11 @@ export function createAppRoomClaim(payload: AppRoomClaimPayload): {
               ),
             }
           : {}),
+        ...(payload.voicePolicy
+          ? {
+              voicePolicy: normalizeClaimVoicePolicy(payload.voicePolicy),
+            }
+          : {}),
         walletPubkeys: payload.walletPubkeys ?? [],
         ...(payload.roles ? { roles: payload.roles } : {}),
         expiresAt: payload.expiresAt,
@@ -125,6 +136,10 @@ export async function resolveCommunicationRoom(
   });
   const retentionPolicy =
     input.retentionPolicy ?? defaultRetentionPolicy(roomType);
+  const metadata = buildRoomMetadata({
+    inputMetadata: input.metadata,
+    verifiedClaim,
+  });
 
   return prisma.communicationRoom.upsert({
     where: { roomKey },
@@ -141,12 +156,12 @@ export async function resolveCommunicationRoom(
       retentionPolicy,
       createdByPubkey: input.createdByPubkey ?? input.walletPubkey ?? null,
       expiresAt,
-      metadata: input.metadata ?? null,
+      metadata,
     },
     update: {
       lifecycleStatus: "active",
       expiresAt,
-      metadata: input.metadata ?? undefined,
+      metadata: metadata ?? undefined,
     },
   });
 }
@@ -333,6 +348,36 @@ function resolveTranscriptionMode(input: {
     input.verifiedClaim?.transcriptionMode,
   );
   return claimed === requested ? requested : "off";
+}
+
+function buildRoomMetadata(input: {
+  inputMetadata?: Record<string, unknown> | null;
+  verifiedClaim: AppRoomClaimPayload | null;
+}): Record<string, unknown> | null {
+  const metadata =
+    input.inputMetadata &&
+    typeof input.inputMetadata === "object" &&
+    !Array.isArray(input.inputMetadata)
+      ? { ...input.inputMetadata }
+      : {};
+  delete metadata.voicePolicy;
+
+  if (input.verifiedClaim?.voicePolicy) {
+    metadata.voicePolicy = normalizeClaimVoicePolicy(
+      input.verifiedClaim.voicePolicy,
+    );
+  }
+
+  return Object.keys(metadata).length > 0 ? metadata : null;
+}
+
+function normalizeClaimVoicePolicy(raw: unknown) {
+  return normalizeVoiceSpeakerPolicy(raw, {
+    fallbackMaxSpeakers: 16,
+    platformMaxSpeakers: 100,
+    fallbackStrategy: "listen_only",
+    source: "app_room_claim",
+  });
 }
 
 function defaultRetentionPolicy(roomType: string): string {

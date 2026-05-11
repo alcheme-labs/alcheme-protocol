@@ -2037,6 +2037,20 @@
         "hint": "These annotations reflect the author’s intent only. System filtering follows backend semantic analysis."
       }
     },
+    "voice": {
+      "join": "Join voice",
+      "joining": "Joining voice…",
+      "connected": "Voice connected",
+      "listenOnly": "Voice connected · listen only",
+      "leaving": "Leaving voice…",
+      "mute": "Mute mic",
+      "unmute": "Unmute mic",
+      "leave": "Leave voice",
+      "participantCount": "{count} in voice",
+      "walletRequired": "Connect your wallet to join voice.",
+      "membershipRequired": "Join this circle before using voice.",
+      "joinFailed": "Could not join voice."
+    },
     "errors": {
       "walletRequired": "Connect your wallet before sending a message.",
       "syncFailed": "Could not sync discussion messages.",
@@ -2397,14 +2411,14 @@
     "members": {
       "directoryTitle": "Member directory",
       "title": "Members ({count})",
-        "actions": {
-          "setCurator": "Make curator",
-          "unsetCurator": "Remove curator role",
-          "remove": "Remove member",
-          "invite": "Invite members",
-          "leave": "Leave circle"
-        }
-      },
+      "actions": {
+        "setCurator": "Make curator",
+        "unsetCurator": "Remove curator role",
+        "remove": "Remove member",
+        "invite": "Invite members",
+        "leave": "Leave circle"
+      }
+    },
     "danger": {
       "deleteCircle": "Dissolve this circle"
     },

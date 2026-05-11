@@ -117,6 +117,7 @@ const MAX_TEXT_LENGTH = 4_000;
 const DEFAULT_MAX_VOICE_CLIP_DURATION_MS = 5 * 60 * 1000;
 const DEFAULT_MAX_VOICE_CLIP_BYTES = 25 * 1024 * 1024;
 const MAX_STORAGE_URI_LENGTH = 2_048;
+const SIGNED_TIMESTAMP_MAX_SKEW_MS = 15 * 60 * 1000;
 
 export function buildCommunicationSessionBootstrapMessage(
   payload: CommunicationSessionBootstrapPayload,
@@ -287,6 +288,12 @@ export function communicationRouter(
       const clientTimestamp = parseDateOrNow(req.body?.clientTimestamp);
       if (!clientTimestamp) {
         return res.status(400).json({ error: "invalid_client_timestamp" });
+      }
+      const timestampDecision = validateSignedTimestamp(clientTimestamp);
+      if (timestampDecision) {
+        return res
+          .status(timestampDecision.status)
+          .json({ error: timestampDecision.error });
       }
       const nonce = stringOrUndefined(req.body?.nonce) ?? randomNonce();
       const payload: CommunicationSessionBootstrapPayload = {
@@ -511,6 +518,12 @@ export function communicationRouter(
       const clientTimestamp = parseDateOrNow(req.body?.clientTimestamp);
       if (!clientTimestamp) {
         return res.status(400).json({ error: "invalid_client_timestamp" });
+      }
+      const timestampDecision = validateSignedTimestamp(clientTimestamp);
+      if (timestampDecision) {
+        return res
+          .status(timestampDecision.status)
+          .json({ error: timestampDecision.error });
       }
       const clientTimestampIso = clientTimestamp.toISOString();
       const nonce = stringOrUndefined(req.body?.nonce) ?? randomNonce();
@@ -1001,6 +1014,16 @@ function parseDateOrNow(value: unknown): Date | null {
   if (typeof value !== "string") return null;
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function validateSignedTimestamp(
+  value: Date,
+): { status: number; error: string } | null {
+  const skewMs = Math.abs(Date.now() - value.getTime());
+  if (!Number.isFinite(skewMs) || skewMs > SIGNED_TIMESTAMP_MAX_SKEW_MS) {
+    return { status: 401, error: "signed_timestamp_out_of_window" };
+  }
+  return null;
 }
 
 function plainObjectOrNull(value: unknown): Record<string, unknown> | null {

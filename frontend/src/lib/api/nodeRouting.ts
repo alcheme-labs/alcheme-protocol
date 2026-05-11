@@ -13,6 +13,8 @@ export type NodeRoutingSurface =
     | 'circle_agents'
     | 'posts_bind'
     | 'sync_status'
+    | 'communication_runtime'
+    | 'voice_runtime'
     | 'auth_session'
     | 'source_materials'
     | 'seeded'
@@ -69,6 +71,8 @@ const DEFAULT_SIDECAR_SURFACES: NodeRoutingSurface[] = [
     'source_materials',
     'seeded',
     'discussion_runtime',
+    'communication_runtime',
+    'voice_runtime',
     'collab',
     'ghost_draft_private',
 ];
