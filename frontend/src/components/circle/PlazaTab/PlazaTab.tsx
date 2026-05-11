@@ -18,6 +18,7 @@ import { mapDiscussionDtoToPlazaMessage } from '@/lib/circle/utils';
 import {
     appendPlazaDiscussionMessages,
     dedupePlazaMessagesByEnvelope,
+    messageMatchesSemanticFacetFilters,
     pruneExpiredEphemeralMessages,
     refreshPlazaMessagesByEnvelope,
     syncPlazaDiscussionMessages as syncPlazaDiscussionMessagesSnapshot,
@@ -35,8 +36,18 @@ import {
     sendDiscussionMessage,
     tombstoneDiscussionMessage,
 } from '@/lib/api/discussion';
-import { createCommunicationSession } from '@/lib/api/communication';
-import { createVoiceSession, createVoiceToken } from '@/lib/api/voice';
+import {
+    ensureCircleCommunicationRoomSession,
+    updateCircleRoomVoicePolicy,
+} from '@/lib/api/communication';
+import {
+    approveVoiceSpeaker,
+    createVoiceSession,
+    createVoiceToken,
+    denyVoiceSpeaker,
+    fetchVoiceParticipants,
+    type VoiceParticipantsResponse,
+} from '@/lib/api/voice';
 import {
     createLiveKitBrowserVoiceProvider,
     type LiveKitBrowserVoiceConnection,
@@ -75,6 +86,8 @@ const DISCUSSION_SYNC_LIMIT = 120;
 const MANUAL_DRAFT_SOURCE_LIMIT = 16;
 
 type VoiceStatus = 'idle' | 'joining' | 'connected' | 'leaving' | 'error';
+type VoiceOverflowStrategy = 'listen_only' | 'deny' | 'queue' | 'moderated_queue';
+const VOICE_OVERFLOW_STRATEGIES: VoiceOverflowStrategy[] = ['listen_only', 'deny', 'queue', 'moderated_queue'];
 
 interface CachedCommunicationVoiceSession {
     roomKey: string;
@@ -83,17 +96,9 @@ interface CachedCommunicationVoiceSession {
     expiresAt: string;
 }
 
-function messageMatchesContentFilters(
-    message: PlazaMessage,
-    activeFilters: AuthorAnnotationKind[],
-): boolean {
-    if (activeFilters.length === 0) return true;
-    if (message.messageKind === 'draft_candidate_notice' || message.messageKind === 'governance_notice') {
-        return true;
-    }
-    const semanticFacets = message.semanticFacets ?? [];
-    if (semanticFacets.length === 0) return false;
-    return semanticFacets.some((facet) => activeFilters.includes(facet as AuthorAnnotationKind));
+interface CircleRoomVoicePolicy {
+    maxSpeakers: number;
+    overflowStrategy: string;
 }
 
 interface HighlightMessageMutationResult {
@@ -232,6 +237,13 @@ function PlazaTab({
     const [voiceCanPublishAudio, setVoiceCanPublishAudio] = useState(true);
     const [voiceParticipantCount, setVoiceParticipantCount] = useState(0);
     const [activeVoiceSessionId, setActiveVoiceSessionId] = useState<string | null>(null);
+    const [voiceManagement, setVoiceManagement] = useState<VoiceParticipantsResponse | null>(null);
+    const [voiceManagementBusyWallet, setVoiceManagementBusyWallet] = useState<string | null>(null);
+    const [voicePolicyMaxSpeakers, setVoicePolicyMaxSpeakers] = useState(16);
+    const [voicePolicyStrategy, setVoicePolicyStrategy] = useState<VoiceOverflowStrategy>('listen_only');
+    const [voicePolicyDirty, setVoicePolicyDirty] = useState(false);
+    const [voicePolicyLoaded, setVoicePolicyLoaded] = useState(false);
+    const [voicePolicySaving, setVoicePolicySaving] = useState(false);
     const [lastEnvelopeId, setLastEnvelopeId] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<DiscussionViewMode>('all');
     const [showPanel, setShowPanel] = useState(false);
@@ -264,6 +276,14 @@ function PlazaTab({
     const localMessagesRef = useRef<PlazaMessage[]>(messages);
     const shouldFollowLatestRef = useRef(true);
     const previousMessageCountRef = useRef(messages.length);
+    const viewerCircleRole = walletPubkey
+        ? circleMembers?.find((member) => member.user.pubkey === walletPubkey)?.role
+        : null;
+    const viewerCanConfigureVoice = viewerIdentity === 'owner'
+        || viewerIdentity === 'curator'
+        || viewerCircleRole === 'Owner'
+        || viewerCircleRole === 'Admin'
+        || viewerCircleRole === 'Moderator';
     useEffect(() => {
         localMessagesRef.current = localMessages;
     }, [localMessages]);
@@ -492,7 +512,20 @@ function PlazaTab({
         setVoiceParticipantCount(participants.length);
     }, []);
 
-    const ensureCommunicationVoiceSessionToken = useCallback(async (): Promise<string> => {
+    const applyCircleRoomVoicePolicy = useCallback((policy?: CircleRoomVoicePolicy | null): boolean => {
+        if (!policy) return false;
+        setVoicePolicyMaxSpeakers(policy.maxSpeakers);
+        if (VOICE_OVERFLOW_STRATEGIES.includes(policy.overflowStrategy as VoiceOverflowStrategy)) {
+            setVoicePolicyStrategy(policy.overflowStrategy as VoiceOverflowStrategy);
+        }
+        setVoicePolicyDirty(false);
+        setVoicePolicyLoaded(true);
+        return true;
+    }, []);
+
+    const ensureCommunicationVoiceSessionToken = useCallback(async (
+        options: { forceRefresh?: boolean } = {},
+    ): Promise<string> => {
         if (!walletPubkey) {
             throw new Error(t('voice.walletRequired'));
         }
@@ -505,15 +538,16 @@ function PlazaTab({
             current
             && current.walletPubkey === walletPubkey
             && current.roomKey === communicationRoomKey
+            && !options.forceRefresh
             && Number.isFinite(expiresAtMs)
             && expiresAtMs - Date.now() > 60_000
         ) {
             return current.communicationAccessToken;
         }
 
-        const created = await createCommunicationSession({
+        const created = await ensureCircleCommunicationRoomSession({
             walletPubkey,
-            roomKey: communicationRoomKey,
+            circleId: discussionCircleId,
             signMessage,
             clientMeta: {
                 circleId: discussionCircleId,
@@ -528,8 +562,10 @@ function PlazaTab({
             expiresAt: created.expiresAt,
         };
         communicationVoiceSessionRef.current = nextSession;
+        applyCircleRoomVoicePolicy(created.room?.metadata?.voicePolicy);
         return nextSession.communicationAccessToken;
     }, [
+        applyCircleRoomVoicePolicy,
         communicationRoomKey,
         discussionCircleId,
         signMessage,
@@ -537,6 +573,19 @@ function PlazaTab({
         viewerJoined,
         walletPubkey,
     ]);
+
+    const loadVoiceParticipants = useCallback(async (
+        voiceSessionId: string,
+        communicationSessionToken: string,
+    ): Promise<VoiceParticipantsResponse> => {
+        const next = await fetchVoiceParticipants({
+            voiceSessionId,
+            communicationSessionToken,
+        });
+        setVoiceManagement(next);
+        setVoiceParticipantCount(Math.max(next.participants.filter((participant) => !participant.leftAt).length, 1));
+        return next;
+    }, []);
 
     const handleLeaveVoice = useCallback(async () => {
         const currentConnection = voiceConnectionRef.current;
@@ -547,6 +596,7 @@ function PlazaTab({
             setVoiceCanPublishAudio(true);
             setVoiceParticipantCount(0);
             setActiveVoiceSessionId(null);
+            setVoiceManagement(null);
             return;
         }
 
@@ -563,6 +613,7 @@ function PlazaTab({
             setVoiceCanPublishAudio(true);
             setVoiceParticipantCount(0);
             setActiveVoiceSessionId(null);
+            setVoiceManagement(null);
         }
     }, []);
 
@@ -586,6 +637,7 @@ function PlazaTab({
                 voiceSessionId: voiceSession.id,
                 communicationSessionToken,
             });
+            await loadVoiceParticipants(voiceSession.id, communicationSessionToken).catch(() => null);
             const connection = await getVoiceProvider().join({
                 ...token,
                 onParticipantsChanged: updateVoiceParticipantCount,
@@ -607,6 +659,7 @@ function PlazaTab({
             setVoiceStatus('error');
             setVoiceParticipantCount(0);
             setActiveVoiceSessionId(null);
+            setVoiceManagement(null);
             setVoiceCanPublishAudio(true);
             setVoiceMuted(false);
             setVoiceError(error instanceof Error ? error.message : t('voice.joinFailed'));
@@ -616,6 +669,7 @@ function PlazaTab({
         discussionCircleId,
         ensureCommunicationVoiceSessionToken,
         getVoiceProvider,
+        loadVoiceParticipants,
         t,
         updateVoiceParticipantCount,
         voiceStatus,
@@ -641,6 +695,140 @@ function PlazaTab({
         voiceMuted,
     ]);
 
+    const handleVoiceSpeakerDecision = useCallback(async (
+        targetWalletPubkey: string,
+        decision: 'approve' | 'deny',
+    ) => {
+        if (!activeVoiceSessionId) return;
+        setVoiceManagementBusyWallet(targetWalletPubkey);
+        setVoiceError(null);
+        try {
+            const communicationSessionToken = await ensureCommunicationVoiceSessionToken();
+            const input = {
+                voiceSessionId: activeVoiceSessionId,
+                walletPubkey: targetWalletPubkey,
+                communicationSessionToken,
+            };
+            if (decision === 'approve') {
+                await approveVoiceSpeaker(input);
+            } else {
+                await denyVoiceSpeaker(input);
+            }
+            await loadVoiceParticipants(activeVoiceSessionId, communicationSessionToken);
+        } catch (error) {
+            setVoiceError(error instanceof Error ? error.message : t('voice.joinFailed'));
+        } finally {
+            setVoiceManagementBusyWallet(null);
+        }
+    }, [
+        activeVoiceSessionId,
+        ensureCommunicationVoiceSessionToken,
+        loadVoiceParticipants,
+        t,
+    ]);
+
+    const handleSaveVoicePolicy = useCallback(async () => {
+        setVoicePolicySaving(true);
+        setVoiceError(null);
+        try {
+            const needsPolicyLoad = !voicePolicyLoaded && !voicePolicyDirty;
+            const communicationSessionToken = await ensureCommunicationVoiceSessionToken({
+                forceRefresh: needsPolicyLoad,
+            });
+            if (needsPolicyLoad) {
+                setVoiceError(t('voice.policyLoaded'));
+                return;
+            }
+            const response = await updateCircleRoomVoicePolicy({
+                circleId: discussionCircleId,
+                communicationSessionToken,
+                maxSpeakers: voicePolicyMaxSpeakers,
+                overflowStrategy: voicePolicyStrategy,
+            });
+            const updatedPolicy = response.room.metadata?.voicePolicy;
+            if (updatedPolicy) {
+                applyCircleRoomVoicePolicy(updatedPolicy);
+            }
+            if (activeVoiceSessionId) {
+                await loadVoiceParticipants(activeVoiceSessionId, communicationSessionToken).catch(() => null);
+            }
+        } catch (error) {
+            setVoiceError(error instanceof Error ? error.message : t('voice.joinFailed'));
+        } finally {
+            setVoicePolicySaving(false);
+        }
+    }, [
+        activeVoiceSessionId,
+        applyCircleRoomVoicePolicy,
+        discussionCircleId,
+        ensureCommunicationVoiceSessionToken,
+        loadVoiceParticipants,
+        t,
+        voicePolicyDirty,
+        voicePolicyLoaded,
+        voicePolicyMaxSpeakers,
+        voicePolicyStrategy,
+    ]);
+
+    useEffect(() => {
+        if (voiceStatus !== 'connected' || !activeVoiceSessionId || !showPanel) {
+            return undefined;
+        }
+        let cancelled = false;
+        const refresh = async () => {
+            try {
+                const communicationSessionToken = await ensureCommunicationVoiceSessionToken();
+                if (cancelled) return;
+                await loadVoiceParticipants(activeVoiceSessionId, communicationSessionToken);
+            } catch {
+                // Voice management polling is opportunistic; joining state remains authoritative.
+            }
+        };
+        void refresh();
+        const intervalId = window.setInterval(refresh, 7000);
+        return () => {
+            cancelled = true;
+            window.clearInterval(intervalId);
+        };
+    }, [
+        activeVoiceSessionId,
+        ensureCommunicationVoiceSessionToken,
+        loadVoiceParticipants,
+        showPanel,
+        voiceStatus,
+    ]);
+
+    useEffect(() => {
+        if (!showPanel || !viewerJoined || !walletPubkey || !viewerCanConfigureVoice || voicePolicyLoaded) {
+            return undefined;
+        }
+        let cancelled = false;
+        const loadPolicy = async () => {
+            try {
+                await ensureCommunicationVoiceSessionToken({ forceRefresh: true });
+                if (!cancelled) {
+                    setVoiceError(null);
+                }
+            } catch (error) {
+                if (!cancelled) {
+                    setVoiceError(error instanceof Error ? error.message : t('voice.joinFailed'));
+                }
+            }
+        };
+        void loadPolicy();
+        return () => {
+            cancelled = true;
+        };
+    }, [
+        ensureCommunicationVoiceSessionToken,
+        showPanel,
+        t,
+        viewerCanConfigureVoice,
+        viewerJoined,
+        voicePolicyLoaded,
+        walletPubkey,
+    ]);
+
     useEffect(() => {
         return () => {
             const currentConnection = voiceConnectionRef.current;
@@ -658,7 +846,18 @@ function PlazaTab({
         setVoiceCanPublishAudio(true);
         setVoiceParticipantCount(0);
         setActiveVoiceSessionId(null);
+        setVoiceManagement(null);
+        setVoicePolicyDirty(false);
+        setVoicePolicyLoaded(false);
     }, [communicationRoomKey, walletPubkey]);
+
+    useEffect(() => {
+        if (!voiceManagement || voicePolicyDirty) return;
+        applyCircleRoomVoicePolicy({
+            maxSpeakers: voiceManagement.policy.maxSpeakers,
+            overflowStrategy: voiceManagement.policy.strategy,
+        });
+    }, [applyCircleRoomVoicePolicy, voiceManagement, voicePolicyDirty]);
 
     useEffect(() => {
         // Intentionally only react to circle changes. `messages` prop is re-created
@@ -909,7 +1108,8 @@ function PlazaTab({
             return msg.focusLabel !== 'off_topic';
         });
 
-        return filteredByViewMode.filter((message) => messageMatchesContentFilters(message, activeContentFilters));
+        return filteredByViewMode.filter((message) =>
+            messageMatchesSemanticFacetFilters(message, activeContentFilters));
     }, [activeContentFilters, localMessages, viewMode, walletPubkey]);
 
     const manualDraftSourceMessageIds = useMemo(() => visibleMessages
@@ -1647,6 +1847,14 @@ function PlazaTab({
                     ? t('voice.connected')
                     : t('voice.listenOnly')
                 : voiceDisplayError || t('voice.joinFailed');
+    const voiceParticipants = voiceManagement?.participants ?? [];
+    const activeVoiceSpeakerCount = voiceParticipants.filter(
+        (participant) => participant.role === 'speaker' && !participant.leftAt && !participant.mutedByModerator,
+    ).length;
+    const queuedVoiceParticipants = voiceParticipants.filter(
+        (participant) => participant.role === 'queued' && !participant.leftAt,
+    );
+    const showVoiceManagement = Boolean(voiceConnected && voiceManagement?.permissions.canModerate);
 
     return (
         <div className={styles.plazaChat}>
@@ -2172,6 +2380,63 @@ function PlazaTab({
                         )}
                     </div>
                 )}
+                {showVoiceManagement && voiceManagement && (
+                    <div className={styles.composerVoiceManagement}>
+                        <div className={styles.composerVoiceManagementHeader}>
+                            <span>{t('voice.managementTitle')}</span>
+                            <span>
+                                {t('voice.activeSpeakerCount', {
+                                    count: activeVoiceSpeakerCount,
+                                    max: voiceManagement.policy.maxSpeakers,
+                                })}
+                            </span>
+                        </div>
+                        <div className={styles.composerVoicePolicyLine}>
+                            {t('voice.strategy', {strategy: voiceManagement.policy.strategy})}
+                        </div>
+                        {queuedVoiceParticipants.length > 0 ? (
+                            <div className={styles.composerVoiceQueue}>
+                                {queuedVoiceParticipants.map((participant) => (
+                                    <div
+                                        key={participant.walletPubkey}
+                                        className={styles.composerVoiceQueueRow}
+                                    >
+                                        <div className={styles.composerVoiceQueueMeta}>
+                                            <span className={styles.composerVoiceQueueWallet}>
+                                                {participant.walletPubkey}
+                                            </span>
+                                            <span>
+                                                {t('voice.queuePosition', {
+                                                    position: participant.queuePosition ?? 1,
+                                                })}
+                                            </span>
+                                        </div>
+                                        <div className={styles.composerVoiceQueueActions}>
+                                            <button
+                                                type="button"
+                                                className={styles.composerVoiceDecisionBtn}
+                                                onClick={() => handleVoiceSpeakerDecision(participant.walletPubkey, 'approve')}
+                                                disabled={voiceManagementBusyWallet === participant.walletPubkey}
+                                            >
+                                                {t('voice.approve')}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={styles.composerVoiceDecisionBtn}
+                                                onClick={() => handleVoiceSpeakerDecision(participant.walletPubkey, 'deny')}
+                                                disabled={voiceManagementBusyWallet === participant.walletPubkey}
+                                            >
+                                                {t('voice.deny')}
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className={styles.composerVoicePolicyLine}>{t('voice.noQueue')}</div>
+                        )}
+                    </div>
+                )}
                 {/* Input Row: textarea + action button */}
                 <div className={styles.composerRow}>
                     <textarea
@@ -2301,6 +2566,53 @@ function PlazaTab({
                                     <span>{creatingDiscussionDraft ? t('composer.actions.draftBusy') : t('composer.actions.createDraft')}</span>
                                 </button>
                             </div>
+                            {viewerCanConfigureVoice && (
+                                <div className={styles.composerVoiceSettings}>
+                                    <div className={styles.composerVoiceSettingsHeader}>
+                                        {t('voice.settingsTitle')}
+                                    </div>
+                                    <label className={styles.composerVoiceSettingField}>
+                                        <span>{t('voice.maxSpeakers')}</span>
+                                        <input
+                                            type="number"
+                                            min={1}
+                                            max={100}
+                                            value={voicePolicyMaxSpeakers}
+                                            disabled={!voicePolicyLoaded || voicePolicySaving}
+                                            onChange={(event) => {
+                                                const nextValue = Number.parseInt(event.target.value, 10);
+                                                setVoicePolicyMaxSpeakers(Number.isFinite(nextValue) ? nextValue : 1);
+                                                setVoicePolicyDirty(true);
+                                            }}
+                                        />
+                                    </label>
+                                    <label className={styles.composerVoiceSettingField}>
+                                        <span>{t('voice.overflowStrategy')}</span>
+                                        <select
+                                            value={voicePolicyStrategy}
+                                            disabled={!voicePolicyLoaded || voicePolicySaving}
+                                            onChange={(event) => {
+                                                setVoicePolicyStrategy(event.target.value as VoiceOverflowStrategy);
+                                                setVoicePolicyDirty(true);
+                                            }}
+                                        >
+                                            {VOICE_OVERFLOW_STRATEGIES.map((strategy) => (
+                                                <option key={strategy} value={strategy}>
+                                                    {strategy}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </label>
+                                    <button
+                                        type="button"
+                                        className={styles.composerVoiceSettingsSave}
+                                        onClick={handleSaveVoicePolicy}
+                                        disabled={voicePolicySaving || !voicePolicyLoaded}
+                                    >
+                                        {voicePolicySaving ? t('voice.savingPolicy') : t('voice.savePolicy')}
+                                    </button>
+                                </div>
+                            )}
                             <div className={styles.composerLabelSection}>
                                 <div className={styles.composerLabelSectionHeader}>
                                     <span className={styles.composerLabelSectionTitle}>{t('composer.authorAnnotations.title')}</span>

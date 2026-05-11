@@ -1,5 +1,3 @@
-import crypto from "crypto";
-
 import { Router, raw } from "express";
 import type { Prisma, PrismaClient } from "@prisma/client";
 import type { Redis } from "ioredis";
@@ -20,6 +18,11 @@ import {
 } from "../services/communication/permissions";
 import { createLiveKitVoiceProvider } from "../services/voice/livekitProvider";
 import type { VoiceProvider } from "../services/voice/provider";
+import {
+  createOrReuseActiveVoiceSession,
+  loadActiveVoiceSessionByRoomKey,
+} from "../services/voice/activeSession";
+import { canModerateVoiceSession } from "../services/voice/permissions";
 
 type VoicePrisma = PrismaClient;
 
@@ -62,6 +65,7 @@ interface VoiceParticipantRow {
   role: string;
   joinedAt?: Date | null;
   leftAt?: Date | null;
+  mutedBySelf?: boolean | null;
   mutedByModerator?: boolean | null;
 }
 
@@ -115,25 +119,63 @@ export function voiceRouter(
       });
       if (!decision.allowed) return sendPermissionDecision(res, decision);
 
-      const voiceSessionId = `voice_${randomId()}`;
-      const providerRoomId = `alcheme_${voiceSessionId}`;
       const ttlSec =
         optionalPositiveInt(req.body?.ttlSec) ?? config.defaultTtlSec;
-      const expiresAt = new Date(now().getTime() + ttlSec * 1000);
-      const voiceSession = await prisma.voiceSession.create({
-        data: {
-          id: voiceSessionId,
+      const result = await createOrReuseActiveVoiceSession(
+        prisma,
+        {
           roomKey,
           provider: config.provider,
-          providerRoomId,
-          status: "active",
           createdByPubkey: sessionAuth.session.walletPubkey,
-          expiresAt,
+          ttlSec,
           metadata: jsonObjectOrUndefined(req.body?.metadata),
         },
-      });
+        { now: now() },
+      );
 
-      res.status(201).json({
+      res.status(result.reused ? 200 : 201).json({
+        ok: true,
+        reused: result.reused,
+        session: mapVoiceSession(result.session),
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get("/rooms/:roomKey/active", async (req, res, next) => {
+    try {
+      if (!provider || !config.enabled) {
+        return res.status(503).json({ error: "voice_provider_disabled" });
+      }
+      const roomKey = parseRouteValue(req.params.roomKey);
+      if (!roomKey) return res.status(400).json({ error: "missing_room_key" });
+
+      const sessionAuth = await authenticateCommunicationSession(
+        prisma,
+        req,
+        roomKey,
+        now(),
+      );
+      if (!sessionAuth.ok) return sendSessionError(res, sessionAuth);
+
+      const readDecision = await canReadRoom(prisma, {
+        roomKey,
+        walletPubkey: sessionAuth.session.walletPubkey,
+      });
+      if (!readDecision.allowed)
+        return sendPermissionDecision(res, readDecision);
+
+      const voiceSession = await loadActiveVoiceSessionByRoomKey(
+        prisma,
+        roomKey,
+        { now: now() },
+      );
+      if (!voiceSession) {
+        return res.json({ ok: true, session: null });
+      }
+
+      res.json({
         ok: true,
         session: mapVoiceSession(voiceSession),
       });
@@ -252,6 +294,69 @@ export function voiceRouter(
             source: speakerLimit.source,
             queuePosition: speakerLimit.queuePosition,
           },
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get("/sessions/:sessionId/participants", async (req, res, next) => {
+    try {
+      if (!provider || !config.enabled) {
+        return res.status(503).json({ error: "voice_provider_disabled" });
+      }
+      const voiceSession = await loadActiveVoiceSession(
+        prisma,
+        parseRouteValue(req.params.sessionId),
+        now(),
+      );
+      if (!voiceSession) {
+        return res.status(404).json({ error: "voice_session_not_found" });
+      }
+
+      const sessionAuth = await authenticateCommunicationSession(
+        prisma,
+        req,
+        voiceSession.roomKey,
+        now(),
+      );
+      if (!sessionAuth.ok) return sendSessionError(res, sessionAuth);
+
+      const readDecision = await canReadRoom(prisma, {
+        roomKey: voiceSession.roomKey,
+        walletPubkey: sessionAuth.session.walletPubkey,
+      });
+      if (!readDecision.allowed)
+        return sendPermissionDecision(res, readDecision);
+
+      const policy = resolveVoiceSpeakerPolicy(voiceSession, config);
+      const canModerate = await canModerateVoiceSession(prisma, {
+        roomKey: voiceSession.roomKey,
+        walletPubkey: sessionAuth.session.walletPubkey,
+        policy,
+      });
+      const participants = (await prisma.voiceParticipant.findMany({
+        where: {
+          sessionId: voiceSession.id,
+        },
+        orderBy: [
+          { joinedAt: "asc" },
+          { walletPubkey: "asc" },
+        ],
+      })) as VoiceParticipantRow[];
+
+      res.json({
+        ok: true,
+        sessionId: voiceSession.id,
+        participants: mapVoiceParticipants(participants),
+        policy: {
+          maxSpeakers: policy.maxSpeakers,
+          strategy: policy.overflowStrategy,
+          source: policy.source,
+        },
+        permissions: {
+          canModerate,
         },
       });
     } catch (error) {
@@ -613,7 +718,10 @@ export function voiceRouter(
     async (req, res) => {
       try {
         const event = await decodeLiveKitWebhookEvent(req, config);
-        const result = await applyLiveKitWebhookEvent(prisma, event, now());
+        const result = await applyLiveKitWebhookEvent(prisma, event, now(), {
+          config,
+          provider,
+        });
         res.status(202).json({ ok: true, event: event.event, ...result });
       } catch (error) {
         const message = (error as Error).message;
@@ -667,6 +775,10 @@ async function applyLiveKitWebhookEvent(
   prisma: VoicePrisma,
   event: LiveKitWebhookEvent,
   receivedAt: Date,
+  options: {
+    config: VoiceRuntimeConfig;
+    provider: VoiceProvider | null;
+  },
 ): Promise<{ applied: boolean }> {
   const providerRoomId = stringOrUndefined(event.room?.name);
   if (!providerRoomId) return { applied: false };
@@ -701,15 +813,31 @@ async function applyLiveKitWebhookEvent(
       return { applied: true };
 
     case "participant_joined":
-      return syncLiveKitParticipant(prisma, event, providerRoomId, receivedAt, {
-        leftAt: null,
-      });
+      return syncLiveKitParticipant(
+        prisma,
+        event,
+        providerRoomId,
+        receivedAt,
+        {
+          config: options.config,
+          leftAt: null,
+          provider: options.provider,
+        },
+      );
 
     case "participant_left":
     case "participant_connection_aborted":
-      return syncLiveKitParticipant(prisma, event, providerRoomId, receivedAt, {
-        leftAt: receivedAt,
-      });
+      return syncLiveKitParticipant(
+        prisma,
+        event,
+        providerRoomId,
+        receivedAt,
+        {
+          config: options.config,
+          leftAt: receivedAt,
+          provider: options.provider,
+        },
+      );
 
     default:
       return { applied: false };
@@ -721,7 +849,11 @@ async function syncLiveKitParticipant(
   event: LiveKitWebhookEvent,
   providerRoomId: string,
   receivedAt: Date,
-  input: { leftAt: Date | null },
+  input: {
+    config: VoiceRuntimeConfig;
+    leftAt: Date | null;
+    provider: VoiceProvider | null;
+  },
 ): Promise<{ applied: boolean }> {
   const walletPubkey = stringOrUndefined(event.participant?.identity);
   if (!walletPubkey) return { applied: false };
@@ -732,10 +864,35 @@ async function syncLiveKitParticipant(
       providerRoomId,
       status: { in: ["ringing", "active"] },
     },
+    include: {
+      room: {
+        select: {
+          metadata: true,
+        },
+      },
+    },
   });
   if (!voiceSession) return { applied: false };
 
+  const existingParticipant = (await prisma.voiceParticipant.findUnique({
+    where: {
+      sessionId_walletPubkey: {
+        sessionId: voiceSession.id,
+        walletPubkey,
+      },
+    },
+  })) as VoiceParticipantRow | null;
+  const wasActiveSpeaker =
+    existingParticipant?.role === "speaker" &&
+    existingParticipant.leftAt === null &&
+    existingParticipant.mutedByModerator !== true;
+
   const canPublish = event.participant?.permission?.canPublish !== false;
+  const participantRole = resolveWebhookParticipantRole({
+    existingParticipant,
+    canPublish,
+    leftAt: input.leftAt,
+  });
   await prisma.voiceParticipant.upsert({
     where: {
       sessionId_walletPubkey: {
@@ -746,20 +903,106 @@ async function syncLiveKitParticipant(
     create: {
       sessionId: voiceSession.id,
       walletPubkey,
-      role: canPublish ? "speaker" : "listener",
+      role: participantRole,
       joinedAt: input.leftAt ? null : receivedAt,
       leftAt: input.leftAt,
       mutedBySelf: false,
       mutedByModerator: !canPublish,
     },
     update: {
-      role: canPublish ? "speaker" : "listener",
+      role: participantRole,
       leftAt: input.leftAt,
       mutedByModerator: !canPublish,
     },
   });
 
+  if (input.leftAt && wasActiveSpeaker) {
+    await promoteNextQueuedSpeakerIfEligible(prisma, {
+      config: input.config,
+      provider: input.provider,
+      voiceSession,
+    });
+  }
+
   return { applied: true };
+}
+
+function resolveWebhookParticipantRole(input: {
+  existingParticipant: VoiceParticipantRow | null;
+  canPublish: boolean;
+  leftAt: Date | null;
+}): SpeakerLimitDecision["role"] {
+  const existingRole = input.existingParticipant?.role;
+  if (input.leftAt && isVoiceParticipantRole(existingRole)) {
+    return existingRole;
+  }
+  if (input.canPublish) return "speaker";
+  if (existingRole === "queued") return "queued";
+  return "listener";
+}
+
+function isVoiceParticipantRole(
+  role: unknown,
+): role is SpeakerLimitDecision["role"] {
+  return role === "speaker" || role === "listener" || role === "queued";
+}
+
+async function promoteNextQueuedSpeakerIfEligible(
+  prisma: VoicePrisma,
+  input: {
+    config: VoiceRuntimeConfig;
+    provider: VoiceProvider | null;
+    voiceSession: VoiceSessionRow;
+  },
+): Promise<void> {
+  if (!input.provider) return;
+  const policy = resolveVoiceSpeakerPolicy(input.voiceSession, input.config);
+  if (policy.overflowStrategy !== "queue") return;
+
+  const activeSpeakerCount = await prisma.voiceParticipant.count({
+    where: {
+      sessionId: input.voiceSession.id,
+      role: "speaker",
+      leftAt: null,
+      mutedByModerator: false,
+    },
+  });
+  const openSlots = policy.maxSpeakers - activeSpeakerCount;
+  if (openSlots <= 0) return;
+
+  const queuedParticipants = (await prisma.voiceParticipant.findMany({
+    where: {
+      sessionId: input.voiceSession.id,
+      role: "queued",
+      leftAt: null,
+    },
+    orderBy: [
+      { joinedAt: "asc" },
+      { walletPubkey: "asc" },
+    ],
+    take: openSlots,
+  })) as VoiceParticipantRow[];
+
+  for (const participant of queuedParticipants) {
+    await input.provider.muteParticipant({
+      providerRoomId: input.voiceSession.providerRoomId,
+      walletPubkey: participant.walletPubkey,
+      muted: false,
+    });
+    await prisma.voiceParticipant.update({
+      where: {
+        sessionId_walletPubkey: {
+          sessionId: input.voiceSession.id,
+          walletPubkey: participant.walletPubkey,
+        },
+      },
+      data: {
+        role: "speaker",
+        mutedByModerator: false,
+        leftAt: null,
+      },
+    });
+  }
 }
 
 interface LiveKitWebhookEvent {
@@ -1011,35 +1254,6 @@ function readRoomVoicePolicy(metadata: unknown): unknown | null {
   return record.voicePolicy ?? null;
 }
 
-async function canModerateVoiceSession(
-  prisma: VoicePrisma,
-  input: {
-    roomKey: string;
-    walletPubkey: string;
-    policy: VoiceSpeakerPolicy;
-  },
-): Promise<boolean> {
-  const roomModeration = await canModerateRoom(prisma, {
-    roomKey: input.roomKey,
-    walletPubkey: input.walletPubkey,
-  });
-  if (roomModeration.allowed) return true;
-
-  const member = await prisma.communicationRoomMember.findUnique({
-    where: {
-      roomKey_walletPubkey: {
-        roomKey: input.roomKey,
-        walletPubkey: input.walletPubkey,
-      },
-    },
-  });
-  const role =
-    member && !member.leftAt && typeof member.role === "string"
-      ? member.role.trim().toLowerCase()
-      : "";
-  return !!role && input.policy.moderatorRoles.includes(role);
-}
-
 async function loadActiveVoiceSession(
   prisma: VoicePrisma,
   sessionId: string,
@@ -1078,6 +1292,24 @@ function mapVoiceSession(session: VoiceSessionRow) {
     createdAt: session.createdAt.toISOString(),
     updatedAt: session.updatedAt.toISOString(),
   };
+}
+
+function mapVoiceParticipants(participants: VoiceParticipantRow[]) {
+  let queuedPosition = 0;
+  return participants.map((participant) => {
+    const activeQueued =
+      participant.role === "queued" && participant.leftAt === null;
+    const queuePosition = activeQueued ? (queuedPosition += 1) : null;
+    return {
+      walletPubkey: participant.walletPubkey,
+      role: participant.role,
+      joinedAt: participant.joinedAt?.toISOString() ?? null,
+      leftAt: participant.leftAt?.toISOString() ?? null,
+      mutedBySelf: participant.mutedBySelf ?? false,
+      mutedByModerator: participant.mutedByModerator ?? false,
+      queuePosition,
+    };
+  });
 }
 
 function sendPermissionDecision(
@@ -1125,11 +1357,4 @@ function jsonObjectOrUndefined(
   if (!value || typeof value !== "object" || Array.isArray(value))
     return undefined;
   return value as Prisma.InputJsonValue;
-}
-
-function randomId(): string {
-  if (typeof crypto.randomUUID === "function") {
-    return crypto.randomUUID().replace(/-/g, "");
-  }
-  return crypto.randomBytes(16).toString("hex");
 }

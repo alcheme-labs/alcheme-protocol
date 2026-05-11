@@ -26,6 +26,43 @@ function areMessagesEquivalent(left: PlazaMessage, right: PlazaMessage): boolean
     return deepEqual(left, right);
 }
 
+function messageTimeMs(message: PlazaMessage): number {
+    const source = message.createdAt || message.clientTimestamp || null;
+    if (source) {
+        const parsed = Date.parse(source);
+        if (Number.isFinite(parsed)) return parsed;
+    }
+    return Number.POSITIVE_INFINITY;
+}
+
+function messageLamport(message: PlazaMessage): number {
+    const value = Number(message.lamport);
+    return Number.isFinite(value) ? value : Number.POSITIVE_INFINITY;
+}
+
+export function messageMatchesSemanticFacetFilters(
+    message: Pick<PlazaMessage, 'messageKind' | 'semanticFacets'>,
+    activeFilters: string[],
+): boolean {
+    if (activeFilters.length === 0) return true;
+    if (message.messageKind === 'draft_candidate_notice' || message.messageKind === 'governance_notice') {
+        return true;
+    }
+    const semanticFacets = message.semanticFacets ?? [];
+    if (semanticFacets.length === 0) return false;
+    return semanticFacets.some((facet) => activeFilters.includes(facet));
+}
+
+export function sortPlazaMessagesChronologically(messages: PlazaMessage[]): PlazaMessage[] {
+    return [...messages].sort((left, right) => {
+        const byTime = messageTimeMs(left) - messageTimeMs(right);
+        if (byTime !== 0) return byTime;
+        const byLamport = messageLamport(left) - messageLamport(right);
+        if (byLamport !== 0) return byLamport;
+        return left.id - right.id;
+    });
+}
+
 export function dedupePlazaMessagesByEnvelope(messages: PlazaMessage[]): PlazaMessage[] {
     const seenEnvelopeIds = new Set<string>();
     return messages.filter((message) => {
@@ -41,10 +78,10 @@ export function mergePlazaDiscussionMessages(input: {
     serverMessages: PlazaMessage[];
     optimisticMessages: PlazaMessage[];
 }): PlazaMessage[] {
-    return dedupePlazaMessagesByEnvelope([
+    return sortPlazaMessagesChronologically(dedupePlazaMessagesByEnvelope([
         ...input.serverMessages,
         ...input.optimisticMessages,
-    ]);
+    ]));
 }
 
 export function appendPlazaDiscussionMessages(input: {

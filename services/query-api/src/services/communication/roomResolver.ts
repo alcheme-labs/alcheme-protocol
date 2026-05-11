@@ -37,6 +37,7 @@ export interface ResolveCommunicationRoomInput {
   retentionPolicy?: string;
   createdByPubkey?: string | null;
   metadata?: Record<string, unknown> | null;
+  trustedFirstPartyMetadata?: boolean;
   appRoomClaim?: AppRoomClaim | null;
   walletPubkey?: string | null;
 }
@@ -138,6 +139,8 @@ export async function resolveCommunicationRoom(
     input.retentionPolicy ?? defaultRetentionPolicy(roomType);
   const metadata = buildRoomMetadata({
     inputMetadata: input.metadata,
+    roomType,
+    trustedFirstPartyMetadata: input.trustedFirstPartyMetadata === true,
     verifiedClaim,
   });
 
@@ -352,6 +355,8 @@ function resolveTranscriptionMode(input: {
 
 function buildRoomMetadata(input: {
   inputMetadata?: Record<string, unknown> | null;
+  roomType: string;
+  trustedFirstPartyMetadata: boolean;
   verifiedClaim: AppRoomClaimPayload | null;
 }): Record<string, unknown> | null {
   const metadata =
@@ -360,7 +365,14 @@ function buildRoomMetadata(input: {
     !Array.isArray(input.inputMetadata)
       ? { ...input.inputMetadata }
       : {};
-  delete metadata.voicePolicy;
+  const trustedFirstPartyVoicePolicy =
+    input.trustedFirstPartyMetadata &&
+    input.roomType === "circle" &&
+    !input.verifiedClaim &&
+    metadata.voicePolicy;
+  if (!trustedFirstPartyVoicePolicy) {
+    delete metadata.voicePolicy;
+  }
 
   if (input.verifiedClaim?.voicePolicy) {
     metadata.voicePolicy = normalizeClaimVoicePolicy(

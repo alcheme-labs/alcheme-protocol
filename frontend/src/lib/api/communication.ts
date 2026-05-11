@@ -10,6 +10,7 @@ export interface CommunicationSessionResponse {
   expiresAt: string;
   communicationAccessToken: string;
   signatureVerified?: boolean;
+  room?: CircleCommunicationRoom;
 }
 
 export interface CommunicationSessionBootstrapPayload {
@@ -20,6 +21,22 @@ export interface CommunicationSessionBootstrapPayload {
   scopeRef: string;
   clientTimestamp: string;
   nonce: string;
+}
+
+export interface CircleRoomVoicePolicyResponse {
+  ok: boolean;
+  room: CircleCommunicationRoom;
+}
+
+export interface CircleCommunicationRoom {
+  roomKey: string;
+  metadata?: {
+    voicePolicy?: {
+      maxSpeakers: number;
+      overflowStrategy: string;
+      source: string;
+    };
+  } | null;
 }
 
 export function buildCommunicationSessionBootstrapMessage(
@@ -34,6 +51,79 @@ export async function createCommunicationSession(input: {
   signMessage?: (message: Uint8Array) => Promise<Uint8Array>;
   ttlSec?: number;
   clientMeta?: Record<string, unknown>;
+}): Promise<CommunicationSessionResponse> {
+  return requestCommunicationSession({
+    ...input,
+    endpointPath: "/api/v1/communication/sessions",
+    bodyRoomKey: input.roomKey,
+  });
+}
+
+export async function ensureCircleCommunicationRoomSession(input: {
+  circleId: number | string;
+  walletPubkey: string;
+  signMessage?: (message: Uint8Array) => Promise<Uint8Array>;
+  ttlSec?: number;
+  clientMeta?: Record<string, unknown>;
+}): Promise<CommunicationSessionResponse> {
+  const circleId = String(input.circleId).trim();
+  if (!circleId) {
+    throw new Error("missing_circle_id");
+  }
+  const roomKey = `circle:${circleId}`;
+  const response = await requestCommunicationSession({
+    walletPubkey: input.walletPubkey,
+    roomKey,
+    signMessage: input.signMessage,
+    ttlSec: input.ttlSec,
+    clientMeta: input.clientMeta,
+    endpointPath: `/api/v1/communication/circles/${encodeURIComponent(circleId)}/room-session`,
+    bodyRoomKey: roomKey,
+  });
+  return response;
+}
+
+export async function updateCircleRoomVoicePolicy(input: {
+  circleId: number | string;
+  communicationSessionToken: string;
+  maxSpeakers: number;
+  overflowStrategy: "listen_only" | "deny" | "queue" | "moderated_queue";
+}): Promise<CircleRoomVoicePolicyResponse> {
+  const circleId = String(input.circleId).trim();
+  if (!circleId) {
+    throw new Error("missing_circle_id");
+  }
+  const route = await resolveNodeRoute("communication_runtime");
+  const response = await apiFetch(
+    `${route.urlBase}/api/v1/communication/circles/${encodeURIComponent(circleId)}/room/voice-policy`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${input.communicationSessionToken}`,
+      },
+      body: JSON.stringify({
+        maxSpeakers: input.maxSpeakers,
+        overflowStrategy: input.overflowStrategy,
+      }),
+    },
+  );
+  const payload = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw buildRequestError(response, payload, "voice policy request failed");
+  }
+  return payload as CircleRoomVoicePolicyResponse;
+}
+
+async function requestCommunicationSession(input: {
+  walletPubkey: string;
+  roomKey: string;
+  signMessage?: (message: Uint8Array) => Promise<Uint8Array>;
+  ttlSec?: number;
+  clientMeta?: Record<string, unknown>;
+  endpointPath: string;
+  bodyRoomKey: string;
 }): Promise<CommunicationSessionResponse> {
   if (!input.signMessage) {
     throw new Error("wallet_signature_required");
@@ -56,26 +146,23 @@ export async function createCommunicationSession(input: {
     await input.signMessage(new TextEncoder().encode(signedMessage)),
   );
   const route = await resolveNodeRoute("communication_runtime");
-  const response = await apiFetch(
-    `${route.urlBase}/api/v1/communication/sessions`,
-    {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        walletPubkey: input.walletPubkey,
-        roomKey: input.roomKey,
-        clientTimestamp,
-        nonce,
-        signedMessage,
-        signature,
-        ttlSec: input.ttlSec,
-        clientMeta: input.clientMeta,
-      }),
+  const response = await apiFetch(`${route.urlBase}${input.endpointPath}`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify({
+      walletPubkey: input.walletPubkey,
+      roomKey: input.bodyRoomKey,
+      clientTimestamp,
+      nonce,
+      signedMessage,
+      signature,
+      ttlSec: input.ttlSec,
+      clientMeta: input.clientMeta,
+    }),
+  });
   const payload = await response.json().catch(() => null);
   if (!response.ok) {
     throw buildRequestError(
@@ -84,7 +171,18 @@ export async function createCommunicationSession(input: {
       "communication session request failed",
     );
   }
-  return payload as CommunicationSessionResponse;
+  const record =
+    payload && typeof payload === "object"
+      ? (payload as Record<string, unknown>)
+      : null;
+  return (
+    record && "session" in record
+      ? {
+          ...((record.session ?? {}) as Record<string, unknown>),
+          room: record.room,
+        }
+      : payload
+  ) as CommunicationSessionResponse;
 }
 
 function randomNonce(): string {

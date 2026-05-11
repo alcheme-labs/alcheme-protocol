@@ -70,13 +70,17 @@ function buildPrismaMock(
   memberOverrides: Record<string, unknown> = {},
   options: {
     activeSpeakers?: string[];
+    initialVoiceSessions?: "default" | "empty" | any[];
     queuedSpeakers?: Array<{ walletPubkey: string; joinedAt: Date }>;
+    raceWinnerVoiceSession?: any;
     roomMetadata?: Record<string, unknown> | null;
+    sessionScopeRef?: string;
   } = {},
 ) {
   const sessions = new Map<string, any>();
   const voiceSessions = new Map<string, any>();
   const participants = new Map<string, any>();
+  let createCalls = 0;
   const room = {
     roomKey: ROOM_KEY,
     roomType: "dungeon",
@@ -102,11 +106,11 @@ function buildPrismaMock(
     sessionId: "comm-token",
     walletPubkey: member.walletPubkey,
     scopeType: "room",
-    scopeRef: ROOM_KEY,
+    scopeRef: options.sessionScopeRef ?? ROOM_KEY,
     expiresAt: new Date(NOW.getTime() + 60_000),
     revoked: false,
   });
-  voiceSessions.set("voice_1", {
+  const defaultVoiceSession = {
     id: "voice_1",
     roomKey: ROOM_KEY,
     provider: "livekit",
@@ -119,7 +123,16 @@ function buildPrismaMock(
     metadata: null,
     createdAt: NOW,
     updatedAt: NOW,
-  });
+  };
+  const initialVoiceSessions =
+    options.initialVoiceSessions === "empty"
+      ? []
+      : Array.isArray(options.initialVoiceSessions)
+        ? options.initialVoiceSessions
+        : [defaultVoiceSession];
+  for (const session of initialVoiceSessions) {
+    voiceSessions.set(session.id, session);
+  }
   for (const walletPubkey of options.activeSpeakers ?? []) {
     participants.set(`voice_1:${walletPubkey}`, {
       sessionId: "voice_1",
@@ -169,6 +182,14 @@ function buildPrismaMock(
     },
     voiceSession: {
       create: jest.fn(async ({ data }: any) => {
+        createCalls += 1;
+        if (createCalls === 1 && options.raceWinnerVoiceSession) {
+          voiceSessions.set(
+            options.raceWinnerVoiceSession.id,
+            options.raceWinnerVoiceSession,
+          );
+          throw { code: "P2002", meta: { target: ["room_key"] } };
+        }
         const created = {
           ...data,
           startedAt: NOW,
@@ -184,24 +205,41 @@ function buildPrismaMock(
         if (!session || !include?.room) return session;
         return { ...session, room };
       }),
-      findFirst: jest.fn(async ({ where }: any) => {
-        return (
-          Array.from(voiceSessions.values()).find((session) => {
-            if (where.provider && session.provider !== where.provider) {
-              return false;
-            }
+      findFirst: jest.fn(async ({ where, include }: any) => {
+        const session = Array.from(voiceSessions.values()).find((candidate) => {
+          if (where.roomKey && candidate.roomKey !== where.roomKey) {
+            return false;
+          }
+          if (where.provider && candidate.provider !== where.provider) {
+            return false;
+          }
+          if (
+            where.providerRoomId &&
+            candidate.providerRoomId !== where.providerRoomId
+          ) {
+            return false;
+          }
+          if (where.status?.in && !where.status.in.includes(candidate.status)) {
+            return false;
+          }
+          if (where.status && typeof where.status === "string") {
+            if (candidate.status !== where.status) return false;
+          }
+          if (where.endedAt === null && candidate.endedAt !== null) {
+            return false;
+          }
+          if (where.expiresAt?.gt) {
             if (
-              where.providerRoomId &&
-              session.providerRoomId !== where.providerRoomId
+              candidate.expiresAt &&
+              candidate.expiresAt.getTime() <= where.expiresAt.gt.getTime()
             ) {
               return false;
             }
-            if (where.status?.in && !where.status.in.includes(session.status)) {
-              return false;
-            }
-            return true;
-          }) ?? null
-        );
+          }
+          return true;
+        });
+        if (!session || !include?.room) return session ?? null;
+        return { ...session, room };
       }),
       update: jest.fn(async ({ where, data }: any) => {
         const session = voiceSessions.get(where.id);
@@ -212,6 +250,7 @@ function buildPrismaMock(
       updateMany: jest.fn(async ({ where, data }: any) => {
         let count = 0;
         for (const [id, session] of voiceSessions.entries()) {
+          if (where.roomKey && session.roomKey !== where.roomKey) continue;
           if (where.provider && session.provider !== where.provider) continue;
           if (
             where.providerRoomId &&
@@ -222,6 +261,18 @@ function buildPrismaMock(
           if (where.status?.not && session.status === where.status.not) {
             continue;
           }
+          if (where.status && typeof where.status === "string") {
+            if (session.status !== where.status) continue;
+          }
+          if (where.endedAt === null && session.endedAt !== null) continue;
+          if (where.expiresAt?.lte) {
+            if (
+              !session.expiresAt ||
+              session.expiresAt.getTime() > where.expiresAt.lte.getTime()
+            ) {
+              continue;
+            }
+          }
           voiceSessions.set(id, { ...session, ...data, updatedAt: NOW });
           count += 1;
         }
@@ -229,6 +280,48 @@ function buildPrismaMock(
       }),
     },
     voiceParticipant: {
+      findMany: jest.fn(async ({ where, orderBy, take }: any) => {
+        const values = Array.from(participants.values()).filter(
+          (participant) => {
+            if (where.sessionId && participant.sessionId !== where.sessionId) {
+              return false;
+            }
+            if (where.role && participant.role !== where.role) {
+              return false;
+            }
+            if (where.leftAt === null && participant.leftAt !== null) {
+              return false;
+            }
+            return true;
+          },
+        );
+        if (Array.isArray(orderBy)) {
+          values.sort((left, right) => {
+            for (const order of orderBy) {
+              const key = Object.keys(order)[0];
+              const direction = order[key];
+              const leftValue = left[key];
+              const rightValue = right[key];
+              const leftMs =
+                leftValue instanceof Date ? leftValue.getTime() : leftValue;
+              const rightMs =
+                rightValue instanceof Date ? rightValue.getTime() : rightValue;
+              if (leftMs === rightMs) continue;
+              if (leftMs === null || leftMs === undefined) return 1;
+              if (rightMs === null || rightMs === undefined) return -1;
+              return direction === "desc"
+                ? rightMs > leftMs
+                  ? 1
+                  : -1
+                : leftMs > rightMs
+                  ? 1
+                  : -1;
+            }
+            return 0;
+          });
+        }
+        return typeof take === "number" ? values.slice(0, take) : values;
+      }),
       findUnique: jest.fn(async ({ where }: any) => {
         const key = `${where.sessionId_walletPubkey.sessionId}:${where.sessionId_walletPubkey.walletPubkey}`;
         return participants.get(key) ?? null;
@@ -290,7 +383,7 @@ function buildPrismaMock(
 describe("voice routes", () => {
   test("creates a voice session for a member who can join voice", async () => {
     const provider = buildProviderMock();
-    const prisma = buildPrismaMock();
+    const prisma = buildPrismaMock({}, { initialVoiceSessions: "empty" });
 
     const response = await request(buildApp(prisma, provider))
       .post("/api/v1/voice/sessions")
@@ -303,7 +396,315 @@ describe("voice routes", () => {
       provider: "livekit",
       status: "active",
     });
+    expect(response.body.reused).toBe(false);
     expect(prisma.voiceSession.create).toHaveBeenCalled();
+  });
+
+  test("reuses the active voice session for the same room", async () => {
+    const provider = buildProviderMock();
+    const prisma = buildPrismaMock();
+
+    const response = await request(buildApp(prisma, provider))
+      .post("/api/v1/voice/sessions")
+      .set("Authorization", "Bearer comm-token")
+      .send({ roomKey: ROOM_KEY })
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      ok: true,
+      reused: true,
+      session: {
+        id: "voice_1",
+        roomKey: ROOM_KEY,
+        status: "active",
+      },
+    });
+    expect(prisma.voiceSession.create).not.toHaveBeenCalled();
+  });
+
+  test("does not reuse an active voice session from another room", async () => {
+    const provider = buildProviderMock();
+    const prisma = buildPrismaMock(
+      {},
+      {
+        initialVoiceSessions: [
+          {
+            id: "voice_other_room",
+            roomKey: "external:other-game:lobby:1",
+            provider: "livekit",
+            providerRoomId: "alcheme_voice_other_room",
+            status: "active",
+            createdByPubkey: "wallet-other",
+            startedAt: NOW,
+            endedAt: null,
+            expiresAt: new Date(NOW.getTime() + 7_200_000),
+            metadata: null,
+            createdAt: NOW,
+            updatedAt: NOW,
+          },
+        ],
+      },
+    );
+
+    const response = await request(buildApp(prisma, provider))
+      .post("/api/v1/voice/sessions")
+      .set("Authorization", "Bearer comm-token")
+      .send({ roomKey: ROOM_KEY })
+      .expect(201);
+
+    expect(response.body).toMatchObject({
+      ok: true,
+      reused: false,
+      session: {
+        roomKey: ROOM_KEY,
+      },
+    });
+    expect(response.body.session.id).not.toBe("voice_other_room");
+    expect(prisma.voiceSession.create).toHaveBeenCalled();
+  });
+
+  test("ends an expired active session before creating a replacement", async () => {
+    const provider = buildProviderMock();
+    const prisma = buildPrismaMock(
+      {},
+      {
+        initialVoiceSessions: [
+          {
+            id: "voice_expired",
+            roomKey: ROOM_KEY,
+            provider: "livekit",
+            providerRoomId: "alcheme_voice_expired",
+            status: "active",
+            createdByPubkey: "wallet-speaker",
+            startedAt: new Date(NOW.getTime() - 7_200_000),
+            endedAt: null,
+            expiresAt: new Date(NOW.getTime() - 1_000),
+            metadata: null,
+            createdAt: new Date(NOW.getTime() - 7_200_000),
+            updatedAt: new Date(NOW.getTime() - 7_200_000),
+          },
+        ],
+      },
+    );
+
+    const response = await request(buildApp(prisma, provider))
+      .post("/api/v1/voice/sessions")
+      .set("Authorization", "Bearer comm-token")
+      .send({ roomKey: ROOM_KEY })
+      .expect(201);
+
+    expect(response.body).toMatchObject({
+      ok: true,
+      reused: false,
+      session: {
+        roomKey: ROOM_KEY,
+        status: "active",
+      },
+    });
+    expect(response.body.session.id).not.toBe("voice_expired");
+    expect(prisma.voiceSession.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          roomKey: ROOM_KEY,
+          status: "active",
+          endedAt: null,
+        }),
+        data: expect.objectContaining({
+          status: "ended",
+          endedAt: NOW,
+        }),
+      }),
+    );
+    expect(prisma.voiceSession.create).toHaveBeenCalled();
+  });
+
+  test("recovers from an active-session create race by reloading the winner", async () => {
+    const provider = buildProviderMock();
+    const raceWinner = {
+      id: "voice_winner",
+      roomKey: ROOM_KEY,
+      provider: "livekit",
+      providerRoomId: "alcheme_voice_winner",
+      status: "active",
+      createdByPubkey: "wallet-other",
+      startedAt: NOW,
+      endedAt: null,
+      expiresAt: new Date(NOW.getTime() + 7_200_000),
+      metadata: null,
+      createdAt: NOW,
+      updatedAt: NOW,
+    };
+    const prisma = buildPrismaMock(
+      {},
+      {
+        initialVoiceSessions: "empty",
+        raceWinnerVoiceSession: raceWinner,
+      },
+    );
+
+    const response = await request(buildApp(prisma, provider))
+      .post("/api/v1/voice/sessions")
+      .set("Authorization", "Bearer comm-token")
+      .send({ roomKey: ROOM_KEY })
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      ok: true,
+      reused: true,
+      session: {
+        id: "voice_winner",
+        roomKey: ROOM_KEY,
+      },
+    });
+    expect(prisma.voiceSession.create).toHaveBeenCalledTimes(1);
+  });
+
+  test("returns the active voice session for an authenticated room reader", async () => {
+    const provider = buildProviderMock();
+    const prisma = buildPrismaMock();
+
+    const response = await request(buildApp(prisma, provider))
+      .get(`/api/v1/voice/rooms/${encodeURIComponent(ROOM_KEY)}/active`)
+      .set("Authorization", "Bearer comm-token")
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      ok: true,
+      session: {
+        id: "voice_1",
+        roomKey: ROOM_KEY,
+        status: "active",
+      },
+    });
+  });
+
+  test("returns null when an authenticated room reader has no active voice session", async () => {
+    const provider = buildProviderMock();
+    const prisma = buildPrismaMock({}, { initialVoiceSessions: "empty" });
+
+    const response = await request(buildApp(prisma, provider))
+      .get(`/api/v1/voice/rooms/${encodeURIComponent(ROOM_KEY)}/active`)
+      .set("Authorization", "Bearer comm-token")
+      .expect(200);
+
+    expect(response.body).toEqual({
+      ok: true,
+      session: null,
+    });
+  });
+
+  test("does not expose an active voice session to the wrong communication scope", async () => {
+    const provider = buildProviderMock();
+    const prisma = buildPrismaMock({}, { sessionScopeRef: "external:other" });
+
+    await request(buildApp(prisma, provider))
+      .get(`/api/v1/voice/rooms/${encodeURIComponent(ROOM_KEY)}/active`)
+      .set("Authorization", "Bearer comm-token")
+      .expect(403)
+      .expect((response) => {
+        expect(response.body.error).toBe("communication_session_scope_violation");
+      });
+  });
+
+  test("lets room members read voice participants and queue positions", async () => {
+    const provider = buildProviderMock();
+    const prisma = buildPrismaMock(
+      {},
+      {
+        activeSpeakers: ["wallet-speaker-a"],
+        queuedSpeakers: [
+          {
+            walletPubkey: "wallet-waiting-first",
+            joinedAt: new Date(NOW.getTime() - 30_000),
+          },
+          {
+            walletPubkey: "wallet-waiting-second",
+            joinedAt: new Date(NOW.getTime() - 10_000),
+          },
+        ],
+        roomMetadata: {
+          voicePolicy: {
+            maxSpeakers: 2,
+            overflowStrategy: "queue",
+            source: "app_room_claim",
+          },
+        },
+      },
+    );
+
+    const response = await request(buildApp(prisma, provider))
+      .get("/api/v1/voice/sessions/voice_1/participants")
+      .set("Authorization", "Bearer comm-token")
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      ok: true,
+      sessionId: "voice_1",
+      policy: {
+        maxSpeakers: 2,
+        strategy: "queue",
+        source: "room_metadata",
+      },
+      permissions: {
+        canModerate: false,
+      },
+    });
+    expect(response.body.participants).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          walletPubkey: "wallet-speaker-a",
+          role: "speaker",
+          queuePosition: null,
+        }),
+      ]),
+    );
+    const queuedParticipants = response.body.participants
+      .filter((participant: any) => participant.role === "queued")
+      .map((participant: any) => ({
+      walletPubkey: participant.walletPubkey,
+      role: participant.role,
+      queuePosition: participant.queuePosition,
+    }));
+    expect(queuedParticipants).toEqual([
+      {
+        walletPubkey: "wallet-waiting-first",
+        role: "queued",
+        queuePosition: 1,
+      },
+      {
+        walletPubkey: "wallet-waiting-second",
+        role: "queued",
+        queuePosition: 2,
+      },
+    ]);
+  });
+
+  test("shows voice moderation permission on the participants read surface", async () => {
+    const provider = buildProviderMock();
+    const prisma = buildPrismaMock({
+      walletPubkey: "wallet-moderator",
+      role: "moderator",
+    });
+
+    const response = await request(buildApp(prisma, provider))
+      .get("/api/v1/voice/sessions/voice_1/participants")
+      .set("Authorization", "Bearer comm-token")
+      .expect(200);
+
+    expect(response.body.permissions).toEqual({ canModerate: true });
+  });
+
+  test("does not let non-members read voice participants", async () => {
+    const provider = buildProviderMock();
+    const prisma = buildPrismaMock({ leftAt: NOW });
+
+    await request(buildApp(prisma, provider))
+      .get("/api/v1/voice/sessions/voice_1/participants")
+      .set("Authorization", "Bearer comm-token")
+      .expect(403)
+      .expect((response) => {
+        expect(response.body.error).toBe("room_membership_required");
+      });
   });
 
   test("denies banned users before issuing provider tokens", async () => {
@@ -867,6 +1268,112 @@ describe("voice routes", () => {
           providerRoomId: "alcheme_voice_1",
         }),
         data: expect.objectContaining({ status: "ended", endedAt: NOW }),
+      }),
+    );
+  });
+
+  test("keeps queued participants queued when LiveKit joins them listen-only", async () => {
+    const provider = buildProviderMock();
+    const prisma = buildPrismaMock(
+      {},
+      {
+        activeSpeakers: ["wallet-speaker-a"],
+        queuedSpeakers: [
+          {
+            walletPubkey: "wallet-waiting-first",
+            joinedAt: new Date(NOW.getTime() - 30_000),
+          },
+        ],
+        roomMetadata: {
+          voicePolicy: {
+            maxSpeakers: 1,
+            overflowStrategy: "queue",
+            source: "room_metadata",
+          },
+        },
+      },
+    );
+    const app = buildApp(prisma, provider, { unsignedWebhookFixture: true });
+
+    await request(app)
+      .post("/api/v1/voice/providers/livekit/webhook")
+      .send({
+        event: "participant_joined",
+        room: { name: "alcheme_voice_1" },
+        participant: {
+          identity: "wallet-waiting-first",
+          permission: { canPublish: false },
+        },
+      })
+      .expect(202);
+
+    expect(prisma.voiceParticipant.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        update: expect.objectContaining({
+          role: "queued",
+          leftAt: null,
+          mutedByModerator: true,
+        }),
+      }),
+    );
+  });
+
+  test("promotes the first queued speaker when a speaker leaves a queue-mode room", async () => {
+    const provider = buildProviderMock();
+    const prisma = buildPrismaMock(
+      {},
+      {
+        activeSpeakers: ["wallet-speaker-a"],
+        queuedSpeakers: [
+          {
+            walletPubkey: "wallet-waiting-first",
+            joinedAt: new Date(NOW.getTime() - 30_000),
+          },
+          {
+            walletPubkey: "wallet-waiting-second",
+            joinedAt: new Date(NOW.getTime() - 10_000),
+          },
+        ],
+        roomMetadata: {
+          voicePolicy: {
+            maxSpeakers: 1,
+            overflowStrategy: "queue",
+            source: "room_metadata",
+          },
+        },
+      },
+    );
+    const app = buildApp(prisma, provider, { unsignedWebhookFixture: true });
+
+    await request(app)
+      .post("/api/v1/voice/providers/livekit/webhook")
+      .send({
+        event: "participant_left",
+        room: { name: "alcheme_voice_1" },
+        participant: { identity: "wallet-speaker-a" },
+      })
+      .expect(202);
+
+    expect(provider.muteParticipant).toHaveBeenCalledWith({
+      providerRoomId: "alcheme_voice_1",
+      walletPubkey: "wallet-waiting-first",
+      muted: false,
+    });
+    expect(provider.muteParticipant.mock.invocationCallOrder[0]).toBeLessThan(
+      prisma.voiceParticipant.update.mock.invocationCallOrder[0],
+    );
+    expect(prisma.voiceParticipant.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          sessionId_walletPubkey: {
+            sessionId: "voice_1",
+            walletPubkey: "wallet-waiting-first",
+          },
+        },
+        data: expect.objectContaining({
+          role: "speaker",
+          mutedByModerator: false,
+        }),
       }),
     );
   });

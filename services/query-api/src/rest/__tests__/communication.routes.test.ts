@@ -11,6 +11,7 @@ import {
   jest,
   test,
 } from "@jest/globals";
+import { MemberRole, MemberStatus } from "@prisma/client";
 import bs58 from "bs58";
 import nacl from "tweetnacl";
 
@@ -71,7 +72,14 @@ function buildRedisMock() {
   };
 }
 
-function buildPrismaMock(serverPublicKey: string) {
+function buildPrismaMock(
+  serverPublicKey: string,
+  options: {
+    circleMember?: Record<string, unknown> | null;
+    initialRooms?: any[];
+    user?: Record<string, unknown> | null;
+  } = {},
+) {
   const rooms = new Map<string, any>();
   const members = new Map<string, any>();
   const sessions = new Map<string, any>();
@@ -84,6 +92,16 @@ function buildPrismaMock(serverPublicKey: string) {
     serverPublicKey,
     claimAuthMode: "server_ed25519",
   };
+  for (const room of options.initialRooms ?? []) {
+    rooms.set(room.roomKey, {
+      lifecycleStatus: "active",
+      expiresAt: null,
+      endedAt: null,
+      createdAt: NOW,
+      updatedAt: NOW,
+      ...room,
+    });
+  }
 
   return {
     circle: {
@@ -134,10 +152,10 @@ function buildPrismaMock(serverPublicKey: string) {
       }),
     },
     user: {
-      findUnique: jest.fn(async () => null),
+      findUnique: jest.fn(async () => options.user ?? null),
     },
     circleMember: {
-      findUnique: jest.fn(async () => null),
+      findUnique: jest.fn(async () => options.circleMember ?? null),
     },
     communicationSession: {
       create: jest.fn(async ({ data }: any) => {
@@ -205,10 +223,325 @@ function buildPrismaMock(serverPublicKey: string) {
   } as any;
 }
 
+async function bootstrapCircleRoomSession(app: express.Express, circleId = 130) {
+  const payload = {
+    v: 1 as const,
+    action: "communication_session_init" as const,
+    walletPubkey: WALLET,
+    scopeType: "room" as const,
+    scopeRef: `circle:${circleId}`,
+    clientTimestamp: NOW.toISOString(),
+    nonce: `circle-session-${circleId}`,
+  };
+  const signedMessage = buildCommunicationSessionBootstrapMessage(payload);
+  const response = await request(app)
+    .post(`/api/v1/communication/circles/${circleId}/room-session`)
+    .send({
+      walletPubkey: WALLET,
+      clientTimestamp: NOW.toISOString(),
+      nonce: payload.nonce,
+      signedMessage,
+      signature: signBase64(signedMessage, WALLET_KEYPAIR.secretKey),
+    })
+    .expect(201);
+  return response.body.session.communicationAccessToken as string;
+}
+
 describe("communication routes", () => {
   beforeEach(() => {
     jest.useFakeTimers();
     jest.setSystemTime(NOW);
+  });
+
+  test("ensures a first-party circle room and issues a room session in one signed request", async () => {
+    const appClaim = buildSignedAppClaim({
+      externalAppId: "example-web3-game",
+      roomType: "dungeon",
+      externalRoomId: "run-8791",
+      walletPubkeys: [WALLET],
+      expiresAt: "2099-05-08T12:05:00.000Z",
+      nonce: "claim-1",
+    });
+    const prisma = buildPrismaMock(appClaim.serverPublicKey, {
+      user: { id: 7 },
+      circleMember: {
+        status: MemberStatus.Active,
+        role: MemberRole.Admin,
+      },
+    });
+    const app = buildApp(prisma, buildRedisMock());
+    const payload = {
+      v: 1 as const,
+      action: "communication_session_init" as const,
+      walletPubkey: WALLET,
+      scopeType: "room" as const,
+      scopeRef: "circle:130",
+      clientTimestamp: NOW.toISOString(),
+      nonce: "circle-session-1",
+    };
+    const signedMessage = buildCommunicationSessionBootstrapMessage(payload);
+
+    const response = await request(app)
+      .post("/api/v1/communication/circles/130/room-session")
+      .send({
+        walletPubkey: WALLET,
+        clientTimestamp: NOW.toISOString(),
+        nonce: "circle-session-1",
+        signedMessage,
+        signature: signBase64(signedMessage, WALLET_KEYPAIR.secretKey),
+      })
+      .expect(201);
+
+    expect(response.body).toMatchObject({
+      ok: true,
+      room: {
+        roomKey: "circle:130",
+        roomType: "circle",
+        parentCircleId: 130,
+        knowledgeMode: "full",
+        retentionPolicy: "persistent",
+        metadata: {
+          voicePolicy: {
+            maxSpeakers: 16,
+            overflowStrategy: "listen_only",
+            source: "room_metadata",
+          },
+        },
+      },
+      member: {
+        walletPubkey: WALLET,
+        role: "member",
+      },
+      session: {
+        walletPubkey: WALLET,
+        scopeType: "room",
+        scopeRef: "circle:130",
+        communicationAccessToken: expect.any(String),
+      },
+    });
+    expect(prisma.communicationSession.create).toHaveBeenCalledTimes(1);
+  });
+
+  test("rejects circle room session bootstrap when the signed scope does not match the circle room", async () => {
+    const appClaim = buildSignedAppClaim({
+      externalAppId: "example-web3-game",
+      roomType: "dungeon",
+      externalRoomId: "run-8791",
+      walletPubkeys: [WALLET],
+      expiresAt: "2099-05-08T12:05:00.000Z",
+      nonce: "claim-1",
+    });
+    const prisma = buildPrismaMock(appClaim.serverPublicKey, {
+      user: { id: 7 },
+      circleMember: {
+        status: MemberStatus.Active,
+        role: MemberRole.Admin,
+      },
+    });
+    const app = buildApp(prisma, buildRedisMock());
+    const payload = {
+      v: 1 as const,
+      action: "communication_session_init" as const,
+      walletPubkey: WALLET,
+      scopeType: "room" as const,
+      scopeRef: "circle:999",
+      clientTimestamp: NOW.toISOString(),
+      nonce: "circle-session-2",
+    };
+    const signedMessage = buildCommunicationSessionBootstrapMessage(payload);
+
+    await request(app)
+      .post("/api/v1/communication/circles/130/room-session")
+      .send({
+        walletPubkey: WALLET,
+        clientTimestamp: NOW.toISOString(),
+        nonce: "circle-session-2",
+        signedMessage,
+        signature: signBase64(signedMessage, WALLET_KEYPAIR.secretKey),
+      })
+      .expect(400)
+      .expect((response) => {
+        expect(response.body.error).toBe("signed_message_mismatch");
+      });
+    expect(prisma.communicationSession.create).not.toHaveBeenCalled();
+  });
+
+  test("does not let the generic room resolver create first-party circle rooms or voice policy metadata", async () => {
+    const appClaim = buildSignedAppClaim({
+      externalAppId: "example-web3-game",
+      roomType: "dungeon",
+      externalRoomId: "run-8791",
+      walletPubkeys: [WALLET],
+      expiresAt: "2099-05-08T12:05:00.000Z",
+      nonce: "claim-1",
+    });
+    const prisma = buildPrismaMock(appClaim.serverPublicKey, {
+      user: { id: 7 },
+      circleMember: {
+        status: MemberStatus.Active,
+        role: MemberRole.Admin,
+      },
+    });
+    const app = buildApp(prisma, buildRedisMock());
+
+    await request(app)
+      .post("/api/v1/communication/rooms/resolve")
+      .send({
+        roomType: "circle",
+        parentCircleId: 130,
+        createdByPubkey: WALLET,
+        metadata: {
+          voicePolicy: {
+            maxSpeakers: 1,
+            overflowStrategy: "deny",
+          },
+        },
+      })
+      .expect(400)
+      .expect((response) => {
+        expect(response.body.error).toBe("use_circle_room_session_route");
+      });
+
+    expect(prisma.communicationRoom.upsert).not.toHaveBeenCalled();
+  });
+
+  test("lets circle managers update room voice policy while preserving metadata", async () => {
+    const appClaim = buildSignedAppClaim({
+      externalAppId: "example-web3-game",
+      roomType: "dungeon",
+      externalRoomId: "run-8791",
+      walletPubkeys: [WALLET],
+      expiresAt: "2099-05-08T12:05:00.000Z",
+      nonce: "claim-1",
+    });
+    const prisma = buildPrismaMock(appClaim.serverPublicKey, {
+      user: { id: 7 },
+      circleMember: {
+        status: MemberStatus.Active,
+        role: MemberRole.Owner,
+      },
+      initialRooms: [
+        {
+          roomKey: "circle:130",
+          roomType: "circle",
+          parentCircleId: 130,
+          externalAppId: null,
+          externalRoomId: null,
+          lifecycleStatus: "active",
+          knowledgeMode: "full",
+          retentionPolicy: "persistent",
+          metadata: {
+            capabilities: { plazaDiscussion: true },
+            custom: "preserve",
+            voicePolicy: {
+              maxSpeakers: 3,
+              overflowStrategy: "listen_only",
+              source: "room_metadata",
+            },
+          },
+        },
+      ],
+    });
+    const app = buildApp(prisma, buildRedisMock());
+    const token = await bootstrapCircleRoomSession(app);
+
+    const response = await request(app)
+      .patch("/api/v1/communication/circles/130/room/voice-policy")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ maxSpeakers: 999, overflowStrategy: "queue" })
+      .expect(200);
+
+    expect(response.body.room.metadata).toMatchObject({
+      capabilities: { plazaDiscussion: true },
+      custom: "preserve",
+      voicePolicy: {
+        maxSpeakers: 100,
+        overflowStrategy: "queue",
+        source: "room_metadata",
+      },
+    });
+    expect(prisma.communicationRoom.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { roomKey: "circle:130" },
+        data: expect.objectContaining({
+          metadata: expect.objectContaining({
+            capabilities: { plazaDiscussion: true },
+            custom: "preserve",
+            voicePolicy: expect.objectContaining({
+              maxSpeakers: 100,
+              overflowStrategy: "queue",
+            }),
+          }),
+        }),
+      }),
+    );
+  });
+
+  test("rejects non-manager room voice policy updates", async () => {
+    const appClaim = buildSignedAppClaim({
+      externalAppId: "example-web3-game",
+      roomType: "dungeon",
+      externalRoomId: "run-8791",
+      walletPubkeys: [WALLET],
+      expiresAt: "2099-05-08T12:05:00.000Z",
+      nonce: "claim-1",
+    });
+    const prisma = buildPrismaMock(appClaim.serverPublicKey, {
+      user: { id: 7 },
+      circleMember: {
+        status: MemberStatus.Active,
+        role: MemberRole.Member,
+      },
+    });
+    const app = buildApp(prisma, buildRedisMock());
+    const token = await bootstrapCircleRoomSession(app);
+
+    await request(app)
+      .patch("/api/v1/communication/circles/130/room/voice-policy")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ maxSpeakers: 4, overflowStrategy: "queue" })
+      .expect(403)
+      .expect((response) => {
+        expect(response.body.error).toBe("moderator_permission_required");
+      });
+  });
+
+  test("rejects invalid or wrong-scope room voice policy updates", async () => {
+    const appClaim = buildSignedAppClaim({
+      externalAppId: "example-web3-game",
+      roomType: "dungeon",
+      externalRoomId: "run-8791",
+      walletPubkeys: [WALLET],
+      expiresAt: "2099-05-08T12:05:00.000Z",
+      nonce: "claim-1",
+    });
+    const prisma = buildPrismaMock(appClaim.serverPublicKey, {
+      user: { id: 7 },
+      circleMember: {
+        status: MemberStatus.Active,
+        role: MemberRole.Owner,
+      },
+    });
+    const app = buildApp(prisma, buildRedisMock());
+    const token = await bootstrapCircleRoomSession(app);
+
+    await request(app)
+      .patch("/api/v1/communication/circles/130/room/voice-policy")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ maxSpeakers: 4, overflowStrategy: "lottery" })
+      .expect(400)
+      .expect((response) => {
+        expect(response.body.error).toBe("invalid_voice_overflow_strategy");
+      });
+
+    await request(app)
+      .patch("/api/v1/communication/circles/131/room/voice-policy")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ maxSpeakers: 4, overflowStrategy: "queue" })
+      .expect(403)
+      .expect((response) => {
+        expect(response.body.error).toBe("communication_session_scope_violation");
+      });
   });
 
   afterEach(() => {

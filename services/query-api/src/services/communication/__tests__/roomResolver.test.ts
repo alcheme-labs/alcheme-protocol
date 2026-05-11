@@ -132,6 +132,59 @@ describe("resolveCommunicationRoom", () => {
     );
   });
 
+  test("drops unsigned circle voice policy metadata unless the caller is an explicit first-party path", async () => {
+    const prisma = buildPrismaMock();
+
+    const room = await resolveCommunicationRoom(
+      prisma,
+      {
+        roomType: "circle",
+        parentCircleId: 130,
+        createdByPubkey: WALLET,
+        metadata: {
+          voicePolicy: {
+            maxSpeakers: 1,
+            overflowStrategy: "deny",
+          },
+          custom: "keep",
+        },
+      },
+      { now: NOW },
+    );
+
+    expect(room.metadata).toEqual({ custom: "keep" });
+  });
+
+  test("keeps circle voice policy metadata only for trusted first-party room callers", async () => {
+    const prisma = buildPrismaMock();
+
+    const room = await resolveCommunicationRoom(
+      prisma,
+      {
+        roomType: "circle",
+        parentCircleId: 130,
+        createdByPubkey: WALLET,
+        trustedFirstPartyMetadata: true,
+        metadata: {
+          voicePolicy: {
+            maxSpeakers: 8,
+            overflowStrategy: "queue",
+            source: "room_metadata",
+          },
+        },
+      },
+      { now: NOW },
+    );
+
+    expect(room.metadata).toEqual({
+      voicePolicy: {
+        maxSpeakers: 8,
+        overflowStrategy: "queue",
+        source: "room_metadata",
+      },
+    });
+  });
+
   test("keeps transcription off unless the signed app claim authorizes the requested mode", async () => {
     const keyPair = nacl.sign.keyPair();
     const baseClaim = buildSignedClaim(

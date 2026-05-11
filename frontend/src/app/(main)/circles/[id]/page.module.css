@@ -1854,6 +1854,144 @@
     transform: scale(0.96);
 }
 
+.composerVoiceManagement {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: var(--space-2);
+    padding: 9px;
+    border-radius: 8px;
+    border: 1px solid rgba(199, 168, 107, 0.16);
+    background: rgba(18, 22, 20, 0.36);
+}
+
+.composerVoiceManagementHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.composerVoicePolicyLine {
+    color: var(--color-text-tertiary);
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.composerVoiceQueue {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.composerVoiceQueueRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.composerVoiceQueueMeta {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    color: var(--color-text-tertiary);
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+.composerVoiceQueueWallet {
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-text-secondary);
+}
+
+.composerVoiceQueueActions {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.composerVoiceDecisionBtn {
+    min-width: 50px;
+    height: 26px;
+    padding: 0 9px;
+    border-radius: 6px;
+    border: 1px solid rgba(199, 168, 107, 0.2);
+    background: rgba(199, 168, 107, 0.08);
+    color: var(--color-text-secondary);
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.composerVoiceDecisionBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.composerVoiceSettings {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 9px;
+    border-radius: 8px;
+    border: 1px solid rgba(199, 168, 107, 0.14);
+    background: rgba(199, 168, 107, 0.06);
+}
+
+.composerVoiceSettingsHeader {
+    grid-column: 1 / -1;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.composerVoiceSettingField {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: var(--color-text-tertiary);
+    font-size: 11px;
+    line-height: 1.2;
+}
+
+.composerVoiceSettingField input,
+.composerVoiceSettingField select {
+    width: 100%;
+    height: 30px;
+    border-radius: 6px;
+    border: 1px solid rgba(199, 168, 107, 0.18);
+    background: rgba(18, 22, 20, 0.5);
+    color: var(--color-text-secondary);
+    font-size: 12px;
+}
+
+.composerVoiceSettingsSave {
+    height: 30px;
+    padding: 0 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(199, 168, 107, 0.22);
+    background: rgba(199, 168, 107, 0.12);
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.composerVoiceSettingsSave:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 @keyframes composerVoiceSpin {
     to {
         transform: rotate(360deg);
@@ -2252,6 +2390,10 @@
 
     .composerVoiceControls {
         align-self: flex-end;
+    }
+
+    .composerVoiceSettings {
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .composerOps {

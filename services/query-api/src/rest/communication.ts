@@ -5,7 +5,18 @@ import type { Prisma, PrismaClient } from "@prisma/client";
 import type { Redis } from "ioredis";
 
 import { verifyEd25519SignatureBase64 } from "../services/offchainDiscussion";
+import {
+  ensureCircleCommunicationRoom,
+  updateCircleRoomVoicePolicy,
+} from "../services/communication/circleRoom";
 import { resolveCommunicationRoom } from "../services/communication/roomResolver";
+import {
+  buildCommunicationSessionBootstrapMessage,
+  issueCommunicationSession,
+  mapCommunicationSessionResponse,
+  validateCommunicationSessionBootstrap,
+  type CommunicationSessionRow,
+} from "../services/communication/sessionBootstrap";
 import {
   canModerateRoom,
   canReadRoom,
@@ -16,15 +27,8 @@ import {
 
 type CommunicationPrisma = PrismaClient;
 
-export interface CommunicationSessionBootstrapPayload {
-  v: 1;
-  action: "communication_session_init";
-  walletPubkey: string;
-  scopeType: "room";
-  scopeRef: string;
-  clientTimestamp: string;
-  nonce: string;
-}
+export { buildCommunicationSessionBootstrapMessage };
+export type { CommunicationSessionBootstrapPayload } from "../services/communication/sessionBootstrap";
 
 export type CommunicationMessageKind = "plain" | "voice_clip";
 
@@ -52,15 +56,6 @@ export type CommunicationMessageSigningPayload =
       nonce: string;
       prevEnvelopeId: string | null;
     };
-
-interface CommunicationSessionRow {
-  sessionId: string;
-  walletPubkey: string;
-  scopeType: string;
-  scopeRef: string;
-  expiresAt: Date;
-  revoked: boolean;
-}
 
 interface CommunicationMessageRow {
   envelopeId: string;
@@ -119,12 +114,6 @@ const DEFAULT_MAX_VOICE_CLIP_BYTES = 25 * 1024 * 1024;
 const MAX_STORAGE_URI_LENGTH = 2_048;
 const SIGNED_TIMESTAMP_MAX_SKEW_MS = 15 * 60 * 1000;
 
-export function buildCommunicationSessionBootstrapMessage(
-  payload: CommunicationSessionBootstrapPayload,
-): string {
-  return `alcheme-communication-session:${JSON.stringify(payload)}`;
-}
-
 export function buildCommunicationMessageSigningMessage(
   payload: CommunicationMessageSigningPayload,
 ): string {
@@ -168,6 +157,9 @@ export function communicationRouter(
       const roomType = String(req.body?.roomType || "").trim();
       if (!roomType) {
         return res.status(400).json({ error: "missing_room_type" });
+      }
+      if (roomType.toLowerCase() === "circle") {
+        return res.status(400).json({ error: "use_circle_room_session_route" });
       }
 
       const room = await resolveCommunicationRoom(prisma, {
@@ -272,90 +264,122 @@ export function communicationRouter(
     }
   });
 
+  router.post("/circles/:circleId/room-session", async (req, res, next) => {
+    try {
+      const circleId = optionalPositiveInt(req.params.circleId);
+      if (!circleId) {
+        return res.status(400).json({ error: "invalid_circle_id" });
+      }
+      const roomKey = `circle:${circleId}`;
+      const now = new Date();
+      const bootstrap = validateCommunicationSessionBootstrap({
+        body: req.body,
+        expectedRoomKey: roomKey,
+        now,
+      });
+      if (!bootstrap.ok) {
+        return res
+          .status(bootstrap.status)
+          .json({ error: bootstrap.error });
+      }
+
+      const ensured = await ensureCircleCommunicationRoom(
+        prisma,
+        {
+          circleId,
+          walletPubkey: bootstrap.bootstrap.walletPubkey,
+        },
+        { now },
+      );
+      const session = await issueCommunicationSession(
+        prisma,
+        bootstrap.bootstrap,
+        { now },
+      );
+
+      res.status(201).json({
+        ok: true,
+        room: mapRoom(ensured.room),
+        member: mapMember(ensured.member),
+        session: mapCommunicationSessionResponse(session),
+      });
+    } catch (error) {
+      const statusCode =
+        typeof (error as { statusCode?: unknown }).statusCode === "number"
+          ? ((error as { statusCode: number }).statusCode)
+          : null;
+      if (statusCode) {
+        return res
+          .status(statusCode)
+          .json({ error: (error as Error).message || "circle_room_error" });
+      }
+      next(error);
+    }
+  });
+
+  router.patch("/circles/:circleId/room/voice-policy", async (req, res, next) => {
+    try {
+      const circleId = optionalPositiveInt(req.params.circleId);
+      if (!circleId) {
+        return res.status(400).json({ error: "invalid_circle_id" });
+      }
+      const roomKey = `circle:${circleId}`;
+      const sessionAuth = await authenticateRoomSession(prisma, req, roomKey);
+      if (!sessionAuth.ok) return sendSessionError(res, sessionAuth);
+
+      const updated = await updateCircleRoomVoicePolicy(prisma, {
+        circleId,
+        walletPubkey: sessionAuth.session.walletPubkey,
+        maxSpeakers: req.body?.maxSpeakers,
+        overflowStrategy: req.body?.overflowStrategy,
+      });
+
+      res.json({
+        ok: true,
+        room: mapRoom(updated.room),
+      });
+    } catch (error) {
+      const statusCode =
+        typeof (error as { statusCode?: unknown }).statusCode === "number"
+          ? ((error as { statusCode: number }).statusCode)
+          : null;
+      if (statusCode) {
+        return res
+          .status(statusCode)
+          .json({ error: (error as Error).message || "voice_policy_error" });
+      }
+      next(error);
+    }
+  });
+
   router.post("/sessions", async (req, res, next) => {
     try {
-      const walletPubkey = stringOrUndefined(req.body?.walletPubkey);
-      const roomKey = stringOrUndefined(
-        req.body?.roomKey ?? req.body?.scopeRef,
-      );
-      if (!walletPubkey) {
-        return res.status(400).json({ error: "missing_wallet_pubkey" });
-      }
-      if (!roomKey) {
-        return res.status(400).json({ error: "missing_room_key" });
-      }
-
-      const clientTimestamp = parseDateOrNow(req.body?.clientTimestamp);
-      if (!clientTimestamp) {
-        return res.status(400).json({ error: "invalid_client_timestamp" });
-      }
-      const timestampDecision = validateSignedTimestamp(clientTimestamp);
-      if (timestampDecision) {
-        return res
-          .status(timestampDecision.status)
-          .json({ error: timestampDecision.error });
-      }
-      const nonce = stringOrUndefined(req.body?.nonce) ?? randomNonce();
-      const payload: CommunicationSessionBootstrapPayload = {
-        v: 1,
-        action: "communication_session_init",
-        walletPubkey,
-        scopeType: "room",
-        scopeRef: roomKey,
-        clientTimestamp: clientTimestamp.toISOString(),
-        nonce,
-      };
-      const canonicalSignedMessage =
-        buildCommunicationSessionBootstrapMessage(payload);
-      const signedMessage =
-        stringOrUndefined(req.body?.signedMessage) ?? canonicalSignedMessage;
-      if (signedMessage !== canonicalSignedMessage) {
-        return res.status(400).json({ error: "signed_message_mismatch" });
-      }
-
-      const signatureVerified = verifyEd25519SignatureBase64({
-        senderPubkey: walletPubkey,
-        message: signedMessage,
-        signatureBase64: stringOrNull(req.body?.signature),
+      const bootstrap = validateCommunicationSessionBootstrap({
+        body: req.body,
+        now: new Date(),
       });
-      if (!signatureVerified) {
-        return res.status(401).json({ error: "session_signature_required" });
+      if (!bootstrap.ok) {
+        return res
+          .status(bootstrap.status)
+          .json({ error: bootstrap.error });
       }
 
       const readDecision = await canReadRoom(prisma, {
-        roomKey,
-        walletPubkey,
+        roomKey: bootstrap.bootstrap.roomKey,
+        walletPubkey: bootstrap.bootstrap.walletPubkey,
       });
       if (!readDecision.allowed)
         return sendPermissionDecision(res, readDecision);
 
-      const requestedTtl =
-        optionalPositiveInt(req.body?.ttlSec) ?? DEFAULT_SESSION_TTL_SEC;
-      const ttlSec = Math.min(Math.max(requestedTtl, 60), MAX_SESSION_TTL_SEC);
-      const expiresAt = new Date(Date.now() + ttlSec * 1000);
-      const sessionId = randomSessionId();
-      const session = await prisma.communicationSession.create({
-        data: {
-          sessionId,
-          walletPubkey,
-          scopeType: "room",
-          scopeRef: roomKey,
-          expiresAt,
-          revoked: false,
-          lastSeenAt: new Date(),
-          clientMeta: jsonObjectOrUndefined(req.body?.clientMeta),
-        },
-      });
+      const session = await issueCommunicationSession(
+        prisma,
+        bootstrap.bootstrap,
+      );
 
       res.status(201).json({
         ok: true,
-        sessionId: session.sessionId,
-        walletPubkey: session.walletPubkey,
-        scopeType: session.scopeType,
-        scopeRef: session.scopeRef,
-        expiresAt: session.expiresAt.toISOString(),
-        communicationAccessToken: session.sessionId,
-        signatureVerified,
+        ...mapCommunicationSessionResponse(session),
+        signatureVerified: true,
       });
     } catch (error) {
       next(error);
@@ -1233,13 +1257,6 @@ function parseBoundedEnvInt(
 }
 
 function randomNonce(): string {
-  return crypto.randomBytes(16).toString("hex");
-}
-
-function randomSessionId(): string {
-  if (typeof crypto.randomUUID === "function") {
-    return crypto.randomUUID().replace(/-/g, "");
-  }
   return crypto.randomBytes(16).toString("hex");
 }
 

@@ -50,6 +50,16 @@ for (const locale of ["en", "zh", "fr", "es"]) {
     assert.equal(typeof voice?.unmute, "string");
     assert.equal(typeof voice?.leave, "string");
     assert.equal(typeof voice?.participantCount, "string");
+    assert.equal(typeof voice?.managementTitle, "string");
+    assert.equal(typeof voice?.activeSpeakerCount, "string");
+    assert.equal(typeof voice?.queuePosition, "string");
+    assert.equal(typeof voice?.approve, "string");
+    assert.equal(typeof voice?.deny, "string");
+    assert.equal(typeof voice?.settingsTitle, "string");
+    assert.equal(typeof voice?.maxSpeakers, "string");
+    assert.equal(typeof voice?.overflowStrategy, "string");
+    assert.equal(typeof voice?.savePolicy, "string");
+    assert.equal(typeof voice?.policyLoaded, "string");
     assert.equal(typeof voice?.walletRequired, "string");
     assert.equal(typeof voice?.membershipRequired, "string");
     assert.equal(typeof voice?.joinFailed, "string");
@@ -61,9 +71,14 @@ test("PlazaTab exposes voice controls from the existing composer surface", () =>
   assert.match(plazaSource, /handleJoinVoice/);
   assert.match(plazaSource, /handleLeaveVoice/);
   assert.match(plazaSource, /handleToggleVoiceMute/);
-  assert.match(plazaSource, /createCommunicationSession/);
+  assert.match(plazaSource, /ensureCircleCommunicationRoomSession/);
+  assert.match(plazaSource, /updateCircleRoomVoicePolicy/);
+  assert.doesNotMatch(plazaSource, /createCommunicationSession/);
   assert.match(plazaSource, /createVoiceSession/);
   assert.match(plazaSource, /createVoiceToken/);
+  assert.match(plazaSource, /fetchVoiceParticipants/);
+  assert.match(plazaSource, /approveVoiceSpeaker/);
+  assert.match(plazaSource, /denyVoiceSpeaker/);
   assert.match(plazaSource, /createLiveKitBrowserVoiceProvider/);
   assert.match(plazaSource, /styles\.composerVoiceBtn/);
   assert.match(plazaSource, /styles\.composerVoiceDock/);
@@ -77,12 +92,32 @@ test("voice API uses communication session auth before requesting provider token
   );
   assert.match(communicationApiSource, /alcheme-communication-session:/);
   assert.match(communicationApiSource, /\/api\/v1\/communication\/sessions/);
+  assert.match(
+    communicationApiSource,
+    /\/api\/v1\/communication\/circles\/\$\{[^}]+\}\/room-session/,
+  );
+  assert.match(communicationApiSource, /\/room\/voice-policy/);
+  assert.match(communicationApiSource, /ensureCircleCommunicationRoomSession/);
+  assert.match(communicationApiSource, /record\.room/);
   assert.match(communicationApiSource, /signature/);
+  assert.match(voiceApiSource, /reused/);
   assert.match(voiceApiSource, /\/api\/v1\/voice\/sessions/);
+  assert.match(voiceApiSource, /\/participants/);
+  assert.match(voiceApiSource, /\/speakers\/\$\{[^}]+\}\/\$\{decision\}/);
   assert.match(
     voiceApiSource,
     /Authorization["']?\s*:\s*`Bearer \$\{communicationSessionToken\}`/,
   );
+});
+
+test("Plaza voice policy settings load existing room policy before save can overwrite it", () => {
+  assert.match(plazaSource, /voicePolicyLoaded/);
+  assert.match(plazaSource, /setVoicePolicyLoaded\(true\)/);
+  assert.match(plazaSource, /setVoicePolicyDirty\(true\)/);
+  assert.match(plazaSource, /!voicePolicyLoaded && !voicePolicyDirty/);
+  assert.match(plazaSource, /disabled=\{voicePolicySaving \|\| !voicePolicyLoaded\}/);
+  assert.match(plazaSource, /disabled=\{!voicePolicyLoaded \|\| voicePolicySaving\}/);
+  assert.match(plazaSource, /if \(!voiceManagement \|\| voicePolicyDirty\) return;/);
 });
 
 test("browser voice provider is backed by the official LiveKit client package", () => {
