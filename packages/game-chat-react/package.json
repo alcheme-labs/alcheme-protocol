@@ -2,7 +2,7 @@
   "name": "@alcheme/game-chat-react",
   "version": "0.1.0",
   "license": "Apache-2.0",
-  "description": "Optional React components for Alcheme game chat and voice integrations.",
+  "description": "Optional React components for Alcheme external app chat and voice integrations.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

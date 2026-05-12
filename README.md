@@ -124,19 +124,31 @@ The local stack scripts remain the supported way to boot the developer runtime. 
 
 ## Architecture
 
+For the diagram-first architecture guide, see [docs/architecture/README.md](./docs/architecture/README.md). For the global HTML map, open [docs/architecture/alcheme-architecture-map.html](./docs/architecture/alcheme-architecture-map.html). For per-subproject HTML diagrams, open [docs/architecture/subproject-maps.html](./docs/architecture/subproject-maps.html).
+
 ```mermaid
-flowchart LR
+flowchart TB
     Client["Wallet / Client"] --> Frontend["Frontend"]
+    Mobile["mobile-shell"] --> Frontend
     Frontend --> SDK["@alcheme/sdk"]
+    External["External app / runtime"] --> SDK
+    External --> ChatAdapter["Optional chat UI adapter"]
+
     SDK --> Programs["Solana Programs"]
-    Programs --> Chain["Solana Network"]
+    SDK --> QueryApi
+    Programs --> Chain["Chain-authoritative facts"]
 
     Chain --> Indexer["indexer-core"]
-    Indexer --> ReadModel["Postgres / Redis Read Model"]
-    ReadModel --> QueryApi["query-api"]
+    Indexer --> Projected["Projected read model"]
+    Indexer --> Invalidation["Redis invalidation signals"]
+    Projected --> Postgres["Postgres physical store\nprojected + runtime tables"]
 
+    QueryApi["query-api runtime/API"] --> RuntimeState["Runtime-owned state"]
+    RuntimeState --> Postgres
+    Postgres --> QueryApi
+    Invalidation --> QueryApi
     Frontend --> QueryApi
-    QueryApi --> Runtime["Discussion / Collab / AI / Extension Runtime"]
+    QueryApi --> Runtime["AI / Collab / Voice / Governance runtime"]
 
     Extensions["Extensions"] --> Programs
     Extensions --> QueryApi

@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f7f9" />
+    <title>Alcheme Architecture Map</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f7f9;
+        --surface: #ffffff;
+        --ink: #17202a;
+        --muted: #5f6b7a;
+        --line: #d6dce3;
+        --accent: #2f6fed;
+        --accent-soft: #e7efff;
+        --contract: #0f766e;
+        --projection: #7c3aed;
+        --runtime: #b45309;
+        --client: #2563eb;
+        --extension: #be123c;
+        --ops: #475569;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        line-height: 1.5;
+        overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 32px 20px 48px;
+      }
+
+      .skip-link {
+        position: absolute;
+        left: 16px;
+        top: 16px;
+        z-index: 10;
+        transform: translateY(-140%);
+        border: 1px solid var(--accent);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--accent);
+        padding: 8px 12px;
+        text-decoration: none;
+      }
+
+      .skip-link:focus-visible {
+        transform: translateY(0);
+      }
+
+      header {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 3.75rem;
+        letter-spacing: 0;
+        line-height: 1.05;
+        text-wrap: balance;
+      }
+
+      .lede {
+        max-width: 760px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 24px 0;
+      }
+
+      .filter {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink);
+        border-radius: 8px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font: inherit;
+        touch-action: manipulation;
+      }
+
+      .filter:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .filter:focus-visible,
+      .links a:focus-visible,
+      .skip-link:focus-visible {
+        outline: 3px solid rgba(47, 111, 237, 0.35);
+        outline-offset: 2px;
+      }
+
+      .filter[aria-pressed="true"] {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        color: #143d8f;
+      }
+
+      .map {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+      }
+
+      .flow {
+        min-height: 540px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        border-radius: 8px;
+        padding: 16px;
+        overflow-x: auto;
+      }
+
+      svg {
+        width: 100%;
+        min-width: 940px;
+        height: 540px;
+        display: block;
+      }
+
+      .boundary {
+        fill: transparent;
+        stroke-width: 1.5;
+        stroke-dasharray: 7 5;
+      }
+
+      .boundary.chain {
+        fill: rgba(15, 118, 110, 0.06);
+        stroke: var(--contract);
+      }
+
+      .boundary.projection {
+        fill: rgba(124, 58, 237, 0.06);
+        stroke: var(--projection);
+      }
+
+      .boundary.runtime {
+        fill: rgba(180, 83, 9, 0.06);
+        stroke: var(--runtime);
+      }
+
+      .boundary.storage {
+        fill: rgba(71, 85, 105, 0.06);
+        stroke: var(--ops);
+      }
+
+      .boundary-label {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0;
+      }
+
+      .boundary-label.chain {
+        fill: var(--contract);
+      }
+
+      .boundary-label.projection {
+        fill: var(--projection);
+      }
+
+      .boundary-label.runtime {
+        fill: var(--runtime);
+      }
+
+      .boundary-label.storage {
+        fill: var(--ops);
+      }
+
+      .node rect {
+        fill: #fff;
+        stroke: var(--line);
+        stroke-width: 1.5;
+        rx: 8;
+      }
+
+      .node text {
+        fill: var(--ink);
+        font-size: 13px;
+      }
+
+      .node .small {
+        fill: var(--muted);
+        font-size: 11px;
+      }
+
+      .edge {
+        stroke: #9aa6b2;
+        stroke-width: 1.5;
+        fill: none;
+        marker-end: url(#arrow);
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 12px;
+      }
+
+      .boundary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 12px;
+      }
+
+      .boundary-card {
+        border: 1px solid var(--line);
+        border-left: 4px solid var(--ops);
+        background: var(--surface);
+        border-radius: 8px;
+        padding: 14px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .boundary-card[data-boundary="chain"] {
+        border-left-color: var(--contract);
+      }
+
+      .boundary-card[data-boundary="projection"] {
+        border-left-color: var(--projection);
+      }
+
+      .boundary-card[data-boundary="runtime"] {
+        border-left-color: var(--runtime);
+      }
+
+      .boundary-card[data-boundary="hybrid"] {
+        border-left-color: var(--accent);
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-left: 4px solid var(--ops);
+        background: var(--surface);
+        border-radius: 8px;
+        padding: 14px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .card[data-layer="contract"] {
+        border-left-color: var(--contract);
+      }
+
+      .card[data-layer="projection"] {
+        border-left-color: var(--projection);
+      }
+
+      .card[data-layer="runtime"] {
+        border-left-color: var(--runtime);
+      }
+
+      .card[data-layer="client"] {
+        border-left-color: var(--client);
+      }
+
+      .card[data-layer="extension"] {
+        border-left-color: var(--extension);
+      }
+
+      .card h2,
+      .boundary-card h2 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .card p,
+      .boundary-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .links a {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 4px 8px;
+        text-decoration: none;
+        font-size: 0.82rem;
+        color: var(--muted);
+        touch-action: manipulation;
+      }
+
+      .links a:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .related-links {
+        margin-top: 8px;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .status {
+        margin: -8px 0 12px;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 680px) {
+        .shell {
+          padding: 24px 12px 36px;
+        }
+
+        h1 {
+          font-size: 2.4rem;
+        }
+
+        .flow {
+          padding: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#architecture-cards">Skip to architecture cards</a>
+    <main id="main-content" class="shell">
+      <header>
+        <h1>Alcheme Architecture Map</h1>
+        <p class="lede">
+          A no-build interactive overview of the monorepo, from Solana programs
+          through indexer projection, query runtime, SDK, frontend, extensions,
+          and local orchestration.
+        </p>
+        <nav class="links related-links" aria-label="Related architecture maps">
+          <a href="./subproject-maps.html">Subproject HTML maps</a>
+          <a href="./README.md">Architecture README</a>
+        </nav>
+      </header>
+
+      <nav class="filters" aria-label="Filter architecture layers">
+        <button class="filter" type="button" data-filter="all" aria-controls="architecture-cards" aria-pressed="true">All</button>
+        <button class="filter" type="button" data-filter="contract" aria-controls="architecture-cards" aria-pressed="false">Contract</button>
+        <button class="filter" type="button" data-filter="projection" aria-controls="architecture-cards" aria-pressed="false">Projection</button>
+        <button class="filter" type="button" data-filter="runtime" aria-controls="architecture-cards" aria-pressed="false">Runtime/API</button>
+        <button class="filter" type="button" data-filter="client" aria-controls="architecture-cards" aria-pressed="false">Client</button>
+        <button class="filter" type="button" data-filter="extension" aria-controls="architecture-cards" aria-pressed="false">Extensions</button>
+        <button class="filter" type="button" data-filter="ops" aria-controls="architecture-cards" aria-pressed="false">Ops</button>
+      </nav>
+      <p id="filter-status" class="status" aria-live="polite">Showing all architecture layers.</p>
+
+      <section class="map" aria-label="Architecture flow and cards">
+        <div class="flow" aria-label="Architecture flow diagram">
+          <svg viewBox="0 0 980 540" role="img" aria-labelledby="map-title map-desc">
+            <title id="map-title">Alcheme architecture flow</title>
+            <desc id="map-desc">
+              Wallet and external clients connect to frontend and SDK; SDK writes
+              to programs; chain facts project through indexer; Postgres stores
+              both projected read models and runtime-owned state; query-api
+              serves runtime APIs back to clients.
+            </desc>
+            <defs>
+              <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#9aa6b2"></path>
+              </marker>
+            </defs>
+
+            <rect class="boundary chain" x="500" y="42" width="390" height="126"></rect>
+            <text class="boundary-label chain" x="516" y="62">chain-authoritative</text>
+            <rect class="boundary runtime" x="264" y="196" width="408" height="104"></rect>
+            <text class="boundary-label runtime" x="280" y="216">runtime-owned state</text>
+            <rect class="boundary projection" x="724" y="196" width="166" height="104"></rect>
+            <text class="boundary-label projection" x="738" y="216">projected read model</text>
+            <rect class="boundary storage" x="264" y="320" width="424" height="120"></rect>
+            <text class="boundary-label storage" x="280" y="340">physical storage: mixed ownership</text>
+
+            <path class="edge" d="M160 84 H276"></path>
+            <path class="edge" d="M176 150 H276"></path>
+            <path class="edge" d="M336 114 V120"></path>
+            <path class="edge" d="M396 150 L512 114"></path>
+            <path class="edge" d="M396 160 C470 178 505 218 530 246"></path>
+            <path class="edge" d="M632 114 H748"></path>
+            <path class="edge" d="M808 144 V220"></path>
+            <path class="edge" d="M808 280 C760 340 710 396 654 396"></path>
+            <path class="edge" d="M748 264 C632 330 520 360 412 396"></path>
+            <path class="edge" d="M585 362 V284"></path>
+            <path class="edge" d="M412 396 C460 342 500 286 530 260"></path>
+            <path class="edge" d="M530 246 H410"></path>
+            <path class="edge" d="M530 224 C470 176 438 110 396 84"></path>
+
+            <g class="node">
+              <rect x="24" y="54" width="136" height="60"></rect>
+              <text x="42" y="82">Wallet / client</text>
+              <text x="42" y="101" class="small">browser user</text>
+            </g>
+            <g class="node">
+              <rect x="24" y="120" width="152" height="60"></rect>
+              <text x="42" y="148">External app</text>
+              <text x="42" y="167" class="small">runtime integration</text>
+            </g>
+            <g class="node">
+              <rect x="276" y="54" width="120" height="60"></rect>
+              <text x="302" y="82">frontend</text>
+              <text x="302" y="101" class="small">Next.js UI</text>
+            </g>
+            <g class="node">
+              <rect x="276" y="120" width="120" height="60"></rect>
+              <text x="306" y="148">SDK</text>
+              <text x="306" y="167" class="small">program + runtime</text>
+            </g>
+            <g class="node">
+              <rect x="512" y="84" width="120" height="60"></rect>
+              <text x="536" y="112">programs</text>
+              <text x="536" y="131" class="small">Anchor/Solana</text>
+            </g>
+            <g class="node">
+              <rect x="748" y="84" width="120" height="60"></rect>
+              <text x="784" y="112">chain</text>
+              <text x="784" y="131" class="small">localnet/devnet</text>
+            </g>
+            <g class="node">
+              <rect x="530" y="208" width="120" height="76"></rect>
+              <text x="556" y="238">query-api</text>
+              <text x="556" y="257" class="small">GraphQL/REST</text>
+              <text x="556" y="274" class="small">runtime host</text>
+            </g>
+            <g class="node">
+              <rect x="292" y="216" width="118" height="60"></rect>
+              <text x="324" y="244">runtime</text>
+              <text x="324" y="263" class="small">AI/collab/voice</text>
+            </g>
+            <g class="node">
+              <rect x="748" y="220" width="120" height="60"></rect>
+              <text x="782" y="248">indexer</text>
+              <text x="782" y="267" class="small">projection</text>
+            </g>
+            <g class="node">
+              <rect x="516" y="362" width="138" height="68"></rect>
+              <text x="556" y="390">Postgres</text>
+              <text x="543" y="408" class="small">projected +</text>
+              <text x="558" y="423" class="small">runtime</text>
+            </g>
+            <g class="node">
+              <rect x="276" y="362" width="136" height="68"></rect>
+              <text x="325" y="390">Redis</text>
+              <text x="306" y="408" class="small">invalidation</text>
+              <text x="331" y="423" class="small">cache</text>
+            </g>
+          </svg>
+        </div>
+
+        <section class="boundary-grid" aria-label="State authority boundary cards">
+          <article class="boundary-card" data-boundary="chain">
+            <h2>Chain-Authoritative</h2>
+            <p>Canonical protocol facts: program accounts, emitted events, signatures, lifecycle anchors, and settlement anchors.</p>
+          </article>
+          <article class="boundary-card" data-boundary="projection">
+            <h2>Projected Read Model</h2>
+            <p>Rows that should be rebuildable from chain activity through indexer-core, plus sync checkpoints and invalidation signals.</p>
+          </article>
+          <article class="boundary-card" data-boundary="runtime">
+            <h2>Runtime-Owned State</h2>
+            <p>Rows created, scheduled, reconciled, or expired by query-api: AI jobs, drafts, collaboration, voice, governance, and sessions.</p>
+          </article>
+          <article class="boundary-card" data-boundary="hybrid">
+            <h2>Hybrid State</h2>
+            <p>Runtime rows that reference or finalize chain facts, such as crystal receipts, governance execution receipts, and crystallization attempts.</p>
+          </article>
+        </section>
+
+        <section id="architecture-cards" class="cards" aria-label="Architecture layer cards">
+          <article class="card" data-layer="contract">
+            <h2>Shared Foundation</h2>
+            <p>Common Rust types, constants, events, validation, errors, and CPI authorization helpers.</p>
+            <div class="links">
+              <a href="../../shared/README.md">shared</a>
+              <a href="../../cpi-interfaces/README.md">cpi-interfaces</a>
+            </div>
+          </article>
+
+          <article class="card" data-layer="contract">
+            <h2>Program Layer</h2>
+            <p>Identity, access, content, event, registry, messaging, circle, and contribution program authority.</p>
+            <div class="links">
+              <a href="../../programs/README.md">programs</a>
+              <a href="../../extensions/contribution-engine/program/README.md">contribution program</a>
+            </div>
+          </article>
+
+          <article class="card" data-layer="projection">
+            <h2>Projection</h2>
+            <p>Rust indexer that listens through Yellowstone or local RPC and projects chain activity into Postgres.</p>
+            <div class="links">
+              <a href="../../services/indexer-core/README.md">indexer-core</a>
+            </div>
+          </article>
+
+          <article class="card" data-layer="runtime">
+            <h2>Runtime/API</h2>
+            <p>GraphQL, REST, sidecar-gated APIs, AI jobs, collaboration, voice, governance, drafts, and crystallization.</p>
+            <div class="links">
+              <a href="../../services/query-api/README.md">query-api</a>
+              <a href="../../services/query-api/prisma/README.md">Prisma schema</a>
+            </div>
+          </article>
+
+          <article class="card" data-layer="client">
+            <h2>Clients</h2>
+            <p>TypeScript SDK, Next.js frontend, Capacitor shell, and optional external app chat UI adapters.</p>
+            <div class="links">
+              <a href="../../sdk/README.md">sdk</a>
+              <a href="../../frontend/README.md">frontend</a>
+              <a href="../../mobile-shell/README.md">mobile-shell</a>
+              <a href="../../packages/game-chat-react/README.md">game-chat-react</a>
+            </div>
+          </article>
+
+          <article class="card" data-layer="extension">
+            <h2>Extensions</h2>
+            <p>Contribution extension bundle, off-chain tracker, memo-anchor signer, and headless external app example.</p>
+            <div class="links">
+              <a href="../../extensions/contribution-engine/README.md">contribution-engine</a>
+              <a href="../../extensions/contribution-engine/tracker/README.md">tracker</a>
+              <a href="../../extensions/anchor-signer/README.md">anchor-signer</a>
+              <a href="../../examples/game-chat-headless/README.md">headless example</a>
+            </div>
+          </article>
+
+          <article class="card" data-layer="ops">
+            <h2>Ops And Local Stack</h2>
+            <p>Local stack scripts, Docker services, Anchor workspace, program IDs, and consistency checks.</p>
+            <div class="links">
+              <a href="../../scripts/start-local-stack.sh">local stack</a>
+              <a href="../../docker-compose.yml">docker compose</a>
+              <a href="../../Anchor.toml">Anchor.toml</a>
+              <a href="../../package.json">package.json</a>
+            </div>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      const buttons = Array.from(document.querySelectorAll(".filter"));
+      const cards = Array.from(document.querySelectorAll(".card"));
+      const status = document.querySelector("#filter-status");
+      const labels = new Map([
+        ["all", "all architecture layers"],
+        ["contract", "contract layer"],
+        ["projection", "projection layer"],
+        ["runtime", "runtime/API layer"],
+        ["client", "client layer"],
+        ["extension", "extensions layer"],
+        ["ops", "ops layer"],
+      ]);
+
+      function normalizeFilter(raw) {
+        const value = String(raw || "all").replace(/^#layer-/, "");
+        return labels.has(value) ? value : "all";
+      }
+
+      function setFilter(rawFilter, options = {}) {
+        const filter = normalizeFilter(rawFilter);
+        for (const button of buttons) {
+          button.setAttribute("aria-pressed", String(button.dataset.filter === filter));
+        }
+        for (const card of cards) {
+          const hidden = filter !== "all" && card.dataset.layer !== filter;
+          card.classList.toggle("hidden", hidden);
+          card.toggleAttribute("hidden", hidden);
+        }
+        if (status) {
+          status.textContent = `Showing ${labels.get(filter)}.`;
+        }
+        if (options.updateUrl !== false) {
+          const nextUrl = new URL(location.href);
+          nextUrl.hash = filter === "all" ? "" : `layer-${filter}`;
+          history.replaceState(null, "", nextUrl);
+        }
+      }
+
+      for (const button of buttons) {
+        button.addEventListener("click", () => setFilter(button.dataset.filter || "all"));
+      }
+
+      setFilter(location.hash, { updateUrl: false });
+    </script>
+  </body>
+</html>

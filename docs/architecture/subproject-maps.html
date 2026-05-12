@@ -1,0 +1,892 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f7f9" />
+    <title>Alcheme Subproject Architecture Maps</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f7f9;
+        --surface: #ffffff;
+        --ink: #17202a;
+        --muted: #5f6b7a;
+        --line: #d6dce3;
+        --accent: #2f6fed;
+        --accent-soft: #e7efff;
+        --contract: #0f766e;
+        --projection: #7c3aed;
+        --runtime: #b45309;
+        --client: #2563eb;
+        --extension: #be123c;
+        --ops: #475569;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        line-height: 1.5;
+        overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 32px 20px 48px;
+      }
+
+      .skip-link {
+        position: absolute;
+        left: 16px;
+        top: 16px;
+        z-index: 10;
+        transform: translateY(-140%);
+        border: 1px solid var(--accent);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--accent);
+        padding: 8px 12px;
+        text-decoration: none;
+      }
+
+      .skip-link:focus-visible {
+        transform: translateY(0);
+      }
+
+      header {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 3.5rem;
+        letter-spacing: 0;
+        line-height: 1.05;
+        text-wrap: balance;
+      }
+
+      .lede {
+        max-width: 820px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      .top-links,
+      .filters,
+      .map-nav,
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .top-links a,
+      .links a,
+      .map-nav a {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--surface);
+        color: var(--muted);
+        padding: 6px 10px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        touch-action: manipulation;
+      }
+
+      .toolbar {
+        display: grid;
+        gap: 12px;
+        margin: 24px 0 12px;
+      }
+
+      .search {
+        width: min(100%, 420px);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--ink);
+        font: inherit;
+        padding: 10px 12px;
+      }
+
+      .filter {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--ink);
+        cursor: pointer;
+        font: inherit;
+        padding: 8px 12px;
+        touch-action: manipulation;
+      }
+
+      .filter:hover,
+      .top-links a:hover,
+      .links a:hover,
+      .map-nav a:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .filter:focus-visible,
+      .search:focus-visible,
+      .top-links a:focus-visible,
+      .links a:focus-visible,
+      .map-nav a:focus-visible,
+      .skip-link:focus-visible {
+        outline: 3px solid rgba(47, 111, 237, 0.35);
+        outline-offset: 2px;
+      }
+
+      .filter[aria-pressed="true"] {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        color: #143d8f;
+      }
+
+      .status {
+        margin: 0 0 16px;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .maps {
+        display: grid;
+        gap: 18px;
+        margin-top: 18px;
+      }
+
+      .project {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        padding: 16px;
+      }
+
+      .project header {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .project h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        letter-spacing: 0;
+      }
+
+      .project p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+
+      .project:target {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.12);
+      }
+
+      .diagram {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfcfe;
+        padding: 10px;
+      }
+
+      svg {
+        display: block;
+        min-width: 760px;
+      }
+
+      .edge {
+        fill: none;
+        stroke: #9aa6b2;
+        stroke-width: 1.5;
+        marker-end: url(#arrow);
+      }
+
+      .node rect {
+        fill: #ffffff;
+        stroke: var(--line);
+        stroke-width: 1.5;
+        rx: 8;
+      }
+
+      .node[data-kind="contract"] rect {
+        stroke: var(--contract);
+      }
+
+      .node[data-kind="projection"] rect {
+        stroke: var(--projection);
+      }
+
+      .node[data-kind="runtime"] rect {
+        stroke: var(--runtime);
+      }
+
+      .node[data-kind="client"] rect {
+        stroke: var(--client);
+      }
+
+      .node[data-kind="extension"] rect {
+        stroke: var(--extension);
+      }
+
+      .node[data-kind="ops"] rect {
+        stroke: var(--ops);
+      }
+
+      .node text {
+        fill: var(--ink);
+        font-size: 13px;
+      }
+
+      .node .small {
+        fill: var(--muted);
+        font-size: 11px;
+      }
+
+      .empty {
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--muted);
+        padding: 18px;
+      }
+
+      @media (max-width: 680px) {
+        .shell {
+          padding: 24px 12px 36px;
+        }
+
+        h1 {
+          font-size: 2.35rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#maps">Skip to subproject maps</a>
+    <main class="shell">
+      <header>
+        <h1>Alcheme Subproject Architecture Maps</h1>
+        <p class="lede">
+          A no-build atlas of per-subproject diagrams. Each section maps one
+          README-backed package, program, service, extension, client, or local
+          runtime surface.
+        </p>
+        <nav class="top-links" aria-label="Architecture guide links">
+          <a href="./alcheme-architecture-map.html">Global HTML map</a>
+          <a href="./README.md">Architecture README</a>
+          <a href="./architecture-inventory.md">Source inventory</a>
+        </nav>
+      </header>
+
+      <section class="toolbar" aria-label="Subproject map controls">
+        <input id="search" class="search" type="search" placeholder="Search subprojects" aria-label="Search subprojects" />
+        <nav class="filters" aria-label="Filter subproject layers">
+          <button class="filter" type="button" data-filter="all" aria-pressed="true">All</button>
+          <button class="filter" type="button" data-filter="contract" aria-pressed="false">Contract</button>
+          <button class="filter" type="button" data-filter="projection" aria-pressed="false">Projection</button>
+          <button class="filter" type="button" data-filter="runtime" aria-pressed="false">Runtime/API</button>
+          <button class="filter" type="button" data-filter="client" aria-pressed="false">Client</button>
+          <button class="filter" type="button" data-filter="extension" aria-pressed="false">Extension</button>
+          <button class="filter" type="button" data-filter="ops" aria-pressed="false">Ops</button>
+        </nav>
+      </section>
+      <p id="status" class="status" aria-live="polite"></p>
+      <nav id="map-nav" class="map-nav" aria-label="Subproject quick links"></nav>
+      <section id="maps" class="maps" aria-label="Subproject architecture maps"></section>
+    </main>
+
+    <script>
+      const layerLabels = new Map([
+        ["all", "all layers"],
+        ["contract", "contract layer"],
+        ["projection", "projection layer"],
+        ["runtime", "runtime/API layer"],
+        ["client", "client layer"],
+        ["extension", "extension layer"],
+        ["ops", "ops layer"],
+      ]);
+
+      const maps = [
+        {
+          id: "shared",
+          title: "shared",
+          layer: "contract",
+          readme: "../../shared/README.md",
+          summary: "Common Rust protocol vocabulary used by on-chain programs.",
+          nodes: [
+            ["lib", "src/lib.rs", "re-exports", 0, 1, "contract"],
+            ["types", "Types", "identity, content, access", 1, 0, "contract"],
+            ["rules", "Constants + validation", "seeds, limits, helpers", 1, 1, "contract"],
+            ["events", "Events + errors", "payloads and error map", 1, 2, "contract"],
+            ["programs", "Anchor programs", "consume shared crate", 2, 1, "contract"],
+          ],
+          edges: [["lib", "types"], ["lib", "rules"], ["lib", "events"], ["types", "programs"], ["rules", "programs"], ["events", "programs"]],
+        },
+        {
+          id: "cpi-interfaces",
+          title: "cpi-interfaces",
+          layer: "contract",
+          readme: "../../cpi-interfaces/README.md",
+          summary: "Typed cross-program interface helpers between Anchor programs and extensions.",
+          nodes: [
+            ["shared", "shared", "common accounts", 0, 1, "contract"],
+            ["cpi", "CPI interfaces", "typed call boundary", 1, 1, "contract"],
+            ["helpers", "Account contexts", "stable caller shape", 2, 0, "contract"],
+            ["events", "Event helpers", "common emit shape", 2, 2, "contract"],
+            ["consumers", "Program consumers", "content, messaging, circle", 3, 1, "contract"],
+          ],
+          edges: [["shared", "cpi"], ["cpi", "helpers"], ["cpi", "events"], ["helpers", "consumers"], ["events", "consumers"]],
+        },
+        {
+          id: "programs",
+          title: "programs",
+          layer: "contract",
+          readme: "../../programs/README.md",
+          summary: "Anchor workspace for identity, access, content, events, registry, messaging, and circles.",
+          nodes: [
+            ["shared", "shared + cpi", "protocol foundation", 0, 1, "contract"],
+            ["identity", "identity-registry", "profile and reputation", 1, 0, "contract"],
+            ["access", "access-controller", "relationships and policy", 1, 1, "contract"],
+            ["content", "content-manager", "content and proofs", 1, 2, "contract"],
+            ["event", "event-emitter", "canonical event stream", 2, 1, "contract"],
+            ["indexer", "indexer-core", "projects program events", 3, 1, "projection"],
+          ],
+          edges: [["shared", "identity"], ["shared", "access"], ["shared", "content"], ["identity", "event"], ["access", "event"], ["content", "event"], ["event", "indexer"]],
+        },
+        {
+          id: "identity-registry",
+          title: "identity-registry",
+          layer: "contract",
+          readme: "../../programs/identity-registry/README.md",
+          summary: "Identity profiles, credentials, reputation targets, and identity events.",
+          nodes: [
+            ["sdk", "SDK or program caller", "create or update identity", 0, 1, "client"],
+            ["ix", "Identity instructions", "register and mutate", 1, 1, "contract"],
+            ["state", "Identity state", "profile, credentials, rep", 2, 1, "contract"],
+            ["event", "event-emitter", "identity events", 3, 0, "contract"],
+            ["consumers", "Content + contribution", "verify identity facts", 3, 2, "contract"],
+          ],
+          edges: [["sdk", "ix"], ["ix", "state"], ["ix", "event"], ["state", "consumers"]],
+        },
+        {
+          id: "access-controller",
+          title: "access-controller",
+          layer: "contract",
+          readme: "../../programs/access-controller/README.md",
+          summary: "Policy, relationship, and permission checks shared by product flows.",
+          nodes: [
+            ["caller", "Program caller", "content, circle, runtime", 0, 1, "contract"],
+            ["ix", "Access instructions", "grant, revoke, verify", 1, 1, "contract"],
+            ["state", "Access state", "relationships and policies", 2, 1, "contract"],
+            ["event", "event-emitter", "access events", 3, 0, "contract"],
+            ["query", "query-api", "runtime gate context", 3, 2, "runtime"],
+          ],
+          edges: [["caller", "ix"], ["ix", "state"], ["ix", "event"], ["state", "query"]],
+        },
+        {
+          id: "content-manager",
+          title: "content-manager",
+          layer: "contract",
+          readme: "../../programs/content-manager/README.md",
+          summary: "Content, lifecycle anchors, proof packages, and crystallization chain facts.",
+          nodes: [
+            ["frontend", "frontend action", "draft or crystal flow", 0, 1, "client"],
+            ["sdk", "@alcheme/sdk", "transaction helper", 1, 1, "client"],
+            ["ix", "Content instructions", "create, update, anchor", 2, 1, "contract"],
+            ["state", "Content accounts", "post, proof, crystal", 3, 1, "contract"],
+            ["event", "event-emitter", "content events", 4, 0, "contract"],
+            ["indexer", "indexer-core", "read model projection", 4, 2, "projection"],
+          ],
+          edges: [["frontend", "sdk"], ["sdk", "ix"], ["ix", "state"], ["ix", "event"], ["event", "indexer"]],
+        },
+        {
+          id: "event-emitter",
+          title: "event-emitter",
+          layer: "contract",
+          readme: "../../programs/event-emitter/README.md",
+          summary: "Common event emission surface used by program-level domain changes.",
+          nodes: [
+            ["programs", "Domain programs", "identity, content, access", 0, 1, "contract"],
+            ["emitter", "event-emitter", "canonical payload", 1, 1, "contract"],
+            ["chain", "Solana logs", "event stream", 2, 1, "contract"],
+            ["parser", "EventParser", "indexer-core", 3, 1, "projection"],
+            ["read", "Postgres read model", "query surface", 4, 1, "runtime"],
+          ],
+          edges: [["programs", "emitter"], ["emitter", "chain"], ["chain", "parser"], ["parser", "read"]],
+        },
+        {
+          id: "registry-factory",
+          title: "registry-factory",
+          layer: "contract",
+          readme: "../../programs/registry-factory/README.md",
+          summary: "Registry and extension registration authority for protocol expansion.",
+          nodes: [
+            ["authority", "Registry authority", "admin or governance caller", 0, 1, "contract"],
+            ["factory", "registry-factory", "register and configure", 1, 1, "contract"],
+            ["registry", "Registry accounts", "program and extension records", 2, 1, "contract"],
+            ["extension", "Extension programs", "contribution engine", 3, 0, "extension"],
+            ["query", "query-api catalog", "discovery surface", 3, 2, "runtime"],
+          ],
+          edges: [["authority", "factory"], ["factory", "registry"], ["registry", "extension"], ["registry", "query"]],
+        },
+        {
+          id: "messaging-manager",
+          title: "messaging-manager",
+          layer: "contract",
+          readme: "../../programs/messaging-manager/README.md",
+          summary: "Messaging and room-oriented chain anchors used by communication flows.",
+          nodes: [
+            ["client", "SDK runtime caller", "message or room action", 0, 1, "client"],
+            ["ix", "Messaging instructions", "room and message anchors", 1, 1, "contract"],
+            ["state", "Messaging state", "rooms, messages, metadata", 2, 1, "contract"],
+            ["event", "event-emitter", "messaging events", 3, 0, "contract"],
+            ["runtime", "communication runtime", "query-api and SDK clients", 3, 2, "runtime"],
+          ],
+          edges: [["client", "ix"], ["ix", "state"], ["ix", "event"], ["state", "runtime"]],
+        },
+        {
+          id: "circle-manager",
+          title: "circle-manager",
+          layer: "contract",
+          readme: "../../programs/circle-manager/README.md",
+          summary: "Circle creation, membership, hierarchy, fork lineage, and circle events.",
+          nodes: [
+            ["frontend", "Circle UI", "create, join, fork", 0, 1, "client"],
+            ["sdk", "@alcheme/sdk", "circle module", 1, 1, "client"],
+            ["ix", "Circle instructions", "membership and lineage", 2, 1, "contract"],
+            ["state", "Circle state", "parent, members, metadata", 3, 1, "contract"],
+            ["event", "event-emitter", "circle events", 4, 0, "contract"],
+            ["indexer", "circle projection", "descendants and stats", 4, 2, "projection"],
+          ],
+          edges: [["frontend", "sdk"], ["sdk", "ix"], ["ix", "state"], ["ix", "event"], ["event", "indexer"]],
+        },
+        {
+          id: "contribution-engine-program",
+          title: "contribution-engine/program",
+          layer: "contract",
+          readme: "../../extensions/contribution-engine/program/README.md",
+          summary: "On-chain extension authority for contribution settlement and reputation effects.",
+          nodes: [
+            ["tracker", "Contribution tracker", "settlement input", 0, 1, "extension"],
+            ["program", "Contribution program", "settle and attest", 1, 1, "contract"],
+            ["identity", "identity-registry", "reputation target", 2, 0, "contract"],
+            ["factory", "registry-factory", "extension registry", 2, 2, "contract"],
+            ["indexer", "indexer-core", "extension event parser", 3, 1, "projection"],
+          ],
+          edges: [["tracker", "program"], ["program", "identity"], ["program", "factory"], ["program", "indexer"]],
+        },
+        {
+          id: "indexer-core",
+          title: "services/indexer-core",
+          layer: "projection",
+          readme: "../../services/indexer-core/README.md",
+          summary: "Rust projection service from chain events into read models and invalidation signals.",
+          nodes: [
+            ["source", "Event source", "Yellowstone or local RPC", 0, 1, "contract"],
+            ["parser", "EventParser", "program event decoding", 1, 1, "projection"],
+            ["writer", "DbWriter", "transactional writes", 2, 1, "projection"],
+            ["postgres", "Postgres", "projected read model", 3, 0, "runtime"],
+            ["redis", "Redis", "invalidation and runtime state", 3, 2, "runtime"],
+            ["query", "query-api", "serves projection", 4, 1, "runtime"],
+          ],
+          edges: [["source", "parser"], ["parser", "writer"], ["writer", "postgres"], ["writer", "redis"], ["postgres", "query"], ["redis", "query"]],
+        },
+        {
+          id: "query-api",
+          title: "services/query-api",
+          layer: "runtime",
+          readme: "../../services/query-api/README.md",
+          summary: "Node runtime host for GraphQL, REST, private sidecar APIs, AI, collaboration, voice, and cron jobs.",
+          nodes: [
+            ["clients", "frontend + SDK", "HTTP clients", 0, 1, "client"],
+            ["app", "Express + Apollo", "middleware and routes", 1, 1, "runtime"],
+            ["surfaces", "GraphQL + REST", "public and sidecar split", 2, 1, "runtime"],
+            ["services", "Runtime services", "AI, collab, voice, governance", 3, 1, "runtime"],
+            ["state", "Prisma + Redis", "read model and runtime state", 4, 0, "runtime"],
+            ["chain", "Anchor writers", "Solana side effects", 4, 2, "contract"],
+          ],
+          edges: [["clients", "app"], ["app", "surfaces"], ["surfaces", "services"], ["services", "state"], ["services", "chain"]],
+        },
+        {
+          id: "prisma",
+          title: "services/query-api/prisma",
+          layer: "runtime",
+          readme: "../../services/query-api/prisma/README.md",
+          summary: "Database schema for projected facts, runtime-owned state, and hybrid product workflows.",
+          nodes: [
+            ["indexer", "indexer-core", "projected chain facts", 0, 0, "projection"],
+            ["query", "query-api services", "runtime writes", 0, 2, "runtime"],
+            ["schema", "schema.prisma", "model boundary", 1, 1, "runtime"],
+            ["projected", "Projected models", "chain-derived rows", 2, 0, "runtime"],
+            ["runtime", "Runtime models", "AI, collab, draft state", 2, 1, "runtime"],
+            ["hybrid", "Hybrid models", "chain plus side effects", 2, 2, "runtime"],
+          ],
+          edges: [["indexer", "schema"], ["query", "schema"], ["schema", "projected"], ["schema", "runtime"], ["schema", "hybrid"]],
+        },
+        {
+          id: "sdk",
+          title: "sdk",
+          layer: "client",
+          readme: "../../sdk/README.md",
+          summary: "TypeScript client SDK for program transactions, PDA helpers, and runtime API clients.",
+          nodes: [
+            ["app", "App or example", "frontend, runtime, script", 0, 1, "client"],
+            ["sdk", "@alcheme/sdk", "modules and helpers", 1, 1, "client"],
+            ["programs", "Program clients", "Anchor transactions", 2, 0, "contract"],
+            ["runtime", "Runtime clients", "query-api REST clients", 2, 2, "runtime"],
+            ["chain", "Solana RPC", "transaction execution", 3, 0, "contract"],
+            ["query", "query-api", "communication and voice", 3, 2, "runtime"],
+          ],
+          edges: [["app", "sdk"], ["sdk", "programs"], ["sdk", "runtime"], ["programs", "chain"], ["runtime", "query"]],
+        },
+        {
+          id: "frontend",
+          title: "frontend",
+          layer: "client",
+          readme: "../../frontend/README.md",
+          summary: "Next.js product UI for circles, discussions, drafts, crystallization, governance, wallet, and runtime features.",
+          nodes: [
+            ["user", "Wallet user", "browser session", 0, 1, "client"],
+            ["routes", "Next.js routes", "product surfaces", 1, 1, "client"],
+            ["hooks", "Hooks + API clients", "state and requests", 2, 1, "client"],
+            ["sdk", "@alcheme/sdk", "chain helpers", 3, 0, "client"],
+            ["query", "query-api", "GraphQL and REST", 3, 2, "runtime"],
+            ["wallet", "Wallet adapter", "sign transactions", 4, 0, "client"],
+          ],
+          edges: [["user", "routes"], ["routes", "hooks"], ["hooks", "sdk"], ["hooks", "query"], ["sdk", "wallet"]],
+        },
+        {
+          id: "mobile-shell",
+          title: "mobile-shell",
+          layer: "client",
+          readme: "../../mobile-shell/README.md",
+          summary: "Capacitor shell that hosts the web frontend in a mobile application wrapper.",
+          nodes: [
+            ["device", "Mobile device", "native shell", 0, 1, "client"],
+            ["capacitor", "Capacitor app", "bridge and config", 1, 1, "client"],
+            ["web", "frontend build", "hosted web app", 2, 1, "client"],
+            ["wallet", "Wallet bridge", "mobile signing path", 3, 0, "client"],
+            ["api", "query-api", "runtime network calls", 3, 2, "runtime"],
+          ],
+          edges: [["device", "capacitor"], ["capacitor", "web"], ["web", "wallet"], ["web", "api"]],
+        },
+        {
+          id: "contribution-engine",
+          title: "extensions/contribution-engine",
+          layer: "extension",
+          readme: "../../extensions/contribution-engine/README.md",
+          summary: "Contribution extension bundle across manifest, program, SDK surface, parser coverage, tracker, and query discovery.",
+          nodes: [
+            ["manifest", "Extension manifest", "catalog contract", 0, 1, "extension"],
+            ["program", "On-chain program", "settlement authority", 1, 0, "contract"],
+            ["tracker", "Tracker", "off-chain accounting", 1, 2, "extension"],
+            ["parser", "Indexer parser", "extension events", 2, 0, "projection"],
+            ["catalog", "query-api catalog", "extension discovery", 2, 2, "runtime"],
+            ["sdk", "SDK surface", "client integration", 3, 1, "client"],
+          ],
+          edges: [["manifest", "program"], ["manifest", "tracker"], ["program", "parser"], ["tracker", "catalog"], ["catalog", "sdk"]],
+        },
+        {
+          id: "contribution-tracker",
+          title: "extensions/contribution-engine/tracker",
+          layer: "extension",
+          readme: "../../extensions/contribution-engine/tracker/README.md",
+          summary: "Off-chain contribution accounting and settlement runner for contribution-engine.",
+          nodes: [
+            ["inputs", "Activity inputs", "content and discussion facts", 0, 1, "extension"],
+            ["tracker", "Tracker service", "score and aggregate", 1, 1, "extension"],
+            ["rules", "Contribution rules", "weights and windows", 2, 0, "extension"],
+            ["settle", "Settlement output", "program transaction", 2, 2, "contract"],
+            ["program", "Contribution program", "on-chain attestation", 3, 2, "contract"],
+          ],
+          edges: [["inputs", "tracker"], ["tracker", "rules"], ["tracker", "settle"], ["settle", "program"]],
+        },
+        {
+          id: "anchor-signer",
+          title: "extensions/anchor-signer",
+          layer: "extension",
+          readme: "../../extensions/anchor-signer/README.md",
+          summary: "Private signing sidecar for memo or anchor operations that should not live on public read nodes.",
+          nodes: [
+            ["query", "query-api sidecar route", "private call boundary", 0, 1, "runtime"],
+            ["signer", "anchor-signer", "key controlled signing", 1, 1, "extension"],
+            ["policy", "Signing policy", "allowed operations", 2, 0, "extension"],
+            ["tx", "Solana transaction", "anchor or memo output", 2, 2, "contract"],
+            ["chain", "Solana RPC", "submitted transaction", 3, 2, "contract"],
+          ],
+          edges: [["query", "signer"], ["signer", "policy"], ["signer", "tx"], ["tx", "chain"]],
+        },
+        {
+          id: "game-chat-react",
+          title: "packages/game-chat-react",
+          layer: "client",
+          readme: "../../packages/game-chat-react/README.md",
+          summary: "React UI adapter for external app chat, communication runtime, and optional voice integration.",
+          nodes: [
+            ["app", "External app", "host runtime", 0, 1, "client"],
+            ["ui", "game-chat-react", "ChatPanel + VoiceControls", 1, 1, "client"],
+            ["adapter", "Host adapters", "chat + voice methods", 2, 1, "client"],
+            ["client", "SDK or custom client", "runtime implementation", 3, 1, "client"],
+            ["query", "query-api", "rooms, messages, voice", 4, 1, "runtime"],
+          ],
+          edges: [["app", "ui"], ["ui", "adapter"], ["adapter", "client"], ["client", "query"]],
+        },
+        {
+          id: "game-chat-headless",
+          title: "examples/game-chat-headless",
+          layer: "client",
+          readme: "../../examples/game-chat-headless/README.md",
+          summary: "Headless example that integrates an external app runtime with Alcheme communication runtime.",
+          nodes: [
+            ["game", "External runtime", "headless integration", 0, 1, "client"],
+            ["example", "Headless example", "runtime wiring", 1, 1, "client"],
+            ["sdk", "@alcheme/sdk", "room and message clients", 2, 0, "client"],
+            ["api", "query-api", "communication runtime", 3, 0, "runtime"],
+            ["programs", "Messaging programs", "chain anchors when needed", 3, 2, "contract"],
+          ],
+          edges: [["game", "example"], ["example", "sdk"], ["sdk", "api"], ["sdk", "programs"]],
+        },
+        {
+          id: "local-stack",
+          title: "local stack",
+          layer: "ops",
+          readme: "../../scripts/start-local-stack.sh",
+          summary: "Developer-only orchestration that boots chain, storage, services, extensions, and frontend together.",
+          nodes: [
+            ["script", "start-local-stack.sh", "orchestration entry", 0, 1, "ops"],
+            ["chain", "Local Solana RPC", "program deployment", 1, 0, "contract"],
+            ["storage", "Postgres + Redis", "read and runtime state", 1, 2, "runtime"],
+            ["services", "query-api + indexer", "runtime and projection", 2, 1, "runtime"],
+            ["extensions", "tracker + signer", "sidecar processes", 3, 0, "extension"],
+            ["frontend", "frontend", "local product UI", 3, 2, "client"],
+          ],
+          edges: [["script", "chain"], ["script", "storage"], ["chain", "services"], ["storage", "services"], ["services", "extensions"], ["services", "frontend"]],
+        },
+      ];
+
+      const buttons = Array.from(document.querySelectorAll(".filter"));
+      const search = document.querySelector("#search");
+      const status = document.querySelector("#status");
+      const nav = document.querySelector("#map-nav");
+      const mapsRoot = document.querySelector("#maps");
+      const nodeWidth = 168;
+      const nodeHeight = 58;
+      const xGap = 190;
+      const yGap = 92;
+      const marginX = 34;
+      const marginY = 42;
+
+      function normalizeFilter(raw) {
+        const value = String(raw || "all").replace(/^#layer-/, "");
+        return layerLabels.has(value) ? value : "all";
+      }
+
+      function filterFromHash() {
+        return location.hash.startsWith("#layer-") ? normalizeFilter(location.hash) : "all";
+      }
+
+      function scrollToProjectFromHash() {
+        const id = location.hash.replace(/^#/, "");
+        if (!maps.some((project) => project.id === id)) {
+          return;
+        }
+        requestAnimationFrame(() => {
+          document.getElementById(id)?.scrollIntoView({ block: "start" });
+        });
+      }
+
+      function wrapText(value, maxLength) {
+        const words = String(value).split(" ");
+        const lines = [];
+        let line = "";
+        for (const word of words) {
+          const next = line ? `${line} ${word}` : word;
+          if (next.length > maxLength && line) {
+            lines.push(line);
+            line = word;
+          } else {
+            line = next;
+          }
+        }
+        if (line) {
+          lines.push(line);
+        }
+        return lines.slice(0, 2);
+      }
+
+      function createSvgElement(name, attrs = {}) {
+        const element = document.createElementNS("http://www.w3.org/2000/svg", name);
+        for (const [key, value] of Object.entries(attrs)) {
+          element.setAttribute(key, value);
+        }
+        return element;
+      }
+
+      function renderDiagram(project) {
+        const maxCol = Math.max(...project.nodes.map((node) => node[3]));
+        const maxRow = Math.max(...project.nodes.map((node) => node[4]));
+        const width = marginX * 2 + maxCol * xGap + nodeWidth;
+        const height = marginY * 2 + maxRow * yGap + nodeHeight;
+        const svg = createSvgElement("svg", {
+          viewBox: `0 0 ${width} ${height}`,
+          width,
+          height,
+          role: "img",
+          "aria-label": `${project.title} architecture diagram`,
+        });
+
+        const defs = createSvgElement("defs");
+        const marker = createSvgElement("marker", {
+          id: `arrow-${project.id}`,
+          markerWidth: "10",
+          markerHeight: "10",
+          refX: "8",
+          refY: "3",
+          orient: "auto",
+        });
+        marker.appendChild(createSvgElement("path", { d: "M0,0 L0,6 L8,3 z", fill: "#9aa6b2" }));
+        defs.appendChild(marker);
+        svg.appendChild(defs);
+
+        const positions = new Map();
+        for (const [id, label, detail, col, row, kind] of project.nodes) {
+          const x = marginX + col * xGap;
+          const y = marginY + row * yGap;
+          positions.set(id, { x, y });
+          const group = createSvgElement("g", { class: "node", "data-kind": kind || project.layer });
+          group.appendChild(createSvgElement("rect", { x, y, width: nodeWidth, height: nodeHeight }));
+          wrapText(label, 20).forEach((line, index) => {
+            const text = createSvgElement("text", { x: x + 14, y: y + 22 + index * 15 });
+            text.textContent = line;
+            group.appendChild(text);
+          });
+          const small = createSvgElement("text", { class: "small", x: x + 14, y: y + 48 });
+          small.textContent = detail;
+          group.appendChild(small);
+          svg.appendChild(group);
+        }
+
+        for (const [from, to] of project.edges) {
+          const start = positions.get(from);
+          const end = positions.get(to);
+          if (!start || !end) {
+            continue;
+          }
+          const x1 = start.x + nodeWidth;
+          const y1 = start.y + nodeHeight / 2;
+          const x2 = end.x;
+          const y2 = end.y + nodeHeight / 2;
+          const mid = x1 + Math.max(36, (x2 - x1) / 2);
+          const d = x2 >= x1
+            ? `M${x1} ${y1} C${mid} ${y1}, ${mid} ${y2}, ${x2} ${y2}`
+            : `M${start.x + nodeWidth / 2} ${start.y + nodeHeight} V${end.y - 12} H${end.x + nodeWidth / 2} V${end.y}`;
+          svg.insertBefore(createSvgElement("path", {
+            class: "edge",
+            d,
+            "marker-end": `url(#arrow-${project.id})`,
+          }), svg.children[1] || null);
+        }
+
+        return svg;
+      }
+
+      function projectMatches(project, filter, query) {
+        const haystack = `${project.title} ${project.layer} ${project.summary}`.toLowerCase();
+        return (filter === "all" || project.layer === filter) && haystack.includes(query);
+      }
+
+      function updateUrl(filter, query) {
+        const nextUrl = new URL(location.href);
+        nextUrl.searchParams.delete("q");
+        if (query) {
+          nextUrl.searchParams.set("q", query);
+        }
+        nextUrl.hash = filter === "all" ? "" : `layer-${filter}`;
+        history.replaceState(null, "", nextUrl);
+      }
+
+      function render(options = {}) {
+        const filter = normalizeFilter(options.filter || filterFromHash());
+        const query = String(search.value || "").trim().toLowerCase();
+        for (const button of buttons) {
+          button.setAttribute("aria-pressed", String(button.dataset.filter === filter));
+        }
+        const visible = maps.filter((project) => projectMatches(project, filter, query));
+        nav.replaceChildren();
+        mapsRoot.replaceChildren();
+        for (const project of visible) {
+          const quick = document.createElement("a");
+          quick.href = `#${project.id}`;
+          quick.textContent = project.title;
+          nav.appendChild(quick);
+
+          const article = document.createElement("article");
+          article.id = project.id;
+          article.className = "project";
+          article.dataset.layer = project.layer;
+
+          const projectHeader = document.createElement("header");
+          const title = document.createElement("h2");
+          title.textContent = project.title;
+          const summary = document.createElement("p");
+          summary.textContent = project.summary;
+          const links = document.createElement("div");
+          links.className = "links";
+          const readme = document.createElement("a");
+          readme.href = project.readme;
+          readme.textContent = "Open README";
+          links.appendChild(readme);
+          projectHeader.append(title, summary, links);
+
+          const diagram = document.createElement("div");
+          diagram.className = "diagram";
+          diagram.appendChild(renderDiagram(project));
+          article.append(projectHeader, diagram);
+          mapsRoot.appendChild(article);
+        }
+
+        if (!visible.length) {
+          const empty = document.createElement("p");
+          empty.className = "empty";
+          empty.textContent = "No subproject maps match the current filter.";
+          mapsRoot.appendChild(empty);
+        }
+        status.textContent = `Showing ${visible.length} of ${maps.length} subproject maps for ${layerLabels.get(filter)}.`;
+        if (options.updateUrl !== false) {
+          updateUrl(filter, query);
+        }
+        scrollToProjectFromHash();
+      }
+
+      for (const button of buttons) {
+        button.addEventListener("click", () => render({ filter: button.dataset.filter || "all" }));
+      }
+      search.addEventListener("input", () => render({ filter: filterFromHash() }));
+      search.value = new URL(location.href).searchParams.get("q") || "";
+      render({ updateUrl: false });
+    </script>
+  </body>
+</html>
