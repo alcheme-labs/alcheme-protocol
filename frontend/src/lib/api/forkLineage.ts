@@ -14,6 +14,19 @@ function getQueryApiBaseUrl(): string {
     }
 }
 
+function normalizeForkQualificationStatus(value: unknown): ForkQualificationSnapshot['qualificationStatus'] {
+    if (
+        value === 'qualified'
+        || value === 'fork_disabled'
+        || value === 'contribution_shortfall'
+        || value === 'identity_shortfall'
+        || value === 'private_source_not_forkable'
+    ) {
+        return value;
+    }
+    return 'contribution_shortfall';
+}
+
 export async function fetchForkTeam04ResolvedInputs(input: {
     circleId: number;
 }): Promise<Team04ForkResolvedInputs> {
@@ -209,6 +222,6 @@ export async function fetchForkQualificationSnapshot(input: {
         actorIdentityLevel: payload?.actorIdentityLevel ?? null,
         requiresGovernanceVote: Boolean(payload?.requiresGovernanceVote),
         qualifies: Boolean(payload?.qualifies),
-        qualificationStatus: payload?.qualificationStatus,
+        qualificationStatus: normalizeForkQualificationStatus(payload?.qualificationStatus),
     } as ForkQualificationSnapshot;
 }

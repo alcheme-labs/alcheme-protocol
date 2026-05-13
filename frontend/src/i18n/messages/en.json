@@ -525,6 +525,7 @@
     "qualification": {
       "qualified": "You meet the current requirements and can fork.",
       "forkDisabled": "Forking isn't open in this circle yet.",
+      "privateSourceNotForkable": "This source circle is invite-only/private and cannot be forked into a public path by default.",
       "identityShortfall": "Your current role or identity is still below the {roleLabel} floor.",
       "contributionShortfall": "Need {missing} more contributions before you can submit.",
       "fallback": "You still don't meet the submit requirements."
@@ -532,6 +533,7 @@
     "statusBadge": {
       "qualified": "Ready to fork",
       "forkDisabled": "Closed",
+      "privateSourceNotForkable": "Private source",
       "identityShortfall": "Identity too low",
       "contributionShortfall": "More contributions needed"
     }
@@ -748,6 +750,8 @@
       "deleteNotice": "Deleting a circle is still locked behind a safer review flow and is not available yet.",
       "errors": {
         "invalidCircleForAi": "This circle is invalid, so AI settings cannot be saved yet.",
+        "invalidCircleForAccessPolicy": "This circle is invalid, so access policy cannot be saved yet.",
+        "accessPolicyWalletRequired": "Connect a wallet that supports message signing before saving access policy.",
         "invalidCircleForDraftLifecycle": "This circle is invalid, so draft lifecycle settings cannot be saved yet.",
         "invalidCircleForWorkflow": "This circle is invalid, so workflow permissions cannot be saved yet.",
         "invalidCircleForAgents": "This circle is invalid, so agent governance cannot be saved yet.",
@@ -755,6 +759,8 @@
         "loadDraftPolicyFallback": "Could not load the draft workflow settings, so the defaults are in use for now.",
         "loadAgentPolicyFallback": "Could not load the agent governance settings, so the defaults are in use for now.",
         "saveAiFailed": "Could not save the AI settings. Please try again.",
+        "accessPolicySaveFailed": "Could not save the access policy. Please try again.",
+        "accessPolicyPartialSyncFailed": "The crystal threshold changed on chain, but policy signing did not finish. The page was refreshed with the latest indexed state.",
         "saveDraftLifecycleFailed": "Could not save the draft lifecycle settings. Please try again.",
         "saveWorkflowFailed": "Could not save the workflow permissions. Please try again.",
         "saveAgentsFailed": "Could not save the agent governance settings. Please try again.",
@@ -2334,7 +2340,17 @@
       "accessLabel": "Access",
       "accessFree": "🌍 Open",
       "accessCrystal": "💎 ≥{count} crystals",
-      "accessInvite": "🔒 Invite only"
+      "accessInvite": "🔒 Invite only",
+      "accessApproval": "🛡️ Approval required"
+    },
+    "accessEditor": {
+      "free": "Open",
+      "crystal": "Crystal gate",
+      "invite": "Invite only",
+      "approval": "Approval",
+      "minCrystals": "Required crystals",
+      "save": "Save access policy",
+      "saving": "Saving…"
     },
     "permissions": {
       "forwardTitle": "Allow forwarding out",

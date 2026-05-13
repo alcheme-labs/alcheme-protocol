@@ -1439,6 +1439,20 @@ export const resolvers = {
             }
             return circle.circleType;
         },
+        joinRequirement: async (circle: any, _: any, { prisma }: Context) => {
+            if (circle.__projectedCircleSettings?.joinRequirement) {
+                return circle.__projectedCircleSettings.joinRequirement;
+            }
+            if (
+                typeof circle.id === 'number'
+                && typeof circle.joinRequirement === 'string'
+                && typeof circle.circleType === 'string'
+            ) {
+                const projected = await resolveProjectedCircleSettings(prisma as any, circle);
+                return projected.joinRequirement;
+            }
+            return circle.joinRequirement || 'Free';
+        },
         genesisMode: (circle: any) => normalizeCircleGenesisMode(circle.genesisMode),
         minCrystals: async (circle: any, _: any, { prisma }: Context) => {
             if (typeof circle.__projectedCircleSettings?.minCrystals === 'number') {

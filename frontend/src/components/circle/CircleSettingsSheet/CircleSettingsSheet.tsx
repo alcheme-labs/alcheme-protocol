@@ -12,6 +12,7 @@ import {
     DEFAULT_CIRCLE_DRAFT_WORKFLOW_POLICY,
 } from '@/lib/api/circlesPolicyProfile';
 import { resolveCircleSettingsActionFlags } from '@/lib/circle/memberManagement';
+import type { CircleAccessType } from '@/lib/circle/accessPolicy';
 import type {
     CircleDraftWorkflowPolicy,
     CircleDraftLifecycleTemplate,
@@ -56,7 +57,7 @@ interface CircleSettingsSheetProps {
     open: boolean;
     circleName: string;
     circleMode: 'social' | 'knowledge';
-    accessType: 'free' | 'crystal' | 'invite';
+    accessType: CircleAccessType;
     minCrystals?: number;
     allowForwardOut: boolean;
     forwardPolicyEditable?: boolean;
@@ -75,6 +76,9 @@ interface CircleSettingsSheetProps {
     draftWorkflowPolicy?: CircleDraftWorkflowPolicy | null;
     draftLifecycleSaving?: boolean;
     draftLifecycleError?: string | null;
+    accessPolicyEditable?: boolean;
+    accessPolicySaving?: boolean;
+    accessPolicyError?: string | null;
     agents?: CircleAgentRecord[];
     agentPolicy?: CircleAgentPolicy | null;
     agentPolicyLoading?: boolean;
@@ -90,6 +94,10 @@ interface CircleSettingsSheetProps {
         maxRevisionRounds: number;
     }) => Promise<void> | void;
     onSaveDraftWorkflowPolicy?: (policy: CircleDraftWorkflowPolicy) => Promise<void> | void;
+    onSaveAccessPolicy?: (policy: {
+        accessType: CircleAccessType;
+        minCrystals: number;
+    }) => Promise<void> | void;
     onSaveAgentPolicy?: (policy: {
         triggerScope: CircleAgentPolicy['triggerScope'];
         costDiscountBps: number;
@@ -136,6 +144,10 @@ function getReviewEntryModeHelp(
     return t('reviewEntry.help.autoOrManual');
 }
 
+function normalizeCrystalThreshold(value: number): number {
+    return Math.max(1, Math.min(0xffff, Math.floor(Number(value || 1))));
+}
+
 /* ═══ Component ═══ */
 
 export default function CircleSettingsSheet({
@@ -160,6 +172,9 @@ export default function CircleSettingsSheet({
     draftWorkflowPolicy = null,
     draftLifecycleSaving = false,
     draftLifecycleError = null,
+    accessPolicyEditable = false,
+    accessPolicySaving = false,
+    accessPolicyError = null,
     agents = [],
     agentPolicy = null,
     agentPolicyLoading = false,
@@ -170,6 +185,7 @@ export default function CircleSettingsSheet({
     onSaveGhostSettings,
     onSaveDraftLifecycleTemplate,
     onSaveDraftWorkflowPolicy,
+    onSaveAccessPolicy,
     onSaveAgentPolicy,
     deleteCircleAvailable = false,
     deleteCircleNotice = null,
@@ -219,16 +235,55 @@ export default function CircleSettingsSheet({
     const [draftLifecycleDirty, setDraftLifecycleDirty] = useState(false);
     const [draftWorkflowDraft, setDraftWorkflowDraft] = useState(defaultDraftWorkflowPolicy);
     const [draftWorkflowDirty, setDraftWorkflowDirty] = useState(false);
+    const [accessDraftType, setAccessDraftType] = useState<CircleAccessType>(accessType);
+    const [accessDraftMinCrystals, setAccessDraftMinCrystals] = useState(normalizeCrystalThreshold(minCrystals || 1));
     const [memberActionKey, setMemberActionKey] = useState<string | null>(null);
     const [memberActionError, setMemberActionError] = useState<string | null>(null);
     const [identityRulesExpanded, setIdentityRulesExpanded] = useState(false);
     const [draftLifecycleExpanded, setDraftLifecycleExpanded] = useState(false);
     const [draftWorkflowExpanded, setDraftWorkflowExpanded] = useState(false);
     const usesAutoReviewTimer = draftLifecycleDraft.reviewEntryMode !== 'manual_only';
+    const canEditAccessPolicy =
+        accessPolicyEditable
+        && Boolean(onSaveAccessPolicy);
+    const currentAccessMinCrystals = accessType === 'crystal'
+        ? normalizeCrystalThreshold(minCrystals || 1)
+        : 0;
+    const normalizedAccessDraftMinCrystals = accessDraftType === 'crystal'
+        ? normalizeCrystalThreshold(accessDraftMinCrystals)
+        : 0;
+    const accessPolicyDirty =
+        accessDraftType !== accessType
+        || normalizedAccessDraftMinCrystals !== currentAccessMinCrystals;
+    const accessOptions: Array<{ value: CircleAccessType; label: string }> = [
+        { value: 'free', label: t('accessEditor.free') },
+        { value: 'crystal', label: t('accessEditor.crystal') },
+        { value: 'invite', label: t('accessEditor.invite') },
+        { value: 'approval', label: t('accessEditor.approval') },
+    ];
+
+    const renderAccessLabel = (type: CircleAccessType, threshold: number) => {
+        if (type === 'crystal') {
+            return t('basic.accessCrystal', { count: normalizeCrystalThreshold(threshold || 1) });
+        }
+        if (type === 'invite') {
+            return t('basic.accessInvite');
+        }
+        if (type === 'approval') {
+            return t('basic.accessApproval');
+        }
+        return t('basic.accessFree');
+    };
 
     useEffect(() => {
         setForwardEnabled(allowForwardOut);
     }, [allowForwardOut]);
+
+    useEffect(() => {
+        if (!open) return;
+        setAccessDraftType(accessType);
+        setAccessDraftMinCrystals(normalizeCrystalThreshold(minCrystals || 1));
+    }, [open, accessType, minCrystals]);
 
     useEffect(() => {
         if (!open) return;
@@ -335,6 +390,18 @@ export default function CircleSettingsSheet({
         try {
             await onSaveDraftWorkflowPolicy(draftWorkflowDraft);
             setDraftWorkflowDirty(false);
+        } catch {
+            // error surfaced by parent
+        }
+    };
+
+    const handleSaveAccessPolicy = async () => {
+        if (!onSaveAccessPolicy || accessPolicySaving || !accessPolicyDirty) return;
+        try {
+            await onSaveAccessPolicy({
+                accessType: accessDraftType,
+                minCrystals: normalizedAccessDraftMinCrystals,
+            });
         } catch {
             // error surfaced by parent
         }
@@ -471,12 +538,59 @@ export default function CircleSettingsSheet({
 
                                 <div className={styles.infoRow}>
                                     <span className={styles.infoLabel}>{t('basic.accessLabel')}</span>
-                                    <span className={styles.infoValue}>
-                                        {accessType === 'free' && t('basic.accessFree')}
-                                        {accessType === 'crystal' && t('basic.accessCrystal', { count: minCrystals })}
-                                        {accessType === 'invite' && t('basic.accessInvite')}
-                                    </span>
+                                    {!canEditAccessPolicy && (
+                                        <span className={styles.infoValue}>
+                                            {renderAccessLabel(accessType, currentAccessMinCrystals)}
+                                        </span>
+                                    )}
                                 </div>
+
+                                {canEditAccessPolicy && (
+                                    <div className={styles.accessEditor}>
+                                        <div className={styles.accessChoiceGroup}>
+                                            {accessOptions.map((option) => (
+                                                <button
+                                                    key={option.value}
+                                                    type="button"
+                                                    className={`${styles.accessChoiceBtn} ${accessDraftType === option.value ? styles.accessChoiceBtnActive : ''}`}
+                                                    onClick={() => setAccessDraftType(option.value)}
+                                                    disabled={accessPolicySaving}
+                                                >
+                                                    {option.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {accessDraftType === 'crystal' && (
+                                            <div className={styles.infoField}>
+                                                <div className={styles.infoFieldHeader}>
+                                                    <span className={styles.infoLabel}>{t('accessEditor.minCrystals')}</span>
+                                                </div>
+                                                <div className={styles.inlineNumberWrap}>
+                                                    <input
+                                                        className={styles.inlineNumberInput}
+                                                        type="number"
+                                                        min={1}
+                                                        max={65535}
+                                                        value={accessDraftMinCrystals}
+                                                        onChange={(event) => setAccessDraftMinCrystals(normalizeCrystalThreshold(parseInt(event.target.value, 10) || 1))}
+                                                        disabled={accessPolicySaving}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                        {accessPolicyError && (
+                                            <div className={styles.ghostError}>{accessPolicyError}</div>
+                                        )}
+                                        <button
+                                            type="button"
+                                            className={styles.ghostSaveBtn}
+                                            onClick={handleSaveAccessPolicy}
+                                            disabled={accessPolicySaving || !accessPolicyDirty}
+                                        >
+                                            {accessPolicySaving ? t('accessEditor.saving') : t('accessEditor.save')}
+                                        </button>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Permissions */}

@@ -1316,6 +1316,7 @@ export function membershipRouter(prisma: PrismaClient, redis: Redis): Router {
                 select: {
                     joinRequirement: true,
                     circleType: true,
+                    minCrystals: true,
                 },
             });
             if (!currentCircle) {
@@ -1323,6 +1324,29 @@ export function membershipRouter(prisma: PrismaClient, redis: Redis): Router {
             }
             const nextJoinRequirement = joinRequirement ?? currentCircle.joinRequirement;
             const nextCircleType = circleType ?? currentCircle.circleType;
+            const currentMinCrystals = Number(currentCircle.minCrystals || 0);
+            const hasMinCrystalsInput = Object.prototype.hasOwnProperty.call(req.body ?? {}, 'minCrystals');
+            const requestedMinCrystals = hasMinCrystalsInput
+                ? Math.max(0, Math.min(0xffff, Math.floor(Number(req.body.minCrystals))))
+                : nextJoinRequirement === JoinRequirement.TokenGated
+                    ? currentMinCrystals
+                    : 0;
+            if (!Number.isFinite(requestedMinCrystals)) {
+                return res.status(400).json({ error: 'invalid_min_crystals' });
+            }
+            if (nextJoinRequirement === JoinRequirement.TokenGated && requestedMinCrystals < 1) {
+                return res.status(400).json({ error: 'token_gate_min_crystals_required' });
+            }
+            if (nextJoinRequirement !== JoinRequirement.TokenGated && requestedMinCrystals !== 0) {
+                return res.status(400).json({ error: 'min_crystals_requires_token_gate' });
+            }
+            if (requestedMinCrystals !== currentMinCrystals) {
+                return res.status(409).json({
+                    error: 'min_crystals_projection_mismatch',
+                    expected: requestedMinCrystals,
+                    actual: currentMinCrystals,
+                });
+            }
             const actorPubkey = typeof req.body?.actorPubkey === 'string'
                 ? req.body.actorPubkey.trim()
                 : '';
@@ -1357,6 +1381,7 @@ export function membershipRouter(prisma: PrismaClient, redis: Redis): Router {
                 payload: {
                     joinRequirement: nextJoinRequirement,
                     circleType: nextCircleType,
+                    minCrystals: requestedMinCrystals,
                 },
                 clientTimestamp: signedPayload.clientTimestamp,
                 nonce: signedPayload.nonce,
@@ -1416,7 +1441,7 @@ export function membershipRouter(prisma: PrismaClient, redis: Redis): Router {
                     payload: {
                         joinRequirement: updated.joinRequirement,
                         circleType: updated.circleType,
-                        minCrystals: updated.minCrystals,
+                        minCrystals: requestedMinCrystals,
                     },
                     actorPubkey,
                     signedMessage,
@@ -1426,6 +1451,9 @@ export function membershipRouter(prisma: PrismaClient, redis: Redis): Router {
                     anchor: signedPayload.anchor ?? null,
                 }),
             });
+            if (typeof (redis as any)?.del === 'function') {
+                await (redis as any).del(`circle:${circleId}`);
+            }
 
             return res.json({
                 ok: true,

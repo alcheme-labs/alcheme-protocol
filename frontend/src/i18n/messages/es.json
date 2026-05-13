@@ -525,6 +525,7 @@
     "qualification": {
       "qualified": "Ya cumples las condiciones actuales y puedes hacer fork.",
       "forkDisabled": "Este círculo todavía no abrió la opción de fork.",
+      "privateSourceNotForkable": "El círculo origen es privado o solo con invitación y no puede bifurcarse a una ruta pública de forma predeterminada.",
       "identityShortfall": "Tu rol o identidad actual todavía está por debajo del piso de {roleLabel}.",
       "contributionShortfall": "Te faltan {missing} contribuciones para poder enviarlo.",
       "fallback": "Todavía no cumples las condiciones para enviarlo."
@@ -532,6 +533,7 @@
     "statusBadge": {
       "qualified": "Listo para fork",
       "forkDisabled": "Cerrado",
+      "privateSourceNotForkable": "Origen privado",
       "identityShortfall": "Identidad insuficiente",
       "contributionShortfall": "Faltan contribuciones"
     }
@@ -748,6 +750,8 @@
       "deleteNotice": "Eliminar un círculo todavía está bloqueado detrás de un flujo de revisión más seguro y aún no está disponible.",
       "errors": {
         "invalidCircleForAi": "Este círculo no es válido, así que los ajustes de IA aún no se pueden guardar.",
+        "invalidCircleForAccessPolicy": "Este círculo no es válido, así que la política de acceso aún no se puede guardar.",
+        "accessPolicyWalletRequired": "Conecta una billetera compatible con firma de mensajes antes de guardar la política de acceso.",
         "invalidCircleForDraftLifecycle": "Este círculo no es válido, así que los ajustes del ciclo del borrador aún no se pueden guardar.",
         "invalidCircleForWorkflow": "Este círculo no es válido, así que los permisos del flujo todavía no se pueden guardar.",
         "invalidCircleForAgents": "Este círculo no es válido, así que la gobernanza de agentes aún no se puede guardar.",
@@ -755,6 +759,8 @@
         "loadDraftPolicyFallback": "No se pudieron cargar los ajustes del flujo del borrador, así que por ahora se usan los valores predeterminados.",
         "loadAgentPolicyFallback": "No se pudieron cargar los ajustes de gobernanza de agentes, así que por ahora se usan los valores predeterminados.",
         "saveAiFailed": "No se pudieron guardar los ajustes de IA. Inténtalo de nuevo.",
+        "accessPolicySaveFailed": "No se pudo guardar la política de acceso. Inténtalo de nuevo.",
+        "accessPolicyPartialSyncFailed": "El umbral de cristales cambió on-chain, pero la política firmada no terminó de guardarse. La página se actualizó con el último estado indexado.",
         "saveDraftLifecycleFailed": "No se pudieron guardar los ajustes del ciclo del borrador. Inténtalo de nuevo.",
         "saveWorkflowFailed": "No se pudieron guardar los permisos del flujo. Inténtalo de nuevo.",
         "saveAgentsFailed": "No se pudieron guardar los ajustes de gobernanza de agentes. Inténtalo de nuevo.",
@@ -2334,7 +2340,17 @@
       "accessLabel": "Acceso",
       "accessFree": "🌍 Abierto",
       "accessCrystal": "💎 ≥{count} cristales",
-      "accessInvite": "🔒 Solo con invitación"
+      "accessInvite": "🔒 Solo con invitación",
+      "accessApproval": "🛡️ Requiere aprobación"
+    },
+    "accessEditor": {
+      "free": "Abierto",
+      "crystal": "Puerta de cristales",
+      "invite": "Solo invitación",
+      "approval": "Aprobación",
+      "minCrystals": "Cristales requeridos",
+      "save": "Guardar política de acceso",
+      "saving": "Guardando…"
     },
     "permissions": {
       "forwardTitle": "Permitir reenvío hacia fuera",

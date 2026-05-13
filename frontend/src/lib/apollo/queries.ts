@@ -101,6 +101,7 @@ export const CIRCLE_FIELDS = gql`
     archivedByPubkey
     archiveReason
     circleType
+    joinRequirement
     level
     knowledgeCount
     genesisMode

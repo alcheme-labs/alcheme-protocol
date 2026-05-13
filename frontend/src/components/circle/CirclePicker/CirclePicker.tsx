@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUp, Lock } from 'lucide-react';
 import { useI18n } from '@/i18n/useI18n';
+import type { CircleAccessRequirement } from '@/lib/circle/accessPolicy';
 import styles from './CirclePicker.module.css';
 
 export interface PickerCircle {
@@ -17,7 +18,7 @@ export interface PickerCircle {
     /** Level in hierarchy (higher = deeper) */
     level: number;
     /** Access requirement */
-    accessRequirement: { type: 'free' } | { type: 'crystal'; minCrystals: number };
+    accessRequirement: CircleAccessRequirement;
 }
 
 interface CirclePickerProps {

@@ -66,10 +66,12 @@ export function bytesToBase64(bytes: Uint8Array): string {
 export function normalizeMembershipPolicyEnvelopePayload(input: {
     joinRequirement: 'Free' | 'ApprovalRequired' | 'TokenGated' | 'InviteOnly';
     circleType: 'Open' | 'Closed' | 'Secret';
+    minCrystals?: number;
 }): Record<string, unknown> {
     return {
         joinRequirement: input.joinRequirement,
         circleType: input.circleType,
+        minCrystals: Math.max(0, Math.min(0xffff, Math.floor(Number(input.minCrystals || 0)))),
     };
 }
 

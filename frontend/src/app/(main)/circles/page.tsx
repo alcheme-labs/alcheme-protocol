@@ -203,6 +203,7 @@ export default function CirclesPage() {
                         mode: data.mode,
                         genesisMode: data.genesisMode,
                         seededSources: data.seededSources,
+                        accessType: data.accessType,
                         minCrystals: data.accessType === 'crystal' ? data.minCrystals : 0,
                         ghostSettings: data.ghostSettings,
                         draftLifecycleTemplate: data.draftLifecycleTemplate,

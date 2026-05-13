@@ -525,6 +525,7 @@
     "qualification": {
       "qualified": "Vous remplissez les conditions actuelles et pouvez forker.",
       "forkDisabled": "Le fork n’est pas encore ouvert dans ce cercle.",
+      "privateSourceNotForkable": "Le cercle source est privé ou sur invitation et ne peut pas être forké vers un chemin public par défaut.",
       "identityShortfall": "Votre rôle ou identité actuelle reste sous le seuil {roleLabel}.",
       "contributionShortfall": "Il manque encore {missing} contributions avant l’envoi.",
       "fallback": "Les conditions d’envoi ne sont pas encore réunies."
@@ -532,6 +533,7 @@
     "statusBadge": {
       "qualified": "Prêt à forker",
       "forkDisabled": "Fermé",
+      "privateSourceNotForkable": "Source privée",
       "identityShortfall": "Identité insuffisante",
       "contributionShortfall": "Contributions manquantes"
     }
@@ -748,6 +750,8 @@
       "deleteNotice": "La suppression d’un cercle reste bloquée derrière un flux de validation plus sûr et n’est pas encore disponible.",
       "errors": {
         "invalidCircleForAi": "Ce cercle est invalide, donc les réglages IA ne peuvent pas encore être enregistrés.",
+        "invalidCircleForAccessPolicy": "Ce cercle est invalide, donc la politique d’accès ne peut pas encore être enregistrée.",
+        "accessPolicyWalletRequired": "Connectez un wallet prenant en charge la signature de message avant d’enregistrer la politique d’accès.",
         "invalidCircleForDraftLifecycle": "Ce cercle est invalide, donc les réglages du cycle de brouillon ne peuvent pas encore être enregistrés.",
         "invalidCircleForWorkflow": "Ce cercle est invalide, donc les permissions de workflow ne peuvent pas encore être enregistrées.",
         "invalidCircleForAgents": "Ce cercle est invalide, donc la gouvernance des agents ne peut pas encore être enregistrée.",
@@ -755,6 +759,8 @@
         "loadDraftPolicyFallback": "Impossible de charger les réglages du flux de brouillon ; les valeurs par défaut sont utilisées pour le moment.",
         "loadAgentPolicyFallback": "Impossible de charger les réglages de gouvernance des agents ; les valeurs par défaut sont utilisées pour le moment.",
         "saveAiFailed": "Impossible d’enregistrer les réglages IA. Réessayez.",
+        "accessPolicySaveFailed": "Impossible d’enregistrer la politique d’accès. Réessayez.",
+        "accessPolicyPartialSyncFailed": "Le seuil de cristaux a changé on-chain, mais la politique signée n’a pas fini d’être enregistrée. La page a été rafraîchie avec le dernier état indexé.",
         "saveDraftLifecycleFailed": "Impossible d’enregistrer les réglages du cycle de brouillon. Réessayez.",
         "saveWorkflowFailed": "Impossible d’enregistrer les permissions du workflow. Réessayez.",
         "saveAgentsFailed": "Impossible d’enregistrer les réglages de gouvernance des agents. Réessayez.",
@@ -2334,7 +2340,17 @@
       "accessLabel": "Accès",
       "accessFree": "🌍 Ouvert",
       "accessCrystal": "💎 ≥{count} cristaux",
-      "accessInvite": "🔒 Sur invitation"
+      "accessInvite": "🔒 Sur invitation",
+      "accessApproval": "🛡️ Approbation requise"
+    },
+    "accessEditor": {
+      "free": "Ouvert",
+      "crystal": "Seuil de cristaux",
+      "invite": "Sur invitation",
+      "approval": "Approbation",
+      "minCrystals": "Cristaux requis",
+      "save": "Enregistrer la politique d’accès",
+      "saving": "Enregistrement…"
     },
     "permissions": {
       "forwardTitle": "Autoriser le transfert sortant",

@@ -307,6 +307,7 @@ export async function updateCircleJoinPolicy(
         accessType?: 'free' | 'crystal' | 'invite' | 'approval';
         joinRequirement?: JoinRequirement;
         circleType?: CircleType;
+        minCrystals?: number;
     },
     auth: CircleJoinPolicyUpdateAuth,
 ): Promise<{
@@ -338,6 +339,7 @@ export async function updateCircleJoinPolicy(
         payload: normalizeMembershipPolicyEnvelopePayload({
             joinRequirement: normalizedJoinRequirement,
             circleType: normalizedCircleType,
+            minCrystals: input.minCrystals,
         }),
         auth,
     });

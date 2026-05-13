@@ -33,6 +33,7 @@ import {
 } from '@/lib/api/createCircleFlow';
 import { useI18n } from '@/i18n/useI18n';
 import { getBrowserOnlyMockUnsupportedError } from '@/lib/testing/browserOnlyMockPolicy';
+import { encodeCircleFlags } from '@/lib/circle/flags';
 
 interface CreateCircleOptions {
     name: string;
@@ -133,18 +134,6 @@ function appendCreateCircleNotice(previous: string | null, next: string): string
     return previous ? `${previous} ${next}` : next;
 }
 
-function encodeCircleFlags(
-    kind: 'main' | 'auxiliary',
-    mode: 'knowledge' | 'social',
-    minCrystals: number,
-): BN {
-    const kindBit = kind === 'auxiliary' ? 1 : 0;
-    const modeBit = mode === 'social' ? 1 : 0;
-    const boundedMinCrystals = Math.max(0, Math.min(Math.floor(minCrystals), 0xffff));
-    const flags = kindBit | (modeBit << 1) | (boundedMinCrystals << 2);
-    return new BN(flags);
-}
-
 function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -199,6 +188,7 @@ async function syncCircleGhostSettingsWithRetry(input: {
 async function syncCircleJoinPolicyWithRetry(input: {
     circleId: number;
     accessType: 'free' | 'crystal' | 'invite' | 'approval';
+    minCrystals: number;
     actorPubkey: string;
     signMessage: (message: Uint8Array) => Promise<Uint8Array>;
     maxAttempts?: number;
@@ -212,6 +202,7 @@ async function syncCircleJoinPolicyWithRetry(input: {
         try {
             await updateCircleJoinPolicy(input.circleId, {
                 accessType: input.accessType,
+                minCrystals: input.accessType === 'crystal' ? input.minCrystals : 0,
             }, {
                 actorPubkey: input.actorPubkey,
                 signMessage: input.signMessage,
@@ -597,7 +588,11 @@ export function useCreateCircle(): UseCreateCircleReturn {
                     throw new Error(t('errors.circleIdMissing'));
                 }
 
-                const targetFlags = encodeCircleFlags(targetKind, targetMode, targetMinCrystals);
+                const targetFlags = encodeCircleFlags({
+                    kind: targetKind,
+                    mode: targetMode,
+                    minCrystals: targetMinCrystals,
+                });
                 const needFlagUpdate =
                     targetKind !== 'main' ||
                     targetMode !== 'knowledge' ||
@@ -746,6 +741,7 @@ export function useCreateCircle(): UseCreateCircleReturn {
                         await syncCircleJoinPolicyWithRetry({
                             circleId: createdCircleId,
                             accessType: effectiveAccessType,
+                            minCrystals: effectiveAccessType === 'crystal' ? targetMinCrystals : 0,
                             actorPubkey: publicKey.toBase58(),
                             signMessage,
                         });

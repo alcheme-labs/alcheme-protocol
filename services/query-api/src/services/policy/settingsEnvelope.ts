@@ -16,6 +16,7 @@ export type CircleSettingsEnvelopeKind =
 export interface CircleSettingsMembershipPolicyPayload {
     joinRequirement: JoinRequirement;
     circleType: CircleType;
+    minCrystals?: number;
 }
 
 export interface CircleSettingsPolicyProfilePayload {
@@ -114,6 +115,19 @@ function normalizePositiveInt(value: unknown): number | null {
     return null;
 }
 
+function normalizeNonNegativeInt(value: unknown): number | null {
+    if (typeof value === 'number' && Number.isFinite(value) && value >= 0) {
+        return Math.max(0, Math.min(0xffff, Math.floor(value)));
+    }
+    if (typeof value === 'string' && value.trim()) {
+        const parsed = Number(value);
+        if (Number.isFinite(parsed) && parsed >= 0) {
+            return Math.max(0, Math.min(0xffff, Math.floor(parsed)));
+        }
+    }
+    return null;
+}
+
 function normalizeGovernanceRole(value: unknown): string | null {
     const normalized = String(value || '').trim();
     if (
@@ -139,9 +153,11 @@ function normalizeMembershipPolicyPayload(raw: unknown): CircleSettingsMembershi
     ) {
         return null;
     }
+    const minCrystals = normalizeNonNegativeInt(raw.minCrystals);
     return {
         joinRequirement: joinRequirement as JoinRequirement,
         circleType: circleType as CircleType,
+        ...(minCrystals !== null ? { minCrystals } : {}),
     };
 }
 

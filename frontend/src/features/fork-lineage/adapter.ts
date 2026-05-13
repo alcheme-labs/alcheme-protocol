@@ -34,7 +34,8 @@ export type ForkQualificationStatus =
     | 'qualified'
     | 'fork_disabled'
     | 'contribution_shortfall'
-    | 'identity_shortfall';
+    | 'identity_shortfall'
+    | 'private_source_not_forkable';
 
 export type ActorIdentityLevel = 'Visitor' | 'Initiate' | 'Member' | 'Elder';
 
@@ -102,11 +103,13 @@ export interface ForkReadinessCopy {
     roleLabels: Record<Team04ForkThresholdResolvedView['minimumRole'], string>;
     qualificationQualified: string;
     qualificationForkDisabled: string;
+    qualificationPrivateSourceNotForkable: string;
     qualificationIdentityShortfall: (input: {roleLabel: string}) => string;
     qualificationContributionShortfall: (input: {missing: number}) => string;
     qualificationFallback: string;
     statusBadgeQualified: string;
     statusBadgeForkDisabled: string;
+    statusBadgePrivateSourceNotForkable: string;
     statusBadgeIdentityShortfall: string;
     statusBadgeContributionShortfall: string;
     sourceLevelLabel: (input: {level: number}) => string;
@@ -147,11 +150,13 @@ export function createForkReadinessCopy(
         },
         qualificationQualified: t('qualification.qualified'),
         qualificationForkDisabled: t('qualification.forkDisabled'),
+        qualificationPrivateSourceNotForkable: t('qualification.privateSourceNotForkable'),
         qualificationIdentityShortfall: ({roleLabel}) => t('qualification.identityShortfall', {roleLabel}),
         qualificationContributionShortfall: ({missing}) => t('qualification.contributionShortfall', {missing}),
         qualificationFallback: t('qualification.fallback'),
         statusBadgeQualified: t('statusBadge.qualified'),
         statusBadgeForkDisabled: t('statusBadge.forkDisabled'),
+        statusBadgePrivateSourceNotForkable: t('statusBadge.privateSourceNotForkable'),
         statusBadgeIdentityShortfall: t('statusBadge.identityShortfall'),
         statusBadgeContributionShortfall: t('statusBadge.contributionShortfall'),
         sourceLevelLabel: ({level}) => t('defaults.sourceLevel', {level}),
@@ -330,6 +335,8 @@ function formatQualificationLabel(input: {
             return input.copy.qualificationQualified;
         case 'fork_disabled':
             return input.copy.qualificationForkDisabled;
+        case 'private_source_not_forkable':
+            return input.copy.qualificationPrivateSourceNotForkable;
         case 'identity_shortfall':
             return input.copy.qualificationIdentityShortfall({
                 roleLabel: formatMinimumRoleLabel(
@@ -359,6 +366,8 @@ function formatStatusBadgeLabel(
             return copy.statusBadgeQualified;
         case 'fork_disabled':
             return copy.statusBadgeForkDisabled;
+        case 'private_source_not_forkable':
+            return copy.statusBadgePrivateSourceNotForkable;
         case 'identity_shortfall':
             return copy.statusBadgeIdentityShortfall;
         case 'contribution_shortfall':

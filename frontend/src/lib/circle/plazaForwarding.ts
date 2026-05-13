@@ -1,10 +1,12 @@
+import type { CircleAccessRequirement } from './accessPolicy';
+
 export interface PlazaForwardTarget {
     groupId: number;
     groupName: string;
     subCircleId: string;
     subCircleName: string;
     level: number;
-    accessRequirement: { type: 'free' } | { type: 'crystal'; minCrystals: number };
+    accessRequirement: CircleAccessRequirement;
 }
 
 export interface PlazaForwardAction {

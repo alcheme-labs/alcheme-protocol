@@ -54,6 +54,7 @@ describe('GraphQL circle read model projection', () => {
     test('Circle.circleType and Circle.minCrystals prefer projected protocol state over raw row fields', async () => {
         const circle = {
             id: 7,
+            joinRequirement: 'Free',
             circleType: 'Open',
             minCrystals: 1,
             __projectedCircleSettings: {
@@ -66,6 +67,24 @@ describe('GraphQL circle read model projection', () => {
 
         await expect((resolvers as any).Circle.circleType(circle, {}, { prisma: {} })).resolves.toBe('Closed');
         await expect((resolvers as any).Circle.minCrystals(circle, {}, { prisma: {} })).resolves.toBe(5);
+    });
+
+    test('Circle.joinRequirement prefers projected membership policy state', async () => {
+        jest.spyOn(circleSettingsService, 'resolveProjectedCircleSettings').mockResolvedValue({
+            joinRequirement: 'InviteOnly',
+            circleType: 'Closed',
+            minCrystals: 0,
+            source: 'signed_envelope',
+        });
+
+        const circle = {
+            id: 7,
+            joinRequirement: 'Free',
+            circleType: 'Open',
+            minCrystals: 0,
+        };
+
+        await expect((resolvers as any).Circle.joinRequirement(circle, {}, { prisma: {} })).resolves.toBe('InviteOnly');
     });
 
     test('Query.allCircles excludes archived circles from public listings', async () => {

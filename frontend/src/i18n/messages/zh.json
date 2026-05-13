@@ -525,6 +525,7 @@
     "qualification": {
       "qualified": "当前资格已满足，可继续 Fork。",
       "forkDisabled": "当前圈层暂未开放 Fork。",
+      "privateSourceNotForkable": "来源圈层为邀请制/私密状态，默认不能 Fork 到公共路径。",
       "identityShortfall": "当前角色或身份仍低于 {roleLabel} 的保护线。",
       "contributionShortfall": "还差 {missing} 份贡献，达到门槛后即可提交。",
       "fallback": "当前还未满足提交条件。"
@@ -532,6 +533,7 @@
     "statusBadge": {
       "qualified": "可继续 Fork",
       "forkDisabled": "暂未开放",
+      "privateSourceNotForkable": "私密来源",
       "identityShortfall": "身份仍不足",
       "contributionShortfall": "贡献仍不足"
     }
@@ -748,6 +750,8 @@
       "deleteNotice": "解散圈层尚未接入更安全的审核闭环，当前暂不开放。",
       "errors": {
         "invalidCircleForAi": "当前圈层 ID 无效，无法保存 AI 配置。",
+        "invalidCircleForAccessPolicy": "当前圈层 ID 无效，无法保存准入策略。",
+        "accessPolicyWalletRequired": "请先连接支持消息签名的钱包，再保存准入策略。",
         "invalidCircleForDraftLifecycle": "当前圈层 ID 无效，无法保存草稿流程设置。",
         "invalidCircleForWorkflow": "当前圈层 ID 无效，无法保存问题单与阶段权限。",
         "invalidCircleForAgents": "当前圈层 ID 无效，无法保存 Agent 策略。",
@@ -755,6 +759,8 @@
         "loadDraftPolicyFallback": "加载草稿流程设置失败，已使用默认值。",
         "loadAgentPolicyFallback": "加载 Agent 治理配置失败，已使用默认值。",
         "saveAiFailed": "保存 AI 配置失败，请稍后重试。",
+        "accessPolicySaveFailed": "保存准入策略失败，请稍后重试。",
+        "accessPolicyPartialSyncFailed": "晶体门槛已在链上更新，但签名策略保存未完成。页面已刷新为最新索引状态。",
         "saveDraftLifecycleFailed": "保存草稿流程设置失败，请稍后重试。",
         "saveWorkflowFailed": "保存问题单与阶段权限失败，请稍后重试。",
         "saveAgentsFailed": "保存 Agent 策略失败，请稍后重试。",
@@ -2334,7 +2340,17 @@
       "accessLabel": "准入",
       "accessFree": "🌍 开放",
       "accessCrystal": "💎 ≥{count} 晶体",
-      "accessInvite": "🔒 邀请制"
+      "accessInvite": "🔒 邀请制",
+      "accessApproval": "🛡️ 审批制"
+    },
+    "accessEditor": {
+      "free": "开放",
+      "crystal": "晶体门槛",
+      "invite": "邀请制",
+      "approval": "审批制",
+      "minCrystals": "所需晶体数",
+      "save": "保存准入策略",
+      "saving": "保存中…"
     },
     "permissions": {
       "forwardTitle": "允许消息转出",

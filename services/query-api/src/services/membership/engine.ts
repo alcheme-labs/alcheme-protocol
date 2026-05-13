@@ -42,10 +42,16 @@ export function resolveCircleJoinPolicy(input: {
     circleType: CircleType;
     minCrystals?: number | null;
 }): CircleJoinPolicy {
+    const parsedMinCrystals = Number(input.minCrystals ?? 0);
+    const rawMinCrystals = Number.isFinite(parsedMinCrystals)
+        ? Math.max(0, Math.floor(parsedMinCrystals))
+        : 0;
     return {
         joinRequirement: input.joinRequirement,
         circleType: input.circleType,
-        minCrystals: Math.max(0, Number(input.minCrystals || 0)),
+        minCrystals: input.joinRequirement === JoinRequirement.TokenGated
+            ? Math.max(1, rawMinCrystals)
+            : rawMinCrystals,
     };
 }
 

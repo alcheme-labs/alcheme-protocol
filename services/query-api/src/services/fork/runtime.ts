@@ -1,5 +1,6 @@
-import { MemberStatus, Prisma, type PrismaClient } from '@prisma/client';
+import { CircleType, JoinRequirement, MemberStatus, Prisma, type PrismaClient } from '@prisma/client';
 import { resolveCirclePolicyProfile } from '../policy/profile';
+import { resolveProjectedCircleSettings } from '../policy/settingsEnvelope';
 import type { GovernanceRole } from '../policy/types';
 
 type PrismaLike = PrismaClient | Prisma.TransactionClient;
@@ -15,7 +16,8 @@ export type ForkQualificationStatus =
     | 'qualified'
     | 'fork_disabled'
     | 'contribution_shortfall'
-    | 'identity_shortfall';
+    | 'identity_shortfall'
+    | 'private_source_not_forkable';
 
 interface ForkDeclarationRow {
     declarationId: string | number;
@@ -236,6 +238,7 @@ function isIdentityFloorSatisfied(input: {
 
 function mapQualificationSnapshot(raw: unknown): ForkQualificationSnapshot {
     const record = asRecord(raw);
+    const qualificationStatus = String(record?.qualificationStatus || '');
     return {
         thresholdMode: 'contribution_threshold',
         minimumContributions: Math.max(0, Number(record?.minimumContributions || 0)),
@@ -245,13 +248,15 @@ function mapQualificationSnapshot(raw: unknown): ForkQualificationSnapshot {
         actorIdentityLevel: normalizeActorIdentityLevel(record?.actorIdentityLevel),
         requiresGovernanceVote: Boolean(record?.requiresGovernanceVote),
         qualifies: Boolean(record?.qualifies),
-        qualificationStatus: String(record?.qualificationStatus || 'contribution_shortfall') === 'qualified'
+        qualificationStatus: qualificationStatus === 'qualified'
             ? 'qualified'
-            : String(record?.qualificationStatus || '') === 'fork_disabled'
+            : qualificationStatus === 'fork_disabled'
                 ? 'fork_disabled'
-                : String(record?.qualificationStatus || '') === 'identity_shortfall'
+                : qualificationStatus === 'identity_shortfall'
                     ? 'identity_shortfall'
-                    : 'contribution_shortfall',
+                    : qualificationStatus === 'private_source_not_forkable'
+                        ? 'private_source_not_forkable'
+                        : 'contribution_shortfall',
     };
 }
 
@@ -318,6 +323,14 @@ export function evaluateForkQualification(
     };
 }
 
+export function isPrivateSourceForkBlocked(input: {
+    joinRequirement: JoinRequirement;
+    circleType: CircleType;
+}): boolean {
+    return input.joinRequirement === JoinRequirement.InviteOnly
+        || input.circleType === CircleType.Secret;
+}
+
 export async function resolveForkQualification(
     prisma: PrismaLike,
     input: ResolveForkQualificationInput,
@@ -328,7 +341,22 @@ export async function resolveForkQualification(
         throw new Error('invalid_fork_qualification_input');
     }
 
-    const profile = await resolveCirclePolicyProfile(prisma as PrismaClient, sourceCircleId);
+    const [profile, sourceCircle] = await Promise.all([
+        resolveCirclePolicyProfile(prisma as PrismaClient, sourceCircleId),
+        prisma.circle.findUnique({
+            where: { id: sourceCircleId },
+            select: {
+                id: true,
+                joinRequirement: true,
+                circleType: true,
+                minCrystals: true,
+            },
+        }),
+    ]);
+    if (!sourceCircle) {
+        throw new Error('source_circle_not_found');
+    }
+    const projectedSourcePolicy = await resolveProjectedCircleSettings(prisma as PrismaClient, sourceCircle);
     const [user, membership] = await Promise.all([
         prisma.user.findUnique({
             where: { id: userId },
@@ -367,6 +395,20 @@ export async function resolveForkQualification(
     const actorIdentityLevel = membership?.status === MemberStatus.Active
         ? normalizeActorIdentityLevel(membership.identityLevel)
         : null;
+
+    if (isPrivateSourceForkBlocked(projectedSourcePolicy)) {
+        return {
+            thresholdMode: 'contribution_threshold',
+            minimumContributions: profile.forkPolicy.minimumContributions,
+            contributorCount,
+            minimumRole: profile.forkPolicy.minimumRole,
+            actorRole,
+            actorIdentityLevel,
+            requiresGovernanceVote: profile.forkPolicy.requiresGovernanceVote,
+            qualifies: false,
+            qualificationStatus: 'private_source_not_forkable',
+        };
+    }
 
     if (!profile.forkPolicy.enabled) {
         return {

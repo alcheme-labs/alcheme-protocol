@@ -483,6 +483,45 @@
     pointer-events: none;
 }
 
+.accessEditor {
+    display: grid;
+    gap: var(--space-2);
+    padding-bottom: var(--space-1);
+}
+
+.accessChoiceGroup {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.accessChoiceBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 8px 10px;
+    border: 1px solid rgba(231, 228, 221, 0.16);
+    border-radius: var(--radius-button);
+    background: rgba(231, 228, 221, 0.04);
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 1.35;
+    text-align: center;
+    cursor: pointer;
+}
+
+.accessChoiceBtnActive {
+    border-color: rgba(199, 168, 107, 0.4);
+    color: var(--color-accent-gold);
+    background: rgba(199, 168, 107, 0.12);
+}
+
+.accessChoiceBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
 /* ── Info Row ── */
 .infoRow {
     display: flex;
@@ -594,6 +633,10 @@
 
 @media (max-width: 520px) {
     .ghostChoiceGroup {
+        grid-template-columns: 1fr;
+    }
+
+    .accessChoiceGroup {
         grid-template-columns: 1fr;
     }
 

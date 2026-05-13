@@ -1,8 +1,10 @@
 import { describe, expect, test } from '@jest/globals';
+import { CircleType, JoinRequirement } from '@prisma/client';
 
 import {
     createForkCircle,
     evaluateForkQualification,
+    isPrivateSourceForkBlocked,
     type CircleForkLineageRecord,
     type ForkCreationResult,
     type ForkDeclarationRecord,
@@ -60,6 +62,28 @@ function expectSuccessfulCreation(result: ForkCreationResult) {
 }
 
 describe('fork runtime', () => {
+    test('blocks invite-only and secret sources from public fork by default', () => {
+        expect(isPrivateSourceForkBlocked({
+            joinRequirement: JoinRequirement.InviteOnly,
+            circleType: CircleType.Closed,
+        })).toBe(true);
+
+        expect(isPrivateSourceForkBlocked({
+            joinRequirement: JoinRequirement.ApprovalRequired,
+            circleType: CircleType.Closed,
+        })).toBe(false);
+
+        expect(isPrivateSourceForkBlocked({
+            joinRequirement: JoinRequirement.TokenGated,
+            circleType: CircleType.Open,
+        })).toBe(false);
+
+        expect(isPrivateSourceForkBlocked({
+            joinRequirement: JoinRequirement.Free,
+            circleType: CircleType.Secret,
+        })).toBe(true);
+    });
+
     test('allows attached filing prepare before target circle exists and finalizes the same declaration later', async () => {
         const { store } = createInMemoryStore();
 

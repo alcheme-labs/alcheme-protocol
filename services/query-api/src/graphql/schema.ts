@@ -131,6 +131,7 @@ export const typeDefs = gql`
     onChainAddress: String!
     creator: User!
     circleType: CircleType!
+    joinRequirement: JoinRequirement!
     level: Int!
     knowledgeCount: Int!
     genesisMode: String
@@ -154,6 +155,13 @@ export const typeDefs = gql`
     Open
     Closed
     Secret
+  }
+
+  enum JoinRequirement {
+    Free
+    ApprovalRequired
+    TokenGated
+    InviteOnly
   }
 
   enum CircleLifecycleStatus {

@@ -1,12 +1,11 @@
+import type { CircleAccessRequirement } from './accessPolicy';
+
 type RequestedCircleTab = 'plaza' | 'feed' | 'crucible' | 'sanctuary' | null;
 
 interface RestorableSubCircle {
     id: string;
     tabs: string[];
-    accessRequirement: {
-        type: 'free' | 'crystal';
-        minCrystals?: number;
-    };
+    accessRequirement: CircleAccessRequirement;
 }
 
 interface ResolvePreferredActiveTierIdInput {

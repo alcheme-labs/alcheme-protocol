@@ -93,10 +93,12 @@ import {
     joinCircle,
     leaveCircle,
     removeCircleMember,
+    updateCircleJoinPolicy,
     updateCircleMemberRole,
     type CircleIdentityStatus,
     type CircleMembershipSnapshot,
 } from '@/lib/api/circlesMembership';
+import { waitForCircleMinCrystalsProjection } from '@/lib/api/createCircleFlow';
 import styles from './page.module.css';
 import TierPill from '@/components/circle/TierPill/TierPill';
 import AccessGate from '@/components/circle/AccessGate/AccessGate';
@@ -104,6 +106,12 @@ import PlazaTab from '@/components/circle/PlazaTab/PlazaTab';
 import CrucibleTab from '@/components/circle/CrucibleTab/CrucibleTab';
 import SanctuaryTab from '@/components/circle/SanctuaryTab/SanctuaryTab';
 import type { SubCircle, PlazaMessage, PlazaQuickAuxCircle, CircleGroup, DiscussionSessionState } from '@/lib/circle/types';
+import {
+    accessRequirementToAccessType,
+    resolveCircleAccessRequirement,
+    type CircleAccessRequirement,
+} from '@/lib/circle/accessPolicy';
+import { encodeCircleFlags } from '@/lib/circle/flags';
 import { timeAgo, mapContributorRole, mapMembershipToIdentityState, normalizeJoinActionError, mapDiscussionDtoToPlazaMessage, createCircleJoinCopy } from '@/lib/circle/utils';
 import { resolveCircleJoinBannerState } from '@/lib/circle/joinBanner';
 import { createIdentityCopy, normalizeIdentityCopy } from '@/lib/circle/identityCopy';
@@ -370,10 +378,8 @@ function isKnowledgeCircleTab(tab: NotificationTab | null): tab is 'crucible' | 
     return tab === 'crucible' || tab === 'sanctuary';
 }
 
-function mapAccessRequirementToAccessType(input: {
-    type: 'free' | 'crystal';
-}): 'free' | 'crystal' | 'invite' | 'approval' {
-    return input.type === 'crystal' ? 'crystal' : 'free';
+function mapAccessRequirementToAccessType(input: CircleAccessRequirement): 'free' | 'crystal' | 'invite' | 'approval' {
+    return accessRequirementToAccessType(input);
 }
 
 function normalizeForkActorIdentityLevel(
@@ -482,7 +488,7 @@ export default function CircleDetailPage() {
                 name: root.name || circleDetailT('defaults.publicCircle'),
                 level: root.level ?? 0,
                 isDefault: true,
-                accessRequirement: root.minCrystals ? { type: 'crystal', minCrystals: root.minCrystals } : { type: 'free' },
+                accessRequirement: resolveCircleAccessRequirement(root),
                 memberCount: root.stats?.members || 0,
                 crystalCount: root.knowledgeCount || 0,
                 kind: rootKind,
@@ -514,9 +520,7 @@ export default function CircleDetailPage() {
                     // IMPORTANT: level can legitimately be 0 (aux circle under Lv.0).
                     level: circle.level ?? 1,
                     isDefault: false,
-                    accessRequirement: circle.minCrystals
-                        ? { type: 'crystal', minCrystals: circle.minCrystals }
-                        : { type: 'free' },
+                    accessRequirement: resolveCircleAccessRequirement(circle),
                     memberCount: circle.stats?.members || 0,
                     crystalCount: circle.knowledgeCount || 0,
                     kind,
@@ -587,6 +591,8 @@ export default function CircleDetailPage() {
     const [circlePolicyLoading, setCirclePolicyLoading] = useState(false);
     const [circlePolicySaving, setCirclePolicySaving] = useState(false);
     const [circlePolicyError, setCirclePolicyError] = useState<string | null>(null);
+    const [circleAccessPolicySaving, setCircleAccessPolicySaving] = useState(false);
+    const [circleAccessPolicyError, setCircleAccessPolicyError] = useState<string | null>(null);
     const [circleAgents, setCircleAgents] = useState<CircleAgentRecord[]>([]);
     const [circleAgentPolicy, setCircleAgentPolicy] = useState<CircleAgentPolicy | null>(null);
     const [circleAgentPolicyLoading, setCircleAgentPolicyLoading] = useState(false);
@@ -2660,6 +2666,7 @@ export default function CircleDetailPage() {
                         mode: data.mode,
                         genesisMode: data.genesisMode,
                         seededSources: data.seededSources,
+                        accessType: data.accessType,
                         minCrystals: data.accessType === 'crystal' ? data.minCrystals : 0,
                         ghostSettings: data.ghostSettings,
                         draftLifecycleTemplate: data.draftLifecycleTemplate,
@@ -2882,7 +2889,7 @@ export default function CircleDetailPage() {
                 open={showSettings}
                 circleName={activeSubCircle.name}
                 circleMode={activeSubCircle.mode}
-                accessType={activeSubCircle.accessRequirement.type as 'free' | 'crystal' | 'invite'}
+                accessType={activeSubCircle.accessRequirement.type}
                 minCrystals={activeSubCircle.accessRequirement.type === 'crystal' ? activeSubCircle.accessRequirement.minCrystals : 0}
                 allowForwardOut={false}
                 forwardPolicyEditable={false}
@@ -2900,12 +2907,83 @@ export default function CircleDetailPage() {
                 draftWorkflowPolicy={circlePolicyDraftWorkflowPolicy || DEFAULT_CIRCLE_DRAFT_WORKFLOW_POLICY}
                 draftLifecycleSaving={circlePolicySaving}
                 draftLifecycleError={circlePolicyError}
+                accessPolicyEditable={viewerMembership?.role === 'Owner' || viewerMembership?.role === 'Admin'}
+                accessPolicySaving={circleAccessPolicySaving}
+                accessPolicyError={circleAccessPolicyError}
                 agents={CIRCLE_AGENT_GOVERNANCE_UI_ENABLED ? circleAgents : []}
                 agentPolicy={CIRCLE_AGENT_GOVERNANCE_UI_ENABLED ? circleAgentPolicy : null}
                 agentPolicyLoading={CIRCLE_AGENT_GOVERNANCE_UI_ENABLED ? circleAgentPolicyLoading : false}
                 agentPolicySaving={CIRCLE_AGENT_GOVERNANCE_UI_ENABLED ? circleAgentPolicySaving : false}
                 agentPolicyError={CIRCLE_AGENT_GOVERNANCE_UI_ENABLED ? circleAgentPolicyError : null}
                 onClose={() => setShowSettings(false)}
+                onSaveAccessPolicy={async ({ accessType, minCrystals }) => {
+                    if (activeCircleIdForSettings === null) {
+                        setCircleAccessPolicyError(circleDetailT('settings.errors.invalidCircleForAccessPolicy'));
+                        return;
+                    }
+                    if (!publicKey || !signMessage) {
+                        setCircleAccessPolicyError(circleDetailT('settings.errors.accessPolicyWalletRequired'));
+                        throw new Error('wallet_sign_message_unavailable');
+                    }
+                    if (!sdk) {
+                        setCircleAccessPolicyError(circleDetailT('settings.errors.accessPolicyWalletRequired'));
+                        throw new Error('wallet_sdk_unavailable');
+                    }
+
+                    const targetCircleId = activeCircleIdForSettings;
+                    const nextMinCrystals = accessType === 'crystal'
+                        ? Math.max(1, Math.min(0xffff, Math.floor(Number(minCrystals || 1))))
+                        : 0;
+                    const currentMinCrystals = activeSubCircle.accessRequirement.type === 'crystal'
+                        ? Math.max(1, Math.min(0xffff, Math.floor(Number(activeSubCircle.accessRequirement.minCrystals || 1))))
+                        : 0;
+                    let flagsProjectionUpdated = false;
+
+                    setCircleAccessPolicySaving(true);
+                    setCircleAccessPolicyError(null);
+                    try {
+                        if (nextMinCrystals !== currentMinCrystals) {
+                            const circlesModule = sdk.circles as typeof sdk.circles & {
+                                updateCircleFlags: (
+                                    circleId: number,
+                                    flags: ReturnType<typeof encodeCircleFlags>,
+                                ) => Promise<string>;
+                            };
+                            await circlesModule.updateCircleFlags(targetCircleId, encodeCircleFlags({
+                                kind: activeSubCircle.kind,
+                                mode: activeSubCircle.mode,
+                                minCrystals: nextMinCrystals,
+                            }));
+
+                            const indexed = await waitForCircleMinCrystalsProjection({
+                                circleId: targetCircleId,
+                                expectedMinCrystals: nextMinCrystals,
+                            });
+                            if (!indexed) {
+                                throw new Error('circle_min_crystals_projection_timeout');
+                            }
+                            flagsProjectionUpdated = true;
+                        }
+
+                        await updateCircleJoinPolicy(
+                            activeCircleIdForSettings,
+                            { accessType, minCrystals: nextMinCrystals },
+                            { actorPubkey: publicKey.toBase58(), signMessage },
+                        );
+                        await refetch();
+                    } catch (error) {
+                        console.error('[CirclePage] save access policy failed', error);
+                        setCircleAccessPolicyError(
+                            flagsProjectionUpdated
+                                ? circleDetailT('settings.errors.accessPolicyPartialSyncFailed')
+                                : circleDetailT('settings.errors.accessPolicySaveFailed'),
+                        );
+                        await refetch().catch(() => undefined);
+                        throw error;
+                    } finally {
+                        setCircleAccessPolicySaving(false);
+                    }
+                }}
                 onSaveGhostSettings={async (settings) => {
                     if (activeCircleIdForSettings === null) {
                         setCircleGhostSettingsError(circleDetailT('settings.errors.invalidCircleForAi'));

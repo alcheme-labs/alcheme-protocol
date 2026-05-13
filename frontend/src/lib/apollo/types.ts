@@ -128,6 +128,7 @@ export interface GQLCircle {
     archivedByPubkey: string | null;
     archiveReason: string | null;
     circleType: 'Open' | 'Closed' | 'Secret';
+    joinRequirement: 'Free' | 'ApprovalRequired' | 'TokenGated' | 'InviteOnly';
     level: number;
     knowledgeCount: number;
     genesisMode: 'BLANK' | 'SEEDED' | string | null;

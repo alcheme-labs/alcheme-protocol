@@ -51,13 +51,13 @@ function createPrismaMock(input?: {
                 creator: { pubkey: 'owner-pubkey' },
                 joinRequirement: 'Free',
                 circleType: 'Open',
-                minCrystals: 3,
+                    minCrystals: 0,
             })),
             update: jest.fn(async ({ data }: any) => ({
                 id: 7,
                 joinRequirement: data.joinRequirement ?? 'Free',
                 circleType: data.circleType ?? 'Open',
-                minCrystals: 3,
+                minCrystals: 0,
             })),
         },
         user: {
@@ -95,10 +95,11 @@ describe('membership policy route', () => {
             params: { id: '7' },
             body: {
                 actorPubkey: 'owner-pubkey',
-                signedMessage: 'alcheme-circle-settings:{"v":1,"action":"circle_settings_publish","circleId":7,"actorPubkey":"owner-pubkey","settingKind":"membership_policy","payload":{"joinRequirement":"ApprovalRequired","circleType":"Closed"},"clientTimestamp":"2026-03-27T00:00:00.000Z","nonce":"membership-policy-01"}',
+                signedMessage: 'alcheme-circle-settings:{"v":1,"action":"circle_settings_publish","circleId":7,"actorPubkey":"owner-pubkey","settingKind":"membership_policy","payload":{"joinRequirement":"ApprovalRequired","circleType":"Closed","minCrystals":0},"clientTimestamp":"2026-03-27T00:00:00.000Z","nonce":"membership-policy-01"}',
                 signature: 'base64-signature',
                 joinRequirement: 'ApprovalRequired',
                 circleType: 'Closed',
+                minCrystals: 0,
             },
         } as any, res as any, jest.fn());
 
@@ -122,7 +123,7 @@ describe('membership policy route', () => {
             policy: {
                 joinRequirement: 'ApprovalRequired',
                 circleType: 'Closed',
-                minCrystals: 3,
+                minCrystals: 0,
                 requiresApproval: true,
                 requiresInvite: false,
             },

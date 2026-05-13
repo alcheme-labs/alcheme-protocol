@@ -94,3 +94,47 @@ export async function waitForCircleReadModelVisibility(input: {
 
     return false;
 }
+
+export async function waitForCircleMinCrystalsProjection(input: {
+    circleId: number;
+    expectedMinCrystals: number;
+    baseUrl?: string;
+    fetchImpl?: FetchLike;
+    timeoutMs?: number;
+    pollMs?: number;
+}): Promise<boolean> {
+    const baseUrl = input.baseUrl || getQueryApiBaseUrl();
+    const fetchImpl = input.fetchImpl ?? fetch;
+    const expectedMinCrystals = Math.max(0, Math.floor(Number(input.expectedMinCrystals || 0)));
+    const timeoutMs = Math.max(1, input.timeoutMs ?? DEFAULT_VISIBILITY_TIMEOUT_MS);
+    const pollMs = Math.max(1, input.pollMs ?? DEFAULT_VISIBILITY_POLL_MS);
+    const deadline = Date.now() + timeoutMs;
+
+    while (Date.now() < deadline) {
+        try {
+            const response = await apiFetch(`${baseUrl}/api/v1/circles/${input.circleId}`, {
+                fetchImpl,
+                init: {
+                    method: 'GET',
+                    cache: 'no-store',
+                },
+            });
+            if (response.ok) {
+                const payload = await response.json().catch(() => null);
+                const rawMinCrystals =
+                    payload?.circle?.minCrystals
+                    ?? payload?.data?.circle?.minCrystals
+                    ?? payload?.minCrystals;
+                if (Number(rawMinCrystals) === expectedMinCrystals) {
+                    return true;
+                }
+            }
+        } catch {
+            // Ignore transient projection fetch failures while polling.
+        }
+
+        await sleep(pollMs);
+    }
+
+    return false;
+}

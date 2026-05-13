@@ -3,6 +3,7 @@ import type {
     AuthorAnnotationKind,
     SemanticFacet,
 } from '@/features/discussion-intake/labels/structuredMetadata';
+import type { CircleAccessRequirement } from '@/lib/circle/accessPolicy';
 
 /* ══════════════════════════════════════════
    Sub-Circle (层级) Data Model
@@ -13,7 +14,7 @@ export interface SubCircle {
     name: string;
     level: number;
     isDefault: boolean;
-    accessRequirement: { type: 'free' } | { type: 'crystal'; minCrystals: number };
+    accessRequirement: CircleAccessRequirement;
     memberCount: number;
     crystalCount: number;
     // ── P3: Auxiliary circle fields ──
