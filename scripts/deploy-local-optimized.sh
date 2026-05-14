@@ -113,7 +113,7 @@ echo -e "${GREEN}✓ 构建完成${NC}"
 
 # 显示程序大小
 echo -e "\n${YELLOW}程序大小:${NC}"
-for program in identity_registry content_manager access_controller event_emitter registry_factory messaging_manager circle_manager; do
+for program in identity_registry content_manager access_controller event_emitter registry_factory messaging_manager circle_manager external_app_registry; do
   if [ -f "target/deploy/${program}.so" ]; then
     SIZE=$(ls -lh target/deploy/${program}.so | awk '{print $5}')
     echo -e "  ${program}: ${SIZE}"
@@ -139,6 +139,7 @@ programs=(
   "registry_factory"     # ~517KB - 注册表工厂
   "messaging_manager"    # ~327KB - 即时通讯
   "circle_manager"       # ~342KB - 圈层管理
+  "external_app_registry" # 外部应用注册审计根
 )
 
 deployed_count=0
@@ -235,7 +236,8 @@ cat > sdk/localnet-config.json << EOF
     "event": "$(solana address -k target/deploy/event_emitter-keypair.json)",
     "factory": "$(solana address -k target/deploy/registry_factory-keypair.json)",
     "messaging": "$(solana address -k target/deploy/messaging_manager-keypair.json)",
-    "circles": "$(solana address -k target/deploy/circle_manager-keypair.json)"
+    "circles": "$(solana address -k target/deploy/circle_manager-keypair.json)",
+    "externalAppRegistry": "$(solana address -k target/deploy/external_app_registry-keypair.json)"
   }
 }
 EOF

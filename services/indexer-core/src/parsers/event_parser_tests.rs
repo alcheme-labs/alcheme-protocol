@@ -4,7 +4,8 @@ mod tests {
         build_get_account_info_params,
         content_post_snapshot_target_for_event, project_circle_membership_event,
         project_content_anchor_v2_event, decode_user_identity_account_snapshot,
-        project_identity_registration,
+        project_external_app_receipt_v2_event, project_external_app_registered_v2_event,
+        project_identity_registration, EventProjectionContext,
     };
     use crate::database::db_writer::ProjectedUserProfile;
     use alcheme_shared::content::ContentAnchorRelation;
@@ -123,6 +124,85 @@ mod tests {
         assert_eq!(projection.v2_status, "Published");
         assert!(!projection.is_v2_private);
         assert!(!projection.is_v2_draft);
+    }
+
+    #[test]
+    fn test_external_app_registered_v2_projection_keeps_hashes_and_tx_evidence() {
+        let program_id = Pubkey::new_unique();
+        let owner = Pubkey::new_unique();
+        let context = EventProjectionContext {
+            slot: Some(321),
+            signature: Some("registration_signature".to_string()),
+        };
+
+        let projection = project_external_app_registered_v2_event(
+            Some(program_id),
+            [1_u8; 32],
+            owner,
+            [2_u8; 32],
+            [3_u8; 32],
+            [4_u8; 32],
+            [5_u8; 32],
+            9,
+            [6_u8; 32],
+            [7_u8; 32],
+            [8_u8; 32],
+            &context,
+        );
+
+        assert_eq!(projection.external_app_id, "01".repeat(32));
+        assert_eq!(projection.app_id_hash, "01".repeat(32));
+        assert_ne!(projection.record_pda, projection.app_id_hash);
+        assert_eq!(projection.owner_pubkey, owner.to_string());
+        assert_eq!(projection.manifest_hash, "02".repeat(32));
+        assert_eq!(projection.server_key_hash, "03".repeat(32));
+        assert_eq!(projection.owner_assertion_hash.as_deref(), Some("04".repeat(32).as_str()));
+        assert_eq!(projection.policy_state_digest.as_deref(), Some("05".repeat(32).as_str()));
+        assert_eq!(projection.review_circle_id, Some(9));
+        assert_eq!(projection.review_policy_digest.as_deref(), Some("06".repeat(32).as_str()));
+        assert_eq!(projection.decision_digest.as_deref(), Some("07".repeat(32).as_str()));
+        assert_eq!(projection.execution_intent_digest.as_deref(), Some("08".repeat(32).as_str()));
+        assert_eq!(projection.execution_receipt_digest, None);
+        assert_eq!(projection.registry_status, "active");
+        assert_eq!(projection.tx_signature.as_deref(), Some("registration_signature"));
+        assert_eq!(projection.tx_slot, Some(321));
+        assert_eq!(projection.receipt_tx_signature, None);
+        assert_eq!(projection.receipt_tx_slot, None);
+        assert_eq!(projection.finality_status, "confirmed");
+        assert_eq!(projection.receipt_finality_status, "pending");
+    }
+
+    #[test]
+    fn test_external_app_receipt_v2_projection_only_fills_receipt_evidence() {
+        let context = EventProjectionContext {
+            slot: Some(654),
+            signature: Some("receipt_signature".to_string()),
+        };
+
+        let projection = project_external_app_receipt_v2_event(
+            None,
+            [10_u8; 32],
+            [11_u8; 32],
+            [12_u8; 32],
+            [13_u8; 32],
+            &context,
+        );
+
+        assert_eq!(projection.external_app_id, "0a".repeat(32));
+        assert_eq!(projection.app_id_hash, "0a".repeat(32));
+        assert_eq!(projection.record_pda, projection.app_id_hash);
+        assert_eq!(projection.owner_pubkey, "");
+        assert_eq!(projection.manifest_hash, "");
+        assert_eq!(projection.server_key_hash, "");
+        assert_eq!(projection.decision_digest.as_deref(), Some("0b".repeat(32).as_str()));
+        assert_eq!(projection.execution_intent_digest.as_deref(), Some("0c".repeat(32).as_str()));
+        assert_eq!(projection.execution_receipt_digest.as_deref(), Some("0d".repeat(32).as_str()));
+        assert_eq!(projection.tx_signature, None);
+        assert_eq!(projection.tx_slot, None);
+        assert_eq!(projection.receipt_tx_signature.as_deref(), Some("receipt_signature"));
+        assert_eq!(projection.receipt_tx_slot, Some(654));
+        assert_eq!(projection.finality_status, "pending");
+        assert_eq!(projection.receipt_finality_status, "confirmed");
     }
 
     #[test]

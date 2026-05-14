@@ -9,6 +9,7 @@ const REGISTRY_FACTORY_ID: Pubkey = solana_program::pubkey!("AYrzTqFdxpiH3VhCBzL
 const IDENTITY_REGISTRY_ID: Pubkey = solana_program::pubkey!("75fXAp66PU3sgUcQCGJxdA4MKhFcyXXoGW8rhVk8zm4x");
 const MESSAGING_MANAGER_ID: Pubkey = solana_program::pubkey!("4MZjksSnfSNa25ttV4smquKE6ggAmpZKjK74eDQLdoLx");
 const CIRCLE_MANAGER_ID: Pubkey = solana_program::pubkey!("GZswb1rGbZfoiapkvatDuMZrptVAX2p1pEVDSrMuyLqQ");
+const EXTERNAL_APP_REGISTRY_ID: Pubkey = solana_program::pubkey!("FT4n9xkfEafYP2MSmqwur3xCeu361Vzrfpz8XNmaAG7J");
 
 // CPI 接口 — 支持核心程序互信 + 链上扩展注册
 
@@ -258,6 +259,13 @@ fn get_core_programs() -> Vec<AuthorizedCaller> {
         },
         AuthorizedCaller {
             program_id: CIRCLE_MANAGER_ID,
+            permissions: vec![
+                CpiPermission::EventEmit,
+            ],
+            enabled: true,
+        },
+        AuthorizedCaller {
+            program_id: EXTERNAL_APP_REGISTRY_ID,
             permissions: vec![
                 CpiPermission::EventEmit,
             ],
@@ -761,5 +769,22 @@ impl<T> CpiResult<T> {
             data: None,
             error_message: Some(message),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const EXTERNAL_APP_REGISTRY_TEST_ID: Pubkey =
+        solana_program::pubkey!("FT4n9xkfEafYP2MSmqwur3xCeu361Vzrfpz8XNmaAG7J");
+
+    #[test]
+    fn external_app_registry_can_emit_events_as_core_program() {
+        let authorized =
+            is_authorized_for_cpi(&EXTERNAL_APP_REGISTRY_TEST_ID, CpiPermission::EventEmit)
+                .expect("CPI authorization check should not error");
+
+        assert!(authorized);
     }
 }

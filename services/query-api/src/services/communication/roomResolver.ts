@@ -2,6 +2,12 @@ import bs58 from "bs58";
 import nacl from "tweetnacl";
 
 import { normalizeVoiceSpeakerPolicy } from "../../config/voice";
+import {
+  externalAppRegistryModeFromEnv,
+  isExternalAppChainTrusted,
+  type ExternalAppRegistryAnchorProjection,
+} from "../externalApps/chainRegistryProjection";
+import type { ExternalAppRegistryMode } from "../externalApps/chainRegistryAdapter";
 import { withRoomCapabilitiesMetadata } from "./capabilities";
 import { communicationError } from "./errors";
 import { buildCommunicationRoomKey, normalizeRoomType } from "./roomScope";
@@ -46,11 +52,13 @@ export interface ResolveCommunicationRoomInput {
 
 export interface ResolveCommunicationRoomOptions {
   now?: Date;
+  externalAppRegistryMode?: ExternalAppRegistryMode;
 }
 
 export interface ExternalAppRecord {
   id: string;
   status: string;
+  environment?: string | null;
   registryStatus?: string | null;
   serverPublicKey?: string | null;
   claimAuthMode?: string | null;
@@ -62,6 +70,9 @@ interface CommunicationRoomPrisma {
   };
   externalApp: {
     findUnique(input: unknown): Promise<ExternalAppRecord | null>;
+  };
+  externalAppRegistryAnchor?: {
+    findUnique(input: unknown): Promise<ExternalAppRegistryAnchorProjection | null>;
   };
   communicationRoom: {
     upsert(input: unknown): Promise<any>;
@@ -111,7 +122,9 @@ export async function resolveCommunicationRoom(
   }
 
   const externalApp = input.externalAppId
-    ? await loadActiveExternalApp(prisma, input.externalAppId)
+    ? await loadActiveExternalApp(prisma, input.externalAppId, {
+        mode: options.externalAppRegistryMode ?? externalAppRegistryModeFromEnv(),
+      })
     : null;
 
   const verifiedClaim = externalApp
@@ -230,12 +243,14 @@ async function assertParentCircleExists(
 async function loadActiveExternalApp(
   prisma: CommunicationRoomPrisma,
   externalAppId: string,
+  options: { mode: ExternalAppRegistryMode },
 ): Promise<ExternalAppRecord> {
   const externalApp = await prisma.externalApp.findUnique({
     where: { id: externalAppId },
     select: {
         id: true,
         status: true,
+        environment: true,
         registryStatus: true,
         serverPublicKey: true,
         claimAuthMode: true,
@@ -249,6 +264,33 @@ async function loadActiveExternalApp(
   }
   if (externalApp.registryStatus && externalApp.registryStatus !== "active") {
     throw communicationError(403, "external_app_not_approved", "External app is not approved");
+  }
+  const anchor =
+    options.mode === "required" && externalApp.environment === "mainnet_production"
+      ? await prisma.externalAppRegistryAnchor?.findUnique({
+          where: { externalAppId: externalApp.id },
+          select: {
+            registryStatus: true,
+            finalityStatus: true,
+            receiptFinalityStatus: true,
+          },
+        })
+      : null;
+  if (
+    !isExternalAppChainTrusted({
+      app: {
+        environment: externalApp.environment,
+        registryStatus: externalApp.registryStatus,
+      },
+      anchor,
+      mode: options.mode,
+    })
+  ) {
+    throw communicationError(
+      403,
+      "external_app_registry_anchor_required",
+      "External app registry anchor is not confirmed",
+    );
   }
   return externalApp;
 }

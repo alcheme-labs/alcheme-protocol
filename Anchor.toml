@@ -15,6 +15,7 @@ event_emitter = "uhPvVgDANHaUzUq2rYEVXJ9vGEBjWjNZ1E6gQJqdBUC"
 identity_registry = "75fXAp66PU3sgUcQCGJxdA4MKhFcyXXoGW8rhVk8zm4x"
 messaging_manager = "4MZjksSnfSNa25ttV4smquKE6ggAmpZKjK74eDQLdoLx"
 registry_factory = "AYrzTqFdxpiH3VhCBzLsJQtzFqjoSRKYUvk29d797AQC"
+external_app_registry = "FT4n9xkfEafYP2MSmqwur3xCeu361Vzrfpz8XNmaAG7J"
 
 [registry]
 url = "https://api.apr.dev"
@@ -24,7 +25,7 @@ cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [workspace]
-members = ["programs/identity-registry", "programs/content-manager", "programs/access-controller", "programs/event-emitter", "programs/registry-factory", "programs/messaging-manager", "programs/circle-manager", "extensions/contribution-engine/program"]
+members = ["programs/identity-registry", "programs/content-manager", "programs/access-controller", "programs/event-emitter", "programs/registry-factory", "programs/messaging-manager", "programs/circle-manager", "programs/external-app-registry", "extensions/contribution-engine/program"]
 
 [scripts]
 test = "TS_NODE_PREFER_TS_EXTS=1 yarn run ts-mocha -r tsconfig-paths/register -p ./tsconfig.json -t 1000000 tests/**/*.ts extensions/**/tests/*.ts"

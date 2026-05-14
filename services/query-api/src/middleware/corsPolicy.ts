@@ -1,14 +1,31 @@
 import type { RequestHandler } from "express";
+import {
+  externalAppRegistryModeFromEnv,
+  isExternalAppChainTrusted,
+  type ExternalAppRegistryAnchorProjection,
+} from "../services/externalApps/chainRegistryProjection";
+import type { ExternalAppRegistryMode } from "../services/externalApps/chainRegistryAdapter";
 
 export interface CorsPolicyOptions {
   firstPartyOrigins: string[];
   devExternalOrigins: string[];
   cacheTtlMs: number;
+  externalAppRegistryMode?: ExternalAppRegistryMode;
 }
 
 interface CorsPolicyPrisma {
   externalApp: {
-    findMany(input: unknown): Promise<Array<{ allowedOrigins: unknown }>>;
+    findMany(input: unknown): Promise<Array<{
+      id: string;
+      allowedOrigins: unknown;
+      environment?: string | null;
+      registryStatus?: string | null;
+    }>>;
+  };
+  externalAppRegistryAnchor?: {
+    findMany(input: unknown): Promise<Array<{
+      externalAppId: string;
+    } & ExternalAppRegistryAnchorProjection>>;
   };
 }
 
@@ -32,14 +49,34 @@ export function createCorsPolicy(
     }
     const rows = await prisma.externalApp.findMany({
       where: { status: "active", registryStatus: "active" },
-      select: { allowedOrigins: true },
+      select: {
+        id: true,
+        allowedOrigins: true,
+        environment: true,
+        registryStatus: true,
+      },
     });
+    const registryMode =
+      options.externalAppRegistryMode ?? externalAppRegistryModeFromEnv();
+    const anchors = await loadAnchorMap(prisma, rows, registryMode);
     cachedExternalOrigins = new Set(
-      rows.flatMap((row) =>
-        Array.isArray(row.allowedOrigins)
+      rows.flatMap((row) => {
+        if (
+          !isExternalAppChainTrusted({
+            app: {
+              environment: row.environment,
+              registryStatus: row.registryStatus,
+            },
+            anchor: anchors.get(row.id),
+            mode: registryMode,
+          })
+        ) {
+          return [];
+        }
+        return Array.isArray(row.allowedOrigins)
           ? row.allowedOrigins.map((origin) => String(origin))
-          : [],
-      ),
+          : [];
+      }),
     );
     cachedAt = now;
     return cachedExternalOrigins;
@@ -88,6 +125,32 @@ export function createCorsPolicy(
       cachedAt = 0;
     },
   };
+}
+
+async function loadAnchorMap(
+  prisma: CorsPolicyPrisma,
+  rows: Array<{ id: string; environment?: string | null }>,
+  mode: ExternalAppRegistryMode,
+): Promise<Map<string, ExternalAppRegistryAnchorProjection>> {
+  if (mode !== "required" || !prisma.externalAppRegistryAnchor) {
+    return new Map();
+  }
+  const productionIds = rows
+    .filter((row) => row.environment === "mainnet_production")
+    .map((row) => row.id);
+  if (productionIds.length === 0) {
+    return new Map();
+  }
+  const anchors = await prisma.externalAppRegistryAnchor.findMany({
+    where: { externalAppId: { in: productionIds } },
+    select: {
+      externalAppId: true,
+      registryStatus: true,
+      finalityStatus: true,
+      receiptFinalityStatus: true,
+    },
+  });
+  return new Map(anchors.map((anchor) => [anchor.externalAppId, anchor]));
 }
 
 export function parseOriginList(value: string | undefined): string[] {

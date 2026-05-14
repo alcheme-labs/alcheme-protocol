@@ -23,6 +23,7 @@ describe("external app validation", () => {
   it("normalizes status and policy fields", () => {
     expect(normalizeExternalAppRegistryStatus("pending")).toBe("pending");
     expect(normalizeExternalAppRegistryStatus("active")).toBe("active");
+    expect(normalizeExternalAppRegistryStatus("suspended")).toBe("suspended");
     expect(normalizeExternalAppDiscoveryStatus("listed")).toBe("listed");
     expect(normalizeManagedNodePolicy("restricted")).toBe("restricted");
   });

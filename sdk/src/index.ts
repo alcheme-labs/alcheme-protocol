@@ -8,6 +8,7 @@ export * from "./modules/factory";
 export * from "./modules/messaging";
 export * from "./modules/circles";
 export * from "./modules/contribution-engine";
+export * from "./modules/external-app-registry";
 export * from "./runtime/communication";
 export * from "./runtime/voice";
 export * from "./runtime/server";

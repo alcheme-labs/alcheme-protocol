@@ -1,0 +1,24 @@
+[package]
+name = "external-app-registry"
+version = "0.1.0"
+license = "Apache-2.0"
+description = "External App Registry Program for Alcheme Protocol"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "external_app_registry"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+idl-build = ["anchor-lang/idl-build"]
+
+[dependencies]
+anchor-lang = { version = "0.31.1", features = ["init-if-needed"] }
+solana-program = "^2.0"
+alcheme-shared = { path = "../../shared" }
+alcheme-cpi = { path = "../../cpi-interfaces" }

@@ -24,6 +24,7 @@ const externalOrigin =
   process.env.ALCHEME_EXTERNAL_ORIGIN ?? "http://127.0.0.1:5173";
 const appId = process.env.ALCHEME_EXTERNAL_APP_ID ?? "smoke-web3-game";
 const adminToken = process.env.EXTERNAL_APP_ADMIN_TOKEN ?? "local-external-app-admin";
+const externalAppRegistryMode = process.env.EXTERNAL_APP_REGISTRY_MODE ?? "disabled";
 const requireVoice = process.env.ALCHEME_SMOKE_REQUIRE_VOICE === "true";
 const skipRegistration =
   process.env.ALCHEME_SKIP_EXTERNAL_APP_REGISTRATION === "true";
@@ -112,6 +113,7 @@ async function main() {
       {
         ok: true,
         appId,
+        externalAppRegistryMode,
         roomKey: joined.room.roomKey,
         memberWallet: joined.member.walletPubkey,
         messageId: messageRef,

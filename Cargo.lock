@@ -1616,6 +1616,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "external-app-registry"
+version = "0.1.0"
+dependencies = [
+ "alcheme-cpi",
+ "alcheme-shared",
+ "anchor-lang",
+ "solana-program",
+]
+
+[[package]]
 name = "fastbloom"
 version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

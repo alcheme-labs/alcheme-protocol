@@ -31,6 +31,36 @@ pub(crate) struct ProjectedCircleMembership {
     pub changed_at: i64,
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct EventProjectionContext {
+    pub slot: Option<u64>,
+    pub signature: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct ProjectedExternalAppRegistryAnchor {
+    pub external_app_id: String,
+    pub app_id_hash: String,
+    pub record_pda: String,
+    pub owner_pubkey: String,
+    pub server_key_hash: String,
+    pub manifest_hash: String,
+    pub owner_assertion_hash: Option<String>,
+    pub policy_state_digest: Option<String>,
+    pub review_circle_id: Option<i32>,
+    pub review_policy_digest: Option<String>,
+    pub decision_digest: Option<String>,
+    pub execution_intent_digest: Option<String>,
+    pub execution_receipt_digest: Option<String>,
+    pub registry_status: String,
+    pub tx_signature: Option<String>,
+    pub tx_slot: Option<i64>,
+    pub receipt_tx_signature: Option<String>,
+    pub receipt_tx_slot: Option<i64>,
+    pub finality_status: String,
+    pub receipt_finality_status: String,
+}
+
 /// 事件解析器 - 负责解析和路由 ProtocolEvent
 pub struct EventParser {
     db_pool: PgPool,
@@ -38,6 +68,7 @@ pub struct EventParser {
     extension_parser_registry: ExtensionParserRegistry,
     event_emitter_program_id: String,
     circle_manager_program_id: Option<Pubkey>,
+    external_app_registry_program_id: Option<Pubkey>,
     rpc_client: RpcAccountClient,
 }
 
@@ -47,6 +78,7 @@ impl EventParser {
         redis: Option<redis::aio::MultiplexedConnection>,
         event_emitter_program_id: String,
         circle_manager_program_id: Option<String>,
+        external_app_registry_program_id: Option<String>,
         solana_rpc_url: String,
     ) -> Self {
         let extension_parser_registry = ExtensionParserRegistry::default();
@@ -71,6 +103,23 @@ impl EventParser {
                 }
             }
         });
+        let parsed_external_app_registry_program_id =
+            external_app_registry_program_id.and_then(|raw| {
+                let candidate = raw.trim();
+                if candidate.is_empty() {
+                    return None;
+                }
+                match candidate.parse::<Pubkey>() {
+                    Ok(pubkey) => Some(pubkey),
+                    Err(error) => {
+                        warn!(
+                            "Invalid EXTERNAL_APP_REGISTRY_PROGRAM_ID ({}): {}",
+                            candidate, error
+                        );
+                        None
+                    }
+                }
+            });
 
         Self {
             db_writer: DbWriter::new(db_pool.clone(), redis),
@@ -78,6 +127,7 @@ impl EventParser {
             extension_parser_registry,
             event_emitter_program_id,
             circle_manager_program_id: parsed_circle_manager_program_id,
+            external_app_registry_program_id: parsed_external_app_registry_program_id,
             rpc_client: RpcAccountClient::new(solana_rpc_url, 4_000),
         }
     }
@@ -222,8 +272,9 @@ impl EventParser {
     pub async fn route_event(
         &self,
         event: ProtocolEvent,
-        min_context_slot: Option<u64>,
+        projection_context: &EventProjectionContext,
     ) -> anyhow::Result<()> {
+        let min_context_slot = projection_context.slot;
         match event {
             // ========== 身份相关事件 ==========
             ProtocolEvent::IdentityRegistered {
@@ -929,6 +980,137 @@ impl EventParser {
                 // 可以选择记录注册表部署事件
             }
 
+            ProtocolEvent::ExternalAppRegisteredV2 {
+                app_id_hash,
+                owner,
+                manifest_hash,
+                server_key_hash,
+                owner_assertion_hash,
+                policy_state_digest,
+                review_circle_id,
+                review_policy_digest,
+                decision_digest,
+                execution_intent_digest,
+                ..
+            } => {
+                let projection = project_external_app_registered_v2_event(
+                    self.external_app_registry_program_id,
+                    app_id_hash,
+                    owner,
+                    manifest_hash,
+                    server_key_hash,
+                    owner_assertion_hash,
+                    policy_state_digest,
+                    review_circle_id,
+                    review_policy_digest,
+                    decision_digest,
+                    execution_intent_digest,
+                    projection_context,
+                );
+                info!(
+                    "🧾 ExternalApp registered v2: app_id_hash={}",
+                    projection.app_id_hash
+                );
+                self.db_writer
+                    .upsert_external_app_registry_anchor(&projection)
+                    .await?;
+            }
+
+            ProtocolEvent::ExternalAppExecutionReceiptAnchoredV2 {
+                app_id_hash,
+                decision_digest,
+                execution_intent_digest,
+                execution_receipt_digest,
+                ..
+            } => {
+                let projection = project_external_app_receipt_v2_event(
+                    self.external_app_registry_program_id,
+                    app_id_hash,
+                    decision_digest,
+                    execution_intent_digest,
+                    execution_receipt_digest,
+                    projection_context,
+                );
+                info!(
+                    "🧾 ExternalApp execution receipt anchored v2: app_id_hash={}",
+                    projection.app_id_hash
+                );
+                self.db_writer
+                    .upsert_external_app_registry_anchor(&projection)
+                    .await?;
+            }
+
+            ProtocolEvent::ExternalAppManifestUpdatedV2 {
+                app_id_hash,
+                manifest_hash,
+                policy_state_digest,
+                decision_digest,
+                execution_intent_digest,
+                ..
+            } => {
+                self.db_writer
+                    .update_external_app_registry_manifest(
+                        &hex::encode(app_id_hash),
+                        &hex::encode(manifest_hash),
+                        &hex::encode(policy_state_digest),
+                        &hex::encode(decision_digest),
+                        &hex::encode(execution_intent_digest),
+                        projection_context.signature.as_deref(),
+                        projection_context.slot.map(|slot| slot as i64),
+                    )
+                    .await?;
+            }
+
+            ProtocolEvent::ExternalAppServerKeyRotatedV2 {
+                app_id_hash,
+                server_key_hash,
+                decision_digest,
+                execution_intent_digest,
+                ..
+            } => {
+                self.db_writer
+                    .update_external_app_registry_server_key(
+                        &hex::encode(app_id_hash),
+                        &hex::encode(server_key_hash),
+                        &hex::encode(decision_digest),
+                        &hex::encode(execution_intent_digest),
+                        projection_context.signature.as_deref(),
+                        projection_context.slot.map(|slot| slot as i64),
+                    )
+                    .await?;
+            }
+
+            ProtocolEvent::ExternalAppRegistryStatusChangedV2 {
+                app_id_hash,
+                status,
+                decision_digest,
+                execution_intent_digest,
+                ..
+            } => {
+                self.db_writer
+                    .update_external_app_registry_status(
+                        &hex::encode(app_id_hash),
+                        external_app_registry_status_label(status),
+                        &hex::encode(decision_digest),
+                        &hex::encode(execution_intent_digest),
+                        projection_context.signature.as_deref(),
+                        projection_context.slot.map(|slot| slot as i64),
+                    )
+                    .await?;
+            }
+
+            ProtocolEvent::ExternalAppRegistryAuthorityChangedV2 {
+                admin,
+                old_governance_authority,
+                new_governance_authority,
+                ..
+            } => {
+                info!(
+                    "🧾 ExternalApp registry authority changed by {}: {} -> {}",
+                    admin, old_governance_authority, new_governance_authority
+                );
+            }
+
             ProtocolEvent::EmergencyAction {
                 action_type,
                 triggered_by,
@@ -1026,14 +1208,14 @@ impl EventParser {
     pub async fn process_events(
         &self,
         events: Vec<ProtocolEvent>,
-        min_context_slot: Option<u64>,
+        projection_context: EventProjectionContext,
     ) -> anyhow::Result<()> {
         let mut processed = 0;
         let mut failed = 0;
         let mut first_error: Option<String> = None;
 
         for event in events {
-            match self.route_event(event, min_context_slot).await {
+            match self.route_event(event, &projection_context).await {
                 Ok(_) => processed += 1,
                 Err(e) => {
                     error!("Failed to process event: {:?}", e);
@@ -1230,6 +1412,108 @@ pub(crate) fn project_circle_membership_event(
         status,
         on_chain_address: derive_circle_member_on_chain_address(circle_manager_program_id, circle_id, member),
         changed_at,
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn project_external_app_registered_v2_event(
+    external_app_registry_program_id: Option<Pubkey>,
+    app_id_hash: [u8; 32],
+    owner: Pubkey,
+    manifest_hash: [u8; 32],
+    server_key_hash: [u8; 32],
+    owner_assertion_hash: [u8; 32],
+    policy_state_digest: [u8; 32],
+    review_circle_id: u32,
+    review_policy_digest: [u8; 32],
+    decision_digest: [u8; 32],
+    execution_intent_digest: [u8; 32],
+    context: &EventProjectionContext,
+) -> ProjectedExternalAppRegistryAnchor {
+    let app_id_hash_hex = hex::encode(app_id_hash);
+    ProjectedExternalAppRegistryAnchor {
+        external_app_id: app_id_hash_hex.clone(),
+        app_id_hash: app_id_hash_hex.clone(),
+        record_pda: derive_external_app_record_pda(
+            external_app_registry_program_id,
+            &app_id_hash,
+        )
+        .unwrap_or_else(|| app_id_hash_hex.clone()),
+        owner_pubkey: owner.to_string(),
+        server_key_hash: hex::encode(server_key_hash),
+        manifest_hash: hex::encode(manifest_hash),
+        owner_assertion_hash: Some(hex::encode(owner_assertion_hash)),
+        policy_state_digest: Some(hex::encode(policy_state_digest)),
+        review_circle_id: Some(review_circle_id as i32),
+        review_policy_digest: Some(hex::encode(review_policy_digest)),
+        decision_digest: Some(hex::encode(decision_digest)),
+        execution_intent_digest: Some(hex::encode(execution_intent_digest)),
+        execution_receipt_digest: None,
+        registry_status: "active".to_string(),
+        tx_signature: context.signature.clone(),
+        tx_slot: context.slot.map(|slot| slot as i64),
+        receipt_tx_signature: None,
+        receipt_tx_slot: None,
+        finality_status: "confirmed".to_string(),
+        receipt_finality_status: "pending".to_string(),
+    }
+}
+
+pub(crate) fn project_external_app_receipt_v2_event(
+    external_app_registry_program_id: Option<Pubkey>,
+    app_id_hash: [u8; 32],
+    decision_digest: [u8; 32],
+    execution_intent_digest: [u8; 32],
+    execution_receipt_digest: [u8; 32],
+    context: &EventProjectionContext,
+) -> ProjectedExternalAppRegistryAnchor {
+    let app_id_hash_hex = hex::encode(app_id_hash);
+    ProjectedExternalAppRegistryAnchor {
+        external_app_id: app_id_hash_hex.clone(),
+        app_id_hash: app_id_hash_hex.clone(),
+        record_pda: derive_external_app_record_pda(
+            external_app_registry_program_id,
+            &app_id_hash,
+        )
+        .unwrap_or_else(|| app_id_hash_hex.clone()),
+        owner_pubkey: String::new(),
+        server_key_hash: String::new(),
+        manifest_hash: String::new(),
+        owner_assertion_hash: None,
+        policy_state_digest: None,
+        review_circle_id: None,
+        review_policy_digest: None,
+        decision_digest: Some(hex::encode(decision_digest)),
+        execution_intent_digest: Some(hex::encode(execution_intent_digest)),
+        execution_receipt_digest: Some(hex::encode(execution_receipt_digest)),
+        registry_status: "active".to_string(),
+        tx_signature: None,
+        tx_slot: None,
+        receipt_tx_signature: context.signature.clone(),
+        receipt_tx_slot: context.slot.map(|slot| slot as i64),
+        finality_status: "pending".to_string(),
+        receipt_finality_status: "confirmed".to_string(),
+    }
+}
+
+fn derive_external_app_record_pda(
+    external_app_registry_program_id: Option<Pubkey>,
+    app_id_hash: &[u8; 32],
+) -> Option<String> {
+    let program_id = external_app_registry_program_id?;
+    let seeds: [&[u8]; 2] = [b"external_app", app_id_hash.as_ref()];
+    let (record_pda, _) = Pubkey::find_program_address(&seeds, &program_id);
+    Some(record_pda.to_string())
+}
+
+fn external_app_registry_status_label(
+    status: alcheme_shared::ExternalAppRegistryStatus,
+) -> &'static str {
+    match status {
+        alcheme_shared::ExternalAppRegistryStatus::Pending => "pending",
+        alcheme_shared::ExternalAppRegistryStatus::Active => "active",
+        alcheme_shared::ExternalAppRegistryStatus::Suspended => "suspended",
+        alcheme_shared::ExternalAppRegistryStatus::Revoked => "revoked",
     }
 }
 

@@ -24,12 +24,18 @@ async function run(policy: ReturnType<typeof createCorsPolicy>, origin: string) 
   const res = responseMock();
   const next = jest.fn();
   await policy.corsMiddleware(req, res, next);
+  await new Promise((resolve) => setTimeout(resolve, 0));
   return { res, next };
 }
 
 describe("cors policy", () => {
   it("allows first-party and active external origins", async () => {
-    const findMany = jest.fn(async () => [{ allowedOrigins: ["http://127.0.0.1:4173"] }]);
+    const findMany = jest.fn(async () => [{
+      id: "demo-game",
+      environment: "sandbox",
+      registryStatus: "active",
+      allowedOrigins: ["http://127.0.0.1:4173"],
+    }]);
     const policy = createCorsPolicy(
       {
         externalApp: {
@@ -46,8 +52,79 @@ describe("cors policy", () => {
     expect(external.next).toHaveBeenCalled();
     expect(findMany).toHaveBeenCalledWith({
       where: { status: "active", registryStatus: "active" },
-      select: { allowedOrigins: true },
+      select: {
+        id: true,
+        allowedOrigins: true,
+        environment: true,
+        registryStatus: true,
+      },
     });
+  });
+
+  it("requires confirmed chain anchor for production external origins in required mode", async () => {
+    const policy = createCorsPolicy(
+      {
+        externalApp: {
+          findMany: jest.fn(async () => [{
+            id: "prod-game",
+            environment: "mainnet_production",
+            registryStatus: "active",
+            allowedOrigins: ["https://game.example.com"],
+          }]),
+        },
+        externalAppRegistryAnchor: {
+          findMany: jest.fn(async () => [{
+            externalAppId: "prod-game",
+            registryStatus: "active",
+            finalityStatus: "confirmed",
+            receiptFinalityStatus: "confirmed",
+          }]),
+        },
+      },
+      {
+        firstPartyOrigins: [],
+        devExternalOrigins: [],
+        cacheTtlMs: 0,
+        externalAppRegistryMode: "required",
+      },
+    );
+
+    const result = await run(policy, "https://game.example.com");
+
+    expect(result.next).toHaveBeenCalled();
+  });
+
+  it("rejects production external origins without receipt finality in required mode", async () => {
+    const policy = createCorsPolicy(
+      {
+        externalApp: {
+          findMany: jest.fn(async () => [{
+            id: "prod-game",
+            environment: "mainnet_production",
+            registryStatus: "active",
+            allowedOrigins: ["https://game.example.com"],
+          }]),
+        },
+        externalAppRegistryAnchor: {
+          findMany: jest.fn(async () => [{
+            externalAppId: "prod-game",
+            registryStatus: "active",
+            finalityStatus: "submitted",
+            receiptFinalityStatus: "pending",
+          }]),
+        },
+      },
+      {
+        firstPartyOrigins: [],
+        devExternalOrigins: [],
+        cacheTtlMs: 0,
+        externalAppRegistryMode: "required",
+      },
+    );
+
+    const result = await run(policy, "https://game.example.com");
+
+    expect(result.res.status).toHaveBeenCalledWith(403);
   });
 
   it("rejects unknown origins with a stable 403", async () => {

@@ -8,6 +8,7 @@ export type ExternalAppRegistryStatus =
   | "pending"
   | "active"
   | "disputed"
+  | "suspended"
   | "revoked";
 
 export type ExternalAppDiscoveryStatus =

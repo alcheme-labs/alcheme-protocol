@@ -10,6 +10,7 @@ pub mod events;
 pub mod access;
 pub mod content;
 pub mod factory;
+pub mod external_app;
 
 // Shared library needs declare_id for #[account] macro
 // but we hide ID from re-exports to avoid conflicts
@@ -32,6 +33,7 @@ pub use events::*;
 pub use access::*;
 pub use content::*;
 pub use factory::*;
+pub use external_app::*;
 
 // Core program IDs
 pub const IDENTITY_REGISTRY_ID: Pubkey = pubkey!("2222222222222222222222222222222222222222222a");

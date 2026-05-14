@@ -10,7 +10,9 @@ use crate::database::checkpoint::{CheckpointManager, ProgramCursor};
 use crate::database::RuntimeStateStore;
 use crate::listeners::local_logs_subscriber::{LiveLogCandidate, LocalLogsSubscriber};
 use crate::listeners::local_rpc_listener::{RpcJsonClient, RpcTransactionResult};
-use crate::parsers::event_parser::{content_post_snapshot_target_for_event, EventParser};
+use crate::parsers::event_parser::{
+    content_post_snapshot_target_for_event, EventParser, EventProjectionContext,
+};
 
 pub const PROGRAM_CURSOR_LISTENER_MODE: &str = "program_cursor";
 
@@ -341,7 +343,13 @@ impl LocalProgramListener {
                 slot
             );
             self.event_parser
-                .process_events(events.clone(), Some(slot))
+                .process_events(
+                    events.clone(),
+                    EventProjectionContext {
+                        slot: Some(slot),
+                        signature: Some(signature.to_string()),
+                    },
+                )
                 .await?;
             self.reconcile_tx_scoped_addresses(&events, &transaction).await?;
         }

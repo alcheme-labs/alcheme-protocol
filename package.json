@@ -24,6 +24,7 @@
     "test:cost:crystal-asset-issuance": "TS_NODE_PREFER_TS_EXTS=1 mocha -r ts-node/register -r tsconfig-paths/register tests/cost/crystal-asset-issuance-cost.test.ts --timeout 300000",
     "test:all": "npm run test:unit && npm run test:integration",
     "smoke:external-game-local": "node scripts/smoke/external-game-local-smoke.mjs",
+    "smoke:external-app-registry-v2": "node scripts/smoke/external-app-registry-v2-smoke.mjs",
     "measure:create-content-v2-cost": "ts-node scripts/measure/create-content-v2-cost.ts",
     "measure:create-reply-v2-cost": "ts-node scripts/measure/create-reply-v2-cost.ts",
     "measure:create-repost-v2-cost": "ts-node scripts/measure/create-repost-v2-cost.ts",

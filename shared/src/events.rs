@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::types::*;
 use crate::content::ContentAnchorRelation;
+use crate::external_app::ExternalAppRegistryStatus;
 
 /// 事件发射器主账户
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug)]
@@ -528,6 +529,55 @@ pub enum ProtocolEvent {
         new_value: u64,
         timestamp: i64,
     },
+
+    ExternalAppRegisteredV2 {
+        app_id_hash: [u8; 32],
+        owner: Pubkey,
+        manifest_hash: [u8; 32],
+        server_key_hash: [u8; 32],
+        owner_assertion_hash: [u8; 32],
+        policy_state_digest: [u8; 32],
+        review_circle_id: u32,
+        review_policy_digest: [u8; 32],
+        decision_digest: [u8; 32],
+        execution_intent_digest: [u8; 32],
+        timestamp: i64,
+    },
+    ExternalAppExecutionReceiptAnchoredV2 {
+        app_id_hash: [u8; 32],
+        decision_digest: [u8; 32],
+        execution_intent_digest: [u8; 32],
+        execution_receipt_digest: [u8; 32],
+        timestamp: i64,
+    },
+    ExternalAppManifestUpdatedV2 {
+        app_id_hash: [u8; 32],
+        manifest_hash: [u8; 32],
+        policy_state_digest: [u8; 32],
+        decision_digest: [u8; 32],
+        execution_intent_digest: [u8; 32],
+        timestamp: i64,
+    },
+    ExternalAppServerKeyRotatedV2 {
+        app_id_hash: [u8; 32],
+        server_key_hash: [u8; 32],
+        decision_digest: [u8; 32],
+        execution_intent_digest: [u8; 32],
+        timestamp: i64,
+    },
+    ExternalAppRegistryStatusChangedV2 {
+        app_id_hash: [u8; 32],
+        status: ExternalAppRegistryStatus,
+        decision_digest: [u8; 32],
+        execution_intent_digest: [u8; 32],
+        timestamp: i64,
+    },
+    ExternalAppRegistryAuthorityChangedV2 {
+        admin: Pubkey,
+        old_governance_authority: Pubkey,
+        new_governance_authority: Pubkey,
+        timestamp: i64,
+    },
 }
 
 /// 档案更新类型
@@ -902,7 +952,13 @@ impl EventSubscription {
             ProtocolEvent::EmergencyAction { .. } => EventType::System,
             
             ProtocolEvent::RegistryDeployed { .. } |
-            ProtocolEvent::RegistryUpgraded { .. } => EventType::Registry,
+            ProtocolEvent::RegistryUpgraded { .. } |
+            ProtocolEvent::ExternalAppRegisteredV2 { .. } |
+            ProtocolEvent::ExternalAppExecutionReceiptAnchoredV2 { .. } |
+            ProtocolEvent::ExternalAppManifestUpdatedV2 { .. } |
+            ProtocolEvent::ExternalAppServerKeyRotatedV2 { .. } |
+            ProtocolEvent::ExternalAppRegistryStatusChangedV2 { .. } |
+            ProtocolEvent::ExternalAppRegistryAuthorityChangedV2 { .. } => EventType::Registry,
 
             ProtocolEvent::CircleCreated { .. } |
             ProtocolEvent::CircleFlagsUpdated { .. } |
@@ -963,7 +1019,13 @@ impl EventSubscription {
             ProtocolEvent::CircleRestored { timestamp, .. } |
             ProtocolEvent::CircleMembershipChanged { timestamp, .. } |
             ProtocolEvent::KnowledgeSubmitted { timestamp, .. } |
-            ProtocolEvent::ContributorsUpdated { timestamp, .. } => *timestamp,
+            ProtocolEvent::ContributorsUpdated { timestamp, .. } |
+            ProtocolEvent::ExternalAppRegisteredV2 { timestamp, .. } |
+            ProtocolEvent::ExternalAppExecutionReceiptAnchoredV2 { timestamp, .. } |
+            ProtocolEvent::ExternalAppManifestUpdatedV2 { timestamp, .. } |
+            ProtocolEvent::ExternalAppServerKeyRotatedV2 { timestamp, .. } |
+            ProtocolEvent::ExternalAppRegistryStatusChangedV2 { timestamp, .. } |
+            ProtocolEvent::ExternalAppRegistryAuthorityChangedV2 { timestamp, .. } => *timestamp,
             _ => 0,
         }
     }
@@ -987,6 +1049,8 @@ impl EventSubscription {
             ProtocolEvent::CircleMembershipChanged { actor, .. } => Some(*actor),
             ProtocolEvent::KnowledgeSubmitted { author, .. } => Some(*author),
             ProtocolEvent::ContributorsUpdated { updated_by, .. } => Some(*updated_by),
+            ProtocolEvent::ExternalAppRegisteredV2 { owner, .. } => Some(*owner),
+            ProtocolEvent::ExternalAppRegistryAuthorityChangedV2 { admin, .. } => Some(*admin),
             _ => None,
         }
     }

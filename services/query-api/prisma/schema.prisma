@@ -851,6 +851,39 @@ model ExternalApp {
   @@map("external_apps")
 }
 
+model ExternalAppRegistryAnchor {
+  id                     String   @id @db.VarChar(96)
+  externalAppId          String   @map("external_app_id") @db.VarChar(64)
+  appIdHash              String   @map("app_id_hash") @db.VarChar(64)
+  recordPda              String   @map("record_pda") @db.VarChar(64)
+  ownerPubkey            String   @map("owner_pubkey") @db.VarChar(44)
+  serverKeyHash          String   @map("server_key_hash") @db.VarChar(64)
+  manifestHash           String   @map("manifest_hash") @db.VarChar(64)
+  ownerAssertionHash     String?  @map("owner_assertion_hash") @db.VarChar(64)
+  policyStateDigest      String?  @map("policy_state_digest") @db.VarChar(64)
+  reviewCircleId         Int?     @map("review_circle_id")
+  reviewPolicyDigest     String?  @map("review_policy_digest") @db.VarChar(64)
+  decisionDigest         String?  @map("decision_digest") @db.VarChar(64)
+  executionIntentDigest  String?  @map("execution_intent_digest") @db.VarChar(64)
+  executionReceiptDigest String?  @map("execution_receipt_digest") @db.VarChar(64)
+  registryStatus         String   @map("registry_status") @db.VarChar(24)
+  txSignature            String?  @map("tx_signature") @db.VarChar(128)
+  txSlot                 BigInt?  @map("tx_slot")
+  receiptTxSignature     String?  @map("receipt_tx_signature") @db.VarChar(128)
+  receiptTxSlot          BigInt?  @map("receipt_tx_slot")
+  cluster                String?  @db.VarChar(32)
+  finalityStatus         String   @default("pending") @map("finality_status") @db.VarChar(24)
+  receiptFinalityStatus  String   @default("pending") @map("receipt_finality_status") @db.VarChar(24)
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([externalAppId])
+  @@unique([appIdHash])
+  @@unique([recordPda])
+  @@index([registryStatus, finalityStatus])
+  @@map("external_app_registry_anchors")
+}
+
 model CommunicationRoom {
   id                String    @id @db.VarChar(96)
   roomKey           String    @unique @map("room_key") @db.VarChar(96)

@@ -29,6 +29,7 @@ export function buildProductionExternalAppRegistrationRequest(input: {
   eligibleActors: GovernanceEligibleActor[];
   manifestHash: string;
   manifest: ExternalAppManifest;
+  ownerAssertion: { payload: string; signature: string };
   idempotencyKey: string;
   openedAt: Date;
 }) {
@@ -46,7 +47,15 @@ export function buildProductionExternalAppRegistrationRequest(input: {
       type: "external_app_register",
       targetType: "external_app",
       targetRef: input.externalAppId,
-      payload: { manifestHash: input.manifestHash, manifest: input.manifest },
+      payload: {
+        manifestHash: input.manifestHash,
+        manifest: input.manifest,
+        ownerAssertion: input.ownerAssertion,
+        reviewCircleId: input.reviewCircleId,
+        reviewPolicyId: input.reviewPolicyId,
+        reviewPolicyVersionId: input.reviewPolicyVersionId,
+        reviewPolicyVersion: input.reviewPolicyVersion,
+      },
       idempotencyKey: input.idempotencyKey,
     },
     proposerPubkey: input.proposerPubkey,
@@ -214,6 +223,10 @@ export async function openExternalAppProductionRegistrationRequest(
     eligibleActors,
     manifestHash,
     manifest,
+    ownerAssertion: {
+      payload: String(ownerAssertion.payload),
+      signature: String(ownerAssertion.signature),
+    },
     idempotencyKey: `${externalAppId}:${manifestHash}`,
     openedAt: new Date(),
   });

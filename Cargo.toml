@@ -9,6 +9,7 @@ members = [
     "programs/registry-factory",
     "programs/messaging-manager",
     "programs/circle-manager",
+    "programs/external-app-registry",
     "extensions/contribution-engine/program",
     # Temporarily commented out due to Solana SDK version conflict
     # "services/indexer-core"

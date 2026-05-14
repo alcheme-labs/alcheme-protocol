@@ -252,6 +252,40 @@ x-external-app-admin-token: <EXTERNAL_APP_ADMIN_TOKEN>
 Any reviewed production registration must use the ExternalApp manifest and
 governance request path, not `wallet_only_dev`.
 
+### ExternalApp Registry V2 Modes
+
+ExternalApp Registry V2 is the Solana/SVM audit root for reviewed production
+apps. It stores objective registry facts such as `appIdHash`, owner wallet,
+manifest hash, server key hash, policy digest, governance decision digest, and
+execution receipt digest. It does not custody bonds or execute slashing.
+
+```bash
+EXTERNAL_APP_REGISTRY_MODE=disabled|optional|required
+```
+
+- `disabled`: local/runtime-only behavior. No chain registry submission is
+  attempted.
+- `optional`: query-api attempts chain anchoring when registry config is
+  present, but local/dev flows can continue if the chain path is unavailable.
+- `required`: production exposure must have a trusted chain projection. For
+  `environment=mainnet_production`, discovery, CORS, and room resolution require
+  an active registry anchor with both registration and execution-receipt finality
+  confirmed or finalized.
+
+Local sandbox apps can remain `disabled` or `optional`. Reviewed production apps
+should move to `required` before public exposure. The current smoke entrypoint is:
+
+```bash
+npm run smoke:external-app-registry-v2
+```
+
+By default this smoke checks manifest hashing, discovery reachability, and the
+database projection invariant for required mode. Set
+`ALCHEME_EXTERNAL_APP_REGISTRY_EXECUTE=true` only when the local validator,
+ExternalApp Registry program, event emitter, registry authority keypair, and IDL
+are all configured; then it submits real registry and receipt-anchor
+transactions through the chain registry adapter.
+
 The local browser-like smoke path is:
 
 ```bash
@@ -593,7 +627,8 @@ Before calling an integration complete:
 - SDK runtime tests pass
 - frontend typecheck still passes if frontend code changed
 - `npm run check:covenant` passes
-- no contract or Anchor program files changed
+- no temporary game room, chat message, voice session, or raw audio state is
+  written to chain
 - `transcriptionMode` remains `off` unless a server-signed app claim explicitly
   authorizes a non-off mode
 - external room `voicePolicy` comes from a verified server-signed app claim, and

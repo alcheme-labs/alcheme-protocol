@@ -5,6 +5,8 @@ use sqlx::{FromRow, PgPool, Postgres, Transaction};
 use std::str::FromStr;
 use tracing::{debug, info, warn};
 
+use crate::parsers::event_parser::ProjectedExternalAppRegistryAnchor;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct ProjectedUserProfile {
     pub display_name: Option<String>,
@@ -91,6 +93,279 @@ impl DbWriter {
                 debug!("Published cache invalidation for {}", key);
             }
         }
+    }
+
+    pub async fn upsert_external_app_registry_anchor(
+        &self,
+        projection: &ProjectedExternalAppRegistryAnchor,
+    ) -> Result<()> {
+        sqlx::query(
+            r#"
+            INSERT INTO external_app_registry_anchors (
+                id,
+                external_app_id,
+                app_id_hash,
+                record_pda,
+                owner_pubkey,
+                server_key_hash,
+                manifest_hash,
+                owner_assertion_hash,
+                policy_state_digest,
+                review_circle_id,
+                review_policy_digest,
+                decision_digest,
+                execution_intent_digest,
+                execution_receipt_digest,
+                registry_status,
+                tx_signature,
+                tx_slot,
+                receipt_tx_signature,
+                receipt_tx_slot,
+                finality_status,
+                receipt_finality_status,
+                updated_at
+            )
+            VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
+                $11, $12, $13, $14, $15, $16, $17, $18, $19,
+                $20, $21, NOW()
+            )
+            ON CONFLICT (app_id_hash) DO UPDATE SET
+                record_pda = COALESCE(NULLIF(EXCLUDED.record_pda, ''), external_app_registry_anchors.record_pda),
+                owner_pubkey = COALESCE(NULLIF(EXCLUDED.owner_pubkey, ''), external_app_registry_anchors.owner_pubkey),
+                server_key_hash = COALESCE(NULLIF(EXCLUDED.server_key_hash, ''), external_app_registry_anchors.server_key_hash),
+                manifest_hash = COALESCE(NULLIF(EXCLUDED.manifest_hash, ''), external_app_registry_anchors.manifest_hash),
+                owner_assertion_hash = COALESCE(EXCLUDED.owner_assertion_hash, external_app_registry_anchors.owner_assertion_hash),
+                policy_state_digest = COALESCE(EXCLUDED.policy_state_digest, external_app_registry_anchors.policy_state_digest),
+                review_circle_id = COALESCE(EXCLUDED.review_circle_id, external_app_registry_anchors.review_circle_id),
+                review_policy_digest = COALESCE(EXCLUDED.review_policy_digest, external_app_registry_anchors.review_policy_digest),
+                decision_digest = COALESCE(EXCLUDED.decision_digest, external_app_registry_anchors.decision_digest),
+                execution_intent_digest = COALESCE(EXCLUDED.execution_intent_digest, external_app_registry_anchors.execution_intent_digest),
+                execution_receipt_digest = CASE
+                    WHEN EXCLUDED.execution_receipt_digest IS NOT NULL THEN EXCLUDED.execution_receipt_digest
+                    WHEN EXCLUDED.owner_pubkey <> '' THEN NULL
+                    ELSE external_app_registry_anchors.execution_receipt_digest
+                END,
+                registry_status = EXCLUDED.registry_status,
+                tx_signature = COALESCE(EXCLUDED.tx_signature, external_app_registry_anchors.tx_signature),
+                tx_slot = COALESCE(EXCLUDED.tx_slot, external_app_registry_anchors.tx_slot),
+                receipt_tx_signature = CASE
+                    WHEN EXCLUDED.receipt_tx_signature IS NOT NULL THEN EXCLUDED.receipt_tx_signature
+                    WHEN EXCLUDED.owner_pubkey <> '' THEN NULL
+                    ELSE external_app_registry_anchors.receipt_tx_signature
+                END,
+                receipt_tx_slot = CASE
+                    WHEN EXCLUDED.receipt_tx_slot IS NOT NULL THEN EXCLUDED.receipt_tx_slot
+                    WHEN EXCLUDED.owner_pubkey <> '' THEN NULL
+                    ELSE external_app_registry_anchors.receipt_tx_slot
+                END,
+                finality_status = CASE
+                    WHEN EXCLUDED.finality_status <> 'pending' THEN EXCLUDED.finality_status
+                    ELSE external_app_registry_anchors.finality_status
+                END,
+                receipt_finality_status = CASE
+                    WHEN EXCLUDED.receipt_finality_status <> 'pending' THEN EXCLUDED.receipt_finality_status
+                    WHEN EXCLUDED.owner_pubkey <> '' THEN 'pending'
+                    ELSE external_app_registry_anchors.receipt_finality_status
+                END,
+                updated_at = NOW()
+            "#,
+        )
+        .bind(format!("external_app_registry:{}", projection.app_id_hash))
+        .bind(&projection.external_app_id)
+        .bind(&projection.app_id_hash)
+        .bind(&projection.record_pda)
+        .bind(&projection.owner_pubkey)
+        .bind(&projection.server_key_hash)
+        .bind(&projection.manifest_hash)
+        .bind(&projection.owner_assertion_hash)
+        .bind(&projection.policy_state_digest)
+        .bind(projection.review_circle_id)
+        .bind(&projection.review_policy_digest)
+        .bind(&projection.decision_digest)
+        .bind(&projection.execution_intent_digest)
+        .bind(&projection.execution_receipt_digest)
+        .bind(&projection.registry_status)
+        .bind(&projection.tx_signature)
+        .bind(projection.tx_slot)
+        .bind(&projection.receipt_tx_signature)
+        .bind(projection.receipt_tx_slot)
+        .bind(&projection.finality_status)
+        .bind(&projection.receipt_finality_status)
+        .execute(&self.pool)
+        .await
+        .context("Failed to upsert external app registry anchor")?;
+
+        self.update_external_app_registry_status_from_anchor(
+            &projection.app_id_hash,
+            &projection.registry_status,
+        )
+        .await?;
+        Ok(())
+    }
+
+    pub async fn update_external_app_registry_manifest(
+        &self,
+        app_id_hash: &str,
+        manifest_hash: &str,
+        policy_state_digest: &str,
+        decision_digest: &str,
+        execution_intent_digest: &str,
+        tx_signature: Option<&str>,
+        tx_slot: Option<i64>,
+    ) -> Result<()> {
+        sqlx::query(
+            r#"
+            INSERT INTO external_app_registry_anchors (
+                id, external_app_id, app_id_hash, record_pda, owner_pubkey,
+                server_key_hash, manifest_hash, policy_state_digest, decision_digest,
+                execution_intent_digest, registry_status, tx_signature, tx_slot,
+                finality_status, updated_at
+            )
+            VALUES ($1, $2, $2, $2, '', '', $3, $4, $5, $6, 'active', $7, $8, 'confirmed', NOW())
+            ON CONFLICT (app_id_hash) DO UPDATE SET
+                manifest_hash = EXCLUDED.manifest_hash,
+                policy_state_digest = EXCLUDED.policy_state_digest,
+                decision_digest = EXCLUDED.decision_digest,
+                execution_intent_digest = EXCLUDED.execution_intent_digest,
+                execution_receipt_digest = NULL,
+                receipt_tx_signature = NULL,
+                receipt_tx_slot = NULL,
+                receipt_finality_status = 'pending',
+                tx_signature = COALESCE(EXCLUDED.tx_signature, external_app_registry_anchors.tx_signature),
+                tx_slot = COALESCE(EXCLUDED.tx_slot, external_app_registry_anchors.tx_slot),
+                finality_status = 'confirmed',
+                updated_at = NOW()
+            "#,
+        )
+        .bind(format!("external_app_registry:{}", app_id_hash))
+        .bind(app_id_hash)
+        .bind(manifest_hash)
+        .bind(policy_state_digest)
+        .bind(decision_digest)
+        .bind(execution_intent_digest)
+        .bind(tx_signature)
+        .bind(tx_slot)
+        .execute(&self.pool)
+        .await
+        .context("Failed to update external app registry manifest")?;
+        Ok(())
+    }
+
+    pub async fn update_external_app_registry_server_key(
+        &self,
+        app_id_hash: &str,
+        server_key_hash: &str,
+        decision_digest: &str,
+        execution_intent_digest: &str,
+        tx_signature: Option<&str>,
+        tx_slot: Option<i64>,
+    ) -> Result<()> {
+        sqlx::query(
+            r#"
+            INSERT INTO external_app_registry_anchors (
+                id, external_app_id, app_id_hash, record_pda, owner_pubkey,
+                server_key_hash, manifest_hash, decision_digest, execution_intent_digest,
+                registry_status, tx_signature, tx_slot, finality_status, updated_at
+            )
+            VALUES ($1, $2, $2, $2, '', $3, '', $4, $5, 'active', $6, $7, 'confirmed', NOW())
+            ON CONFLICT (app_id_hash) DO UPDATE SET
+                server_key_hash = EXCLUDED.server_key_hash,
+                decision_digest = EXCLUDED.decision_digest,
+                execution_intent_digest = EXCLUDED.execution_intent_digest,
+                execution_receipt_digest = NULL,
+                receipt_tx_signature = NULL,
+                receipt_tx_slot = NULL,
+                receipt_finality_status = 'pending',
+                tx_signature = COALESCE(EXCLUDED.tx_signature, external_app_registry_anchors.tx_signature),
+                tx_slot = COALESCE(EXCLUDED.tx_slot, external_app_registry_anchors.tx_slot),
+                finality_status = 'confirmed',
+                updated_at = NOW()
+            "#,
+        )
+        .bind(format!("external_app_registry:{}", app_id_hash))
+        .bind(app_id_hash)
+        .bind(server_key_hash)
+        .bind(decision_digest)
+        .bind(execution_intent_digest)
+        .bind(tx_signature)
+        .bind(tx_slot)
+        .execute(&self.pool)
+        .await
+        .context("Failed to update external app registry server key")?;
+        Ok(())
+    }
+
+    pub async fn update_external_app_registry_status(
+        &self,
+        app_id_hash: &str,
+        registry_status: &str,
+        decision_digest: &str,
+        execution_intent_digest: &str,
+        tx_signature: Option<&str>,
+        tx_slot: Option<i64>,
+    ) -> Result<()> {
+        sqlx::query(
+            r#"
+            INSERT INTO external_app_registry_anchors (
+                id, external_app_id, app_id_hash, record_pda, owner_pubkey,
+                server_key_hash, manifest_hash, decision_digest, execution_intent_digest,
+                registry_status, tx_signature, tx_slot, finality_status, updated_at
+            )
+            VALUES ($1, $2, $2, $2, '', '', '', $3, $4, $5, $6, $7, 'confirmed', NOW())
+            ON CONFLICT (app_id_hash) DO UPDATE SET
+                registry_status = EXCLUDED.registry_status,
+                decision_digest = EXCLUDED.decision_digest,
+                execution_intent_digest = EXCLUDED.execution_intent_digest,
+                execution_receipt_digest = NULL,
+                receipt_tx_signature = NULL,
+                receipt_tx_slot = NULL,
+                receipt_finality_status = 'pending',
+                tx_signature = COALESCE(EXCLUDED.tx_signature, external_app_registry_anchors.tx_signature),
+                tx_slot = COALESCE(EXCLUDED.tx_slot, external_app_registry_anchors.tx_slot),
+                finality_status = 'confirmed',
+                updated_at = NOW()
+            "#,
+        )
+        .bind(format!("external_app_registry:{}", app_id_hash))
+        .bind(app_id_hash)
+        .bind(decision_digest)
+        .bind(execution_intent_digest)
+        .bind(registry_status)
+        .bind(tx_signature)
+        .bind(tx_slot)
+        .execute(&self.pool)
+        .await
+        .context("Failed to update external app registry status")?;
+
+        self.update_external_app_registry_status_from_anchor(app_id_hash, registry_status)
+            .await?;
+        Ok(())
+    }
+
+    async fn update_external_app_registry_status_from_anchor(
+        &self,
+        app_id_hash: &str,
+        registry_status: &str,
+    ) -> Result<()> {
+        sqlx::query(
+            r#"
+            UPDATE external_apps
+            SET registry_status = $2, updated_at = NOW()
+            WHERE id = (
+                SELECT external_app_id
+                FROM external_app_registry_anchors
+                WHERE app_id_hash = $1
+                LIMIT 1
+            )
+            "#,
+        )
+        .bind(app_id_hash)
+        .bind(registry_status)
+        .execute(&self.pool)
+        .await
+        .context("Failed to update external app registry status projection")?;
+        Ok(())
     }
 
     // ==================== 用户相关操作 ====================

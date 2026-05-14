@@ -155,6 +155,7 @@ async fn main() -> Result<()> {
         redis_conn,
         config.event_emitter_program_id.clone(),
         config.circle_manager_program_id.clone(),
+        config.external_app_registry_program_id.clone(),
         config.solana_rpc_url.clone(),
     );
 
@@ -283,6 +284,7 @@ struct Config {
     solana_rpc_url: String,
     event_emitter_program_id: String,
     circle_manager_program_id: Option<String>,
+    external_app_registry_program_id: Option<String>,
     content_manager_program_id: String,
     registry_factory_program_id: Option<String>,
     extension_program_ids: Vec<String>,
@@ -377,6 +379,11 @@ impl Config {
                 .ok()
                 .map(|value| value.trim().to_string())
                 .filter(|value| !value.is_empty()),
+            external_app_registry_program_id: env::var("EXTERNAL_APP_REGISTRY_PROGRAM_ID")
+                .or_else(|_| env::var("NEXT_PUBLIC_EXTERNAL_APP_REGISTRY_PROGRAM_ID"))
+                .ok()
+                .map(|value| value.trim().to_string())
+                .filter(|value| !value.is_empty()),
             content_manager_program_id: env::var("CONTENT_MANAGER_PROGRAM_ID")
                 .or_else(|_| env::var("NEXT_PUBLIC_CONTENT_PROGRAM_ID"))
                 .ok()
@@ -450,6 +457,12 @@ impl Config {
         if let Some(registry_factory_program_id) = &self.registry_factory_program_id {
             if !ids.contains(registry_factory_program_id) {
                 ids.push(registry_factory_program_id.clone());
+            }
+        }
+
+        if let Some(external_app_registry_program_id) = &self.external_app_registry_program_id {
+            if !ids.contains(external_app_registry_program_id) {
+                ids.push(external_app_registry_program_id.clone());
             }
         }
 

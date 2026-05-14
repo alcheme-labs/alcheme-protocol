@@ -15,7 +15,9 @@ use tracing::{debug, info, warn};
 use crate::database::checkpoint::CheckpointManager;
 use crate::database::RuntimeStateStore;
 use crate::metrics;
-use crate::parsers::event_parser::{content_post_snapshot_target_for_event, EventParser};
+use crate::parsers::event_parser::{
+    content_post_snapshot_target_for_event, EventParser, EventProjectionContext,
+};
 
 pub struct LocalRpcListener {
     rpc_client: RpcJsonClient,
@@ -443,7 +445,13 @@ impl LocalRpcListener {
                 signature
             );
             self.event_parser
-                .process_events(events.clone(), Some(slot))
+                .process_events(
+                    events.clone(),
+                    EventProjectionContext {
+                        slot: Some(slot),
+                        signature: Some(signature.to_string()),
+                    },
+                )
                 .await?;
             self.reconcile_tx_scoped_addresses(&events, &transaction)
                 .await?;

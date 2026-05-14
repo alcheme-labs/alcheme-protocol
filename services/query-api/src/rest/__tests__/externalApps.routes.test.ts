@@ -20,9 +20,11 @@ function buildApp(prisma: any) {
 
 describe("external apps routes", () => {
   const previousToken = process.env.EXTERNAL_APP_ADMIN_TOKEN;
+  const previousRegistryMode = process.env.EXTERNAL_APP_REGISTRY_MODE;
 
   afterEach(() => {
     process.env.EXTERNAL_APP_ADMIN_TOKEN = previousToken;
+    process.env.EXTERNAL_APP_REGISTRY_MODE = previousRegistryMode;
   });
 
   it("requires admin token for sandbox registration", async () => {
@@ -99,6 +101,70 @@ describe("external apps routes", () => {
     });
     expect(response.body.apps[0]).not.toHaveProperty("serverPublicKey");
     expect(response.body.apps[0]).not.toHaveProperty("config");
+  });
+
+  it("requires confirmed chain anchor and receipt for production discovery in required mode", async () => {
+    process.env.EXTERNAL_APP_REGISTRY_MODE = "required";
+    const prisma = {
+      externalApp: {
+        findMany: jest.fn(async () => [
+          {
+            id: "anchored-game",
+            name: "Anchored Game",
+            environment: "mainnet_production",
+            registryStatus: "active",
+            discoveryStatus: "listed",
+            managedNodePolicy: "normal",
+            capabilityPolicies: {},
+            manifestHash: "sha256:anchored",
+            trustScore: null,
+            riskScore: null,
+            communityBackingLevel: null,
+            updatedAt: new Date("2026-05-13T00:00:00.000Z"),
+          },
+          {
+            id: "unanchored-game",
+            name: "Unanchored Game",
+            environment: "mainnet_production",
+            registryStatus: "active",
+            discoveryStatus: "listed",
+            managedNodePolicy: "normal",
+            capabilityPolicies: {},
+            manifestHash: "sha256:unanchored",
+            trustScore: null,
+            riskScore: null,
+            communityBackingLevel: null,
+            updatedAt: new Date("2026-05-13T00:00:00.000Z"),
+          },
+        ]),
+      },
+      externalAppRegistryAnchor: {
+        findMany: jest.fn(async () => [
+          {
+            externalAppId: "anchored-game",
+            registryStatus: "active",
+            finalityStatus: "confirmed",
+            receiptFinalityStatus: "confirmed",
+          },
+        ]),
+      },
+    };
+
+    const response = await request(buildApp(prisma)).get("/api/v1/external-apps/discovery");
+
+    expect(response.status).toBe(200);
+    expect(response.body.apps.map((app: { id: string }) => app.id)).toEqual([
+      "anchored-game",
+    ]);
+    expect(prisma.externalAppRegistryAnchor.findMany).toHaveBeenCalledWith({
+      where: { externalAppId: { in: ["anchored-game", "unanchored-game"] } },
+      select: {
+        externalAppId: true,
+        registryStatus: true,
+        finalityStatus: true,
+        receiptFinalityStatus: true,
+      },
+    });
   });
 
   it("opens production registration as governance request without activating app", async () => {

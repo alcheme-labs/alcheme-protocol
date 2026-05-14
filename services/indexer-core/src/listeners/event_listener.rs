@@ -13,7 +13,9 @@ use crate::database::checkpoint::CheckpointManager;
 use crate::database::RuntimeStateStore;
 use crate::grpc::client::AlchemeGrpcClient;
 use crate::metrics;
-use crate::parsers::event_parser::{content_post_snapshot_target_for_event, EventParser};
+use crate::parsers::event_parser::{
+    content_post_snapshot_target_for_event, EventParser, EventProjectionContext,
+};
 
 pub struct EventListener {
     grpc_client: AlchemeGrpcClient,
@@ -230,7 +232,13 @@ impl EventListener {
             );
             // 路由每个事件到对应的 DbWriter 方法
             self.event_parser
-                .process_events(events.clone(), Some(slot))
+                .process_events(
+                    events.clone(),
+                    EventProjectionContext {
+                        slot: Some(slot),
+                        signature: transaction_signature(&tx_info),
+                    },
+                )
                 .await
                 .map_err(|e| anyhow!("Failed to process events at slot {}: {:?}", slot, e))?;
             self.reconcile_tx_scoped_knowledge_snapshots(&events, &tx_info)
@@ -342,6 +350,15 @@ impl EventListener {
             .cloned()
             .collect()
     }
+}
+
+fn transaction_signature(tx_info: &SubscribeUpdateTransactionInfo) -> Option<String> {
+    if tx_info.signature.is_empty() {
+        return None;
+    }
+    solana_sdk::signature::Signature::try_from(tx_info.signature.as_slice())
+        .ok()
+        .map(|signature| signature.to_string())
 }
 
 impl EventListener {

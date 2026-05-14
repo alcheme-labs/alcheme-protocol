@@ -45,6 +45,11 @@
       "require": "./dist/runtime/errors.js",
       "default": "./dist/runtime/errors.js"
     },
+    "./modules/external-app-registry": {
+      "types": "./dist/modules/external-app-registry.d.ts",
+      "require": "./dist/modules/external-app-registry.js",
+      "default": "./dist/modules/external-app-registry.js"
+    },
     "./idl/*.json": "./dist/idl/*.json",
     "./package.json": "./package.json"
   },

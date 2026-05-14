@@ -29,6 +29,7 @@ describe("production external app registry request", () => {
       ],
       manifestHash: "sha256:abc",
       manifest,
+      ownerAssertion: { payload: "payload", signature: "signature" },
       idempotencyKey: "last-ignition:sha256:abc",
       openedAt: new Date("2026-05-13T00:00:00.000Z"),
     });

@@ -8,6 +8,7 @@ import { EventEmitter } from "../target/types/event_emitter";
 import { RegistryFactory } from "../target/types/registry_factory";
 import { MessagingManager } from "../target/types/messaging_manager";
 import { CircleManager } from "../target/types/circle_manager";
+import { ExternalAppRegistry } from "../target/types/external_app_registry";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
@@ -33,6 +34,9 @@ import messagingManagerIdl from "../target/idl/messaging_manager.json";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import circleManagerIdl from "../target/idl/circle_manager.json";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import externalAppRegistryIdl from "../target/idl/external_app_registry.json";
 
 const PROJECT_ROOT = path.resolve(__dirname, "..");
 const DEFAULT_LOCAL_PROGRAM_IDS_PATH = path.resolve(PROJECT_ROOT, "sdk/localnet-config.json");
@@ -54,6 +58,7 @@ interface ProgramIdsConfig {
   factory: string;
   messaging: string;
   circles: string;
+  externalAppRegistry: string;
   contributionEngine?: string;
 }
 
@@ -161,6 +166,7 @@ function normalizeConfig(raw: unknown, sourcePath: string): InitializeConfig {
       factory: getRequiredProgramId(candidateProgramIds, "factory", sourcePath),
       messaging: getRequiredProgramId(candidateProgramIds, "messaging", sourcePath),
       circles: getRequiredProgramId(candidateProgramIds, "circles", sourcePath),
+      externalAppRegistry: getRequiredProgramId(candidateProgramIds, "externalAppRegistry", sourcePath),
       contributionEngine:
         typeof candidateProgramIds.contributionEngine === "string" && candidateProgramIds.contributionEngine.trim().length > 0
           ? candidateProgramIds.contributionEngine
@@ -420,6 +426,11 @@ async function main() {
   const registryFactory = buildProgram<RegistryFactory>(registryFactoryIdl, programIds.factory, provider);
   const messagingManager = buildProgram<MessagingManager>(messagingManagerIdl, programIds.messaging, provider);
   const circleManager = buildProgram<CircleManager>(circleManagerIdl, programIds.circles, provider);
+  const externalAppRegistry = buildProgram<ExternalAppRegistry>(
+    externalAppRegistryIdl,
+    programIds.externalAppRegistry,
+    provider,
+  );
 
   const admin = walletWrapper;
 
@@ -433,6 +444,7 @@ async function main() {
   console.log(`  factory: ${registryFactory.programId.toBase58()}`);
   console.log(`  messaging: ${messagingManager.programId.toBase58()}`);
   console.log(`  circles: ${circleManager.programId.toBase58()}`);
+  console.log(`  externalAppRegistry: ${externalAppRegistry.programId.toBase58()}`);
 
   try {
     console.log("\n📝 初始化 Identity Registry...");
@@ -567,6 +579,47 @@ async function main() {
         console.log("  ✓ Event Emitter already initialized");
       } else {
         throw e;
+      }
+    }
+
+    console.log("\n🧾 初始化 External App Registry...");
+    const [externalAppRegistryPDA] = PublicKey.findProgramAddressSync(
+      [Buffer.from("external_app_registry")],
+      externalAppRegistry.programId,
+    );
+    const externalRegistryInfo = await connection.getAccountInfo(externalAppRegistryPDA);
+    if (externalRegistryInfo) {
+      if (externalRegistryInfo.owner.toBase58() === programIds.externalAppRegistry) {
+        console.log(`  ✓ External App Registry already initialized at ${externalAppRegistryPDA.toBase58()}`);
+      } else {
+        console.log("  ❌ External App Registry PDA exists but owner is wrong.");
+        console.log(`  PDA: ${externalAppRegistryPDA.toBase58()}`);
+        console.log(`  当前所有者: ${externalRegistryInfo.owner.toBase58()}`);
+        console.log(`  期望所有者: ${programIds.externalAppRegistry}`);
+        throw new Error("External App Registry account owner mismatch");
+      }
+    } else {
+      try {
+        await externalAppRegistry.methods
+          .initializeRegistry(
+            admin.publicKey,
+            eventEmitter.programId,
+            eventEmitterPDA,
+          )
+          .accounts({
+            // @ts-ignore
+            registryConfig: externalAppRegistryPDA,
+            admin: admin.publicKey,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc();
+        console.log(`  ✓ External App Registry initialized at ${externalAppRegistryPDA.toBase58()}`);
+      } catch (e: any) {
+        if (e.message.includes("already in use")) {
+          console.log("  ✓ External App Registry already initialized");
+        } else {
+          throw e;
+        }
       }
     }
 
