@@ -34,6 +34,7 @@ import { seededRouter } from "./seeded";
 import { sourceMaterialsRouter } from "./sourceMaterials";
 import { agentsRouter } from "./agents";
 import { discussionAdminRouter } from "./discussionAdmin";
+import { externalAppRouter } from "./externalApps";
 
 export function restRouter(prisma: PrismaClient, redis: Redis): Router {
   const router = Router();
@@ -90,6 +91,10 @@ export function restRouter(prisma: PrismaClient, redis: Redis): Router {
   router.use("/discussion/admin", discussionAdminRouter(prisma, redis));
   router.use("/storage", storageRouter(prisma, redis));
   router.use("/extensions", extensionRouter(prisma, redis));
+  router.use("/external-apps", externalAppRouter(prisma, redis));
+  router.get("/health", async (_req, res) => {
+    res.json({ status: "healthy", timestamp: new Date().toISOString() });
+  });
   router.use("/policy", policyRouter(prisma, redis));
   router.use("/governance", governanceRouter(prisma, redis));
   router.use("/fork", forkRouter(prisma, redis));

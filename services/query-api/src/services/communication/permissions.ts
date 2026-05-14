@@ -5,6 +5,7 @@ import {
   type ExternalAppRecord,
   verifyAppRoomClaim,
 } from "./roomResolver";
+import { communicationError } from "./errors";
 
 export interface CommunicationPermissionDecision {
   allowed: boolean;
@@ -25,7 +26,7 @@ export interface CommunicationPermissionOptions {
 export interface UpsertCommunicationRoomMemberInput {
   roomKey: string;
   walletPubkey: string;
-  appRoomClaim: AppRoomClaim;
+  appRoomClaim?: AppRoomClaim | null;
 }
 
 interface CommunicationRoomRecord {
@@ -178,10 +179,10 @@ export async function upsertCommunicationRoomMemberFromClaim(
   const now = options.now ?? new Date();
   const room = await loadRoom(prisma, input.roomKey);
   if (!room) {
-    throw new Error("Communication room not found");
+    throw communicationError(404, "room_not_found", "Communication room not found");
   }
   if (!room.externalAppId || !room.externalApp) {
-    throw new Error("External app room required");
+    throw communicationError(400, "external_app_room_required", "External app room required");
   }
 
   const payload = verifyAppRoomClaim({

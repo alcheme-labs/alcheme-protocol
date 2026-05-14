@@ -23,8 +23,11 @@ function buildApp(
         enabled: true,
         provider: "livekit" as const,
         publicUrl: "wss://voice.example.test",
+        livekitServerUrl: "https://voice.example.test",
         livekitApiKey: null,
         livekitApiSecret: null,
+        requireProviderHealth: false,
+        providerHealthTimeoutMs: 1500,
         defaultTtlSec: 7200,
         tokenTtlSec: 900,
         platformMaxSpeakersPerSession: 100,
@@ -49,8 +52,15 @@ function buildApp(
   return app;
 }
 
-function buildProviderMock() {
+function buildProviderMock(): any {
   return {
+    healthCheck: jest.fn(async () => ({
+      provider: "livekit" as const,
+      status: "healthy" as const,
+      checkedAt: NOW,
+      responseStatus: 200,
+      error: null,
+    })),
     createJoinToken: jest.fn(async (input: any) => ({
       provider: "livekit",
       url: "wss://voice.example.test",
@@ -381,6 +391,79 @@ function buildPrismaMock(
 }
 
 describe("voice routes", () => {
+  test("reports disabled voice provider health", async () => {
+    const prisma = buildPrismaMock();
+    const response = await request(
+      buildApp(prisma, null, {
+        configOverrides: {
+          enabled: false,
+          provider: "disabled",
+          publicUrl: null,
+          livekitServerUrl: null,
+          livekitApiKey: null,
+          livekitApiSecret: null,
+        },
+      }),
+    )
+      .get("/api/v1/voice/health")
+      .expect(200);
+
+    expect(response.body.health).toMatchObject({
+      enabled: false,
+      provider: "disabled",
+      status: "disabled",
+      healthy: false,
+    });
+  });
+
+  test("reports unhealthy LiveKit provider state", async () => {
+    const provider = buildProviderMock();
+    provider.healthCheck.mockResolvedValueOnce({
+      provider: "livekit",
+      status: "unhealthy",
+      checkedAt: NOW,
+      responseStatus: null,
+      error: "connect ECONNREFUSED",
+    });
+
+    const response = await request(buildApp(buildPrismaMock(), provider))
+      .get("/api/v1/voice/health")
+      .expect(200);
+
+    expect(response.body.health).toMatchObject({
+      enabled: true,
+      provider: "livekit",
+      status: "unhealthy",
+      healthy: false,
+      error: "connect ECONNREFUSED",
+    });
+  });
+
+  test("refuses token issuance when provider health is required and unavailable", async () => {
+    const provider = buildProviderMock();
+    provider.healthCheck.mockResolvedValueOnce({
+      provider: "livekit",
+      status: "unhealthy",
+      checkedAt: NOW,
+      responseStatus: null,
+      error: "connect ECONNREFUSED",
+    });
+
+    await request(
+      buildApp(buildPrismaMock(), provider, {
+        configOverrides: { requireProviderHealth: true },
+      }),
+    )
+      .post("/api/v1/voice/sessions/voice_1/token")
+      .set("Authorization", "Bearer comm-token")
+      .expect(503)
+      .expect((response) => {
+        expect(response.body.error).toBe("voice_provider_unavailable");
+        expect(response.body.health.status).toBe("unhealthy");
+      });
+    expect(provider.createJoinToken).not.toHaveBeenCalled();
+  });
+
   test("creates a voice session for a member who can join voice", async () => {
     const provider = buildProviderMock();
     const prisma = buildPrismaMock({}, { initialVoiceSessions: "empty" });

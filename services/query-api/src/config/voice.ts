@@ -16,8 +16,11 @@ export interface VoiceRuntimeConfig {
   enabled: boolean;
   provider: VoiceProvider;
   publicUrl: string | null;
+  livekitServerUrl: string | null;
   livekitApiKey: string | null;
   livekitApiSecret: string | null;
+  requireProviderHealth: boolean;
+  providerHealthTimeoutMs: number;
   defaultTtlSec: number;
   tokenTtlSec: number;
   platformMaxSpeakersPerSession: number;
@@ -29,6 +32,7 @@ export interface PublicVoiceRuntimeConfig {
   enabled: boolean;
   provider: VoiceProvider;
   publicUrl: string | null;
+  requireProviderHealth: boolean;
   defaultTtlSec: number;
   tokenTtlSec: number;
   platformMaxSpeakersPerSession: number;
@@ -38,6 +42,7 @@ export interface PublicVoiceRuntimeConfig {
 
 const DEFAULT_VOICE_TTL_SEC = 7_200;
 const DEFAULT_TOKEN_TTL_SEC = 900;
+const DEFAULT_PROVIDER_HEALTH_TIMEOUT_MS = 1_500;
 const DEFAULT_PLATFORM_MAX_SPEAKERS_PER_SESSION = 100;
 const DEFAULT_MAX_SPEAKER_SLOTS_PER_SESSION = 16;
 
@@ -54,6 +59,15 @@ export function loadVoiceRuntimeConfig(
     env.VOICE_TOKEN_TTL_SEC,
     DEFAULT_TOKEN_TTL_SEC,
     { min: 60, max: 60 * 60 },
+  );
+  const requireProviderHealth = parseBoolean(
+    env.VOICE_REQUIRE_PROVIDER_HEALTH,
+    false,
+  );
+  const providerHealthTimeoutMs = parseBoundedInteger(
+    env.VOICE_PROVIDER_HEALTH_TIMEOUT_MS,
+    DEFAULT_PROVIDER_HEALTH_TIMEOUT_MS,
+    { min: 100, max: 10_000 },
   );
   const platformMaxSpeakersPerSession = parseBoundedInteger(
     env.VOICE_PLATFORM_MAX_SPEAKERS_PER_SESSION,
@@ -78,8 +92,11 @@ export function loadVoiceRuntimeConfig(
       enabled: false,
       provider,
       publicUrl: null,
+      livekitServerUrl: null,
       livekitApiKey: null,
       livekitApiSecret: null,
+      requireProviderHealth,
+      providerHealthTimeoutMs,
       defaultTtlSec,
       tokenTtlSec,
       platformMaxSpeakersPerSession,
@@ -89,6 +106,8 @@ export function loadVoiceRuntimeConfig(
   }
 
   const publicUrl = normalizeOptionalString(env.VOICE_PUBLIC_URL);
+  const livekitServerUrl =
+    normalizeOptionalString(env.LIVEKIT_SERVER_URL) ?? publicUrl;
   const livekitApiKey = normalizeOptionalString(env.LIVEKIT_API_KEY);
   const livekitApiSecret = normalizeOptionalString(env.LIVEKIT_API_SECRET);
   if (!publicUrl || !livekitApiKey || !livekitApiSecret) {
@@ -99,8 +118,11 @@ export function loadVoiceRuntimeConfig(
     enabled: true,
     provider,
     publicUrl,
+    livekitServerUrl,
     livekitApiKey,
     livekitApiSecret,
+    requireProviderHealth,
+    providerHealthTimeoutMs,
     defaultTtlSec,
     tokenTtlSec,
     platformMaxSpeakersPerSession,
@@ -116,6 +138,7 @@ export function toPublicVoiceRuntimeConfig(
     enabled: config.enabled,
     provider: config.provider,
     publicUrl: config.publicUrl,
+    requireProviderHealth: config.requireProviderHealth,
     defaultTtlSec: config.defaultTtlSec,
     tokenTtlSec: config.tokenTtlSec,
     platformMaxSpeakersPerSession: config.platformMaxSpeakersPerSession,
@@ -183,6 +206,14 @@ function parseStringList(raw: unknown, fallback: string[]): string[] {
     )
     .filter(Boolean);
   return values.length > 0 ? Array.from(new Set(values)) : fallback;
+}
+
+function parseBoolean(raw: unknown, fallback: boolean): boolean {
+  if (typeof raw !== "string") return fallback;
+  const normalized = raw.trim().toLowerCase();
+  if (["1", "true", "yes", "on"].includes(normalized)) return true;
+  if (["0", "false", "no", "off"].includes(normalized)) return false;
+  return fallback;
 }
 
 function parseBoundedInteger(

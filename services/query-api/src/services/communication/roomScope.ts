@@ -1,4 +1,5 @@
 import { createHash } from "crypto";
+import { communicationError } from "./errors";
 
 const ROOM_KEY_MAX_LENGTH = 96;
 const EXTERNAL_ROOM_ID_MAX_LENGTH = 64;
@@ -54,7 +55,7 @@ export type ParsedCommunicationRoomKey =
 export function normalizeRoomType(roomType: string): string {
   const normalized = roomType.trim().toLowerCase();
   if (!ALLOWED_ROOM_TYPES.has(normalized)) {
-    throw new Error(`Invalid roomType: ${roomType}`);
+    throw communicationError(400, "invalid_room_type", `Invalid roomType: ${roomType}`);
   }
   return normalized;
 }
@@ -70,14 +71,22 @@ export function buildCommunicationRoomKey(
       !Number.isSafeInteger(input.parentCircleId) ||
       input.parentCircleId <= 0
     ) {
-      throw new Error("parentCircleId must be a positive integer");
+      throw communicationError(
+        400,
+        "invalid_parent_circle_id",
+        "parentCircleId must be a positive integer",
+      );
     }
     return assertRoomKeyLength(`circle:${input.parentCircleId}`);
   }
 
   if (roomType === "direct") {
     if (!("participantPubkeys" in input)) {
-      throw new Error("participantPubkeys are required for direct rooms");
+      throw communicationError(
+        400,
+        "invalid_direct_room_participants",
+        "participantPubkeys are required for direct rooms",
+      );
     }
     return assertRoomKeyLength(
       `direct:${buildStablePairHash(input.participantPubkeys)}`,
@@ -88,16 +97,16 @@ export function buildCommunicationRoomKey(
     !("externalAppId" in input) ||
     !input.externalAppId.match(VALID_EXTERNAL_APP_ID)
   ) {
-    throw new Error("Invalid externalAppId");
+    throw communicationError(400, "invalid_external_app_id", "Invalid externalAppId");
   }
   if (
     !("externalRoomId" in input) ||
     input.externalRoomId.length > EXTERNAL_ROOM_ID_MAX_LENGTH
   ) {
-    throw new Error("externalRoomId is too long");
+    throw communicationError(400, "invalid_external_room_id", "externalRoomId is too long");
   }
   if (!input.externalRoomId.match(VALID_EXTERNAL_ROOM_ID)) {
-    throw new Error("Invalid externalRoomId");
+    throw communicationError(400, "invalid_external_room_id", "Invalid externalRoomId");
   }
 
   return assertRoomKeyLength(
@@ -116,7 +125,7 @@ export function parseCommunicationRoomKey(
       parentCircleId <= 0 ||
       `${parentCircleId}` !== rawCircleId
     ) {
-      throw new Error("Invalid circle room key");
+      throw communicationError(400, "invalid_room_key", "Invalid circle room key");
     }
     return {
       kind: "circle",
@@ -128,7 +137,7 @@ export function parseCommunicationRoomKey(
   if (roomKey.startsWith("direct:")) {
     const pairHash = roomKey.slice("direct:".length);
     if (!VALID_DIRECT_PAIR_HASH.test(pairHash)) {
-      throw new Error("Invalid direct room key");
+      throw communicationError(400, "invalid_room_key", "Invalid direct room key");
     }
     return {
       kind: "direct",
@@ -142,7 +151,7 @@ export function parseCommunicationRoomKey(
       roomKey.split(":");
     const externalRoomId = externalRoomIdParts.join(":");
     if (!externalAppId?.match(VALID_EXTERNAL_APP_ID)) {
-      throw new Error("Invalid external room key app id");
+      throw communicationError(400, "invalid_external_app_id", "Invalid external room key app id");
     }
     const roomType = normalizeRoomType(rawRoomType ?? "");
     if (
@@ -150,7 +159,7 @@ export function parseCommunicationRoomKey(
       externalRoomId.length > EXTERNAL_ROOM_ID_MAX_LENGTH ||
       !externalRoomId.match(VALID_EXTERNAL_ROOM_ID)
     ) {
-      throw new Error("Invalid external room key room id");
+      throw communicationError(400, "invalid_external_room_id", "Invalid external room key room id");
     }
     return {
       kind: "external",
@@ -161,7 +170,7 @@ export function parseCommunicationRoomKey(
     };
   }
 
-  throw new Error("Unsupported communication room key");
+  throw communicationError(400, "invalid_room_key", "Unsupported communication room key");
 }
 
 function buildStablePairHash(participantPubkeys: string[]): string {
@@ -171,7 +180,9 @@ function buildStablePairHash(participantPubkeys: string[]): string {
     ),
   ].sort();
   if (normalizedPubkeys.length !== 2) {
-    throw new Error(
+    throw communicationError(
+      400,
+      "invalid_direct_room_participants",
       "direct rooms require exactly two unique participant pubkeys",
     );
   }
@@ -181,7 +192,7 @@ function buildStablePairHash(participantPubkeys: string[]): string {
 
 function assertRoomKeyLength(roomKey: string): string {
   if (roomKey.length > ROOM_KEY_MAX_LENGTH) {
-    throw new Error("communication room key is too long");
+    throw communicationError(400, "invalid_room_key", "communication room key is too long");
   }
   return roomKey;
 }

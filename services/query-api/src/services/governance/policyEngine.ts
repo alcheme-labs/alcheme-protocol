@@ -213,6 +213,71 @@ export function createPrismaGovernanceEngineStore(
   };
 }
 
+type GovernanceRequestPrisma = Pick<
+  PrismaClient,
+  "governanceRequest" | "governanceSnapshot" | "governanceSignal"
+>;
+
+export function createPrismaGovernanceRequestStore(
+  prisma: GovernanceRequestPrisma,
+): GovernanceRequestStore {
+  return {
+    async saveRequest(request) {
+      return prisma.governanceRequest.create({
+        data: {
+          id: request.id,
+          policyId: request.policyId,
+          policyVersionId: request.policyVersionId,
+          policyVersion: request.policyVersion,
+          ruleId: request.ruleId,
+          scopeType: request.scopeType,
+          scopeRef: request.scopeRef,
+          actionType: request.actionType,
+          targetType: request.targetType,
+          targetRef: request.targetRef,
+          payload: request.payload as Prisma.InputJsonValue,
+          idempotencyKey: request.idempotencyKey,
+          proposerPubkey: request.proposerPubkey,
+          state: request.state,
+          openedAt: request.openedAt,
+          expiresAt: request.expiresAt ?? null,
+          resolvedAt: request.resolvedAt ?? null,
+        },
+      }) as Promise<GovernanceRequestRecord>;
+    },
+    async saveSnapshot(snapshot) {
+      return prisma.governanceSnapshot.create({
+        data: {
+          id: snapshot.id,
+          requestId: snapshot.requestId,
+          eligibleActors: snapshot.eligibleActors as unknown as Prisma.InputJsonValue,
+          sourceDigest: snapshot.sourceDigest,
+          createdAt: snapshot.createdAt,
+        },
+      }) as unknown as Promise<GovernanceSnapshotRecord>;
+    },
+    async saveSignal(signal) {
+      return prisma.governanceSignal.create({
+        data: {
+          id: signal.id,
+          requestId: signal.requestId,
+          signalType: signal.signalType,
+          actorPubkey: signal.actorPubkey ?? null,
+          value: signal.value,
+          weight: signal.weight,
+          evidence: signal.evidence
+            ? (signal.evidence as Prisma.InputJsonValue)
+            : undefined,
+          signature: signal.signature ?? null,
+          signedMessage: signal.signedMessage ?? null,
+          externalClaimNonce: signal.externalClaimNonce ?? null,
+          createdAt: signal.createdAt,
+        },
+      }) as Promise<GovernanceSignalRecord>;
+    },
+  };
+}
+
 export function computeGovernanceDecisionDigest(
   input: GovernanceDecisionInput,
 ): string {

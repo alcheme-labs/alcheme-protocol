@@ -816,19 +816,38 @@ model DiscussionSession {
 }
 
 model ExternalApp {
-  id              String   @id @map("id") @db.VarChar(64)
-  name            String   @db.VarChar(128)
-  ownerPubkey     String   @map("owner_pubkey") @db.VarChar(44)
-  status          String   @default("active") @db.VarChar(16)
-  serverPublicKey String?  @map("server_public_key") @db.VarChar(128)
-  claimAuthMode   String   @default("server_ed25519") @map("claim_auth_mode") @db.VarChar(32)
-  allowedOrigins  Json?    @map("allowed_origins")
-  config          Json?
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
+  id                    String   @id @map("id") @db.VarChar(64)
+  name                  String   @db.VarChar(128)
+  ownerPubkey           String   @map("owner_pubkey") @db.VarChar(44)
+  status                String   @default("active") @db.VarChar(16)
+  serverPublicKey       String?  @map("server_public_key") @db.VarChar(128)
+  claimAuthMode         String   @default("server_ed25519") @map("claim_auth_mode") @db.VarChar(32)
+  allowedOrigins        Json?    @map("allowed_origins")
+  config                Json?
+  environment           String   @default("sandbox") @db.VarChar(32)
+  registryStatus        String   @default("pending") @map("registry_status") @db.VarChar(24)
+  discoveryStatus       String   @default("unlisted") @map("discovery_status") @db.VarChar(24)
+  managedNodePolicy     String   @default("restricted") @map("managed_node_policy") @db.VarChar(32)
+  capabilityPolicies    Json?    @map("capability_policies")
+  manifestHash          String?  @map("manifest_hash") @db.VarChar(128)
+  allowedOriginsDigest  String?  @map("allowed_origins_digest") @db.VarChar(128)
+  reviewCircleId        Int?     @map("review_circle_id")
+  reviewPolicyId        String?  @map("review_policy_id") @db.VarChar(96)
+  quotaPolicy           Json?    @map("quota_policy")
+  trustScore            String?  @map("trust_score") @db.VarChar(64)
+  riskScore             String?  @map("risk_score") @db.VarChar(64)
+  ownerBond             String?  @map("owner_bond") @db.VarChar(64)
+  communityBackingLevel String?  @map("community_backing_level") @db.VarChar(64)
+  expiresAt             DateTime? @map("expires_at")
+  revokedAt             DateTime? @map("revoked_at")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @default(now()) @updatedAt @map("updated_at")
 
   rooms CommunicationRoom[]
 
+  @@index([environment, registryStatus])
+  @@index([discoveryStatus, managedNodePolicy])
+  @@index([reviewCircleId])
   @@map("external_apps")
 }
 
@@ -877,6 +896,59 @@ model CommunicationRoomMember {
   @@index([walletPubkey])
   @@index([roomKey, role])
   @@map("communication_room_members")
+}
+
+model ExternalAppBacking {
+  id            String   @id @db.VarChar(96)
+  externalAppId String   @map("external_app_id") @db.VarChar(64)
+  backerPubkey  String   @map("backer_pubkey") @db.VarChar(44)
+  amountRaw     String   @map("amount_raw") @db.VarChar(64)
+  riskTier      String   @default("standard") @map("risk_tier") @db.VarChar(24)
+  status        String   @default("active") @db.VarChar(24)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([externalAppId, status])
+  @@index([backerPubkey, status])
+  @@map("external_app_backings")
+}
+
+model ExternalAppChallenge {
+  id                  String   @id @db.VarChar(96)
+  externalAppId       String   @map("external_app_id") @db.VarChar(64)
+  challengerPubkey    String   @map("challenger_pubkey") @db.VarChar(44)
+  challengeType       String   @map("challenge_type") @db.VarChar(32)
+  amountRaw           String   @map("amount_raw") @db.VarChar(64)
+  evidenceHash        String   @map("evidence_hash") @db.VarChar(128)
+  status              String   @default("open") @db.VarChar(24)
+  governanceRequestId String?  @map("governance_request_id") @db.VarChar(96)
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([externalAppId, status])
+  @@index([challengerPubkey, status])
+  @@index([governanceRequestId])
+  @@map("external_app_challenges")
+}
+
+model ExternalNode {
+  id                 String   @id @db.VarChar(96)
+  operatorPubkey     String   @map("operator_pubkey") @db.VarChar(44)
+  nodeType           String   @map("node_type") @db.VarChar(32)
+  serviceUrl         String   @map("service_url")
+  capabilitiesDigest String?  @map("capabilities_digest") @db.VarChar(128)
+  protocolVersion    String?  @map("protocol_version") @db.VarChar(32)
+  syncStatus         String   @default("unknown") @map("sync_status") @db.VarChar(24)
+  conformanceStatus  String   @default("unknown") @map("conformance_status") @db.VarChar(24)
+  nodeTrustScore     String?  @map("node_trust_score") @db.VarChar(64)
+  nodePolicyStatus   String   @default("normal") @map("node_policy_status") @db.VarChar(32)
+  nodeStake          String?  @map("node_stake") @db.VarChar(64)
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([operatorPubkey, nodePolicyStatus])
+  @@index([syncStatus, conformanceStatus])
+  @@map("external_nodes")
 }
 
 model CommunicationSession {

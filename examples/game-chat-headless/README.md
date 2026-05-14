@@ -38,9 +38,9 @@ sequenceDiagram
 
     App->>Server: request appRoomClaim
     Server-->>App: signed claim
-    App->>SDK: resolveRoom(claim)
+    App->>SDK: joinExternalRoom(claim)
     SDK->>API: resolve/create communication room
-    App->>SDK: createCommunicationSession
+    SDK->>API: sync room member from appRoomClaim
     SDK->>API: issue communication access token
     App->>SDK: send/list/subscribe messages
     SDK->>API: communication runtime routes
@@ -70,11 +70,10 @@ External app server:
 ## Minimal Flow
 
 1. Ask the external app server for an `appRoomClaim`.
-2. Resolve or create the communication room.
-3. Create a wallet-signed communication session.
-4. Send/list/stream text and optional voice clip messages.
-5. Pass the communication session token to the voice client.
-6. Join voice through an injected provider client.
+2. Call `joinExternalRoom` to resolve/create the room, sync membership, and create a wallet-signed communication session.
+3. Send/list/stream text and optional voice clip messages.
+4. Pass the communication session token to the voice client.
+5. Join voice through an injected provider client.
 
 ## Running As A Real Example Later
 

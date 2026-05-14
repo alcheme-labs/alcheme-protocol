@@ -223,14 +223,11 @@ export function communicationRouter(
       if (!walletPubkey) {
         return res.status(400).json({ error: "missing_wallet_pubkey" });
       }
-      if (!req.body?.appRoomClaim) {
-        return res.status(400).json({ error: "missing_app_room_claim" });
-      }
 
       const member = await upsertCommunicationRoomMemberFromClaim(prisma, {
         roomKey,
         walletPubkey,
-        appRoomClaim: req.body.appRoomClaim,
+        appRoomClaim: req.body?.appRoomClaim ?? null,
       });
 
       res.json({ ok: true, member: mapMember(member) });

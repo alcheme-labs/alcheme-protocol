@@ -1,3 +1,5 @@
+import { parseApiErrorResponse } from "./errors";
+
 export interface WalletSigner {
   publicKey: string;
   signMessage(message: Uint8Array): Promise<Uint8Array>;
@@ -25,6 +27,18 @@ export interface ResolveRoomInput {
     signature: string;
   };
   walletPubkey?: string;
+}
+
+export interface JoinExternalRoomInput extends ResolveRoomInput {
+  sessionTtlSec?: number;
+  sessionClientMeta?: Record<string, unknown>;
+}
+
+export interface JoinExternalRoomResult {
+  room: any;
+  member: any;
+  session: any;
+  communicationAccessToken: string;
 }
 
 export interface CommunicationSessionInput {
@@ -151,6 +165,31 @@ export class AlchemeGameChatClient {
       },
     );
     return response.room;
+  }
+
+  async joinExternalRoom(input: JoinExternalRoomInput): Promise<JoinExternalRoomResult> {
+    const room = await this.resolveRoom(input);
+    const memberResponse = await this.fetchJson<{ member: any }>(
+      `/communication/rooms/${encodeURIComponent(room.roomKey)}/members`,
+      {
+        method: "POST",
+        body: {
+          walletPubkey: input.walletPubkey ?? this.wallet.publicKey,
+          appRoomClaim: input.appRoomClaim ?? null,
+        },
+      },
+    );
+    const session = await this.createCommunicationSession({
+      roomKey: room.roomKey,
+      ttlSec: input.sessionTtlSec,
+      clientMeta: input.sessionClientMeta,
+    });
+    return {
+      room,
+      member: memberResponse.member,
+      session,
+      communicationAccessToken: session.communicationAccessToken,
+    };
   }
 
   async createCommunicationSession(
@@ -356,7 +395,7 @@ export class AlchemeGameChatClient {
       body: input.body ? JSON.stringify(input.body) : undefined,
     });
     if (!response.ok) {
-      throw new Error(`communication request failed: ${response.status}`);
+      throw await parseApiErrorResponse(response, "communication_request_failed");
     }
     return response.json() as Promise<T>;
   }
@@ -373,7 +412,7 @@ export class AlchemeGameChatClient {
       signal,
     });
     if (!response.ok) {
-      throw new Error(`communication stream failed: ${response.status}`);
+      throw await parseApiErrorResponse(response, "communication_stream_failed");
     }
     const reader = response.body?.getReader();
     if (!reader) {

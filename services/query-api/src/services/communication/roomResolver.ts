@@ -3,6 +3,7 @@ import nacl from "tweetnacl";
 
 import { normalizeVoiceSpeakerPolicy } from "../../config/voice";
 import { withRoomCapabilitiesMetadata } from "./capabilities";
+import { communicationError } from "./errors";
 import { buildCommunicationRoomKey, normalizeRoomType } from "./roomScope";
 
 export interface AppRoomClaim {
@@ -50,6 +51,7 @@ export interface ResolveCommunicationRoomOptions {
 export interface ExternalAppRecord {
   id: string;
   status: string;
+  registryStatus?: string | null;
   serverPublicKey?: string | null;
   claimAuthMode?: string | null;
 }
@@ -209,7 +211,11 @@ async function assertParentCircleExists(
   parentCircleId: number,
 ): Promise<void> {
   if (!Number.isSafeInteger(parentCircleId) || parentCircleId <= 0) {
-    throw new Error("parentCircleId must be a positive integer");
+    throw communicationError(
+      400,
+      "invalid_parent_circle_id",
+      "parentCircleId must be a positive integer",
+    );
   }
 
   const circle = await prisma.circle.findUnique({
@@ -217,7 +223,7 @@ async function assertParentCircleExists(
     select: { id: true },
   });
   if (!circle) {
-    throw new Error("Parent circle not found");
+    throw communicationError(404, "parent_circle_not_found", "Parent circle not found");
   }
 }
 
@@ -228,14 +234,21 @@ async function loadActiveExternalApp(
   const externalApp = await prisma.externalApp.findUnique({
     where: { id: externalAppId },
     select: {
-      id: true,
-      status: true,
-      serverPublicKey: true,
-      claimAuthMode: true,
-    },
+        id: true,
+        status: true,
+        registryStatus: true,
+        serverPublicKey: true,
+        claimAuthMode: true,
+      },
   });
-  if (!externalApp || externalApp.status !== "active") {
-    throw new Error("External app not found or inactive");
+  if (!externalApp) {
+    throw communicationError(404, "external_app_not_found", "External app not found");
+  }
+  if (externalApp.status !== "active") {
+    throw communicationError(403, "external_app_inactive", "External app is inactive");
+  }
+  if (externalApp.registryStatus && externalApp.registryStatus !== "active") {
+    throw communicationError(403, "external_app_not_approved", "External app is not approved");
   }
   return externalApp;
 }
@@ -265,17 +278,21 @@ export function verifyAppRoomClaim(input: {
   }
 
   if (!input.externalApp.serverPublicKey) {
-    throw new Error("External app serverPublicKey is required");
+    throw communicationError(
+      401,
+      "app_room_claim_required",
+      "External app serverPublicKey is required",
+    );
   }
   if (!input.claim) {
-    throw new Error("appRoomClaim is required");
+    throw communicationError(401, "app_room_claim_required", "appRoomClaim is required");
   }
 
   const publicKey = decodePublicKey(input.externalApp.serverPublicKey);
   const signature = Buffer.from(input.claim.signature, "base64");
   const message = Buffer.from(input.claim.payload);
   if (!nacl.sign.detached.verify(message, signature, publicKey)) {
-    throw new Error("appRoomClaim signature invalid");
+    throw communicationError(403, "app_room_claim_invalid", "appRoomClaim signature invalid");
   }
 
   const payload = parseClaimPayload(input.claim.payload);
@@ -284,22 +301,26 @@ export function verifyAppRoomClaim(input: {
     normalizeRoomType(payload.roomType) !== input.expected.roomType ||
     payload.externalRoomId !== input.expected.externalRoomId
   ) {
-    throw new Error("appRoomClaim does not match room");
+    throw communicationError(403, "app_room_claim_mismatch", "appRoomClaim does not match room");
   }
 
   if (new Date(payload.expiresAt).getTime() <= input.now.getTime()) {
-    throw new Error("appRoomClaim expired");
+    throw communicationError(403, "app_room_claim_expired", "appRoomClaim expired");
   }
 
   if (
     input.expected.walletPubkey &&
     !payload.walletPubkeys?.includes(input.expected.walletPubkey)
   ) {
-    throw new Error("appRoomClaim wallet mismatch");
+    throw communicationError(
+      403,
+      "app_room_claim_wallet_mismatch",
+      "appRoomClaim wallet mismatch",
+    );
   }
 
   if (!payload.nonce) {
-    throw new Error("appRoomClaim nonce is required");
+    throw communicationError(403, "app_room_claim_invalid", "appRoomClaim nonce is required");
   }
 
   return payload;
@@ -320,7 +341,9 @@ function parseClaimPayload(encodedPayload: string): AppRoomClaimPayload {
     }
     return parsed;
   } catch (error) {
-    throw new Error(
+    throw communicationError(
+      403,
+      "app_room_claim_invalid",
       `Invalid appRoomClaim payload: ${(error as Error).message}`,
     );
   }

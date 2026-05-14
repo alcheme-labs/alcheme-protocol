@@ -14,6 +14,7 @@
         "prisma:migrate": "prisma migrate dev",
         "verify:knowledge-contributions": "tsx scripts/verify-knowledge-contributions.ts",
         "backfill:crystal-entitlements": "tsx scripts/backfill-crystal-entitlements.ts",
+        "seed:external-app": "tsx scripts/seed-external-app.ts",
         "lint": "eslint src --ext .ts",
         "format": "prettier --write \"src/**/*.ts\"",
         "mcp": "tsx src/mcp-server.ts"

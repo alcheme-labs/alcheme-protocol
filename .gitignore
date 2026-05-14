@@ -66,14 +66,8 @@ LOCAL_DEPLOYMENT.md
 QUICK_START.md
 ROADMAP.md
 next-session-prompt.md
-frontend/README.md
 frontend/docs/
-sdk/README.md
 services/README.md
-services/indexer-core/README.md
-services/query-api/README.md
-extensions/anchor-signer/README.md
-extensions/contribution-engine/README.md
 mobile-shell/ios/App/CapApp-SPM/README.md
 .github/workflows/deploy-devnet.yml
 .github/workflows/deploy-mainnet.yml

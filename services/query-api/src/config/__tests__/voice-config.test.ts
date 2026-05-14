@@ -11,6 +11,8 @@ describe("voice runtime config", () => {
     expect(config.platformMaxSpeakersPerSession).toBe(100);
     expect(config.defaultMaxSpeakersPerSession).toBe(16);
     expect(config.speakerLimitStrategy).toBe("listen_only");
+    expect(config.requireProviderHealth).toBe(false);
+    expect(config.providerHealthTimeoutMs).toBe(1500);
   });
 
   test("requires LiveKit public URL and credentials only when LiveKit is enabled", () => {
@@ -31,12 +33,15 @@ describe("voice runtime config", () => {
       VOICE_PLATFORM_MAX_SPEAKERS_PER_SESSION: "80",
       VOICE_DEFAULT_MAX_SPEAKERS_PER_SESSION: "8",
       VOICE_SPEAKER_LIMIT_STRATEGY: "moderated_queue",
+      VOICE_REQUIRE_PROVIDER_HEALTH: "true",
+      VOICE_PROVIDER_HEALTH_TIMEOUT_MS: "250",
     });
 
     expect(config).toMatchObject({
       enabled: true,
       provider: "livekit",
       publicUrl: "wss://voice.example.test",
+      livekitServerUrl: "wss://voice.example.test",
       livekitApiKey: "lk-key",
       livekitApiSecret: "super-secret",
       defaultTtlSec: 3600,
@@ -44,6 +49,8 @@ describe("voice runtime config", () => {
       platformMaxSpeakersPerSession: 80,
       defaultMaxSpeakersPerSession: 8,
       speakerLimitStrategy: "moderated_queue",
+      requireProviderHealth: true,
+      providerHealthTimeoutMs: 250,
     });
   });
 
@@ -94,6 +101,7 @@ describe("voice runtime config", () => {
       enabled: true,
       provider: "livekit",
       publicUrl: "wss://voice.example.test",
+      requireProviderHealth: false,
       defaultTtlSec: 7200,
       tokenTtlSec: 900,
       platformMaxSpeakersPerSession: 100,

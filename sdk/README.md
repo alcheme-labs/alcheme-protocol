@@ -33,6 +33,7 @@ flowchart TB
     alcheme --> contribution["ContributionEngineModule"]
     index --> communication["runtime/communication.ts"]
     index --> voice["runtime/voice.ts"]
+    index --> server["runtime/server.ts"]
     index --> utils["crypto / storage / transactions"]
 ```
 
@@ -41,6 +42,7 @@ flowchart TB
 - Provides one `Alcheme` client that constructs typed program modules from configured program IDs.
 - Bundles IDLs for core programs and the contribution-engine extension.
 - Provides runtime clients for communication rooms and voice integrations.
+- Provides server-side helpers for app-room claim payload construction and signing.
 - Installs transaction recovery helpers for already-processed send/confirm cases.
 
 ## Entry Points
@@ -52,9 +54,27 @@ flowchart TB
 | Exports | `sdk/src/index.ts` |
 | Program modules | `sdk/src/modules/*.ts` |
 | Runtime clients | `sdk/src/runtime/communication.ts`, `sdk/src/runtime/voice.ts` |
+| Server runtime helpers | `sdk/src/runtime/server.ts` |
 | IDLs | `sdk/src/idl/*.json` |
 | Build | `cd sdk && npm run build` |
 | Tests | `cd sdk && npm test` |
+| Runtime subpath check | `cd sdk && npm run check:runtime-imports` |
+
+## Runtime Subpath Imports
+
+Browser clients should import the runtime surface they need instead of pulling
+the root Anchor/Solana SDK entry by default:
+
+```ts
+import { createAlchemeGameChatClient } from "@alcheme/sdk/runtime/communication";
+import { createAlchemeVoiceClient } from "@alcheme/sdk/runtime/voice";
+```
+
+External app servers can build and sign room claims from the server-only helper:
+
+```ts
+import { signAppRoomClaim } from "@alcheme/sdk/runtime/server";
+```
 
 ## Blind Spots To Check
 

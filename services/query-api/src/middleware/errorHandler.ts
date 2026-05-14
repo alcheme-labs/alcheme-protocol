@@ -7,6 +7,20 @@ export function errorHandler(
     next: NextFunction
 ) {
     console.error('Error:', error);
+    const typed = error as Error & {
+        statusCode?: number;
+        status?: number;
+        code?: string;
+        details?: unknown;
+    };
+    const statusCode = typed.statusCode ?? typed.status;
+    if (statusCode && statusCode >= 400 && statusCode < 600 && typed.code) {
+        return res.status(statusCode).json({
+            error: typed.code,
+            message: error.message,
+            ...(typed.details ? { details: typed.details } : {}),
+        });
+    }
 
     if (error.name === 'PrismaClientKnownRequestError') {
         return res.status(400).json({

@@ -1,5 +1,4 @@
 import express, { type Express } from 'express';
-import cors from 'cors';
 import helmet from 'helmet';
 import { ApolloServer } from 'apollo-server-express';
 import type { PrismaClient } from '@prisma/client';
@@ -11,6 +10,11 @@ import { resolvers } from './graphql/resolvers';
 import { buildContext } from './graphql/context';
 import { restRouter } from './rest';
 import { errorHandler } from './middleware/errorHandler';
+import {
+    createCorsPolicy,
+    defaultDevExternalOrigins,
+    parseOriginList,
+} from './middleware/corsPolicy';
 import { requestLogger } from './middleware/logger';
 import { rateLimiter } from './middleware/rateLimiter';
 import { sessionAuth } from './middleware/sessionAuth';
@@ -58,28 +62,21 @@ export async function createApp(options: CreateAppOptions = {}): Promise<QueryAp
         return status;
     };
 
-    const allowedOrigins = (
-        process.env.CORS_ALLOWED_ORIGINS?.split(',').map((origin) => origin.trim()).filter(Boolean) || [
+    const firstPartyOrigins = parseOriginList(process.env.CORS_ALLOWED_ORIGINS);
+    const devExternalOrigins = parseOriginList(process.env.EXTERNAL_APP_DEV_ORIGINS);
+    const corsPolicy = createCorsPolicy(prisma, {
+        firstPartyOrigins: firstPartyOrigins.length > 0 ? firstPartyOrigins : [
             'http://localhost:3000',
             'http://127.0.0.1:3000',
-        ]
-    );
+        ],
+        devExternalOrigins: devExternalOrigins.length > 0
+            ? devExternalOrigins
+            : defaultDevExternalOrigins(),
+        cacheTtlMs: Number(process.env.EXTERNAL_APP_CORS_CACHE_TTL_MS || '5000'),
+    });
 
     app.use(helmet());
-    app.use(
-        cors({
-            origin: (origin, callback) => {
-                if (!origin || allowedOrigins.includes(origin)) {
-                    callback(null, true);
-                    return;
-                }
-
-                callback(new Error(`CORS blocked for origin: ${origin}`));
-            },
-            credentials: true,
-            methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-        })
-    );
+    app.use(corsPolicy.corsMiddleware);
     app.use(express.json());
     app.use(sessionAuth(redis));
     app.use(async (_req, res, next) => {

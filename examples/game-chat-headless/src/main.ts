@@ -84,18 +84,15 @@ async function main() {
   };
   const appRoomClaim = await fetchAppRoomClaim(roomInput);
 
-  const room = await chat.resolveRoom({
+  const joined = await chat.joinExternalRoom({
     ...roomInput,
     parentCircleId: 130,
     ttlSec: 7200,
     appRoomClaim,
+    sessionTtlSec: 7200,
+    sessionClientMeta: { client: "game-chat-headless-example" },
   });
-
-  const session = await chat.createCommunicationSession({
-    roomKey: room.roomKey,
-    ttlSec: 7200,
-    clientMeta: { client: "game-chat-headless-example" },
-  });
+  const { room, session } = joined;
 
   await chat.sendRoomMessage(room.roomKey, {
     text: "wait, pulling next pack",
@@ -120,7 +117,7 @@ async function main() {
     console.log("Room event", event);
   });
 
-  voice.setCommunicationSession(room.roomKey, session.communicationAccessToken);
+  voice.setCommunicationSession(room.roomKey, joined.communicationAccessToken);
   const connection = await voice.joinVoice(room.roomKey, {
     ttlSec: 7200,
   });

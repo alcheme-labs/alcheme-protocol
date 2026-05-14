@@ -121,6 +121,42 @@ describe("resolveCommunicationRoom", () => {
     expect(secondUpsert.update.metadata).toBeUndefined();
   });
 
+  test("rejects external rooms while app registration is not approved", async () => {
+    const { claim, serverPublicKey } = buildSignedClaim({
+      externalAppId: "example-web3-game",
+      roomType: "dungeon",
+      externalRoomId: "run-8791",
+      walletPubkeys: [WALLET],
+      expiresAt: "2026-05-08T12:05:00.000Z",
+      nonce: "claim-1",
+    });
+    const prisma = buildPrismaMock({
+      externalApp: {
+        findUnique: jest.fn(async () => ({
+          id: "example-web3-game",
+          status: "active",
+          registryStatus: "pending",
+          serverPublicKey,
+          claimAuthMode: "server_ed25519",
+        })),
+      },
+    });
+
+    await expect(
+      resolveCommunicationRoom(
+        prisma,
+        {
+          externalAppId: "example-web3-game",
+          roomType: "dungeon",
+          externalRoomId: "run-8791",
+          appRoomClaim: claim,
+          walletPubkey: WALLET,
+        },
+        { now: NOW },
+      ),
+    ).rejects.toMatchObject({ code: "external_app_not_approved" });
+  });
+
   test("reuses circle room keys and defaults knowledge capture to full", async () => {
     const prisma = buildPrismaMock();
 

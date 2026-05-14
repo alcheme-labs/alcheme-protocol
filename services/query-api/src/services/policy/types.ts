@@ -15,7 +15,13 @@ export type GovernanceActionType =
     | 'archived'
     | 'restore'
     | 'revision_direction'
-    | 'temporary_edit_grant';
+    | 'temporary_edit_grant'
+    | 'external_app_register'
+    | 'approve_store_listing'
+    | 'approve_managed_node_quota'
+    | 'downgrade_discovery_status'
+    | 'limit_capability'
+    | 'emergency_hold';
 
 export type GovernanceActionVoteMode = 'required' | 'optional' | 'none';
 

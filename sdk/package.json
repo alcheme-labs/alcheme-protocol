@@ -1,6 +1,6 @@
 {
   "name": "@alcheme/sdk",
-  "version": "0.1.3-devnet.1",
+  "version": "0.1.3-devnet.2",
   "license": "Apache-2.0",
   "description": "SDK for the Alcheme Protocol on Solana",
   "repository": {
@@ -25,6 +25,26 @@
       "require": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./runtime/communication": {
+      "types": "./dist/runtime/communication.d.ts",
+      "require": "./dist/runtime/communication.js",
+      "default": "./dist/runtime/communication.js"
+    },
+    "./runtime/voice": {
+      "types": "./dist/runtime/voice.d.ts",
+      "require": "./dist/runtime/voice.js",
+      "default": "./dist/runtime/voice.js"
+    },
+    "./runtime/server": {
+      "types": "./dist/runtime/server.d.ts",
+      "require": "./dist/runtime/server.js",
+      "default": "./dist/runtime/server.js"
+    },
+    "./runtime/errors": {
+      "types": "./dist/runtime/errors.d.ts",
+      "require": "./dist/runtime/errors.js",
+      "default": "./dist/runtime/errors.js"
+    },
     "./idl/*.json": "./dist/idl/*.json",
     "./package.json": "./package.json"
   },
@@ -35,6 +55,7 @@
   "scripts": {
     "build": "tsc",
     "prepack": "npm run build",
+    "check:runtime-imports": "node scripts/check-runtime-subpath-imports.mjs",
     "lint": "eslint src --ext .ts",
     "test": "jest"
   },

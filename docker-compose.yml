@@ -34,6 +34,17 @@ services:
       timeout: 3s
       retries: 5
 
+  # LiveKit 本地语音服务
+  livekit:
+    image: livekit/livekit-server:latest
+    container_name: alcheme-livekit
+    command: ["--dev", "--bind", "0.0.0.0"]
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+    restart: unless-stopped
+
   # Rust 索引器核心
   indexer-core:
     build:
@@ -108,6 +119,15 @@ services:
       CRYSTAL_MINT_AUTHORITY_SECRET: ${CRYSTAL_MINT_AUTHORITY_SECRET:-}
       CRYSTAL_MASTER_OWNER_PUBKEY: ${CRYSTAL_MASTER_OWNER_PUBKEY:-}
       CRYSTAL_METADATA_BASE_URL: ${CRYSTAL_METADATA_BASE_URL:-}
+      # disabled keeps query-api usable without LiveKit; set livekit for voice tests.
+      VOICE_PROVIDER: ${VOICE_PROVIDER:-disabled}
+      # Browser/client WebSocket URL. query-api uses LIVEKIT_SERVER_URL internally.
+      VOICE_PUBLIC_URL: ${VOICE_PUBLIC_URL:-ws://localhost:7880}
+      LIVEKIT_SERVER_URL: ${LIVEKIT_SERVER_URL:-http://livekit:7880}
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:-devkey}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:-secret}
+      VOICE_REQUIRE_PROVIDER_HEALTH: ${VOICE_REQUIRE_PROVIDER_HEALTH:-false}
+      VOICE_PROVIDER_HEALTH_TIMEOUT_MS: ${VOICE_PROVIDER_HEALTH_TIMEOUT_MS:-1500}
     restart: unless-stopped
     volumes:
       - ./services/query-api:/app

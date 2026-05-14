@@ -1,0 +1,66 @@
+.page {
+    width: min(1120px, 100%);
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 650;
+    letter-spacing: 0;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.card {
+    display: flex;
+    min-height: 132px;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid rgba(120, 120, 120, 0.24);
+    border-radius: 8px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.card h2 {
+    margin: 0 0 4px;
+    font-size: 16px;
+    letter-spacing: 0;
+}
+
+.card p {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.72;
+}
+
+.badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.badges span {
+    border: 1px solid rgba(120, 120, 120, 0.22);
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-size: 12px;
+}
+
+.empty {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.62);
+}

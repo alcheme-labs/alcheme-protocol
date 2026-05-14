@@ -19,7 +19,16 @@ export interface VoiceJoinToken {
   expiresAt: Date;
 }
 
+export interface VoiceProviderHealth {
+  provider: "livekit";
+  status: "healthy" | "unhealthy" | "unknown";
+  checkedAt: Date;
+  responseStatus?: number | null;
+  error?: string | null;
+}
+
 export interface VoiceProvider {
+  healthCheck?(): Promise<VoiceProviderHealth>;
   createJoinToken(input: VoiceJoinTokenInput): Promise<VoiceJoinToken>;
   muteParticipant(input: {
     providerRoomId: string;

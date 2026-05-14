@@ -4,6 +4,32 @@ import { loadVoiceRuntimeConfig } from "../../../config/voice";
 import { createLiveKitVoiceProvider } from "../livekitProvider";
 
 describe("voice provider adapter", () => {
+  test("checks LiveKit provider health through the server URL", async () => {
+    const fetchImpl = jest.fn(async () => ({
+      ok: true,
+      status: 200,
+    })) as unknown as typeof fetch;
+    const provider = createLiveKitVoiceProvider(
+      loadVoiceRuntimeConfig({
+        VOICE_PROVIDER: "livekit",
+        VOICE_PUBLIC_URL: "wss://voice.example.test",
+        LIVEKIT_API_KEY: "lk-key",
+        LIVEKIT_API_SECRET: "lk-secret",
+      }),
+      { fetchImpl },
+    );
+
+    await expect(provider.healthCheck?.()).resolves.toMatchObject({
+      provider: "livekit",
+      status: "healthy",
+      responseStatus: 200,
+    });
+    expect(fetchImpl).toHaveBeenCalledWith(
+      "https://voice.example.test",
+      expect.objectContaining({ method: "GET" }),
+    );
+  });
+
   test("creates LiveKit join tokens with subscribe-only grants for muted members", async () => {
     const config = loadVoiceRuntimeConfig({
       VOICE_PROVIDER: "livekit",

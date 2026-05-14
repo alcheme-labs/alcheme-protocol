@@ -73,8 +73,11 @@ To enable LiveKit:
 ```bash
 VOICE_PROVIDER=livekit
 VOICE_PUBLIC_URL=wss://your-livekit-host
+LIVEKIT_SERVER_URL=https://your-livekit-server-internal-or-public
 LIVEKIT_API_KEY=...
 LIVEKIT_API_SECRET=...
+VOICE_REQUIRE_PROVIDER_HEALTH=false
+VOICE_PROVIDER_HEALTH_TIMEOUT_MS=1500
 VOICE_DEFAULT_TTL_SEC=7200
 VOICE_TOKEN_TTL_SEC=900
 VOICE_PLATFORM_MAX_SPEAKERS_PER_SESSION=100
@@ -84,8 +87,22 @@ COMMUNICATION_VOICE_CLIP_MAX_DURATION_MS=300000
 COMMUNICATION_VOICE_CLIP_MAX_BYTES=26214400
 ```
 
-`VOICE_PUBLIC_URL` is public. `LIVEKIT_API_KEY` and `LIVEKIT_API_SECRET` must stay
-server-side.
+`VOICE_PUBLIC_URL` is returned to browser clients in voice join tokens.
+`LIVEKIT_SERVER_URL` is the query-api server-side/admin URL used for LiveKit
+health checks and room service calls; for local Docker this can be
+`http://livekit:7880` while the public URL stays `ws://localhost:7880`.
+`LIVEKIT_API_KEY` and `LIVEKIT_API_SECRET` must stay server-side.
+
+Provider readiness is visible at:
+
+```http
+GET /api/v1/voice/health
+```
+
+When `VOICE_REQUIRE_PROVIDER_HEALTH=true`, voice session creation and token
+issuance return `503 voice_provider_unavailable` if the configured provider is
+not reachable. Leave this disabled for loose local development and enable it for
+smoke tests or demo environments where a false voice success would be confusing.
 
 Voice speaker limits have two layers:
 
@@ -212,6 +229,39 @@ Required fields:
 
 Development-only mode `wallet_only_dev` bypasses server claim signatures, but it
 must not be used for production integrations.
+
+Local sandbox/dev onboarding can be bootstrapped without manual database edits:
+
+```bash
+cd services/query-api
+npm run seed:external-app -- \
+  --id example-web3-game \
+  --name "Example Web3 Game" \
+  --owner-pubkey <owner-wallet> \
+  --origin http://localhost:5173 \
+  --wallet-only-dev
+```
+
+The matching admin route is intended only for sandbox/dev operator bootstrap:
+
+```http
+POST /api/v1/external-apps
+x-external-app-admin-token: <EXTERNAL_APP_ADMIN_TOKEN>
+```
+
+Any reviewed production registration must use the ExternalApp manifest and
+governance request path, not `wallet_only_dev`.
+
+The local browser-like smoke path is:
+
+```bash
+npm run smoke:external-game-local
+```
+
+Set `ALCHEME_API_BASE_URL`, `ALCHEME_EXTERNAL_ORIGIN`,
+`EXTERNAL_APP_ADMIN_TOKEN`, and optionally `ALCHEME_SMOKE_REQUIRE_VOICE=true`
+for non-default local stacks. The smoke script default matches
+`scripts/start-local-stack.sh` (`local-external-app-admin`).
 
 ## App Room Claim
 
@@ -439,24 +489,26 @@ The SDK exports:
 
 - `createAlchemeGameChatClient`
 - `createAlchemeVoiceClient`
+- `joinExternalRoom` on the game chat client
+- `signAppRoomClaim` from `@alcheme/sdk/runtime/server`
 - `buildCommunicationSessionBootstrapMessage`
 - `buildCommunicationMessageSigningMessage`
 
-Use the chat client first, then pass the communication session token to the voice
-client.
+Use `joinExternalRoom` for external rooms. It resolves the room, syncs the room
+member from `appRoomClaim`, and creates the communication session in the correct
+order.
 
 ```ts
-const room = await chat.resolveRoom({
+const joined = await chat.joinExternalRoom({
   externalAppId: "example-web3-game",
   roomType: "dungeon",
   externalRoomId: "run-8791",
   parentCircleId: 130,
   appRoomClaim,
+  sessionTtlSec: 7200,
 });
 
-const session = await chat.createCommunicationSession({
-  roomKey: room.roomKey,
-});
+const { room } = joined;
 
 await chat.sendRoomMessage(room.roomKey, {
   text: "wait, pulling next pack",
@@ -469,7 +521,7 @@ await chat.sendRoomVoiceClip(room.roomKey, {
   payloadText: "optional fallback caption",
 });
 
-voice.setCommunicationSession(room.roomKey, session.communicationAccessToken);
+voice.setCommunicationSession(room.roomKey, joined.communicationAccessToken);
 const connection = await voice.joinVoice(room.roomKey);
 ```
 

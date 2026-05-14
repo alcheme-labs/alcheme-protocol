@@ -10,6 +10,7 @@ import type {
   VoiceJoinToken,
   VoiceJoinTokenInput,
   VoiceProvider,
+  VoiceProviderHealth,
 } from "./provider";
 
 export interface LiveKitVoiceProviderOptions {
@@ -17,6 +18,7 @@ export interface LiveKitVoiceProviderOptions {
     RoomServiceClient,
     "deleteRoom" | "removeParticipant" | "updateParticipant"
   >;
+  fetchImpl?: typeof fetch;
 }
 
 export function createLiveKitVoiceProvider(
@@ -35,12 +37,48 @@ export function createLiveKitVoiceProvider(
   const publicUrl = config.publicUrl;
   const apiKey = config.livekitApiKey;
   const apiSecret = config.livekitApiSecret;
+  const serverUrl = toLiveKitServerUrl(config.livekitServerUrl ?? publicUrl);
+  const fetchImpl = options.fetchImpl ?? fetch;
 
   const roomServiceClient =
     options.roomServiceClient ??
-    new RoomServiceClient(toLiveKitServerUrl(publicUrl), apiKey, apiSecret);
+    new RoomServiceClient(serverUrl, apiKey, apiSecret);
 
   return {
+    async healthCheck(): Promise<VoiceProviderHealth> {
+      const controller = new AbortController();
+      const timeout = setTimeout(
+        () => controller.abort(),
+        config.providerHealthTimeoutMs,
+      );
+      try {
+        const response = await fetchImpl(serverUrl, {
+          method: "GET",
+          signal: controller.signal,
+        });
+        return {
+          provider: "livekit",
+          status: response.ok ? "healthy" : "unhealthy",
+          checkedAt: new Date(),
+          responseStatus: response.status,
+          error: response.ok ? null : "livekit_health_check_failed",
+        };
+      } catch (error) {
+        return {
+          provider: "livekit",
+          status: "unhealthy",
+          checkedAt: new Date(),
+          responseStatus: null,
+          error:
+            error instanceof Error
+              ? error.message
+              : "livekit_health_check_failed",
+        };
+      } finally {
+        clearTimeout(timeout);
+      }
+    },
+
     async createJoinToken(input: VoiceJoinTokenInput): Promise<VoiceJoinToken> {
       const ttlSec = Math.max(60, Math.min(input.ttlSec, config.tokenTtlSec));
       const token = new AccessToken(apiKey, apiSecret, {

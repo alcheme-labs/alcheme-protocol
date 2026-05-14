@@ -36,6 +36,51 @@ function sseResponse(payload: string) {
 }
 
 describe("communication runtime client", () => {
+  test("joins external rooms through resolve, member sync, and session creation", async () => {
+    const calls: Array<{ url: string; init: RequestInit }> = [];
+    const fetchImpl = jest.fn(async (url: string, init: RequestInit = {}) => {
+      calls.push({ url, init });
+      if (url.endsWith("/communication/rooms/resolve")) {
+        return jsonResponse({ room: { roomKey: ROOM_KEY } });
+      }
+      if (url.endsWith(`/communication/rooms/${encodeURIComponent(ROOM_KEY)}/members`)) {
+        return jsonResponse({ member: { walletPubkey: WALLET, role: "member" } });
+      }
+      return jsonResponse({
+        sessionId: "session-1",
+        communicationAccessToken: "session-token",
+        scopeRef: ROOM_KEY,
+      });
+    });
+    const wallet: WalletSigner = {
+      publicKey: WALLET,
+      signMessage: jest.fn(async () => new Uint8Array([1, 2, 3])),
+    };
+    const client = createAlchemeGameChatClient({
+      apiBaseUrl: "https://api.example.test/api/v1",
+      wallet,
+      fetch: fetchImpl as any,
+    });
+
+    await expect(
+      client.joinExternalRoom({
+        externalAppId: "example-web3-game",
+        roomType: "dungeon",
+        externalRoomId: "run-8791",
+      }),
+    ).resolves.toMatchObject({
+      room: { roomKey: ROOM_KEY },
+      member: { walletPubkey: WALLET },
+      communicationAccessToken: "session-token",
+    });
+
+    expect(calls.map((call) => call.url)).toEqual([
+      "https://api.example.test/api/v1/communication/rooms/resolve",
+      `https://api.example.test/api/v1/communication/rooms/${encodeURIComponent(ROOM_KEY)}/members`,
+      "https://api.example.test/api/v1/communication/sessions",
+    ]);
+  });
+
   test("resolves rooms, creates sessions, sends and lists messages without Anchor dependencies", async () => {
     const calls: Array<{ url: string; init: RequestInit }> = [];
     const fetchImpl = jest.fn(async (url: string, init: RequestInit = {}) => {

@@ -1,4 +1,5 @@
 import type { WalletSigner } from "./communication";
+import { parseApiErrorResponse } from "./errors";
 
 type FetchLike = typeof fetch;
 
@@ -196,7 +197,7 @@ export class AlchemeVoiceClient {
       body: input.body ? JSON.stringify(input.body) : undefined,
     });
     if (!response.ok) {
-      throw new Error(`voice request failed: ${response.status}`);
+      throw await parseApiErrorResponse(response, "voice_request_failed");
     }
     return response.json() as Promise<T>;
   }

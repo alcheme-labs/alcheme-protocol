@@ -17,7 +17,10 @@ import {
   type CommunicationPermissionDecision,
 } from "../services/communication/permissions";
 import { createLiveKitVoiceProvider } from "../services/voice/livekitProvider";
-import type { VoiceProvider } from "../services/voice/provider";
+import type {
+  VoiceProvider,
+  VoiceProviderHealth,
+} from "../services/voice/provider";
 import {
   createOrReuseActiveVoiceSession,
   loadActiveVoiceSessionByRoomKey,
@@ -97,11 +100,15 @@ export function voiceRouter(
     options.provider ??
     (config.enabled ? createLiveKitVoiceProvider(config) : null);
 
+  router.get("/health", async (_req, res) => {
+    const health = await readVoiceProviderHealth(config, provider, now());
+    res.json({ ok: true, health });
+  });
+
   router.post("/sessions", async (req, res, next) => {
     try {
-      if (!provider || !config.enabled) {
-        return res.status(503).json({ error: "voice_provider_disabled" });
-      }
+      const readiness = await ensureVoiceProviderReady(config, provider, now());
+      if (!readiness.ok) return sendVoiceProviderReadinessError(res, readiness);
       const roomKey = stringOrUndefined(req.body?.roomKey);
       if (!roomKey) return res.status(400).json({ error: "missing_room_key" });
 
@@ -186,9 +193,9 @@ export function voiceRouter(
 
   router.post("/sessions/:sessionId/token", async (req, res, next) => {
     try {
-      if (!provider || !config.enabled) {
-        return res.status(503).json({ error: "voice_provider_disabled" });
-      }
+      const readiness = await ensureVoiceProviderReady(config, provider, now());
+      if (!readiness.ok) return sendVoiceProviderReadinessError(res, readiness);
+      const readyProvider = readiness.provider;
       const voiceSession = await loadActiveVoiceSession(
         prisma,
         parseRouteValue(req.params.sessionId),
@@ -269,7 +276,7 @@ export function voiceRouter(
         },
       });
 
-      const token = await provider.createJoinToken({
+      const token = await readyProvider.createJoinToken({
         voiceSessionId: voiceSession.id,
         providerRoomId: voiceSession.providerRoomId,
         roomKey: voiceSession.roomKey,
@@ -735,6 +742,98 @@ export function voiceRouter(
   );
 
   return router;
+}
+
+type VoiceProviderHealthResponse = {
+  enabled: boolean;
+  provider: VoiceRuntimeConfig["provider"];
+  status: "disabled" | VoiceProviderHealth["status"];
+  healthy: boolean | null;
+  checkedAt: string;
+  requireProviderHealth: boolean;
+  responseStatus?: number | null;
+  error?: string | null;
+};
+
+async function readVoiceProviderHealth(
+  config: VoiceRuntimeConfig,
+  provider: VoiceProvider | null,
+  checkedAt: Date,
+): Promise<VoiceProviderHealthResponse> {
+  if (!config.enabled || !provider) {
+    return {
+      enabled: false,
+      provider: config.provider,
+      status: "disabled",
+      healthy: false,
+      checkedAt: checkedAt.toISOString(),
+      requireProviderHealth: config.requireProviderHealth,
+    };
+  }
+  if (!provider.healthCheck) {
+    return {
+      enabled: true,
+      provider: config.provider,
+      status: "unknown",
+      healthy: null,
+      checkedAt: checkedAt.toISOString(),
+      requireProviderHealth: config.requireProviderHealth,
+    };
+  }
+  const health = await provider.healthCheck();
+  return {
+    enabled: true,
+    provider: config.provider,
+    status: health.status,
+    healthy: health.status === "healthy",
+    checkedAt: health.checkedAt.toISOString(),
+    requireProviderHealth: config.requireProviderHealth,
+    responseStatus: health.responseStatus ?? null,
+    error: health.error ?? null,
+  };
+}
+
+async function ensureVoiceProviderReady(
+  config: VoiceRuntimeConfig,
+  provider: VoiceProvider | null,
+  checkedAt: Date,
+): Promise<
+  | { ok: true; provider: VoiceProvider }
+  | {
+      ok: false;
+      status: 503;
+      error: "voice_provider_disabled" | "voice_provider_unavailable";
+      health: VoiceProviderHealthResponse;
+    }
+> {
+  const health = await readVoiceProviderHealth(config, provider, checkedAt);
+  if (!config.enabled || !provider) {
+    return { ok: false, status: 503, error: "voice_provider_disabled", health };
+  }
+  if (config.requireProviderHealth && health.healthy !== true) {
+    return {
+      ok: false,
+      status: 503,
+      error: "voice_provider_unavailable",
+      health,
+    };
+  }
+  return { ok: true, provider };
+}
+
+function sendVoiceProviderReadinessError(
+  res: {
+    status(code: number): { json(body: unknown): unknown };
+  },
+  readiness: Extract<
+    Awaited<ReturnType<typeof ensureVoiceProviderReady>>,
+    { ok: false }
+  >,
+) {
+  return res.status(readiness.status).json({
+    error: readiness.error,
+    health: readiness.health,
+  });
 }
 
 async function decodeLiveKitWebhookEvent(
