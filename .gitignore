@@ -85,6 +85,7 @@ scripts/restore-backup.sh
 scripts/start-monitoring.sh
 scripts/switch-env.sh
 scripts/verify-deploy-backup.sh
+scripts/x-ops/
 tests/workflows/deploy-mainnet-workflow.test.mjs
 
 # Local browser automation artifacts

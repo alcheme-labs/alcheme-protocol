@@ -218,3 +218,4 @@ Long-lived architecture decisions and technical-debt routes that should remain v
 - [SVM Rollup Route Record](./svm-rollup-route.md): future SVM rollup/appchain adapter route, with spike and production migration gates.
 - [Governance Strategy Roadmap](./governance-strategy-roadmap.md): staged governance strategy expansion beyond the MVP permission gateway.
 - [Fork Context Access Model](./fork-context-access-model.md): product and architecture constraints for fork context, upstream gates, and non-inherited assets/permissions.
+- [External App and Compatible Node Access Product Architecture](./external-app-node-access-product-architecture.md): product architecture for ExternalApp registration, Alcheme managed node access, self-hosted compatible nodes, SDK boundaries, backing, complaint challenges, and governance execution.
