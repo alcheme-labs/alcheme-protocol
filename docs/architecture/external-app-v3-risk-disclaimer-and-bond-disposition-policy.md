@@ -1,17 +1,17 @@
-# External App V3 Risk Disclaimer And Bond Disposition Policy
+# External Program V3 Risk Disclaimer And Bond Disposition Policy
 
 Status: implementation baseline for V3C.
 
 ## Boundary
 
-V3C adds participant risk acceptance and rule-based bond disposition. It does not add loss coverage, user claims, payout queues, refund promises, protection products, or platform liability. Alcheme provides protocol rules, evidence receipts, governance records, discovery surfaces, SDKs, and managed-node capabilities. External app operators and participants accept their own app rules, risks, and consequences.
+V3C adds participant risk acceptance and rule-based bond disposition. It does not add loss coverage, user claims, payout queues, refund promises, protection products, or platform liability. Alcheme provides protocol rules, evidence receipts, governance records, discovery surfaces, SDKs, and managed-node capabilities. External program operators and participants accept their own program rules, risks, and consequences.
 
 ## Required Acceptance
 
-Before production registration, external-app entry, or any bond-affecting action,
+Before production registration, external program entry, or any bond-affecting action,
 the relevant actor must accept a scoped risk disclaimer. The receipt records:
 
-- external app id hash
+- external program id hash
 - actor pubkey
 - scope: `developer_registration`, `external_app_entry`, `challenge_bond`, or
   `bond_disposition`
@@ -26,7 +26,7 @@ For `developer_registration`, the acceptance digest also binds to the manifest
 hash. A production registration request without a matching chain-backed
 developer agreement must not enter governance review.
 Changing the manifest requires a new developer agreement acceptance. The chain
-receipt PDA remains deterministic for the same external app, actor, and scope,
+receipt PDA remains deterministic for the same external program, actor, and scope,
 and the latest acceptance overwrites the prior receipt data at that PDA.
 
 User-facing entrypoints:

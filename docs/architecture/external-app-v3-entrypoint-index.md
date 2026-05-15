@@ -1,12 +1,14 @@
-# ExternalApp V3 Entrypoint Index
+# External Program V3 Entrypoint Index
 
 Date: 2026-05-15
 Status: Implementation navigation index
 
-This document maps the current ExternalApp V3 entrypoints. It does not create
-new product rules. Product semantics remain defined by the ExternalApp product
-architecture, V3 stability model, settlement asset policy, evidence policy, risk
-disclaimer policy, and emergency authority matrix.
+This document maps the current ExternalApp V3 entrypoints. **External Program**
+is the product-facing term; `ExternalApp` remains the current implementation
+object. This index does not create new product rules. Product semantics remain
+defined by the External Program product architecture, V3 stability model,
+settlement asset policy, evidence policy, risk disclaimer policy, and emergency
+authority matrix.
 
 Use this index to avoid mixing sandbox registration, production governance,
 SDK surfaces, chain custody, app-operated routes, and smoke tests.
@@ -20,10 +22,10 @@ Primary frontend entrypoint:
 
 Purpose:
 
-- Show reviewed or listed ExternalApps.
+- Show reviewed or listed external programs.
 - Show registry, discovery, managed-node, stability, rollout, bond, and
   governance projection labels.
-- Make clear that ExternalApps are operated by their owners and are not Alcheme
+- Make clear that external programs are operated by their owners and are not Alcheme
   endorsements.
 
 Backing API entrypoints:
@@ -75,8 +77,8 @@ Code:
 
 Boundary:
 
-- Browser code must not hold app authority keys.
-- App authority claims and production owner assertions belong on server-side
+- Browser code must not hold program authority keys.
+- Program authority claims and production owner assertions belong on server-side
   code.
 - Protocol builders are low-level transaction helpers, not product approval
   shortcuts.
@@ -98,7 +100,7 @@ Code:
 
 Purpose:
 
-- Register local, sandbox, or demo ExternalApps for development and integration
+- Register local, sandbox, or demo external programs for development and integration
   testing.
 
 Boundary:
@@ -144,6 +146,10 @@ Boundary:
   `developer_registration` terms digest, acceptance digest, chain receipt PDA,
   receipt digest, and transaction signature. The agreement binds to the manifest
   hash, so changing the manifest requires a new acceptance.
+- The `developerAgreement.policyEpochId` must be the active External Program
+  review policy version id resolved from the system role binding. It is not
+  returned by the generic terms endpoint and must not be invented by the
+  external program client.
 - Query API verifies the chain receipt PDA, account data, receipt digest, and
   transaction status before opening production review when risk-receipt
   verification is enabled. Production defaults this verification to required.
@@ -174,7 +180,7 @@ Code:
 Boundary:
 
 - This is a proof/receipt path, not a liability or compensation path.
-- The browser or external app must show the scoped terms before the user signs
+- The browser or external program must show the scoped terms before the user signs
   or submits the chain transaction.
 - The Solana receipt records digest-level proof. Raw legal text, private
   evidence, and UI copy are not written directly to chain.

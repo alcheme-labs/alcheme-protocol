@@ -1,9 +1,13 @@
-# External App Chat Headless Example
+# External Program Communication Headless Example
 
 HTML diagram: [Open this subproject map](../../docs/architecture/subproject-maps.html#game-chat-headless).
 
-This example shows the intended SDK-level integration shape for an external app or runtime client.
-It is a template, not a runnable app by itself.
+This example shows the intended SDK-level integration shape for an external
+program or runtime client. It is a template, not a runnable app by itself.
+
+Product terminology: **External Program** is the user-facing umbrella term. The
+implementation object is still named `ExternalApp`, and this example path keeps
+the historical `game-chat-headless` name for compatibility.
 
 The current integration is headless:
 
@@ -17,8 +21,8 @@ The current integration is headless:
 
 ```mermaid
 flowchart LR
-    app["external app client"] --> sdk["@alcheme/sdk"]
-    app --> server["external app server"]
+    app["external program client"] --> sdk["@alcheme/sdk"]
+    app --> server["external program server"]
     server --> claim["appRoomClaim"]
     claim --> sdk
     sdk --> query["query-api communication / voice routes"]
@@ -30,8 +34,8 @@ flowchart LR
 
 ```mermaid
 sequenceDiagram
-    participant App as External app client
-    participant Server as External app server
+    participant App as External program client
+    participant Server as External program server
     participant SDK as Alcheme SDK
     participant API as query-api
     participant Voice as Voice provider
@@ -55,13 +59,13 @@ sequenceDiagram
 
 ## Required Runtime Pieces
 
-External app client:
+External program client:
 
 - a wallet object that exposes `publicKey` and `signMessage(message)`
 - an Alcheme query-api base URL
 - a voice provider adapter if voice is enabled
 
-External app server:
+External program server:
 
 - an `ExternalApp` row in Alcheme
 - an Ed25519 server key whose public key is stored on `ExternalApp.serverPublicKey`
@@ -69,7 +73,7 @@ External app server:
 
 ## Minimal Flow
 
-1. Ask the external app server for an `appRoomClaim`.
+1. Ask the external program server for an `appRoomClaim`.
 2. Call `joinExternalRoom` to resolve/create the room, sync membership, and create a wallet-signed communication session.
 3. Send/list/stream text and optional voice clip messages.
 4. Pass the communication session token to the voice client.
@@ -90,6 +94,6 @@ with real browser wallet and LiveKit code.
 
 | Question | Evidence Needed |
 | --- | --- |
-| What should the external app server sign into `appRoomClaim`? | Check query-api communication route validation and SDK runtime types. |
+| What should the external program server sign into `appRoomClaim`? | Check query-api communication route validation and SDK runtime types. |
 | Which voice provider is used in production-like runs? | Check query-api voice provider config and the injected `VoiceProviderClient`. |
-| Which room metadata should external apps persist locally? | Compare `resolveRoom` responses with host runtime state requirements. |
+| Which room metadata should external programs persist locally? | Compare `resolveRoom` responses with host runtime state requirements. |

@@ -1,14 +1,19 @@
-# Game Chat And Voice Integration
+# External Program Communication And Voice Integration
 
-This document describes the current headless game integration path for Alcheme
-communication rooms and voice sessions. It is intentionally separate from Plaza
-discussion, draft, semantic, and crystallization flows.
+This document describes the current headless external program integration path
+for Alcheme communication rooms and voice sessions. It is intentionally separate
+from Plaza discussion, draft, semantic, and crystallization flows.
+
+Product terminology: **External Program** is the user-facing umbrella term. The
+implementation object is still named `ExternalApp`, and legacy SDK/package names
+may still contain `game-chat` for compatibility.
 
 ## Current Scope
 
 Implemented:
 
-- Resolve communication rooms for circles, direct rooms, and external game rooms.
+- Resolve communication rooms for circles, direct rooms, and external program
+  rooms.
 - Create wallet-signed communication sessions.
 - Send, list, and stream signed text messages.
 - Send voice clip messages by referencing externally stored audio.
@@ -21,8 +26,8 @@ Not implemented in this slice:
 
 - React UI kit.
 - Browser/provider transcription capture UI.
-- Auto draft creation from game chat or voice.
-- Auto crystallization from game chat or voice.
+- Auto draft creation from external program chat or voice.
+- Auto crystallization from external program chat or voice.
 - On-chain temporary room or voice state.
 
 ## Runtime Roles
@@ -30,7 +35,7 @@ Not implemented in this slice:
 Alcheme/query-api is the control plane:
 
 - verifies wallet signatures
-- verifies external app room claims
+- verifies external program room claims
 - stores room/session/message metadata
 - issues voice provider tokens
 - enforces room permissions
@@ -131,7 +136,7 @@ Voice speaker limits have two layers:
   default for guild halls, public lobbies, AMAs, teaching rooms, or any room
   where speaking order needs active control.
 
-External game rooms can set room-specific policy through the server-signed
+External program rooms can set room-specific policy through the server-signed
 `appRoomClaim.voicePolicy`. Effective speaker slots are always clamped to the
 platform hard cap. Unsigned `metadata.voicePolicy` in the browser request is
 ignored for external rooms.
@@ -160,7 +165,7 @@ container:
 - long-lived game community
 - strategy room tied to existing Alcheme knowledge
 
-Use a communication room when the room is temporary or game-native:
+Use a communication room when the room is temporary or external-program-native:
 
 - party
 - dungeon
@@ -195,7 +200,7 @@ Circle room capabilities default to Plaza-aware behavior:
 - AI summary, draft generation, crystallization, and governance enabled through
   the existing review-gated Plaza paths
 
-External game rooms default to generic runtime behavior:
+External program rooms default to generic runtime behavior:
 
 - text chat and voice enabled
 - Plaza discussion disabled
@@ -213,9 +218,9 @@ Do not migrate Plaza discussion storage into `communication_messages` without th
 separate message-unification gate described in
 `docs/architecture/room-capability-carrier.md`.
 
-## External App Registration
+## External Program Registration
 
-External game rooms require an `ExternalApp` row before claim verification can
+External program rooms require an `ExternalApp` row before claim verification can
 succeed.
 
 Required fields:
@@ -224,7 +229,7 @@ Required fields:
 - `name`: display name
 - `ownerPubkey`: owner wallet
 - `status`: `active`
-- `serverPublicKey`: bs58 Ed25519 public key for the game server
+- `serverPublicKey`: bs58 Ed25519 public key for the external program server
 - `claimAuthMode`: `server_ed25519`
 
 Development-only mode `wallet_only_dev` bypasses server claim signatures, but it
@@ -259,7 +264,7 @@ scoped developer agreement:
 GET /api/v1/external-apps/risk-disclaimers/developer_registration
 ```
 
-The external app records the acceptance on chain through the ExternalApp
+The external program records the acceptance on chain through the ExternalApp
 Economics program, then submits the receipt evidence as `developerAgreement` in:
 
 ```http
@@ -304,7 +309,7 @@ ExternalApp Registry program, event emitter, registry authority keypair, and IDL
 are all configured; then it submits real registry and receipt-anchor
 transactions through the chain registry adapter.
 
-The local browser-like smoke path is:
+The local browser-like smoke path uses a historical script name:
 
 ```bash
 npm run smoke:external-game-local
@@ -317,9 +322,9 @@ for non-default local stacks. The smoke script default matches
 
 ## App Room Claim
 
-For external rooms, the game server signs a short-lived room claim. The payload is
-base64url-encoded JSON, and the signature is base64 Ed25519 over the encoded
-payload string.
+For external rooms, the external program server signs a short-lived room claim.
+The payload is base64url-encoded JSON, and the signature is base64 Ed25519 over
+the encoded payload string.
 
 Payload fields:
 
@@ -541,7 +546,7 @@ The SDK exports:
 
 - `createAlchemeGameChatClient`
 - `createAlchemeVoiceClient`
-- `joinExternalRoom` on the game chat client
+- `joinExternalRoom` on the communication client
 - `signAppRoomClaim` from `@alcheme/sdk/server`
 - `buildCommunicationSessionBootstrapMessage`
 - `buildCommunicationMessageSigningMessage`
@@ -645,7 +650,7 @@ Before calling an integration complete:
 - SDK runtime tests pass
 - frontend typecheck still passes if frontend code changed
 - `npm run check:covenant` passes
-- no temporary game room, chat message, voice session, or raw audio state is
+- no temporary external program room, chat message, voice session, or raw audio state is
   written to chain
 - `transcriptionMode` remains `off` unless a server-signed app claim explicitly
   authorizes a non-off mode

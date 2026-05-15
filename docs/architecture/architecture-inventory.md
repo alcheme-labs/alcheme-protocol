@@ -25,8 +25,8 @@ This inventory is the working index for the diagram-first architecture documenta
 | Contribution engine extension | `extensions/contribution-engine/` | Extension bundle | `extension.manifest.json`, package scripts, tests | `extensions/contribution-engine/README.md` |
 | Contribution tracker | `extensions/contribution-engine/tracker/` | Node service | `tracker/package.json`, `tracker/src/*`, tests | `extensions/contribution-engine/tracker/README.md` |
 | Anchor signer | `extensions/anchor-signer/` | Node sidecar | `extensions/anchor-signer/package.json`, `src/server.js` | `extensions/anchor-signer/README.md` |
-| External app chat React package | `packages/game-chat-react/` | React package | `packages/game-chat-react/src/index.ts`, existing README | `packages/game-chat-react/README.md` |
-| External app headless communication example | `examples/game-chat-headless/` | Example | `examples/game-chat-headless/src/main.ts`, existing README | `examples/game-chat-headless/README.md` |
+| External program React communication package | `packages/game-chat-react/` | React package | `packages/game-chat-react/src/index.ts`, existing README | `packages/game-chat-react/README.md` |
+| External program headless communication example | `examples/game-chat-headless/` | Example | `examples/game-chat-headless/src/main.ts`, existing README | `examples/game-chat-headless/README.md` |
 
 ## Root Orchestration Evidence
 
@@ -47,7 +47,7 @@ flowchart LR
     inventory["Architecture inventory"] --> contracts["Foundation and programs"]
     contracts --> projection["Indexer and read model"]
     projection --> runtime["query-api runtime"]
-    runtime --> clients["SDK, frontend, mobile, external app packages"]
+    runtime --> clients["SDK, frontend, mobile, external program packages"]
     runtime --> extensions["Extensions and sidecars"]
     clients --> global["Global architecture README"]
     extensions --> global
@@ -79,7 +79,7 @@ flowchart TB
     signer["anchor-signer"] --> query
 
     mobile["mobile-shell"] --> frontend
-    external["external app / runtime"] --> sdk
+    external["external program / runtime"] --> sdk
     external --> gameui["optional chat UI adapter"]
 ```
 

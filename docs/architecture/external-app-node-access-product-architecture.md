@@ -1,8 +1,12 @@
-# Alcheme External App and Compatible Node Access Product Architecture
+# Alcheme External Program And Compatible Node Access Product Architecture
 
 Date: 2026-05-13
 Status: Product architecture draft; superseded in key areas by the 2026-05-14 no-liability and external-route boundary decisions below.
 Scope: ExternalApp registration, Alcheme managed node access, app-operated external routes, SDK boundaries, owner/challenge bonds, complaint challenges, risk disclaimer, and dispute handling.
+
+Terminology: **External Program** is the product-facing term for third-party
+runtimes that connect to Alcheme capabilities. `ExternalApp` remains the current
+code, API, and database object name.
 
 ## 0. 2026-05-14 Boundary Update
 
@@ -17,18 +21,18 @@ Current product and legal boundaries:
 
 - Alcheme must not be described as compensating, reimbursing, insuring,
   guaranteeing, making users whole, protecting principal, or assuming liability
-  for external-app behavior or participant outcomes.
+  for external program behavior or participant outcomes.
 - Alcheme provides protocol, node, SDK, discovery, governance, evidence, and
-  rule-execution capabilities. External app operators and participants accept
+  rule-execution capabilities. External program operators and participants accept
   their own rules, risks, and consequences when entering or using an external
-  app.
+  program.
 - Abuse prevention, review, evidence, bond, and governance mechanisms reduce
   misuse risk and execute transparent rules. They do not create Alcheme
-  responsibility for what external apps do.
+  responsibility for what external programs do.
 - Participant-posted bonds may be locked, released, forfeited, or routed by
   active policy and receipts. They must not be presented as Alcheme
   compensation, reimbursement, guarantee, coverage, or platform liability.
-- External apps may declare app-operated routes for continuity. Those routes are
+- External programs may declare app-operated routes for continuity. Those routes are
   outside Alcheme's official managed-node system and outside Alcheme
   responsibility. Alcheme does not operate, recognize, recommend, certify, rank,
   or govern a public self-hosted node network in this plan.
@@ -38,8 +42,8 @@ Current product and legal boundaries:
 
 ## 1. Executive Conclusion
 
-Alcheme should treat external app access as its own product layer. It should not
-be reduced to a set of `game-chat` or `voice` APIs.
+Alcheme should treat external program access as its own product layer. It should not
+be reduced to a set of legacy communication or voice APIs.
 
 The recommended target architecture is:
 
@@ -79,7 +83,7 @@ Already present:
 
 - An `ExternalApp` data table with fields including `id`, `ownerPubkey`, `status`, `serverPublicKey`, `claimAuthMode`, `allowedOrigins`, and `config`.
 - `CommunicationRoom` can be associated with `externalAppId`, `roomType`, and `externalRoomId`.
-- `appRoomClaim` already exists as an authority boundary for external app rooms.
+- `appRoomClaim` already exists as an authority boundary for external program rooms.
 - `wallet_only_dev` already exists, but it is a development convenience mode and should not become the production default.
 - `query-api` exposes `/api/v1/extensions/capabilities`, which can provide node capabilities and public/private sidecar route information.
 - `query-api` exposes `/sync/status`, which can become part of node sync health reporting.
@@ -171,8 +175,8 @@ What to borrow:
 
 How Alcheme should use it:
 
-- Reviewed and production ExternalApps should deploy `https://<domain>/.well-known/alcheme-app.json`.
-- Sandbox ExternalApps can initially use local seeds or development configuration without a mandatory manifest.
+- Reviewed and production external programs should deploy `https://<domain>/.well-known/alcheme-app.json`.
+- Sandbox external programs can initially use local seeds or development configuration without a mandatory manifest.
 - The manifest declares app id, owner, server key, origins, callback, capabilities, policy, and SDK version.
 - The on-chain registry stores only the manifest hash and trust root. Nodes fetch and verify the manifest.
 
@@ -227,8 +231,8 @@ Reference:
 
 ### 4.1 ExternalApp
 
-ExternalApp is the identity object for third-party games, tools, mini apps,
-community apps, and similar external programs inside Alcheme.
+ExternalApp is the implementation identity object for third-party external
+programs inside Alcheme.
 
 It is not a browser origin, and it is not a simple API key.
 
@@ -265,14 +269,14 @@ Trust` belongs to the node or node operator, not to the app identity itself.
 
 ### 4.2 ExternalApp Manifest
 
-Reviewed and production external apps must provide the following file under
+Reviewed and production external programs must provide the following file under
 their primary domain:
 
 ```text
 https://example.com/.well-known/alcheme-app.json
 ```
 
-Sandbox external apps may temporarily omit the manifest, but UI, API responses,
+Sandbox external programs may temporarily omit the manifest, but UI, API responses,
 and documentation must clearly mark them as development or test identities. They
 must not enter mainnet discovery pages or receive production quota.
 
@@ -346,7 +350,7 @@ an external team.
 There are two categories:
 
 - Private self-use nodes: serve only the operator's own app and players, with a lower barrier.
-- Public service nodes: serve other ExternalApps or users, and therefore need stronger compatibility and reputation constraints.
+- Public service nodes: serve other external programs or users, and therefore need stronger compatibility and reputation constraints.
 
 V3 should only expose read-only app-operated external-route node availability and compatibility
 labels from `ExternalNode` projections. Full public node staking, public node
@@ -470,7 +474,7 @@ Purpose:
 
 - local development
 - demo testing
-- quick external game integration trials
+- quick external program integration trials
 
 Rules:
 
@@ -544,30 +548,30 @@ The default production-grade ExternalApp integration should be server-backed.
 
 Characteristics:
 
-- The external app has its own server.
-- The app server stores the private key and signs `appRoomClaim`.
-- The user client only holds a wallet session. It does not hold app authority keys.
-- This fits app-owned rooms, game-owned roles, cross-player team or room synchronization, and production quota.
+- The external program has its own server.
+- The program server stores the private key and signs `appRoomClaim`.
+- The user client only holds a wallet session. It does not hold program authority keys.
+- This fits program-owned rooms, program-owned roles, cross-user team or room synchronization, and production quota.
 
 This is the recommended path for mainnet production and high-trust integrations.
 
 ### 6.2 Client-Only Integration
 
-A client-only app has no secure place to store an app server private key, so it
-cannot receive production app-owned room authority.
+A client-only external program has no secure place to store a program server
+private key, so it cannot receive production program-owned room authority.
 
 Allowed paths:
 
 - sandbox or dev testing
 - user-owned rooms
 - low-trust integration on an app-operated external-route node
-- a future Alcheme hosted claim service, which is equivalent to Alcheme custodying app authority and therefore requires separate review
+- a future Alcheme hosted claim service, which is equivalent to Alcheme custodying program authority and therefore requires separate review
 
 Client-only integration must not bypass the production `appRoomClaim` boundary,
-and the browser SDK must not become an app authority signer.
+and the browser SDK must not become a program authority signer.
 
 Alcheme hosted claim service is a separate product shape. It is not a shortcut
-around the server-backed model. It means Alcheme custodies app authority, so it
+around the server-backed model. It means Alcheme custodies program authority, so it
 must default to lower quotas, narrower capabilities, stricter review, and
 stronger risk controls. By default it must not enter the high-trust or featured
 tiers. Permission can only increase after separate assessment and accountability
@@ -590,8 +594,8 @@ It is not an installation market, and it is not a service kill switch.
 
 Basic capabilities:
 
-- Show reviewed or production ExternalApps.
-- Show app name, icon, description, entry point, and supported capabilities.
+- Show reviewed or production external programs.
+- Show program name, icon, description, entry point, and supported capabilities.
 - Show simplified status labels such as `Reviewed`, `Owner Bonded`, `Independent Support Declared`, `Risk Notice`, `Under Review`, `Under Challenge`, `Official Node Limited`, and `External Route Declared`.
 - Do not use bare `Backed` as an ordinary user-facing label. Show `Under Challenge` only after the V3 credibility gate decides that the complaint deserves public challenge labeling.
 - Support deterministic grey rollout so new or risky apps can be shown to a
@@ -603,8 +607,8 @@ Boundaries:
 
 - `delisted` only means removed from official discovery, recommendations, and app store distribution.
 - The app store does not decide whether the on-chain ExternalApp exists.
-- The app store does not shut down the external app's own service.
-- Users may continue through direct links, app-operated external-route nodes, or the external app's own entry point unless a separate `ManagedNodePolicy` or governance ruling says otherwise.
+- The app store does not shut down the external program's own service.
+- Users may continue through direct links, app-operated external-route nodes, or the external program's own entry point unless a separate `ManagedNodePolicy` or governance ruling says otherwise.
 
 ### 6.5 Boundary With Existing Circle / Governance Abstractions
 
@@ -671,7 +675,7 @@ These authorities must not replace one another.
 
 ### 7.2 `appRoomClaim`
 
-`appRoomClaim` is signed by the external application server. It should not be
+`appRoomClaim` is signed by the external program server. It should not be
 generated by the browser.
 
 Recommended payload:
@@ -947,7 +951,7 @@ At a heavy threshold:
 
 App store delisting only means that Alcheme official discovery, recommendation,
 and app store surfaces no longer actively distribute the app. Direct links,
-existing users, app-operated external-route nodes, and the external app's own entry point should
+existing users, app-operated external-route nodes, and the external program's own entry point should
 continue by default.
 
 Managed node downgrade only means that Alcheme official nodes reduce resource
@@ -1128,7 +1132,7 @@ separate versioned registry-status migration is explicitly approved.
 ### 9.3 Service Suspension Boundary
 
 By default, Alcheme should not have product semantics that let it arbitrarily
-shut down the basic functionality of an external app.
+shut down the basic functionality of an external program.
 
 Most risks should first be handled through:
 
@@ -1328,11 +1332,11 @@ The SDK should internally handle:
 
 ### 11.2 Server Integration
 
-The external game server is responsible for:
+The external program server is responsible for:
 
 - storing the app server private key
 - signing `appRoomClaim`
-- syncing in-game room/member/role state
+- syncing host-program room/member/role state
 - receiving webhooks
 - handling key rotation
 
@@ -1398,9 +1402,9 @@ Target flow:
 
 ## 13. Relationship To Existing Implementation Plan
 
-The existing `2026-05-13-external-game-integration-hardening-plan.md` should be
-downgraded to a V1 repair plan. It should no longer carry the complete product
-architecture definition.
+The existing May 13 integration hardening plan should be downgraded to a V1
+repair plan. It should no longer carry the complete product architecture
+definition.
 
 Parts that remain valid:
 
@@ -1439,7 +1443,7 @@ Deliverables:
 
 Goals:
 
-- External games can connect to local/dev nodes without manual DB seeding.
+- External programs can connect to local/dev nodes without manual DB seeding.
 - SDK can join a room in one call.
 - Errors are understandable.
 - CORS is configurable.
@@ -1558,4 +1562,4 @@ The right shape is:
 
 This design can significantly reduce manual review cost without turning Alcheme
 into a system where "whoever pays more is trusted," "whoever complains more
-wins," or "the platform can arbitrarily shut down external apps."
+wins," or "the platform can arbitrarily shut down external programs."

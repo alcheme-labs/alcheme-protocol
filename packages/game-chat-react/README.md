@@ -2,7 +2,11 @@
 
 HTML diagram: [Open this subproject map](../../docs/architecture/subproject-maps.html#game-chat-react).
 
-Optional React components for external app or runtime integrations that want a simple UI on top of the Alcheme headless communication and voice clients.
+Optional React components for external program or runtime integrations that want
+a simple UI on top of the Alcheme headless communication and voice clients.
+
+Product terminology: **External Program** is the user-facing umbrella term. The
+package keeps the historical `game-chat-react` name for compatibility.
 
 This package is intentionally adapter-based. It does not require API users to use React, and it does not import Plaza, draft, semantic, knowledge, transcript, or recap controls.
 
@@ -10,7 +14,7 @@ This package is intentionally adapter-based. It does not require API users to us
 
 ```mermaid
 flowchart LR
-    app["external app UI"] --> package["@alcheme/game-chat-react"]
+    app["external program UI"] --> package["@alcheme/game-chat-react"]
     package --> chat["ChatPanel"]
     package --> voice["VoiceControls"]
     chat --> adapter["host-supplied GameChatClientAdapter"]
@@ -38,7 +42,8 @@ flowchart TB
 
 - Provides optional React UI for chat messages and voice controls.
 - Depends on adapters supplied by the host application instead of importing Plaza or Alcheme product UI.
-- Keeps external app integrations compatible with headless SDK runtime clients.
+- Keeps external program integrations compatible with headless SDK runtime
+  clients.
 - Leaves authentication, wallet signing, room claims, and provider setup to the host application.
 
 ## Build

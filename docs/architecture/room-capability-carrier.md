@@ -37,7 +37,7 @@ Circle Plaza still owns the existing discussion/product workflow:
 
 The bridge is `CommunicationRoom.metadata.capabilities`. For circle rooms,
 `plazaDiscussion`, `aiSummary`, `draftGeneration`, `crystallization`, and
-`governance` default to enabled. For external game rooms, those Plaza-specific
+`governance` default to enabled. For external program rooms, those Plaza-specific
 capabilities default to disabled.
 
 ## Capability Defaults
@@ -56,7 +56,7 @@ crystallization: true
 governance: true
 ```
 
-External game room defaults:
+External program room defaults:
 
 ```text
 textChat: true

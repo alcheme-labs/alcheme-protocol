@@ -1,7 +1,11 @@
-# External App V3 Emergency Authority Matrix
+# External Program V3 Emergency Authority Matrix
 
-This document defines the implementation baseline for ExternalApp V3 emergency controls.
-Emergency authority is a scoped correction mechanism for protocol and official managed-node risk. It is not an app shutdown system, not a public self-hosted node control system, and not a source of Alcheme responsibility for external app outcomes.
+This document defines the implementation baseline for ExternalApp V3 emergency
+controls. **External Program** is the product-facing term; `ExternalApp` remains
+the current implementation object. Emergency authority is a scoped correction
+mechanism for protocol and official managed-node risk. It is not a program
+shutdown system, not a public self-hosted node control system, and not a source
+of Alcheme responsibility for external program outcomes.
 
 ## Scope
 
@@ -16,7 +20,7 @@ Emergency actions must prefer the narrowest effective control:
 7. Registry `suspended`.
 8. Registry `revoked`.
 
-An emergency hold on an official managed node does not imply self-hosted node shutdown, external-app shutdown, app-store delisting, registry suspension, or registry revocation.
+An emergency hold on an official managed node does not imply self-hosted node shutdown, external program shutdown, app-store delisting, registry suspension, or registry revocation.
 
 ## Required Receipt Fields
 
@@ -68,4 +72,4 @@ If an emergency action was too broad, expired, unsupported by evidence, or based
 
 ## Wording Boundary
 
-Emergency controls reduce misuse risk and protect protocol integrity. They do not make Alcheme a compensating party, insurer, guarantor, fiduciary, principal protector, or liability-bearing operator for external app behavior or participant outcomes.
+Emergency controls reduce misuse risk and protect protocol integrity. They do not make Alcheme a compensating party, insurer, guarantor, fiduciary, principal protector, or liability-bearing operator for external program behavior or participant outcomes.

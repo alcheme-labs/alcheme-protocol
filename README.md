@@ -131,7 +131,7 @@ flowchart TB
     Client["Wallet / Client"] --> Frontend["Frontend"]
     Mobile["mobile-shell"] --> Frontend
     Frontend --> SDK["@alcheme/sdk"]
-    External["External app / runtime"] --> SDK
+    External["External program / runtime"] --> SDK
     External --> ChatAdapter["Optional chat UI adapter"]
 
     SDK --> Programs["Solana Programs"]
@@ -169,6 +169,17 @@ Architecturally, the repo still distinguishes between public-safe read surfaces 
 - `extensions/`: official extensions and extension-side services
 - `scripts/`: local stack, deployment, consistency, and maintenance scripts
 - `docs/schemas/`: public schema and example files carried into the first public snapshot
+
+## External Program Integration
+
+External Program is the product-facing term for third-party runtimes that connect
+to Alcheme capabilities. The implementation object is still named `ExternalApp`
+in code and APIs.
+
+For the current developer entrypoint, start with
+[External Program Integration Quickstart](./docs/integration/external-program-quickstart.md).
+It covers sandbox registration, server-signed room claims, SDK runtime clients,
+voice, production review, risk-disclaimer receipts, and local verification.
 
 ## Public Snapshot Note
 

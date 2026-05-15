@@ -1,4 +1,4 @@
-# External App V3 Settlement Asset Policy
+# External Program V3 Settlement Asset Policy
 
 Status: Phase 2 implementation baseline before custody code.
 
@@ -47,7 +47,7 @@ existing rule-bound cases. Disabled assets reject all new settlement requests.
 Every fund movement must include:
 
 - policy epoch id
-- external app id hash
+- external program id hash
 - case id when applicable
 - mint
 - amount

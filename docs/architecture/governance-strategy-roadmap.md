@@ -158,7 +158,7 @@ Possible V3 actions:
 Not default V3 actions:
 
 - normal chat moderation
-- game room membership sync
+- external program room membership sync
 - voice controls
 - temporary room lifecycle changes
 

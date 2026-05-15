@@ -1,8 +1,12 @@
-# ExternalApp Registry V3 Stability Model
+# External Program Registry V3 Stability Model
 
 Date: 2026-05-14
 Status: Draft for review; superseded in key areas by the 2026-05-14 no-liability and external-route boundary decisions below.
 Scope: ExternalApp owner bond, challenge bond, risk disclaimer, participant-posted bond disposition, dispute flow, settlement rules, and stable policy epochs.
+
+Terminology: **External Program** is the product-facing term for third-party
+runtimes that connect to Alcheme capabilities. `ExternalApp` remains the current
+code, API, and database object name.
 
 ## 0. 2026-05-14 Boundary Update
 
@@ -17,19 +21,19 @@ Current product and legal boundaries:
 
 - Alcheme must not be described as compensating, reimbursing, insuring,
   guaranteeing, making users whole, protecting principal, or assuming liability
-  for external-app behavior or participant outcomes.
+  for external program behavior or participant outcomes.
 - Alcheme provides protocol, node, SDK, discovery, governance, evidence, and
-  rule-execution capabilities. External app operators and participants accept
+  rule-execution capabilities. External program operators and participants accept
   their own rules, risks, and consequences when entering or using an external
-  app.
+  program.
 - Abuse prevention, review, evidence, bond, and governance mechanisms reduce
   misuse risk and execute transparent rules. They do not create Alcheme
-  responsibility for what external apps do.
+  responsibility for what external programs do.
 - Default V3C is risk disclaimer plus participant-posted bond disposition:
   bonds may be locked, released, forfeited, or routed by active policy and
   receipts. It is not a compensation, payout, insurance, refund, principal
   protection, make-whole, or platform-liability system.
-- Public app-operated external-route node networks are excluded from this plan. External apps
+- Public app-operated external-route node networks are excluded from this plan. External programs
   may declare app-operated routes for continuity, but those routes are outside
   Alcheme's official managed-node system and outside Alcheme responsibility.
   Alcheme does not operate, recognize, recommend, certify, rank, or govern a
@@ -69,7 +73,7 @@ requires evidence, response, governance or arbitration, and appeal.
 - App store delisting, managed-node downgrade, capability restriction, and
   protocol revocation stay separate states.
 - Emergency holds are temporary official managed-node controls, not a generic
-  right to shut down an external app.
+  right to shut down an external program.
 
 ### 1.1 Operating Principle
 
@@ -846,7 +850,7 @@ Rules:
 
 ### 7.2 Selective Log And Evidence Pollution Controls
 
-External apps, node operators, challengers, and users may all submit incomplete
+External programs, node operators, challengers, and users may all submit incomplete
 or misleading evidence.
 
 Controls:
@@ -902,7 +906,7 @@ Recommended evidence classes:
 | paid Alcheme/API/service fee incident | maybe | may justify process correction or limited bond routing only under active policy |
 | official managed-node incident | maybe | requires node receipt, operator evidence, or ruling; does not create Alcheme liability |
 | verified app-mediated asset incident | maybe | requires app server signed report plus Alcheme usage evidence and explicit app policy |
-| external game-only virtual value | no by default | review-only unless app signed the asset state and policy opted in |
+| external program-internal virtual value | no by default | review-only unless app signed the asset state and policy opted in |
 | expected yield or future reward | no | avoid financialization and speculative claims |
 | opportunity cost, emotional harm, reputational harm | no by default | may affect penalties, not automatic compensation |
 | Independent Support Signal loss | separate | handled only by explicit bond-disposition policy, not Alcheme compensation |
@@ -920,7 +924,7 @@ Bond disposition and high-impact risk actions need evidence tiers:
 
 Alcheme can prove Alcheme usage, sessions, messages, voice sessions, registry
 state, and node receipts. It cannot automatically prove every game-internal
-asset or off-platform promise unless the external app signs those facts or they
+asset or off-platform promise unless the external program signs those facts or they
 are otherwise verifiable.
 
 ### 8.1.3 Actor Role Deduplication
@@ -977,9 +981,9 @@ Allowed paths:
 Batch actions still need a receipt and should be contestable during a short
 review window.
 
-### 8.1.6 External App Loss Oracle Boundary
+### 8.1.6 External Program Loss Oracle Boundary
 
-External app-internal incident assertions require stronger boundaries.
+External program-internal incident assertions require stronger boundaries.
 
 An app-mediated asset incident is eligible for bond-disposition review only when
 the policy accepts the asset class and the evidence package includes:
@@ -990,7 +994,7 @@ the policy accepts the asset class and the evidence package includes:
 - user incident statement or receipt.
 - case id and evidence hash.
 
-If the external app refuses to sign the incident report, or if the app server
+If the external program refuses to sign the incident report, or if the program server
 itself is accused of fraud, the case must go to governance/arbitration. It must
 not be automatically routed as an Alcheme payment or reserve claim.
 
@@ -1813,7 +1817,7 @@ The store should stay simple in V3.
 
 Minimum behavior:
 
-- list reviewed or production ExternalApps.
+- list reviewed or production external programs.
 - show status labels and risk notices.
 - show status provenance for material warning, hold, suspension, and revocation
   states.
@@ -1843,7 +1847,7 @@ but cannot dominate discovery.
 ### 13.1 Graduated Exposure And Grey Rollout
 
 Optimistic acceptance should not mean immediate full exposure. New or newly
-changed ExternalApps should move through deterministic exposure buckets before
+changed external programs should move through deterministic exposure buckets before
 they become visible to the full audience.
 
 Recommended exposure states:
@@ -1904,7 +1908,7 @@ When official managed-node access is limited, app surfaces should distinguish:
 
 - `Official Managed Node Limited`: Alcheme official node policy is restricted.
 - `External Route Declared`: compatible app-operated external-route route exists.
-- `Direct App Entry Available`: external app can still be reached directly.
+- `Direct Program Entry Available`: external program can still be reached directly.
 - `Protocol Registry Not Revoked`: chain registry identity remains non-revoked;
   any active dispute is a V3 case or projection state, not a V2 registry enum.
 
@@ -1928,7 +1932,7 @@ Independent Support Signal. This prevents the store from becoming pay-to-rank.
 | App owner creates fake victims | related-party exclusion and signed evidence requirements |
 | Same actor acts as challenger, affected user, and supporter | actor role deduplication and capped combinations |
 | Process Reserve is drained by one incident | per-case, per-actor, evidence-class, and per-epoch caps |
-| Game-internal loss cannot be verified | external app loss oracle boundary and governance fallback |
+| Program-internal loss cannot be verified | external program loss oracle boundary and governance fallback |
 | Small incident reports cost more to review than to process | Merkle/evidence batch path and weak-evidence risk-score-only path |
 | New wallets spam complaints | low new-account weight, sybil clustering, usage-record multiplier |
 | App owner masquerades as community | related-wallet marking, owner-affiliate tier |

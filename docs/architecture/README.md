@@ -12,8 +12,8 @@ flowchart TB
         wallet["Wallet / client"] --> frontend["frontend"]
         mobile["mobile-shell"] --> frontend
         frontend --> sdk["@alcheme/sdk"]
-        external["external app / runtime"] --> sdk
-        external["external app / runtime"] --> gameui["optional chat UI adapter"]
+        external["external program / runtime"] --> sdk
+        external["external program / runtime"] --> gameui["optional chat UI adapter"]
     end
 
     subgraph chain_boundary["Chain-authoritative boundary"]
@@ -69,7 +69,7 @@ flowchart TB
 | Runtime/API | GraphQL, REST, private sidecar routes, AI jobs, collaboration, voice, governance, drafts, crystallization, and cron workers. | [query-api](../../services/query-api/README.md), [Prisma schema](../../services/query-api/prisma/README.md) |
 | Client SDK | Program modules, PDA helpers, transaction helpers, communication runtime clients, and voice runtime clients. | [sdk](../../sdk/README.md) |
 | Product UI | Next.js product routes, hooks, API clients, wallet adapters, i18n, browser/mobile runtime integration. | [frontend](../../frontend/README.md), [mobile-shell](../../mobile-shell/README.md) |
-| Extensions and examples | Contribution accounting, settlement tracker, memo-anchor signer sidecar, external app chat/voice integration. | [contribution-engine](../../extensions/contribution-engine/README.md), [tracker](../../extensions/contribution-engine/tracker/README.md), [anchor-signer](../../extensions/anchor-signer/README.md), [game-chat-react](../../packages/game-chat-react/README.md), [headless example](../../examples/game-chat-headless/README.md) |
+| Extensions and examples | Contribution accounting, settlement tracker, memo-anchor signer sidecar, external program communication/voice integration. | [contribution-engine](../../extensions/contribution-engine/README.md), [tracker](../../extensions/contribution-engine/tracker/README.md), [anchor-signer](../../extensions/anchor-signer/README.md), [external program quickstart](../integration/external-program-quickstart.md), [game-chat-react](../../packages/game-chat-react/README.md), [headless example](../../examples/game-chat-headless/README.md) |
 | Local orchestration | Local stack startup, Docker services, program deployment, config, covenant checks. | `scripts/start-local-stack.sh`, `docker-compose.yml`, `Anchor.toml`, `package.json` |
 
 ## State Authority Boundaries
@@ -218,10 +218,11 @@ Long-lived architecture decisions and technical-debt routes that should remain v
 - [SVM Rollup Route Record](./svm-rollup-route.md): future SVM rollup/appchain adapter route, with spike and production migration gates.
 - [Governance Strategy Roadmap](./governance-strategy-roadmap.md): staged governance strategy expansion beyond the MVP permission gateway.
 - [Fork Context Access Model](./fork-context-access-model.md): product and architecture constraints for fork context, upstream gates, and non-inherited assets/permissions.
-- [External App and Compatible Node Access Product Architecture](./external-app-node-access-product-architecture.md): product architecture for ExternalApp registration, Alcheme managed node access, self-hosted compatible nodes, SDK boundaries, backing, complaint challenges, and governance execution.
-- [ExternalApp Registry V3 Stability Model](./external-app-registry-v3-stability-model.md): optimistic trust onion model for Owner Bond, Community Backing, funded complaints, bounded settlement, manual intervention, and stable policy epochs.
-- [ExternalApp V3 Settlement Asset Policy](./external-app-v3-settlement-asset-policy.md): local/devnet test SPL mint setup, production asset allowlist criteria, pause/retire runbooks, and first production candidate requirements.
-- [ExternalApp V3 Evidence Privacy And Retention Policy](./external-app-v3-evidence-privacy-retention-policy.md): evidence visibility tiers, redaction semantics, retention windows, evidence loss behavior, and access receipts.
-- [ExternalApp V3 Risk Disclaimer And Bond Disposition Policy](./external-app-v3-risk-disclaimer-and-bond-disposition-policy.md): no-liability wording boundary, participant risk acceptance, and rule-based bond disposition defaults.
-- [ExternalApp V3 Emergency Authority Matrix](./external-app-v3-emergency-authority-matrix.md): scoped temporary emergency actions, owner notice, correction receipts, appeal path, and revocation boundaries.
-- [ExternalApp V3 Entrypoint Index](./external-app-v3-entrypoint-index.md): navigation map for player discovery, developer SDK, sandbox registration, production review, governance bootstrap, settlement, external routes, smoke tests, and local stack boundaries.
+- [External Program And Compatible Node Access Product Architecture](./external-app-node-access-product-architecture.md): product architecture for ExternalApp registration, Alcheme managed node access, self-hosted compatible nodes, SDK boundaries, backing, complaint challenges, and governance execution.
+- [External Program Integration Quickstart](../integration/external-program-quickstart.md): developer-facing entrypoint for sandbox registration, server-signed room claims, SDK runtime usage, voice, production review, and local verification.
+- [External Program Registry V3 Stability Model](./external-app-registry-v3-stability-model.md): optimistic trust onion model for Owner Bond, Community Backing, funded complaints, bounded settlement, manual intervention, and stable policy epochs.
+- [External Program V3 Settlement Asset Policy](./external-app-v3-settlement-asset-policy.md): local/devnet test SPL mint setup, production asset allowlist criteria, pause/retire runbooks, and first production candidate requirements.
+- [External Program V3 Evidence Privacy And Retention Policy](./external-app-v3-evidence-privacy-retention-policy.md): evidence visibility tiers, redaction semantics, retention windows, evidence loss behavior, and access receipts.
+- [External Program V3 Risk Disclaimer And Bond Disposition Policy](./external-app-v3-risk-disclaimer-and-bond-disposition-policy.md): no-liability wording boundary, participant risk acceptance, and rule-based bond disposition defaults.
+- [External Program V3 Emergency Authority Matrix](./external-app-v3-emergency-authority-matrix.md): scoped temporary emergency actions, owner notice, correction receipts, appeal path, and revocation boundaries.
+- [External Program V3 Entrypoint Index](./external-app-v3-entrypoint-index.md): navigation map for player discovery, developer SDK, sandbox registration, production review, governance bootstrap, settlement, external routes, smoke tests, and local stack boundaries.

@@ -2,13 +2,15 @@
 
 HTML diagram: [Open this subproject map](../docs/architecture/subproject-maps.html#sdk).
 
-`sdk/` provides the TypeScript client package for Alcheme. It wraps the Anchor programs, PDA helpers, transaction helpers, storage helpers, and runtime clients used by external apps and the first-party frontend.
+`sdk/` provides the TypeScript client package for Alcheme. It wraps the Anchor
+programs, PDA helpers, transaction helpers, storage helpers, and runtime clients
+used by external programs and the first-party frontend.
 
 ## System Position
 
 ```mermaid
 flowchart LR
-    app["frontend / external app"] --> sdk["@alcheme/sdk"]
+    app["frontend / external program"] --> sdk["@alcheme/sdk"]
     sdk --> modules["program modules"]
     sdk --> runtime["runtime clients"]
     modules --> programs["Anchor programs"]
@@ -64,7 +66,7 @@ flowchart TB
 | Runtime subpath check | `cd sdk && npm run check:runtime-imports` |
 
 `@alcheme/sdk/runtime/server` remains as a deprecated compatibility alias for
-early external-game integrations. New code should import server authority
+early external program integrations. New code should import server authority
 helpers from `@alcheme/sdk/server`.
 
 ## Runtime Subpath Imports
@@ -77,7 +79,7 @@ import { createAlchemeGameChatClient } from "@alcheme/sdk/runtime/communication"
 import { createAlchemeVoiceClient } from "@alcheme/sdk/runtime/voice";
 ```
 
-External app servers can build and sign room claims from the server-only helper:
+External program servers can build and sign room claims from the server-only helper:
 
 ```ts
 import {
@@ -112,7 +114,7 @@ POST /api/v1/external-apps/:appId/risk-disclaimer-acceptances
 The chain transaction stores digests, not the full agreement text. For production
 registration, the developer agreement acceptance must bind to the manifest hash
 and be included as `developerAgreement` when opening the governance request.
-External app servers can use `computeExternalAppRiskDisclaimerAcceptanceDigest`
+External program servers can use `computeExternalAppRiskDisclaimerAcceptanceDigest`
 to compute the exact digest that the chain receipt and Query API validation both
 expect. The Query API production path verifies the submitted receipt PDA,
 on-chain account contents, account-data digest, and transaction status before it

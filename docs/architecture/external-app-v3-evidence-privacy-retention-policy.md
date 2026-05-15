@@ -1,4 +1,4 @@
-# External App V3 Evidence Privacy And Retention Policy
+# External Program V3 Evidence Privacy And Retention Policy
 
 Status: implementation baseline for V3A no-custody evidence projection.
 
