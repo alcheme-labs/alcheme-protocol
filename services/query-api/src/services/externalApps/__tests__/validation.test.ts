@@ -28,6 +28,12 @@ describe("external app validation", () => {
     expect(normalizeManagedNodePolicy("restricted")).toBe("restricted");
   });
 
+  it("rejects v3 dispute state as v2 registry status", () => {
+    expect(() => normalizeExternalAppRegistryStatus("disputed")).toThrow(
+      "invalid_external_app_registry_status",
+    );
+  });
+
   it("keeps capability policy as explicit named capabilities", () => {
     expect(normalizeCapabilityPolicyMap({ voice: "limited", ai: "normal" })).toEqual({
       voice: "limited",

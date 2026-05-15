@@ -18,7 +18,6 @@ const ENVIRONMENTS = new Set<ExternalAppEnvironment>([
 const REGISTRY_STATUSES = new Set<ExternalAppRegistryStatus>([
   "pending",
   "active",
-  "disputed",
   "suspended",
   "revoked",
 ]);

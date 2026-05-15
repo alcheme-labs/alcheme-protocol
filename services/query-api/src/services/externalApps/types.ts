@@ -7,7 +7,6 @@ export type ExternalAppEnvironment =
 export type ExternalAppRegistryStatus =
   | "pending"
   | "active"
-  | "disputed"
   | "suspended"
   | "revoked";
 

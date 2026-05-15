@@ -13,6 +13,7 @@ function run(command, args, options = {}) {
     env: {
       ...process.env,
       LC_ALL: "C",
+      NODE_PATH: join(cwd, "node_modules"),
       npm_config_cache: npmCacheDir,
       npm_config_loglevel: "error",
     },
@@ -42,8 +43,10 @@ try {
   const script = [
     'require("@alcheme/sdk/runtime/communication")',
     'require("@alcheme/sdk/runtime/voice")',
-    'require("@alcheme/sdk/runtime/server")',
     'require("@alcheme/sdk/runtime/errors")',
+    'require("@alcheme/sdk/server")',
+    'require("@alcheme/sdk/runtime/server")',
+    'require("@alcheme/sdk/protocol")',
     'console.log("runtime subpath imports ok")',
   ].join(";\n");
   run("node", ["-e", script], { cwd: checkDir });

@@ -59,6 +59,7 @@ interface ProgramIdsConfig {
   messaging: string;
   circles: string;
   externalAppRegistry: string;
+  externalAppEconomics?: string;
   contributionEngine?: string;
 }
 
@@ -167,6 +168,10 @@ function normalizeConfig(raw: unknown, sourcePath: string): InitializeConfig {
       messaging: getRequiredProgramId(candidateProgramIds, "messaging", sourcePath),
       circles: getRequiredProgramId(candidateProgramIds, "circles", sourcePath),
       externalAppRegistry: getRequiredProgramId(candidateProgramIds, "externalAppRegistry", sourcePath),
+      externalAppEconomics:
+        typeof candidateProgramIds.externalAppEconomics === "string" && candidateProgramIds.externalAppEconomics.trim().length > 0
+          ? candidateProgramIds.externalAppEconomics
+          : undefined,
       contributionEngine:
         typeof candidateProgramIds.contributionEngine === "string" && candidateProgramIds.contributionEngine.trim().length > 0
           ? candidateProgramIds.contributionEngine

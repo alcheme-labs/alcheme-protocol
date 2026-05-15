@@ -201,6 +201,12 @@ impl EventEmitterUtils {
             ProtocolEvent::ProgramUpgraded { timestamp, .. } |
             ProtocolEvent::RegistryDeployed { timestamp, .. } |
             ProtocolEvent::RegistryUpgraded { timestamp, .. } |
+            ProtocolEvent::ExternalAppRegisteredV2 { timestamp, .. } |
+            ProtocolEvent::ExternalAppExecutionReceiptAnchoredV2 { timestamp, .. } |
+            ProtocolEvent::ExternalAppManifestUpdatedV2 { timestamp, .. } |
+            ProtocolEvent::ExternalAppServerKeyRotatedV2 { timestamp, .. } |
+            ProtocolEvent::ExternalAppRegistryStatusChangedV2 { timestamp, .. } |
+            ProtocolEvent::ExternalAppRegistryAuthorityChangedV2 { timestamp, .. } |
             ProtocolEvent::EmergencyAction { timestamp, .. } |
             ProtocolEvent::CircleCreated { timestamp, .. } |
             ProtocolEvent::CircleMembershipChanged { timestamp, .. } |
@@ -260,7 +266,13 @@ impl EventEmitterUtils {
             ProtocolEvent::EmergencyAction { .. } => EventType::System,
             
             ProtocolEvent::RegistryDeployed { .. } |
-            ProtocolEvent::RegistryUpgraded { .. } => EventType::Registry,
+            ProtocolEvent::RegistryUpgraded { .. } |
+            ProtocolEvent::ExternalAppRegisteredV2 { .. } |
+            ProtocolEvent::ExternalAppExecutionReceiptAnchoredV2 { .. } |
+            ProtocolEvent::ExternalAppManifestUpdatedV2 { .. } |
+            ProtocolEvent::ExternalAppServerKeyRotatedV2 { .. } |
+            ProtocolEvent::ExternalAppRegistryStatusChangedV2 { .. } |
+            ProtocolEvent::ExternalAppRegistryAuthorityChangedV2 { .. } => EventType::Registry,
 
             ProtocolEvent::CircleCreated { .. } |
             ProtocolEvent::CircleMembershipChanged { .. } |
@@ -302,6 +314,8 @@ impl EventEmitterUtils {
             ProtocolEvent::ProofAttestorRegistered { registered_by, .. } => Some(*registered_by),
             ProtocolEvent::MembershipAttestorRegistered { registered_by, .. } => Some(*registered_by),
             ProtocolEvent::MembershipAttestorRevoked { revoked_by, .. } => Some(*revoked_by),
+            ProtocolEvent::ExternalAppRegisteredV2 { owner, .. } => Some(*owner),
+            ProtocolEvent::ExternalAppRegistryAuthorityChangedV2 { admin, .. } => Some(*admin),
             _ => None,
         }
     }
@@ -558,6 +572,22 @@ mod tests {
         }
     }
 
+    fn external_app_registered_event(owner: Pubkey, timestamp: i64) -> ProtocolEvent {
+        ProtocolEvent::ExternalAppRegisteredV2 {
+            app_id_hash: [1u8; 32],
+            owner,
+            manifest_hash: [2u8; 32],
+            server_key_hash: [3u8; 32],
+            owner_assertion_hash: [4u8; 32],
+            policy_state_digest: [5u8; 32],
+            review_circle_id: 7,
+            review_policy_digest: [6u8; 32],
+            decision_digest: [8u8; 32],
+            execution_intent_digest: [9u8; 32],
+            timestamp,
+        }
+    }
+
     #[test]
     fn get_size_with_new_event_uses_actual_serialized_size() {
         let batch = empty_batch_account();
@@ -627,5 +657,15 @@ mod tests {
 
         assert_eq!(EventEmitterUtils::get_event_timestamp(&event), 123);
         assert_eq!(EventEmitterUtils::get_event_type(&event), EventType::Content);
+    }
+
+    #[test]
+    fn external_app_events_use_registry_timestamp_type_and_owner() {
+        let owner = Pubkey::new_unique();
+        let event = external_app_registered_event(owner, 456);
+
+        assert_eq!(EventEmitterUtils::get_event_timestamp(&event), 456);
+        assert_eq!(EventEmitterUtils::get_event_type(&event), EventType::Registry);
+        assert_eq!(EventEmitterUtils::get_event_user(&event), Some(owner));
     }
 }

@@ -1,0 +1,4691 @@
+{
+  "address": "5YUcL1ysdx9busDkvMGjiXNbugFAAWPLby5hoe2hQHAJ",
+  "metadata": {
+    "name": "external_app_economics",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "External App V3 bounded economics program for Alcheme Protocol"
+  },
+  "instructions": [
+    {
+      "name": "anchor_governance_ruling",
+      "discriminator": [
+        92,
+        238,
+        168,
+        20,
+        245,
+        52,
+        117,
+        94
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "challenge_case",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  99,
+                  104,
+                  97,
+                  108,
+                  108,
+                  101,
+                  110,
+                  103,
+                  101,
+                  95,
+                  99,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "case_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "case_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "ruling_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "deposit_challenge_bond",
+      "discriminator": [
+        27,
+        42,
+        5,
+        61,
+        144,
+        29,
+        75,
+        116
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "challenge_case",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  99,
+                  104,
+                  97,
+                  108,
+                  108,
+                  101,
+                  110,
+                  103,
+                  101,
+                  95,
+                  99,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "case_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "challenger",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "asset_mint"
+        },
+        {
+          "name": "challenger_token_account",
+          "writable": true
+        },
+        {
+          "name": "case_vault_token_account",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "case_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "deposit_owner_bond",
+      "discriminator": [
+        51,
+        142,
+        97,
+        246,
+        161,
+        77,
+        172,
+        82
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "bond_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  111,
+                  119,
+                  110,
+                  101,
+                  114,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "account",
+                "path": "asset_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "asset_mint"
+        },
+        {
+          "name": "owner_token_account",
+          "writable": true
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "execute_bond_forfeiture",
+      "discriminator": [
+        115,
+        123,
+        101,
+        85,
+        187,
+        106,
+        44,
+        73
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "disposition_case",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  99,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "case_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "exposure_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  101,
+                  120,
+                  112,
+                  111,
+                  115,
+                  117,
+                  114,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "account",
+                "path": "disposition_case.mint",
+                "account": "ExternalAppBondDispositionCase"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "case_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "execute_bond_release",
+      "discriminator": [
+        149,
+        172,
+        156,
+        51,
+        153,
+        177,
+        111,
+        31
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "disposition_case",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  99,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "case_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "exposure_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  101,
+                  120,
+                  112,
+                  111,
+                  115,
+                  117,
+                  114,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "account",
+                "path": "disposition_case.mint",
+                "account": "ExternalAppBondDispositionCase"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "case_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "execute_bond_settlement",
+      "discriminator": [
+        171,
+        135,
+        211,
+        95,
+        130,
+        223,
+        162,
+        255
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "challenge_case",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  99,
+                  104,
+                  97,
+                  108,
+                  108,
+                  101,
+                  110,
+                  103,
+                  101,
+                  95,
+                  99,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "case_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "settlement_receipt",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  115,
+                  101,
+                  116,
+                  116,
+                  108,
+                  101,
+                  95,
+                  114,
+                  101,
+                  99,
+                  101,
+                  105,
+                  112,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "case_id"
+              },
+              {
+                "kind": "arg",
+                "path": "receipt_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "case_vault_token_account",
+          "writable": true
+        },
+        {
+          "name": "settlement_destination_token_account",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "case_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "receipt_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "receipt_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "execute_unlocked_owner_bond_withdrawal",
+      "discriminator": [
+        248,
+        86,
+        251,
+        112,
+        131,
+        67,
+        149,
+        192
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "bond_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  111,
+                  119,
+                  110,
+                  101,
+                  114,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "account",
+                "path": "asset_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "exposure_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  101,
+                  120,
+                  112,
+                  111,
+                  115,
+                  117,
+                  114,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "account",
+                "path": "asset_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "asset_mint"
+        },
+        {
+          "name": "owner_token_account",
+          "writable": true
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initialize_economics_config",
+      "discriminator": [
+        66,
+        226,
+        41,
+        225,
+        72,
+        20,
+        113,
+        59
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "governance_authority",
+          "type": "pubkey"
+        },
+        {
+          "name": "policy_epoch_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "withdrawal_lock_seconds",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "lock_bond_for_case",
+      "discriminator": [
+        71,
+        48,
+        127,
+        41,
+        122,
+        65,
+        186,
+        6
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "policy",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  112,
+                  111,
+                  108,
+                  105,
+                  99,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "disposition_case.policy_id",
+                "account": "ExternalAppBondDispositionCase"
+              }
+            ]
+          }
+        },
+        {
+          "name": "disposition_case",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  99,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "case_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "bond_vault",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  111,
+                  119,
+                  110,
+                  101,
+                  114,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "account",
+                "path": "bond_vault.mint",
+                "account": "ExternalAppBondVault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "exposure_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  101,
+                  120,
+                  112,
+                  111,
+                  115,
+                  117,
+                  114,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "account",
+                "path": "bond_vault.mint",
+                "account": "ExternalAppBondVault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "case_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "open_bond_disposition_case",
+      "discriminator": [
+        80,
+        88,
+        10,
+        111,
+        194,
+        90,
+        189,
+        101
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "policy",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  112,
+                  111,
+                  108,
+                  105,
+                  99,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "policy_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "risk_disclaimer_receipt"
+        },
+        {
+          "name": "disposition_case",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  99,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "case_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "bond_vault",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  111,
+                  119,
+                  110,
+                  101,
+                  114,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "account",
+                "path": "bond_vault.mint",
+                "account": "ExternalAppBondVault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_token_account"
+        },
+        {
+          "name": "initiator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "case_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "policy_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "evidence_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "requested_amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "open_challenge_case",
+      "discriminator": [
+        163,
+        125,
+        88,
+        158,
+        162,
+        116,
+        123,
+        232
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "challenge_case",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  99,
+                  104,
+                  97,
+                  108,
+                  108,
+                  101,
+                  110,
+                  103,
+                  101,
+                  95,
+                  99,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "case_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "challenger",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "asset_mint"
+        },
+        {
+          "name": "case_vault_token_account"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "case_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "evidence_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "challenge_type",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "open_owner_bond_vault",
+      "discriminator": [
+        202,
+        92,
+        184,
+        238,
+        26,
+        76,
+        226,
+        87
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "bond_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  111,
+                  119,
+                  110,
+                  101,
+                  114,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "account",
+                "path": "asset_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "asset_mint"
+        },
+        {
+          "name": "vault_token_account"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "pause_new_bond_exposure",
+      "discriminator": [
+        95,
+        6,
+        162,
+        167,
+        108,
+        42,
+        220,
+        31
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "exposure_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  101,
+                  120,
+                  112,
+                  111,
+                  115,
+                  117,
+                  114,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "account",
+                "path": "config.asset_mint",
+                "account": "ExternalAppEconomicsConfig"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "paused",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "pause_new_economic_exposure",
+      "discriminator": [
+        162,
+        87,
+        154,
+        130,
+        222,
+        135,
+        199,
+        59
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "paused",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "record_appeal_window",
+      "discriminator": [
+        93,
+        128,
+        151,
+        64,
+        116,
+        102,
+        86,
+        189
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "challenge_case",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  99,
+                  104,
+                  97,
+                  108,
+                  108,
+                  101,
+                  110,
+                  103,
+                  101,
+                  95,
+                  99,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "case_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "case_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "appeal_window_ends_at",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "record_bond_disposition_evidence",
+      "discriminator": [
+        228,
+        108,
+        55,
+        240,
+        237,
+        68,
+        57,
+        47
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "disposition_case",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  99,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "case_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "case_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "evidence_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "ruling_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "record_challenge_response",
+      "discriminator": [
+        192,
+        191,
+        154,
+        174,
+        72,
+        23,
+        215,
+        79
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "challenge_case",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  99,
+                  104,
+                  97,
+                  108,
+                  108,
+                  101,
+                  110,
+                  103,
+                  101,
+                  95,
+                  99,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "case_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "case_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "response_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "record_risk_disclaimer_acceptance",
+      "discriminator": [
+        90,
+        129,
+        254,
+        125,
+        209,
+        91,
+        208,
+        17
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "risk_disclaimer_receipt",
+          "writable": true
+        },
+        {
+          "name": "actor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "scope",
+          "type": "u8"
+        },
+        {
+          "name": "terms_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "acceptance_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "request_owner_bond_withdrawal",
+      "discriminator": [
+        159,
+        169,
+        116,
+        250,
+        221,
+        55,
+        81,
+        96
+      ],
+      "accounts": [
+        {
+          "name": "bond_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  111,
+                  119,
+                  110,
+                  101,
+                  114,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "account",
+                "path": "bond_vault.mint",
+                "account": "ExternalAppBondVault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "route_forfeited_bond_by_policy",
+      "discriminator": [
+        207,
+        129,
+        71,
+        64,
+        240,
+        146,
+        110,
+        129
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "disposition_case",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  99,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "case_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "bond_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  111,
+                  119,
+                  110,
+                  101,
+                  114,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "account",
+                "path": "bond_vault.mint",
+                "account": "ExternalAppBondVault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "exposure_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  101,
+                  120,
+                  112,
+                  111,
+                  115,
+                  117,
+                  114,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "account",
+                "path": "bond_vault.mint",
+                "account": "ExternalAppBondVault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "routing_receipt",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  114,
+                  111,
+                  117,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "case_id"
+              },
+              {
+                "kind": "arg",
+                "path": "receipt_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true
+        },
+        {
+          "name": "route_destination_token_account",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "case_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "receipt_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "routing_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_asset_allowlist",
+      "discriminator": [
+        211,
+        145,
+        141,
+        148,
+        79,
+        23,
+        140,
+        112
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "signer": true
+        },
+        {
+          "name": "asset_mint"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "status",
+          "type": {
+            "defined": {
+              "name": "AssetStatus"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_bond_disposition_policy",
+      "discriminator": [
+        16,
+        195,
+        17,
+        82,
+        4,
+        107,
+        112,
+        165
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "policy",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  112,
+                  111,
+                  108,
+                  105,
+                  99,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "policy_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "policy_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "policy_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "max_case_amount",
+          "type": "u64"
+        },
+        {
+          "name": "paused",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "set_policy_epoch",
+      "discriminator": [
+        177,
+        59,
+        88,
+        125,
+        21,
+        13,
+        162,
+        204
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "policy_epoch_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "settle_machine_verifiable_case",
+      "discriminator": [
+        36,
+        141,
+        192,
+        61,
+        113,
+        209,
+        216,
+        184
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "challenge_case",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  99,
+                  104,
+                  97,
+                  108,
+                  108,
+                  101,
+                  110,
+                  103,
+                  101,
+                  95,
+                  99,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "case_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "case_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "ruling_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_bond_exposure_state",
+      "discriminator": [
+        163,
+        32,
+        4,
+        166,
+        99,
+        74,
+        31,
+        85
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  101,
+                  99,
+                  111,
+                  110,
+                  111,
+                  109,
+                  105,
+                  99,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "exposure_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  118,
+                  51,
+                  95,
+                  98,
+                  111,
+                  110,
+                  100,
+                  95,
+                  101,
+                  120,
+                  112,
+                  111,
+                  115,
+                  117,
+                  114,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "account",
+                "path": "config.asset_mint",
+                "account": "ExternalAppEconomicsConfig"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "exposure_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "ExternalAppBondDispositionCase",
+      "discriminator": [
+        127,
+        144,
+        28,
+        112,
+        64,
+        72,
+        152,
+        66
+      ]
+    },
+    {
+      "name": "ExternalAppBondDispositionPolicy",
+      "discriminator": [
+        179,
+        168,
+        240,
+        182,
+        206,
+        210,
+        145,
+        182
+      ]
+    },
+    {
+      "name": "ExternalAppBondExposureState",
+      "discriminator": [
+        67,
+        235,
+        217,
+        150,
+        225,
+        71,
+        210,
+        181
+      ]
+    },
+    {
+      "name": "ExternalAppBondRoutingReceipt",
+      "discriminator": [
+        164,
+        118,
+        46,
+        142,
+        150,
+        182,
+        102,
+        169
+      ]
+    },
+    {
+      "name": "ExternalAppBondVault",
+      "discriminator": [
+        71,
+        111,
+        30,
+        7,
+        42,
+        241,
+        243,
+        228
+      ]
+    },
+    {
+      "name": "ExternalAppChallengeCase",
+      "discriminator": [
+        121,
+        183,
+        163,
+        88,
+        124,
+        146,
+        143,
+        240
+      ]
+    },
+    {
+      "name": "ExternalAppEconomicsConfig",
+      "discriminator": [
+        152,
+        61,
+        1,
+        145,
+        2,
+        15,
+        208,
+        129
+      ]
+    },
+    {
+      "name": "ExternalAppRiskDisclaimerReceipt",
+      "discriminator": [
+        193,
+        191,
+        14,
+        179,
+        83,
+        178,
+        144,
+        152
+      ]
+    },
+    {
+      "name": "ExternalAppSettlementReceipt",
+      "discriminator": [
+        157,
+        137,
+        171,
+        141,
+        22,
+        218,
+        21,
+        5
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Unauthorized"
+    },
+    {
+      "code": 6001,
+      "name": "AppMismatch",
+      "msg": "External app hash does not match"
+    },
+    {
+      "code": 6002,
+      "name": "CaseMismatch",
+      "msg": "Challenge case id does not match"
+    },
+    {
+      "code": 6003,
+      "name": "AssetNotActive",
+      "msg": "Configured settlement asset is not active"
+    },
+    {
+      "code": 6004,
+      "name": "AssetMismatch",
+      "msg": "Settlement asset mismatch"
+    },
+    {
+      "code": 6005,
+      "name": "NewExposurePaused",
+      "msg": "New economic exposure is paused"
+    },
+    {
+      "code": 6006,
+      "name": "AmountMustBePositive",
+      "msg": "Amount must be positive"
+    },
+    {
+      "code": 6007,
+      "name": "AmountOverflow",
+      "msg": "Amount overflow"
+    },
+    {
+      "code": 6008,
+      "name": "InsufficientBond",
+      "msg": "Insufficient bond"
+    },
+    {
+      "code": 6009,
+      "name": "WithdrawalNotRequested",
+      "msg": "Withdrawal has not been requested"
+    },
+    {
+      "code": 6010,
+      "name": "WithdrawalLocked",
+      "msg": "Withdrawal is still locked"
+    },
+    {
+      "code": 6011,
+      "name": "InvalidAppealWindow",
+      "msg": "Invalid appeal window"
+    },
+    {
+      "code": 6012,
+      "name": "RulingRequired",
+      "msg": "Governance or machine-verifiable ruling is required"
+    },
+    {
+      "code": 6013,
+      "name": "SettlementAppealWindowOpen",
+      "msg": "Settlement cannot execute while appeal window is open"
+    },
+    {
+      "code": 6014,
+      "name": "SettlementExceedsCaseBond",
+      "msg": "Settlement amount exceeds locked challenge bond"
+    },
+    {
+      "code": 6015,
+      "name": "ZeroDigest",
+      "msg": "Digest must not be zero"
+    },
+    {
+      "code": 6016,
+      "name": "PolicyMismatch",
+      "msg": "Bond disposition policy does not match"
+    },
+    {
+      "code": 6017,
+      "name": "BondDispositionPolicyPaused",
+      "msg": "Bond disposition policy is paused"
+    },
+    {
+      "code": 6018,
+      "name": "DispositionAmountExceedsPolicy",
+      "msg": "Bond disposition amount exceeds policy cap"
+    },
+    {
+      "code": 6019,
+      "name": "DispositionAmountExceedsRequest",
+      "msg": "Bond disposition amount exceeds requested amount"
+    },
+    {
+      "code": 6020,
+      "name": "BondAlreadyLocked",
+      "msg": "Bond is already locked for this case"
+    },
+    {
+      "code": 6021,
+      "name": "BondDispositionCaseNotLocked",
+      "msg": "Bond disposition case is not locked"
+    },
+    {
+      "code": 6022,
+      "name": "DispositionRulingRequired",
+      "msg": "Bond disposition ruling is required"
+    },
+    {
+      "code": 6023,
+      "name": "BondDispositionCaseNotForfeited",
+      "msg": "Bond disposition case is not forfeited"
+    },
+    {
+      "code": 6024,
+      "name": "BondVaultMismatch",
+      "msg": "Bond vault does not match disposition case"
+    },
+    {
+      "code": 6025,
+      "name": "InvalidRiskDisclaimerScope",
+      "msg": "Invalid risk disclaimer scope"
+    },
+    {
+      "code": 6026,
+      "name": "RiskDisclaimerMismatch",
+      "msg": "Risk disclaimer receipt does not match action"
+    },
+    {
+      "code": 6027,
+      "name": "NewBondExposurePaused",
+      "msg": "New bond exposure is paused"
+    }
+  ],
+  "types": [
+    {
+      "name": "AssetStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Disabled"
+          },
+          {
+            "name": "TestOnly"
+          },
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Paused"
+          },
+          {
+            "name": "Retired"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BondDispositionStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unlocked"
+          },
+          {
+            "name": "LockedForCase"
+          },
+          {
+            "name": "Released"
+          },
+          {
+            "name": "Forfeited"
+          },
+          {
+            "name": "RoutedByPolicy"
+          },
+          {
+            "name": "Paused"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BondVaultStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Open"
+          },
+          {
+            "name": "WithdrawalRequested"
+          },
+          {
+            "name": "Closed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ChallengeCaseStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Open"
+          },
+          {
+            "name": "Responded"
+          },
+          {
+            "name": "AppealWindow"
+          },
+          {
+            "name": "Ruled"
+          },
+          {
+            "name": "Settled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExternalAppBondDispositionCase",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "app_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "case_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "policy_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "owner_bond_vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner_vault_token_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "initiator",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "evidence_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "ruling_digest",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "requested_amount",
+            "type": "u64"
+          },
+          {
+            "name": "locked_amount",
+            "type": "u64"
+          },
+          {
+            "name": "routed_amount",
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "BondDispositionStatus"
+              }
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExternalAppBondDispositionPolicy",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "policy_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "policy_epoch_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "governance_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "max_case_amount",
+            "type": "u64"
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          },
+          {
+            "name": "policy_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExternalAppBondExposureState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "app_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "active_locked_amount",
+            "type": "u64"
+          },
+          {
+            "name": "total_routed_amount",
+            "type": "u64"
+          },
+          {
+            "name": "paused_new_bond_exposure",
+            "type": "bool"
+          },
+          {
+            "name": "exposure_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExternalAppBondRoutingReceipt",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "app_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "case_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "receipt_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "policy_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "source_token_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "destination_token_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "routing_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExternalAppBondVault",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "app_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "vault_token_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner_bond_raw",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawal_requested_at",
+            "type": "i64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "BondVaultStatus"
+              }
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExternalAppChallengeCase",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "app_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "case_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "challenger",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "case_vault_token_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "challenge_type",
+            "type": "u8"
+          },
+          {
+            "name": "evidence_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "challenge_bond_raw",
+            "type": "u64"
+          },
+          {
+            "name": "response_digest",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "ruling_digest",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "appeal_window_ends_at",
+            "type": "i64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "ChallengeCaseStatus"
+              }
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExternalAppEconomicsConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "governance_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "policy_epoch_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "asset_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "asset_token_program",
+            "type": "pubkey"
+          },
+          {
+            "name": "asset_status",
+            "type": {
+              "defined": {
+                "name": "AssetStatus"
+              }
+            }
+          },
+          {
+            "name": "withdrawal_lock_seconds",
+            "type": "u32"
+          },
+          {
+            "name": "paused_new_economic_exposure",
+            "type": "bool"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExternalAppRiskDisclaimerReceipt",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "app_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "actor",
+            "type": "pubkey"
+          },
+          {
+            "name": "scope",
+            "type": "u8"
+          },
+          {
+            "name": "terms_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "acceptance_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "policy_epoch_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExternalAppSettlementReceipt",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "app_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "case_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "receipt_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "policy_epoch_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "source_token_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "destination_token_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "receipt_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ]
+}

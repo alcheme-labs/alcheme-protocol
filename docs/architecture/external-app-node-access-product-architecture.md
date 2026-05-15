@@ -1,8 +1,40 @@
 # Alcheme External App and Compatible Node Access Product Architecture
 
 Date: 2026-05-13
-Status: Product architecture draft
-Scope: ExternalApp registration, Alcheme managed node access, self-hosted compatible nodes, SDK boundaries, backing, complaint challenges, and dispute handling.
+Status: Product architecture draft; superseded in key areas by the 2026-05-14 no-liability and external-route boundary decisions below.
+Scope: ExternalApp registration, Alcheme managed node access, app-operated external routes, SDK boundaries, owner/challenge bonds, complaint challenges, risk disclaimer, and dispute handling.
+
+## 0. 2026-05-14 Boundary Update
+
+This section supersedes older references in this document to `Independent Support Signal`,
+`Independent Support`, `Process Reserve`, compensation, payout, user loss
+coverage, and public self-hosted node networks.
+Those older sections are retained only as historical design exploration. Do not
+implement them unless a later plan explicitly replaces this boundary with a new
+product, legal, security, and protocol review.
+
+Current product and legal boundaries:
+
+- Alcheme must not be described as compensating, reimbursing, insuring,
+  guaranteeing, making users whole, protecting principal, or assuming liability
+  for external-app behavior or participant outcomes.
+- Alcheme provides protocol, node, SDK, discovery, governance, evidence, and
+  rule-execution capabilities. External app operators and participants accept
+  their own rules, risks, and consequences when entering or using an external
+  app.
+- Abuse prevention, review, evidence, bond, and governance mechanisms reduce
+  misuse risk and execute transparent rules. They do not create Alcheme
+  responsibility for what external apps do.
+- Participant-posted bonds may be locked, released, forfeited, or routed by
+  active policy and receipts. They must not be presented as Alcheme
+  compensation, reimbursement, guarantee, coverage, or platform liability.
+- External apps may declare app-operated routes for continuity. Those routes are
+  outside Alcheme's official managed-node system and outside Alcheme
+  responsibility. Alcheme does not operate, recognize, recommend, certify, rank,
+  or govern a public self-hosted node network in this plan.
+- Current implementation work should follow
+  `docs/plans/2026-05-14-external-app-v3-full-implementation-plan.md` for phase
+  order, acceptance gates, and exact terminology.
 
 ## 1. Executive Conclusion
 
@@ -19,8 +51,11 @@ This model needs to support four scenarios at the same time:
 
 1. External programs can connect to Alcheme demo or dev nodes at low cost during development and testing.
 2. External programs using Alcheme managed nodes on mainnet are subject to strict review, rate limits, revocation, and accountability.
-3. External programs can operate their own Alcheme-compatible nodes.
-4. Players and backers can help shape ExternalApp reputation, reducing manual review cost while preserving governance or arbitration for subjective disputes.
+3. External programs can declare their own app-operated routes for continuity,
+   without those routes becoming Alcheme-recognized public nodes.
+4. Players and challengers can help shape ExternalApp reputation, reducing
+   manual review cost while preserving governance or arbitration for subjective
+   disputes.
 
 Core principles:
 
@@ -29,7 +64,8 @@ Core principles:
 - A browser SDK must not hold app authority keys.
 - App authority comes from ExternalApp registration state and an externally server-signed claim.
 - User action authority comes from user wallet signatures or sessions.
-- Backing capital can improve economic security, but it is not the same as trustworthiness.
+- Participant-posted bonds can improve accountability, but they are not the same
+  as trustworthiness and must not be presented as Alcheme coverage.
 - Complaint capital can trigger risk downgrades and dispute processes, but principal should not be redistributed automatically based on amount alone.
 - App store delisting, managed node downgrades, capability restrictions, and service suspension must remain separate. By default, governance actions should affect distribution and official node policy. Only severe malicious behavior should trigger emergency service holds.
 - Product semantics come before code reuse. Existing abstractions should be reused to avoid parallel systems, not simply to write less code. If an existing abstraction breaks ExternalApp product semantics, extend or refactor the abstraction instead of forcing ExternalApp into it.
@@ -50,7 +86,7 @@ Already present:
 - The existing `registry_factory` and extension registry provide extension and program discovery infrastructure. They are not the ExternalApp mainnet registry.
 - `Circle` and `CircleMember` can already carry the organizational boundary for who is allowed to participate in certain public processes.
 - `GovernancePolicy`, `GovernancePolicyVersion`, `GovernanceRequest`, `GovernanceSignal`, `GovernanceSnapshot`, `GovernanceDecision`, and `GovernanceExecutionReceipt` already form the generic governance decision foundation. ExternalApp review should not create a parallel review system.
-- The current `@alcheme/sdk` root export exposes both on-chain modules and runtime modules. It does not yet provide clear browser runtime, server, and protocol package boundaries.
+- The current `@alcheme/sdk` package now has explicit browser runtime, server, and protocol subpath boundaries: browser-safe runtime clients under `@alcheme/sdk/runtime/*`, server authority helpers under `@alcheme/sdk/server`, and ExternalApp protocol builders under `@alcheme/sdk/protocol`. The root export remains a general client surface and must not become the server authority surface.
 
 Current gaps:
 
@@ -60,8 +96,7 @@ Current gaps:
 - `ExternalApp.allowedOrigins` is not currently used as an Express CORS source.
 - Expected integration errors, such as CORS mismatch, missing ExternalApp, and invalid `roomType`, can still surface as 500 errors.
 - External integration examples do not fully hide the sequence `resolve room -> sync member -> create session -> voice token`.
-- The SDK has not yet been split clearly into browser runtime SDK, server SDK, and protocol SDK, and it lacks browser runtime subpath exports.
-- Self-hosted nodes currently only have the beginnings of capability discovery and sync status. That is not the same as a full ExternalApp registry synchronization network.
+- App-operated external routes currently only have the beginnings of capability discovery and sync status. That is not the same as an Alcheme-recognized public node network, and V3 should not present it as one.
 
 Therefore, the existing hardening plan should be treated as a V1 developer
 experience repair plan, not as the full mainnet product architecture.
@@ -175,11 +210,11 @@ Reference:
 What to borrow:
 
 - Open node networks need indexer or operator registration, staking, sync status, and service-correctness constraints.
-- Running a self-hosted node is not just running one service. Compatibility, economic incentives, and error penalties matter.
+- Running an app-operated external-route node is not just running one service. Compatibility, economic incentives, and error penalties matter.
 
 How Alcheme should use it:
 
-- Self-hosted Alcheme-compatible nodes should declare capabilities, sync status, and protocol version.
+- App-operated external-route Alcheme-compatible nodes should declare capabilities, sync status, and protocol version.
 - Public service nodes need registration, monitoring, staking or reputation, and error accountability.
 - Private self-use nodes can have a low barrier, but they do not automatically receive the same trust level as Alcheme managed nodes.
 
@@ -305,7 +340,7 @@ claim verification, session verification, quota, and ban state.
 
 ### 4.4 Self-Hosted Compatible Node
 
-A self-hosted compatible node is an Alcheme protocol-compatible node operated by
+An app-operated external-route compatible node is an Alcheme protocol-compatible node operated by
 an external team.
 
 There are two categories:
@@ -313,7 +348,12 @@ There are two categories:
 - Private self-use nodes: serve only the operator's own app and players, with a lower barrier.
 - Public service nodes: serve other ExternalApps or users, and therefore need stronger compatibility and reputation constraints.
 
-Self-hosted nodes must provide:
+V3 should only expose read-only app-operated external-route node availability and compatibility
+labels from `ExternalNode` projections. Full public node staking, public node
+marketplace ranking, cross-node penalty settlement, and open node operator
+economics belong to a later V4 design.
+
+App-operated external-route nodes must provide:
 
 - capabilities endpoint
 - sync status
@@ -322,7 +362,7 @@ Self-hosted nodes must provide:
 - registry projection status
 - optional conformance report
 
-Self-hosted or public service nodes should be managed as separate trust objects,
+App-operated external-route or public service nodes should be managed as separate trust objects,
 with at least:
 
 - `nodeId`
@@ -337,7 +377,7 @@ with at least:
 - `nodePolicyStatus`
 - `nodeStake` or an equivalent accountability mechanism
 
-A self-hosted node should not receive the same trust level as an Alcheme managed
+An app-operated external-route node should not receive the same trust level as an Alcheme managed
 node merely because it runs a query-api service with the same name.
 
 ### 4.5 Backer
@@ -367,7 +407,11 @@ It means:
 
 - The app has a clear accountable party.
 - The app owner bears first economic responsibility for severe violations.
-- When a major dispute is upheld, Owner Bond is the first source for compensating harmed users, node resource losses, and protocol risk pools.
+- When a major dispute is upheld, Owner Bond is the first accountable bond source
+  for policy-bound forfeiture, capability correction, node-resource cost routing,
+  and protocol process handling. It must not be described as Alcheme
+  compensation, reimbursement, insurance, guarantee, refund, principal
+  protection, or make-whole recovery.
 
 It does not mean:
 
@@ -375,9 +419,9 @@ It does not mean:
 - The app owner can buy exposure with the bond.
 - Every complaint should trigger slashing.
 
-### 4.7 Community Backing
+### 4.7 Independent Support Signal
 
-Community Backing is limited backing for an app from users or communities.
+Independent Support Signal is limited backing for an app from users or communities.
 
 It mainly affects:
 
@@ -386,16 +430,18 @@ It mainly affects:
 - quota ceiling on official managed nodes
 - risk buffer against light complaints
 
-It should not be the first source of compensation when the app owner behaves
-maliciously. When a severe violation is upheld, Owner Bond should absorb losses
-first. Community Backing may only be slashed in limited form when the rules are
-clear, risk disclosure is sufficient, and the ruling confirms that the backing
-pool should carry responsibility.
+It should not be presented as compensation, coverage, guarantee, or recovery
+when the app owner behaves maliciously. When a severe violation is upheld, Owner
+Bond is the primary accountability deposit. Independent Support Signal may only
+be forfeited or routed in limited form when the rules are clear, risk disclosure
+is sufficient, and the ruling confirms that explicit bond-disposition policy
+applies.
 
-### 4.8 Protocol Risk Pool
+### 4.8 Process Reserve
 
-The Protocol Risk Pool covers dispute handling costs, node resource loss
-backstops, and specific compensation scenarios.
+The Process Reserve covers dispute handling, evidence retention, review
+operations, correction, and audit costs. It is not an Alcheme compensation pool
+or user-loss coverage pool.
 
 It should not be designed as a speculative yield pool for ordinary users. Its
 product goal is to reduce systemic risk, not to create yield expectations.
@@ -514,7 +560,7 @@ Allowed paths:
 
 - sandbox or dev testing
 - user-owned rooms
-- low-trust integration on a self-hosted node
+- low-trust integration on an app-operated external-route node
 - a future Alcheme hosted claim service, which is equivalent to Alcheme custodying app authority and therefore requires separate review
 
 Client-only integration must not bypass the production `appRoomClaim` boundary,
@@ -529,11 +575,11 @@ agreements.
 
 ### 6.3 Self-Hosted Node Integration
 
-Self-hosted node integration lets external projects control cost, latency, and
+App-operated external-route node integration lets external projects control cost, latency, and
 privacy boundaries.
 
 It does not automatically grant official Alcheme app store exposure, and it does
-not automatically grant official managed node trust. Self-hosted nodes should
+not automatically grant official managed node trust. App-operated external-route nodes should
 have independent `Node Trust`, while ExternalApp should have independent `App
 Trust`.
 
@@ -546,7 +592,10 @@ Basic capabilities:
 
 - Show reviewed or production ExternalApps.
 - Show app name, icon, description, entry point, and supported capabilities.
-- Show simplified status labels such as `Reviewed`, `Backed`, `Under Challenge`, `Official Node Limited`, and `Self-hosted`.
+- Show simplified status labels such as `Reviewed`, `Owner Bonded`, `Independent Support Declared`, `Risk Notice`, `Under Review`, `Under Challenge`, `Official Node Limited`, and `External Route Declared`.
+- Do not use bare `Backed` as an ordinary user-facing label. Show `Under Challenge` only after the V3 credibility gate decides that the complaint deserves public challenge labeling.
+- Support deterministic grey rollout so new or risky apps can be shown to a
+  sampled audience before full discovery exposure.
 - Provide categories, search, trending, latest, and recommendations.
 - Show necessary risk notices.
 
@@ -555,7 +604,7 @@ Boundaries:
 - `delisted` only means removed from official discovery, recommendations, and app store distribution.
 - The app store does not decide whether the on-chain ExternalApp exists.
 - The app store does not shut down the external app's own service.
-- Users may continue through direct links, self-hosted nodes, or the external app's own entry point unless a separate `ManagedNodePolicy` or governance ruling says otherwise.
+- Users may continue through direct links, app-operated external-route nodes, or the external app's own entry point unless a separate `ManagedNodePolicy` or governance ruling says otherwise.
 
 ### 6.5 Boundary With Existing Circle / Governance Abstractions
 
@@ -564,7 +613,7 @@ Circle/Governance system instead of creating an independent review chain.
 
 The decision order should be:
 
-1. First, make sure the product semantics of ExternalApp, app store, managed node, self-hosted node, backing, and complaints are complete.
+1. First, make sure the product semantics of ExternalApp, app store, managed node, app-operated external-route node, backing, and complaints are complete.
 2. Then place common ideas such as membership, organization boundary, rules, requests, signals, rulings, and execution receipts into the existing Circle/Governance trunk.
 3. Finally, add domain adapters for ExternalApp-specific registration, quota, app store state, node execution, and capability limits.
 
@@ -578,6 +627,8 @@ Recommended product abstractions:
 - The review committee should reuse `Circle` and `CircleMember` organization and membership capabilities, for example an `Alcheme Review Council`.
 - That review circle should be marked as a system/governance/private type. It should not automatically enter ordinary circle discovery, fork flows, knowledge ownership, Plaza discussion, or public circle recommendations.
 - If the current `Circle` model does not naturally express this governance organization, extend circle kind/mode/metadata or add a clear view boundary instead of making a review council behave like an ordinary content circle.
+- A review circle is not official merely because it has the right shape. ExternalApp review authority must resolve through an active system governance role binding, for example `external_app_review_primary -> circleId + policyId + policyVersionId`.
+- The first Alcheme Review Council can be bootstrapped by Alcheme during local/devnet setup, but production changes to that binding must be audited and later governed. The binding should be treated as protocol configuration, not as a normal user-created circle preference.
 - Reviewers are `CircleMember` records in that circle. Membership, roles, and eligibility keep using circle membership semantics.
 - Review rules are `GovernancePolicy` and `GovernancePolicyVersion`.
 - A review, challenge, appeal, delisting, quota adjustment, or capability limit is a `GovernanceRequest`.
@@ -586,7 +637,7 @@ Recommended product abstractions:
 
 ExternalApp only adds the necessary domain adapter layer:
 
-- ExternalApp needs a `reviewCircleId`, `reviewPolicyId`, or equivalent configuration that says which circle reviews it under which policy.
+- ExternalApp needs a resolved `reviewCircleId`, `reviewPolicyId`, and `reviewPolicyVersionId` from the active system governance role binding that says which circle reviews it under which policy.
 - Governance needs ExternalApp-related action types, such as `approve_store_listing`, `approve_managed_node_quota`, `downgrade_discovery_status`, `limit_capability`, and `emergency_hold`.
 - An ExternalApp execution adapter must apply governance decisions to states such as `DiscoveryStatus`, `ManagedNodePolicy`, `CapabilityPolicy`, and `RegistryStatus`.
 - Conflict-of-interest rules are required. For example, can the app owner, major backers, challengers, or direct competitors participate in a given governance request?
@@ -759,7 +810,7 @@ Score meanings:
 - `App Trust` and `Node Trust` must be separate. A good app using a bad node, or a bad app using a good node, must not launder trust across boundaries.
 - `Backing Level` may increase quota ceilings and risk tolerance, but it must not lift `Trust Score` on its own.
 - `Risk Score` directly affects trending rank, default recommendations, and node risk controls.
-- `Trust Score` is a derived aggregate score for display and ranking. It is calculated from `App Trust`, `Node Trust`, review, operating history, real user behavior, dispute history, backing, and node health.
+- `Trust Score` is a derived aggregate score for display and ranking. It is calculated from `App Trust`, review, operating history, real user behavior, dispute history, capped support signals, and official managed-node health where applicable. App-operated external route declarations must not become Alcheme trust or ranking inputs.
 - `Discovery Score` must not be determined by money alone.
 
 For ordinary users, avoid exposing too many scores. Recommended simplified
@@ -767,14 +818,21 @@ labels:
 
 - `Sandbox`
 - `Reviewed`
-- `Backed`
+- `Owner Bonded`
+- `Independent Support Declared`
+- `Risk Notice`
+- `Under Review`
 - `Under Challenge`
 - `Limited`
 - `Delisted`
 - `Official Node Limited`
 - `Managed Node Suspended`
-- `Self-hosted`
-- `Unverified Node`
+- `External Route Declared`
+- `Unverified External Route`
+
+Avoid the bare label `Backed` in ordinary user surfaces because it can be read
+as an Alcheme guarantee. `Under Challenge` should be reserved for complaints or
+disputes that pass the credibility gate, not every funded complaint.
 
 Detailed scores should only appear in developer dashboards, governance pages, or
 advanced detail views.
@@ -783,12 +841,12 @@ advanced detail views.
 
 Capital pools must be separated:
 
-- `Owner Bond`: the app owner or operator bond. It is the first source for violation compensation and slashing.
-- `Community Backing`: user or community backing. It carries limited risk and must not automatically pay for the app owner's misconduct.
+- `Owner Bond`: the app owner or operator bond. It is a policy-bound accountability deposit for upheld severe violations.
+- `Independent Support Signal`: user or community backing. It carries limited risk and must not automatically pay for the app owner's misconduct.
 - `Challenge Bond`: the bond paid by a Challenger to cover complaint truthfulness and process cost.
-- `Protocol Risk Pool`: the pool used for dispute costs and systemic risk backstops.
+- `Bond Exposure Guard`: the policy state used to pause new exposure when bond or asset risk is outside bounds.
 
-Owner Bond and Community Backing must not be merged into one pool. If they are
+Owner Bond and Independent Support Signal must not be merged into one pool. If they are
 merged, an app owner's misconduct first harms ordinary backers, and the backing
 mechanism loses product trust.
 
@@ -802,7 +860,7 @@ Rules:
 - Backing yield or weight should have a diminishing curve so a single large holder cannot directly buy trust.
 - Backing by the app owner must be marked separately and must not masquerade as third-party trust.
 - Backing capital carries limited risk.
-- If a severe violation is upheld, Owner Bond should be slashed first. Community Backing should only be slashed in limited form when the rules are clear, risk disclosure is sufficient, and the ruling confirms it should share responsibility.
+- If a severe violation is upheld, Owner Bond should be slashed first. Independent Support Signal should only be slashed in limited form when the rules are clear, risk disclosure is sufficient, and the ruling confirms it should share responsibility.
 - Ordinary quality complaints should not directly confiscate backing principal.
 - Backing does not promise yield and should not be designed as an investment product.
 
@@ -848,7 +906,7 @@ Purpose:
 - Increases the complaint signal weight.
 - Makes the complainant bear the cost of false claims.
 - Triggers dispute when thresholds are reached.
-- May provide limited reward or compensation priority if successful.
+- May provide limited process-cost routing if successful under active policy.
 
 Weight rules:
 
@@ -857,7 +915,7 @@ Weight rules:
 - Newly registered users may file complaints, but start with lower weight.
 - Complaints from the same funding source, device, or social graph should pass sybil risk controls.
 - Large complaints should not increase weight linearly. They should have diminishing returns.
-- Successful complaint rewards should primarily compensate cost and incentivize oversight. They should not become the main profit mechanic.
+- Successful complaint routing should primarily cover bounded process-cost recovery and incentivize oversight. It should not become the main profit mechanic.
 
 ### 8.7 Downgrade And Delisting Rules
 
@@ -889,7 +947,7 @@ At a heavy threshold:
 
 App store delisting only means that Alcheme official discovery, recommendation,
 and app store surfaces no longer actively distribute the app. Direct links,
-existing users, self-hosted nodes, and the external app's own entry point should
+existing users, app-operated external-route nodes, and the external app's own entry point should
 continue by default.
 
 Managed node downgrade only means that Alcheme official nodes reduce resource
@@ -922,7 +980,7 @@ Recommended process:
 3. App owner submits a response, remediation note, or counter-evidence.
 4. If the app owner does not respond in time, default light or medium penalties may execute.
 5. If both sides dispute the facts, the case goes to governance or arbitration.
-6. Once the ruling is upheld, execute app store delisting, managed node downgrade, capability-level restrictions, slashing, or compensation.
+6. Once the ruling is upheld, execute app store delisting, managed node downgrade, capability-level restrictions, slashing, or rule-based bond disposition.
 7. Allow an appeal window.
 8. Execute final settlement after the appeal window.
 
@@ -949,27 +1007,27 @@ Subjective disputes must go through governance or arbitration, for example:
 - content compliance disputes
 - improper operations
 
-### 8.10 Capital Distribution
+### 8.10 Bond Disposition
 
 Do not use a rule like "if complaint amount exceeds backing amount, automatically
 split all principal."
 
 Recommended rules:
 
-- Failed complaint: part of the complaint bond is forfeited to the protocol pool or to compensate the attacked app.
-- Partially upheld complaint: app is downgraded or capability-limited, Owner Bond is slashed by a small percentage, and the complainant receives limited cost compensation.
-- Severely upheld complaint: app is delisted from the official app store, managed nodes downgrade it or restrict capabilities, and Owner Bond is slashed first. Community Backing only shares limited losses when rules are clear and the ruling confirms it.
-- When there are clearly harmed users, harmed users are compensated first.
-- Challenger rewards are capped so complaints do not become the main profit mechanic.
-- Community Backer losses are capped unless the backer is the app owner, an affiliate, or explicitly chose a higher-risk backing tier.
+- Failed complaint: part of the complaint bond can be forfeited or routed by active policy.
+- Partially upheld complaint: app is downgraded or capability-limited, Owner Bond may be slashed by a small percentage, and bounded process-cost routing may occur.
+- Severely upheld complaint: app is delisted from the official app store, managed nodes downgrade it or restrict capabilities, and Owner Bond is slashed first. Independent Support Signal only shares limited exposure when rules are clear and the ruling confirms it.
+- No flow should present Alcheme as compensating harmed users, reimbursing losses, or guaranteeing recovery.
+- Challenger routing is capped so complaints do not become the main profit mechanic.
+- Supporter bond-disposition exposure is capped unless the supporter is the app owner, an affiliate, or explicitly chose a higher-risk tier.
 
-Capital priority:
+Bond-disposition priority:
 
-1. Harmed user compensation.
-2. Cost compensation for successful Challengers.
-3. Node resource loss compensation.
-4. Protocol Risk Pool.
-5. Remaining funds unlocked for the app owner or Community Backers.
+1. Release or keep locked any bonds unaffected by the ruling.
+2. Forfeit the violating actor's bond within active policy caps.
+3. Route forfeited bond according to active policy and receipts.
+4. Update app-store, managed-node, risk, and case projections.
+5. Unlock remaining funds for eligible participants.
 
 ### 8.11 Attack Constraints
 
@@ -982,7 +1040,7 @@ The design must prevent:
 - backers entering and exiting quickly to farm levels
 - complainants using fake evidence to trigger delisting
 - node operators abusing ban authority
-- Community Backing being packaged as a yield product
+- Independent Support Signal being packaged as a yield product
 
 Countermeasures:
 
@@ -994,7 +1052,7 @@ Countermeasures:
 - appeal window
 - governance or multisig execution for high-risk penalties
 - separation between emergency node pause and final ruling
-- clear risk disclosure and limited loss caps
+- clear risk disclosure and limited bond-disposition caps
 
 ## 9. Review And Penalty Model
 
@@ -1004,7 +1062,7 @@ Alcheme should use neither pure human review nor pure contract-automated review.
 
 Recommended three-layer model:
 
-1. Contract constraints: registration, stake, status, evidence hash, capital lockup, and final execution.
+1. Contract constraints: registration, stake, status, evidence hash, capital lockup, and digest-bound final execution after an accepted ruling or pre-existing machine-verifiable rule.
 2. Node execution: CORS, rate limits, tokens, sessions, voice, discovery, and emergency holds.
 3. Governance/arbitration: subjective review, dispute rulings, appeals, and severe penalties.
 
@@ -1042,15 +1100,30 @@ This only controls how Alcheme official managed nodes treat the app's resources.
 This controls capabilities individually, such as voice, AI, message write, and
 featured distribution.
 
-`RegistryStatus`:
+`RegistryStatus` has two layers.
+
+Current V2 chain/shared/SDK registry status:
 
 - `pending`
 - `active`
-- `disputed`
+- `suspended`
 - `revoked`
 
 This is the protocol-level identity state. Only severe and adjudicated cases
 should enter `revoked`.
+
+V3 challenge and dispute state is a separate economic case and read-model
+projection:
+
+- `private_watch`
+- `public_watch`
+- `review`
+- `dispute`
+- `resolved`
+
+Query APIs or app-store views may expose `dispute` / `disputed` as a projection
+state, but that must not be confused with the V2 chain registry enum unless a
+separate versioned registry-status migration is explicitly approved.
 
 ### 9.3 Service Suspension Boundary
 
@@ -1110,8 +1183,9 @@ evidence, response windows, governance/multisig/arbitration, and appeal windows.
 - evidence hash
 - challenge bond
 - appeal bond
-- final ruling
-- slash, release, and compensation execution
+- final ruling digest or accepted ruling receipt
+- authorized slash, release, and bond-disposition execution after a
+  machine-verifiable rule or governance/arbitration receipt
 
 ### 9.5 What Contracts Should Not Judge Alone
 
@@ -1140,20 +1214,38 @@ V2:
 
 - ExternalApp Registry on-chain or chain-anchored.
 - Manifest hash.
-- Owner Bond, Community Backing, and complaint challenge pool.
+- Owner Bond, Independent Support Signal, and complaint challenge pool may appear only
+  as compatibility fields or digest placeholders. V2 does not custody funds or
+  execute slashing, release, or bond disposition.
 - Multisig review and on-chain events.
 - ExternalApp action types, read models, and execution adapter expand from minimal usable form to a complete strategy set, with tests stabilized.
 
+V2 scope clarification:
+
+V2 implements ExternalApp Registry as a Solana/SVM identity and audit layer. It
+stores objective facts: app identity hash, owner wallet, manifest hash, server
+key hash, owner assertion hash, registry status, policy digest, governance
+decision digest, execution intent digest, and execution receipt digest.
+
+V2 does not custody Owner Bond, Independent Support Signal, Challenge Bond, Appeal Bond,
+or execute slash, release, or bond disposition. Those are V3 economic-dispute
+features and require the dedicated stability model in
+`docs/architecture/external-app-registry-v3-stability-model.md`.
+
 V3:
 
+- optimistic trust onion model from
+  `docs/architecture/external-app-registry-v3-stability-model.md`
+- Dynamic Policy Formula Engine for repeated scale-sensitive rules
 - optimistic dispute
 - governance/arbitration module
 - appeal window
-- automatic capital settlement execution
+- bounded settlement execution for machine-verifiable cases
+- governance-bound settlement execution for subjective cases
 
 V4:
 
-- stake for self-hosted public service nodes
+- stake for app-operated external-route public service nodes
 - node service-error challenges
 - registry/network-level reputation
 
@@ -1169,7 +1261,7 @@ External projects may want to:
 - avoid depending on Alcheme managed nodes
 - reduce latency in high-concurrency games
 
-Self-hosted nodes should therefore be an allowed direction.
+App-operated external-route nodes should therefore be an allowed direction.
 
 ### 10.2 Minimum Requirements For Self-Hosted Nodes
 
@@ -1193,7 +1285,7 @@ Public service node:
 
 ### 10.3 Relationship With Alcheme Managed Nodes
 
-A self-hosted node can be protocol-compatible, but it does not automatically
+An app-operated external-route node can be protocol-compatible, but it does not automatically
 inherit the reputation of an Alcheme managed node.
 
 The Alcheme frontend or SDK may let users choose among:
@@ -1263,7 +1355,7 @@ const claim = await alchemeServer.signAppRoomClaim({
 Recommended path for apps without a server:
 
 1. Use sandbox/dev environments to validate SDK and experience.
-2. Use user-owned rooms or a low-trust self-hosted node.
+2. Use user-owned rooms or a low-trust app-operated external-route node.
 3. If production app-owned rooms are required, add server signing capability or apply for Alcheme hosted claim service.
 4. Hosted claim service means Alcheme custodies app authority and therefore needs stricter review, quota, and accountability boundaries.
 5. Hosted claim service does not allow high-trust/featured by default, does not allow broad room/member authority, and must issue short-lived least-privilege claims.
@@ -1296,10 +1388,10 @@ Target flow:
 | Competitor funds complaint attack | Good app is downgraded or delisted | Evidence window, bond, usage-record weighting, appeal |
 | New accounts spam complaints | Risk score is distorted | New accounts have lower weight; real usage records increase weight |
 | App store delisting is confused with service shutdown | External developers fear excessive platform power | Split `DiscoveryStatus`, `ManagedNodePolicy`, `CapabilityPolicy`, and `RegistryStatus` |
-| Backing becomes financialized | Compliance and speculation risk | No yield promises, Owner Bond separated from Community Backing, capped Challenger rewards |
+| Backing becomes financialized | Compliance and speculation risk | No yield promises, Owner Bond separated from Independent Support Signal, capped Challenger rewards |
 | Non-Web apps are harmed by a CORS-only model | Native/desktop integration becomes difficult | Manifest adds platform bindings, bundle ids, redirect URIs, and server callbacks |
 | Client-only app receives excessive authority | App claim key is leaked or forged | Client-only apps are limited to sandbox/user-owned rooms; production app-owned rooms require server-backed or hosted claim |
-| Self-hosted node returns incorrect data | Users see incorrect state | Sync status, capabilities, conformance, node reputation, and challenges |
+| App-operated external-route node returns incorrect data | Users see incorrect state | Sync status, capabilities, conformance, node reputation, and challenges |
 | Server key leak | Claims are forged | Key rotation, short expiry, nonce, revocation |
 | Voice provider unavailable | API succeeds but media fails | Provider health check and typed unavailable error |
 | Too much moves on-chain | High cost and slow iteration | Store only trust roots and hashes on-chain; keep detailed config in manifest/DB projection |
@@ -1327,10 +1419,10 @@ Parts that need adjustment based on this document:
 - Add a Server SDK direction.
 - Add later-stage ExternalApp Registry.
 - Add backing/complaint challenge mechanisms as the mainnet trust market.
-- Add capital layering for Owner Bond, Community Backing, and Protocol Risk Pool.
+- Add capital layering for Owner Bond, Independent Support Signal, and Process Reserve.
 - Add state layering for app store delisting, managed node downgrade, capability-level restrictions, and emergency service holds.
 - Add integration boundaries for client-only apps and native/desktop apps.
-- Clarify that self-hosted node compatibility is not complete just because a capabilities endpoint exists.
+- Clarify that app-operated external-route node compatibility is not complete just because a capabilities endpoint exists.
 - Clarify that ExternalApp review reuses existing Circle/Governance abstractions, adding only action types, binding configuration, and an execution adapter. Do not add a parallel review system.
 
 ## 14. Staged Roadmap
@@ -1365,7 +1457,7 @@ Goals:
 - SDK package boundaries are clear.
 - Manifest covers Web, native, desktop, and server callbacks.
 - Client-only access path is clearly downgraded.
-- Add configuration shape for ExternalApp review circle/policy binding so manifest, owner wallet, server key, and review policy can be linked.
+- Add the ExternalApp system governance role binding shape so manifest, owner wallet, server key, review circle, review policy, active policy version, and governance execution provenance can be linked.
 - Define minimal ExternalApp governance action types and a minimal execution adapter interface as prerequisites for the Phase D production registry.
 
 ### Phase D: Production Registry
@@ -1387,8 +1479,8 @@ Goals:
 Goals:
 
 - Owner Bond.
-- Community Backing.
-- Protocol Risk Pool.
+- Independent Support Signal.
+- Process Reserve.
 - Funded complaints.
 - Risk score.
 - Dispute thresholds.
@@ -1412,7 +1504,7 @@ At the current stage:
 
 - Do not make complaint amount directly split backing principal.
 - Do not make backing amount equal aggregate trust.
-- Do not package Community Backing as an investment or yield product.
+- Do not package Independent Support Signal as an investment or yield product.
 - Do not equate app store delisting with service shutdown.
 - Do not shut down the entire app by default because one capability is risky.
 - Do not let the browser sign app authority claims.
@@ -1420,7 +1512,7 @@ At the current stage:
 - Do not hard-code the Alcheme demo URL into npm packages.
 - Do not require DAO arbitration in the first version.
 - Do not create parallel tables such as `ReviewCommittee`, `ReviewVote`, or `ReviewDecision` to replace Circle/Governance.
-- Do not require a full self-hosted node staking network in the first version.
+- Do not require a full app-operated external-route node staking network in the first version.
 
 ## 16. Open Decisions
 
@@ -1428,18 +1520,23 @@ These do not block the product document, but they will affect implementation
 parameters:
 
 - Minimum Owner Bond for mainnet production.
-- Community Backing lockup period.
+- Independent Support Signal lockup period.
 - Minimum challenge bond.
 - Light and heavy dispute thresholds.
-- Curve for increasing complaint weight based on usage records.
-- Weight discount for app owner self-backing.
-- Minimum operating time for featured apps.
+- Dynamic Policy Formula Engine registry entries for complaint pressure,
+  Challenge Bond, grey rollout exposure, managed-node quota, risk notices,
+  review escalation, response-cost caps, and funding pause triggers.
+- Formula inputs, baselines, smoothing windows, hard bounds, hysteresis bands,
+  and input quality grades.
+- Relationship and actor multipliers, including app owner self-backing,
+  affiliate backing, challenger reputation, and sybil risk.
+- Minimum operating time and grey rollout expansion criteria for featured apps.
 - Maximum temporary duration for `emergency_hold`.
 - Which capabilities can be restricted independently and their default downgrade strategies.
-- Maximum Community Backing loss cap.
+- Maximum Independent Support Signal disposition cap.
 - Whether client-only apps should receive a hosted claim service.
 - Whether to integrate an external arbitration protocol or start with Alcheme multisig/governance.
-- Whether public self-hosted service nodes require stake from V1.
+- Whether a future public self-hosted service-node network should exist at all.
 
 ## 17. Final Product Judgment
 
@@ -1454,7 +1551,7 @@ The right shape is:
 - Server claim proves app room authority.
 - Wallet session proves the user's own action.
 - Owner Bond provides the first source of accountability.
-- Community Backing provides limited economic backing.
+- Independent Support Signal provides limited economic backing.
 - Challenge pool gives complaints a cost.
 - Dispute resolution handles subjective conflicts.
 - Nodes enforce access control, quota, rate limits, capability-level restrictions, and rare emergency suspensions.

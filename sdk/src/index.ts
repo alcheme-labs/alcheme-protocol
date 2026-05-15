@@ -9,7 +9,7 @@ export * from "./modules/messaging";
 export * from "./modules/circles";
 export * from "./modules/contribution-engine";
 export * from "./modules/external-app-registry";
+export * from "./modules/external-app-economics";
 export * from "./runtime/communication";
 export * from "./runtime/voice";
-export * from "./runtime/server";
 export * from "./runtime/errors";

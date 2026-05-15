@@ -964,6 +964,548 @@ model ExternalAppChallenge {
   @@map("external_app_challenges")
 }
 
+model ExternalAppPolicyEpoch {
+  id              String    @id @db.VarChar(96)
+  epochKey        String    @unique @map("epoch_key") @db.VarChar(96)
+  status          String    @default("draft") @db.VarChar(24)
+  environment     String    @default("sandbox") @db.VarChar(32)
+  formulaRegistry Json?     @map("formula_registry")
+  parameterBounds Json?     @map("parameter_bounds")
+  effectiveFrom   DateTime? @map("effective_from")
+  effectiveTo     DateTime? @map("effective_to")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([status, environment])
+  @@map("external_app_policy_epochs")
+}
+
+model ExternalAppStabilityProjection {
+  id                       String   @id @db.VarChar(128)
+  externalAppId            String   @map("external_app_id") @db.VarChar(64)
+  policyEpochId            String   @map("policy_epoch_id") @db.VarChar(96)
+  challengeState           String   @default("none") @map("challenge_state") @db.VarChar(24)
+  projectionStatus         String   @default("normal") @map("projection_status") @db.VarChar(32)
+  publicLabels             Json?    @map("public_labels")
+  riskScore                Float    @default(0) @map("risk_score")
+  trustScore               Float    @default(0) @map("trust_score")
+  supportSignalLevel       Float    @default(0) @map("support_signal_level")
+  supportIndependenceScore Float    @default(0) @map("support_independence_score")
+  rollout                  Json?
+  formulaInputs            Json?    @map("formula_inputs")
+  formulaOutputs           Json?    @map("formula_outputs")
+  bondDispositionState     Json?    @map("bond_disposition_state")
+  governanceState          Json?    @map("governance_state")
+  statusProvenance         Json?    @map("status_provenance")
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([externalAppId, policyEpochId])
+  @@index([externalAppId, updatedAt])
+  @@index([projectionStatus, challengeState])
+  @@map("external_app_stability_projections")
+}
+
+model ExternalAppRiskSignal {
+  id                String   @id @db.VarChar(96)
+  externalAppId     String   @map("external_app_id") @db.VarChar(64)
+  signalType        String   @map("signal_type") @db.VarChar(48)
+  severity          Float    @default(0)
+  source            String   @db.VarChar(48)
+  evidenceHash      String?  @map("evidence_hash") @db.VarChar(128)
+  actorPubkey       String?  @map("actor_pubkey") @db.VarChar(44)
+  relationshipClass String?  @map("relationship_class") @db.VarChar(48)
+  occurredAt        DateTime @default(now()) @map("occurred_at")
+  metadata          Json?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([externalAppId, occurredAt])
+  @@index([signalType, severity])
+  @@map("external_app_risk_signals")
+}
+
+model ExternalAppProjectionReceipt {
+  id              String   @id @db.VarChar(128)
+  externalAppId   String   @map("external_app_id") @db.VarChar(64)
+  receiptType     String   @map("receipt_type") @db.VarChar(48)
+  sourceHierarchy Json?    @map("source_hierarchy")
+  parserVersion   String   @map("parser_version") @db.VarChar(32)
+  inputDigest     String   @map("input_digest") @db.VarChar(71)
+  outputDigest    String   @map("output_digest") @db.VarChar(71)
+  status          String   @default("active") @db.VarChar(24)
+  metadata        Json?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([externalAppId, receiptType, status])
+  @@index([inputDigest])
+  @@index([outputDigest])
+  @@map("external_app_projection_receipts")
+}
+
+model ExternalAppStoreProjection {
+  externalAppId    String   @map("external_app_id") @db.VarChar(64)
+  policyEpochId    String   @map("policy_epoch_id") @db.VarChar(96)
+  listingState     String   @default("unlisted") @map("listing_state") @db.VarChar(32)
+  categoryTags     Json?    @map("category_tags")
+  searchText       String   @default("") @map("search_text")
+  rankingInputs    Json?    @map("ranking_inputs")
+  rankingOutput    Json?    @map("ranking_output")
+  featuredState    String   @default("none") @map("featured_state") @db.VarChar(24)
+  continuityLabels Json?    @map("continuity_labels")
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@id([externalAppId, policyEpochId])
+  @@index([listingState, featuredState])
+  @@map("external_app_store_projections")
+}
+
+model ExternalAppEvidenceReceipt {
+  id                 String    @id @db.VarChar(96)
+  externalAppId      String    @map("external_app_id") @db.VarChar(64)
+  caseId             String?   @map("case_id") @db.VarChar(96)
+  evidenceHash       String    @map("evidence_hash") @db.VarChar(128)
+  evidenceKind       String    @map("evidence_kind") @db.VarChar(48)
+  availabilityStatus String    @default("available") @map("availability_status") @db.VarChar(24)
+  redactionLevel     String    @default("public") @map("redaction_level") @db.VarChar(24)
+  redactionState     String    @default("none") @map("redaction_state") @db.VarChar(32)
+  retentionUntil     DateTime? @map("retention_until")
+  sourceActorPubkey  String?   @map("source_actor_pubkey") @db.VarChar(44)
+  sourceRole         String?   @map("source_role") @db.VarChar(48)
+  metadata           Json?
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([externalAppId, caseId])
+  @@index([evidenceHash])
+  @@index([availabilityStatus, redactionLevel])
+  @@map("external_app_evidence_receipts")
+}
+
+model ExternalAppActorRelation {
+  id               String    @id @db.VarChar(96)
+  externalAppId    String    @map("external_app_id") @db.VarChar(64)
+  actorPubkey      String    @map("actor_pubkey") @db.VarChar(44)
+  relationType     String    @map("relation_type") @db.VarChar(32)
+  disclosureSource String    @map("disclosure_source") @db.VarChar(32)
+  confidence       String    @default("medium") @db.VarChar(16)
+  effectiveFrom    DateTime  @default(now()) @map("effective_from")
+  endedAt          DateTime? @map("ended_at")
+  metadata         Json?
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([externalAppId, relationType])
+  @@index([actorPubkey, relationType])
+  @@map("external_app_actor_relations")
+}
+
+model ExternalAppRiskDisclaimerAcceptance {
+  id                String   @id @db.VarChar(96)
+  externalAppId     String   @map("external_app_id") @db.VarChar(64)
+  actorPubkey       String   @map("actor_pubkey") @db.VarChar(44)
+  scope             String   @db.VarChar(32)
+  policyEpochId     String   @map("policy_epoch_id") @db.VarChar(96)
+  disclaimerVersion String   @map("disclaimer_version") @db.VarChar(64)
+  termsDigest       String   @map("terms_digest") @db.VarChar(128)
+  acceptanceDigest  String   @map("acceptance_digest") @db.VarChar(128)
+  acceptedAt        DateTime @default(now()) @map("accepted_at")
+  source            String   @db.VarChar(32)
+  signatureDigest   String?  @map("signature_digest") @db.VarChar(128)
+  chainReceiptPda   String?  @map("chain_receipt_pda") @db.VarChar(64)
+  chainReceiptDigest String? @map("chain_receipt_digest") @db.VarChar(64)
+  txSignature       String?  @map("tx_signature") @db.VarChar(128)
+  metadata          Json?
+
+  @@index([externalAppId, actorPubkey, scope])
+  @@index([policyEpochId, disclaimerVersion])
+  @@index([chainReceiptPda])
+  @@map("external_app_risk_disclaimer_acceptances")
+}
+
+model ExternalAppSettlementAsset {
+  id                    String   @id @db.VarChar(96)
+  policyEpochId          String   @map("policy_epoch_id") @db.VarChar(96)
+  environment            String   @db.VarChar(24)
+  mint                   String   @db.VarChar(64)
+  tokenProgramId         String   @map("token_program_id") @db.VarChar(64)
+  decimals               Int
+  symbol                 String   @db.VarChar(16)
+  displayName            String   @map("display_name") @db.VarChar(64)
+  status                 String   @default("disabled") @db.VarChar(24)
+  perAppCapRaw           String?  @map("per_app_cap_raw") @db.VarChar(64)
+  perCaseCapRaw          String?  @map("per_case_cap_raw") @db.VarChar(64)
+  perUserCapRaw          String?  @map("per_user_cap_raw") @db.VarChar(64)
+  withdrawalLockSeconds  Int      @default(0) @map("withdrawal_lock_seconds")
+  activationReceiptId    String?  @map("activation_receipt_id") @db.VarChar(96)
+  metadata               Json?
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([environment, mint])
+  @@index([policyEpochId, status])
+  @@map("external_app_settlement_assets")
+}
+
+model ExternalAppEconomicsConfigProjection {
+  id                          String    @id @db.VarChar(96)
+  environment                 String    @db.VarChar(24)
+  programId                   String    @map("program_id") @db.VarChar(64)
+  configPda                   String    @map("config_pda") @db.VarChar(64)
+  governanceAuthority         String    @map("governance_authority") @db.VarChar(64)
+  policyEpochDigest           String    @map("policy_epoch_digest") @db.VarChar(64)
+  assetMint                   String?   @map("asset_mint") @db.VarChar(64)
+  assetTokenProgram           String?   @map("asset_token_program") @db.VarChar(64)
+  assetStatus                 String    @default("disabled") @map("asset_status") @db.VarChar(24)
+  withdrawalLockSeconds       Int       @default(0) @map("withdrawal_lock_seconds")
+  pausedNewEconomicExposure   Boolean   @default(true) @map("paused_new_economic_exposure")
+  txSignature                 String?   @map("tx_signature") @db.VarChar(128)
+  txSlot                      BigInt?   @map("tx_slot")
+  syncedAt                    DateTime? @map("synced_at")
+  createdAt                   DateTime  @default(now()) @map("created_at")
+  updatedAt                   DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([environment, programId])
+  @@unique([configPda])
+  @@index([environment, assetStatus])
+  @@map("external_app_economics_config_projections")
+}
+
+model ExternalAppBondVault {
+  id                     String    @id @db.VarChar(128)
+  externalAppId          String    @map("external_app_id") @db.VarChar(64)
+  policyEpochId          String    @map("policy_epoch_id") @db.VarChar(96)
+  appIdHash              String    @map("app_id_hash") @db.VarChar(64)
+  ownerPubkey            String    @map("owner_pubkey") @db.VarChar(64)
+  mint                   String    @db.VarChar(64)
+  vaultPda               String    @map("vault_pda") @db.VarChar(64)
+  vaultTokenAccount      String    @map("vault_token_account") @db.VarChar(64)
+  ownerBondRaw           String    @default("0") @map("owner_bond_raw") @db.VarChar(64)
+  withdrawalRequestedAt  DateTime? @map("withdrawal_requested_at")
+  status                 String    @default("open") @db.VarChar(24)
+  lastReceiptDigest      String?   @map("last_receipt_digest") @db.VarChar(64)
+  txSignature            String?   @map("tx_signature") @db.VarChar(128)
+  txSlot                 BigInt?   @map("tx_slot")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([appIdHash, mint])
+  @@unique([vaultPda])
+  @@index([externalAppId, status])
+  @@index([ownerPubkey, status])
+  @@index([policyEpochId, status])
+  @@map("external_app_bond_vaults")
+}
+
+model ExternalAppChallengeCase {
+  id                     String    @id @db.VarChar(128)
+  externalAppId          String    @map("external_app_id") @db.VarChar(64)
+  policyEpochId          String    @map("policy_epoch_id") @db.VarChar(96)
+  appIdHash              String    @map("app_id_hash") @db.VarChar(64)
+  caseId                 String    @map("case_id") @db.VarChar(64)
+  challengerPubkey       String    @map("challenger_pubkey") @db.VarChar(64)
+  challengeType          String    @map("challenge_type") @db.VarChar(48)
+  evidenceHash           String    @map("evidence_hash") @db.VarChar(128)
+  mint                   String    @db.VarChar(64)
+  casePda                String    @map("case_pda") @db.VarChar(64)
+  caseVaultTokenAccount  String    @map("case_vault_token_account") @db.VarChar(64)
+  challengeBondRaw       String    @default("0") @map("challenge_bond_raw") @db.VarChar(64)
+  responseDigest         String?   @map("response_digest") @db.VarChar(64)
+  rulingDigest           String?   @map("ruling_digest") @db.VarChar(64)
+  appealWindowEndsAt     DateTime? @map("appeal_window_ends_at")
+  status                 String    @default("open") @db.VarChar(24)
+  governanceRequestId    String?   @map("governance_request_id") @db.VarChar(96)
+  txSignature            String?   @map("tx_signature") @db.VarChar(128)
+  txSlot                 BigInt?   @map("tx_slot")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([caseId])
+  @@unique([casePda])
+  @@index([externalAppId, status])
+  @@index([challengerPubkey, status])
+  @@index([policyEpochId, status])
+  @@index([governanceRequestId])
+  @@map("external_app_challenge_cases")
+}
+
+model ExternalAppSettlementReceipt {
+  id                       String   @id @db.VarChar(128)
+  externalAppId            String   @map("external_app_id") @db.VarChar(64)
+  policyEpochId            String   @map("policy_epoch_id") @db.VarChar(96)
+  policyEpochDigest        String   @map("policy_epoch_digest") @db.VarChar(64)
+  appIdHash                String   @map("app_id_hash") @db.VarChar(64)
+  caseId                   String   @map("case_id") @db.VarChar(64)
+  receiptId                String   @map("receipt_id") @db.VarChar(64)
+  mint                     String   @db.VarChar(64)
+  amountRaw                String   @map("amount_raw") @db.VarChar(64)
+  authorityPubkey          String   @map("authority_pubkey") @db.VarChar(64)
+  sourceTokenAccount       String   @map("source_token_account") @db.VarChar(64)
+  destinationTokenAccount  String   @map("destination_token_account") @db.VarChar(64)
+  receiptDigest            String   @map("receipt_digest") @db.VarChar(64)
+  txSignature              String?  @map("tx_signature") @db.VarChar(128)
+  txSlot                   BigInt?  @map("tx_slot")
+  status                   String   @default("submitted") @db.VarChar(24)
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([receiptId])
+  @@unique([receiptDigest])
+  @@index([externalAppId, status])
+  @@index([caseId, status])
+  @@index([policyEpochId, status])
+  @@map("external_app_settlement_receipts")
+}
+
+model ExternalAppBondDispositionPolicy {
+  id                  String   @id @db.VarChar(128)
+  policyEpochId        String   @map("policy_epoch_id") @db.VarChar(96)
+  policyId             String   @map("policy_id") @db.VarChar(64)
+  policyDigest         String   @map("policy_digest") @db.VarChar(64)
+  mint                 String   @db.VarChar(64)
+  governanceAuthority  String   @map("governance_authority") @db.VarChar(64)
+  maxCaseAmountRaw     String   @map("max_case_amount_raw") @db.VarChar(64)
+  status               String   @default("active") @db.VarChar(24)
+  paused               Boolean  @default(false)
+  txSignature          String?  @map("tx_signature") @db.VarChar(128)
+  txSlot               BigInt?  @map("tx_slot")
+  metadata             Json?
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([policyId])
+  @@index([policyEpochId, status])
+  @@index([mint, status])
+  @@map("external_app_bond_disposition_policies")
+}
+
+model ExternalAppBondDispositionCase {
+  id                    String    @id @db.VarChar(128)
+  externalAppId          String    @map("external_app_id") @db.VarChar(64)
+  policyEpochId          String    @map("policy_epoch_id") @db.VarChar(96)
+  appIdHash              String    @map("app_id_hash") @db.VarChar(64)
+  caseId                 String    @map("case_id") @db.VarChar(64)
+  policyId               String    @map("policy_id") @db.VarChar(64)
+  initiatorPubkey        String    @map("initiator_pubkey") @db.VarChar(64)
+  mint                   String    @db.VarChar(64)
+  ownerBondVaultPda      String    @map("owner_bond_vault_pda") @db.VarChar(64)
+  ownerVaultTokenAccount String    @map("owner_vault_token_account") @db.VarChar(64)
+  requestedAmountRaw     String    @map("requested_amount_raw") @db.VarChar(64)
+  lockedAmountRaw        String    @default("0") @map("locked_amount_raw") @db.VarChar(64)
+  routedAmountRaw        String    @default("0") @map("routed_amount_raw") @db.VarChar(64)
+  evidenceHash           String    @map("evidence_hash") @db.VarChar(128)
+  rulingDigest           String?   @map("ruling_digest") @db.VarChar(64)
+  status                 String    @default("unlocked") @db.VarChar(32)
+  relatedPartyFlags      Json?     @map("related_party_flags")
+  governanceRequestId    String?   @map("governance_request_id") @db.VarChar(96)
+  txSignature            String?   @map("tx_signature") @db.VarChar(128)
+  txSlot                 BigInt?   @map("tx_slot")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([caseId])
+  @@index([externalAppId, status])
+  @@index([policyEpochId, status])
+  @@index([initiatorPubkey, status])
+  @@index([governanceRequestId])
+  @@map("external_app_bond_disposition_cases")
+}
+
+model ExternalAppBondRoutingReceipt {
+  id                       String   @id @db.VarChar(128)
+  externalAppId            String   @map("external_app_id") @db.VarChar(64)
+  policyEpochId            String   @map("policy_epoch_id") @db.VarChar(96)
+  appIdHash                String   @map("app_id_hash") @db.VarChar(64)
+  caseId                   String   @map("case_id") @db.VarChar(64)
+  receiptId                String   @map("receipt_id") @db.VarChar(64)
+  policyId                 String   @map("policy_id") @db.VarChar(64)
+  amountRaw                String   @map("amount_raw") @db.VarChar(64)
+  authorityPubkey          String   @map("authority_pubkey") @db.VarChar(64)
+  sourceTokenAccount       String   @map("source_token_account") @db.VarChar(64)
+  destinationTokenAccount  String   @map("destination_token_account") @db.VarChar(64)
+  routingDigest            String   @map("routing_digest") @db.VarChar(64)
+  txSignature              String?  @map("tx_signature") @db.VarChar(128)
+  txSlot                   BigInt?  @map("tx_slot")
+  status                   String   @default("submitted") @db.VarChar(24)
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([receiptId])
+  @@unique([routingDigest])
+  @@index([externalAppId, status])
+  @@index([caseId, status])
+  @@index([policyEpochId, status])
+  @@map("external_app_bond_routing_receipts")
+}
+
+model ExternalAppBondExposureState {
+  id                      String   @id @db.VarChar(128)
+  externalAppId           String   @map("external_app_id") @db.VarChar(64)
+  policyEpochId           String   @map("policy_epoch_id") @db.VarChar(96)
+  appIdHash               String   @map("app_id_hash") @db.VarChar(64)
+  mint                    String   @db.VarChar(64)
+  activeLockedAmountRaw   String   @default("0") @map("active_locked_amount_raw") @db.VarChar(64)
+  totalRoutedAmountRaw    String   @default("0") @map("total_routed_amount_raw") @db.VarChar(64)
+  pausedNewBondExposure   Boolean  @default(false) @map("paused_new_bond_exposure")
+  exposureDigest          String   @map("exposure_digest") @db.VarChar(64)
+  txSignature             String?  @map("tx_signature") @db.VarChar(128)
+  txSlot                  BigInt?  @map("tx_slot")
+  updatedAt               DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([appIdHash, mint])
+  @@index([externalAppId, pausedNewBondExposure])
+  @@index([policyEpochId])
+  @@map("external_app_bond_exposure_states")
+}
+
+model ExternalAppGovernanceConflictDisclosure {
+  id              String    @id @db.VarChar(96)
+  externalAppId   String    @map("external_app_id") @db.VarChar(64)
+  actorPubkey     String    @map("actor_pubkey") @db.VarChar(64)
+  actionType      String    @map("action_type") @db.VarChar(64)
+  role            String    @db.VarChar(48)
+  status          String    @default("active") @db.VarChar(24)
+  source          String    @default("self_disclosed") @db.VarChar(32)
+  evidenceDigest  String?   @map("evidence_digest") @db.VarChar(128)
+  effectiveFrom   DateTime  @default(now()) @map("effective_from")
+  endedAt         DateTime? @map("ended_at")
+  metadata        Json?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([externalAppId, actionType, status])
+  @@index([actorPubkey, role, status])
+  @@map("external_app_governance_conflict_disclosures")
+}
+
+model ExternalAppReviewerReputation {
+  id                    String   @id @db.VarChar(96)
+  reviewerPubkey         String   @map("reviewer_pubkey") @db.VarChar(64)
+  environment            String   @default("production") @db.VarChar(32)
+  participationCount     Int      @default(0) @map("participation_count")
+  recusalCount           Int      @default(0) @map("recusal_count")
+  upheldDecisionCount    Int      @default(0) @map("upheld_decision_count")
+  reversedDecisionCount  Int      @default(0) @map("reversed_decision_count")
+  captureFlagCount       Int      @default(0) @map("capture_flag_count")
+  reputationScore        Float    @default(0) @map("reputation_score")
+  status                 String   @default("active") @db.VarChar(24)
+  metadata               Json?
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([reviewerPubkey, environment])
+  @@index([environment, status, reputationScore])
+  @@map("external_app_reviewer_reputations")
+}
+
+model ExternalAppCaptureReview {
+  id                    String    @id @db.VarChar(96)
+  externalAppId          String    @map("external_app_id") @db.VarChar(64)
+  openedByPubkey         String    @map("opened_by_pubkey") @db.VarChar(64)
+  evidenceDigest         String    @map("evidence_digest") @db.VarChar(128)
+  status                 String    @default("open") @db.VarChar(24)
+  affectedActionTypes    Json?     @map("affected_action_types")
+  governanceRequestId    String?   @map("governance_request_id") @db.VarChar(96)
+  governanceReceiptId    String?   @map("governance_receipt_id") @db.VarChar(96)
+  openedAt               DateTime  @default(now()) @map("opened_at")
+  resolvedAt             DateTime? @map("resolved_at")
+  metadata               Json?
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([externalAppId, status])
+  @@index([openedByPubkey, status])
+  @@index([governanceRequestId])
+  @@map("external_app_capture_reviews")
+}
+
+model ExternalAppProjectionDispute {
+  id                  String    @id @db.VarChar(96)
+  externalAppId        String    @map("external_app_id") @db.VarChar(64)
+  openedByPubkey       String    @map("opened_by_pubkey") @db.VarChar(64)
+  projectionReceiptId  String    @map("projection_receipt_id") @db.VarChar(128)
+  evidenceDigest       String    @map("evidence_digest") @db.VarChar(128)
+  status               String    @default("open") @db.VarChar(24)
+  governanceRequestId  String?   @map("governance_request_id") @db.VarChar(96)
+  reconcileReceiptId   String?   @map("reconcile_receipt_id") @db.VarChar(96)
+  openedAt             DateTime  @default(now()) @map("opened_at")
+  resolvedAt           DateTime? @map("resolved_at")
+  metadata             Json?
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([externalAppId, status])
+  @@index([projectionReceiptId])
+  @@index([governanceRequestId])
+  @@map("external_app_projection_disputes")
+}
+
+model ExternalAppArbitrationReference {
+  id                           String   @id @db.VarChar(128)
+  externalAppId                 String   @map("external_app_id") @db.VarChar(64)
+  caseId                        String   @map("case_id") @db.VarChar(96)
+  provider                      String   @db.VarChar(48)
+  externalReferenceId           String   @map("external_reference_id") @db.VarChar(128)
+  status                        String   @default("opened") @db.VarChar(24)
+  receiptDigest                 String   @map("receipt_digest") @db.VarChar(128)
+  governanceExecutionReceiptId  String?  @map("governance_execution_receipt_id") @db.VarChar(96)
+  metadata                      Json?
+  createdAt                     DateTime @default(now()) @map("created_at")
+  updatedAt                     DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([provider, externalReferenceId])
+  @@index([externalAppId, caseId, status])
+  @@index([governanceExecutionReceiptId])
+  @@map("external_app_arbitration_references")
+}
+
+model ExternalAppEmergencyAction {
+  id                      String    @id @db.VarChar(128)
+  externalAppId            String    @map("external_app_id") @db.VarChar(64)
+  actionType               String    @map("action_type") @db.VarChar(48)
+  actionScope              String    @map("action_scope") @db.VarChar(48)
+  affectedCapabilities     Json?     @map("affected_capabilities")
+  operatorIdentity         String    @map("operator_identity") @db.VarChar(96)
+  evidenceDigest           String    @map("evidence_digest") @db.VarChar(128)
+  sourceReceiptId          String    @map("source_receipt_id") @db.VarChar(96)
+  ownerNotificationStatus  String    @map("owner_notification_status") @db.VarChar(32)
+  appealRoute              String    @map("appeal_route") @db.VarChar(96)
+  existingSessionEffect    String    @map("existing_session_effect") @db.VarChar(32)
+  status                   String    @default("active") @db.VarChar(24)
+  startedAt                DateTime  @default(now()) @map("started_at")
+  expiresAt                DateTime  @map("expires_at")
+  correctedAt              DateTime? @map("corrected_at")
+  metadata                 Json?
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([externalAppId, actionScope, status])
+  @@index([expiresAt])
+  @@index([sourceReceiptId])
+  @@map("external_app_emergency_actions")
+}
+
+model ExternalAppCorrectionReceipt {
+  id                         String   @id @db.VarChar(128)
+  externalAppId               String   @map("external_app_id") @db.VarChar(64)
+  correctionType              String   @map("correction_type") @db.VarChar(48)
+  correctedRecordType         String   @map("corrected_record_type") @db.VarChar(48)
+  correctedRecordId           String   @map("corrected_record_id") @db.VarChar(128)
+  correctionDigest            String   @map("correction_digest") @db.VarChar(128)
+  sourceReceiptId             String   @map("source_receipt_id") @db.VarChar(96)
+  governanceExecutionReceiptId String? @map("governance_execution_receipt_id") @db.VarChar(96)
+  createdByPubkey             String?  @map("created_by_pubkey") @db.VarChar(64)
+  metadata                    Json?
+  createdAt                   DateTime @default(now()) @map("created_at")
+  updatedAt                   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([correctedRecordType, correctedRecordId, correctionDigest])
+  @@index([externalAppId, correctionType])
+  @@index([sourceReceiptId])
+  @@map("external_app_correction_receipts")
+}
+
 model ExternalNode {
   id                 String   @id @db.VarChar(96)
   operatorPubkey     String   @map("operator_pubkey") @db.VarChar(44)
@@ -1418,6 +1960,32 @@ model GovernanceExecutionReceipt {
   @@unique([requestId, executorModule, idempotencyKey])
   @@index([actionType, executedAt(sort: Desc)])
   @@map("governance_execution_receipts")
+}
+
+model SystemGovernanceRoleBinding {
+  id                       String    @id @db.VarChar(96)
+  domain                   String    @db.VarChar(32)
+  roleKey                  String    @map("role_key") @db.VarChar(64)
+  environment              String    @db.VarChar(32)
+  circleId                 Int       @map("circle_id")
+  policyId                 String    @map("policy_id") @db.VarChar(96)
+  policyVersionId          String    @map("policy_version_id") @db.VarChar(96)
+  policyVersion            Int       @map("policy_version")
+  status                   String    @default("active") @db.VarChar(16)
+  activatedAt              DateTime  @default(now()) @map("activated_at")
+  supersededAt             DateTime? @map("superseded_at")
+  createdByPubkey          String?   @map("created_by_pubkey") @db.VarChar(44)
+  sourceRequestId          String?   @map("source_request_id") @db.VarChar(96)
+  sourceDecisionDigest     String?   @map("source_decision_digest") @db.Char(64)
+  sourceExecutionReceiptId String?   @map("source_execution_receipt_id") @db.VarChar(96)
+  metadata                 Json?
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([domain, roleKey, environment, status])
+  @@index([circleId])
+  @@index([policyId, policyVersionId])
+  @@map("system_governance_role_bindings")
 }
 
 model ForkDeclaration {

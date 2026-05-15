@@ -1616,6 +1616,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "external-app-economics"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+]
+
+[[package]]
 name = "external-app-registry"
 version = "0.1.0"
 dependencies = [

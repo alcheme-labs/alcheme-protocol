@@ -1,0 +1,10 @@
+ALTER TABLE "external_app_risk_disclaimer_acceptances"
+  ADD COLUMN "terms_digest" VARCHAR(128) NOT NULL DEFAULT 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+  ADD COLUMN "acceptance_digest" VARCHAR(128) NOT NULL DEFAULT 'sha256:0000000000000000000000000000000000000000000000000000000000000000';
+
+ALTER TABLE "external_app_risk_disclaimer_acceptances"
+  ALTER COLUMN "disclaimer_version" TYPE VARCHAR(64);
+
+ALTER TABLE "external_app_risk_disclaimer_acceptances"
+  ALTER COLUMN "terms_digest" DROP DEFAULT,
+  ALTER COLUMN "acceptance_digest" DROP DEFAULT;

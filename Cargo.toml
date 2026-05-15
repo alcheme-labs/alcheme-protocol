@@ -10,6 +10,7 @@ members = [
     "programs/messaging-manager",
     "programs/circle-manager",
     "programs/external-app-registry",
+    "programs/external-app-economics",
     "extensions/contribution-engine/program",
     # Temporarily commented out due to Solana SDK version conflict
     # "services/indexer-core"

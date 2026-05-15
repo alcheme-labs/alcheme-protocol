@@ -18,6 +18,56 @@
     letter-spacing: 0;
 }
 
+.header p {
+    margin: 6px 0 0;
+    max-width: 680px;
+    color: rgba(0, 0, 0, 0.64);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.controls {
+    display: grid;
+    grid-template-columns: minmax(160px, 1fr) minmax(120px, 180px) auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.controls input {
+    min-width: 0;
+    border: 1px solid rgba(120, 120, 120, 0.24);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font: inherit;
+}
+
+.segmented {
+    display: inline-grid;
+    grid-template-columns: repeat(3, minmax(70px, 1fr));
+    overflow: hidden;
+    border: 1px solid rgba(120, 120, 120, 0.24);
+    border-radius: 6px;
+}
+
+.segmented button {
+    border: 0;
+    border-right: 1px solid rgba(120, 120, 120, 0.18);
+    padding: 8px 10px;
+    background: transparent;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.segmented button:last-child {
+    border-right: 0;
+}
+
+.activeSegment {
+    background: rgba(0, 0, 0, 0.08) !important;
+}
+
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -60,7 +110,40 @@
     font-size: 12px;
 }
 
+.projection {
+    display: grid;
+    gap: 8px;
+}
+
+.scoreRow,
+.labelRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.scoreRow span,
+.labelRow span {
+    border: 1px solid rgba(120, 120, 120, 0.2);
+    border-radius: 6px;
+    padding: 4px 7px;
+    font-size: 12px;
+}
+
+.projection p,
+.provenance {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 12px;
+}
+
 .empty {
     margin: 0;
     color: rgba(0, 0, 0, 0.62);
+}
+
+@media (max-width: 720px) {
+    .controls {
+        grid-template-columns: 1fr;
+    }
 }

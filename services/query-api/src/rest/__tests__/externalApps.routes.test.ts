@@ -10,12 +10,48 @@ import {
   buildExternalAppOwnerAssertionPayload,
   encodeExternalAppOwnerAssertionPayload,
 } from "../../services/externalApps/ownerAssertion";
+import {
+  buildRiskDisclaimerTerms,
+  computeRiskDisclaimerAcceptanceDigest,
+} from "../../services/externalApps/riskDisclaimer";
+import type { RiskDisclaimerReceiptVerifier } from "../../services/externalApps/riskDisclaimerChainVerifier";
 
-function buildApp(prisma: any) {
+function buildApp(
+  prisma: any,
+  deps?: { riskReceiptVerifier?: RiskDisclaimerReceiptVerifier },
+) {
   const app = express();
   app.use(express.json());
-  app.use("/api/v1/external-apps", externalAppRouter(prisma, {} as any));
+  app.use("/api/v1/external-apps", externalAppRouter(prisma, {} as any, deps));
   return app;
+}
+
+function makeDeveloperAgreement(input: {
+  externalAppId?: string;
+  actorPubkey: string;
+  manifestHash: string;
+  policyEpochId?: string;
+}) {
+  const terms = buildRiskDisclaimerTerms("developer_registration");
+  const policyEpochId = input.policyEpochId ?? "external-app-review-v1:1";
+  const acceptanceDigest = computeRiskDisclaimerAcceptanceDigest({
+    externalAppId: input.externalAppId ?? "last-ignition",
+    actorPubkey: input.actorPubkey,
+    scope: "developer_registration",
+    policyEpochId,
+    disclaimerVersion: terms.disclaimerVersion,
+    termsDigest: terms.termsDigest,
+    bindingDigest: input.manifestHash,
+  });
+  return {
+    disclaimerVersion: terms.disclaimerVersion,
+    termsDigest: terms.termsDigest,
+    acceptanceDigest,
+    signatureDigest: "sha256:" + "1".repeat(64),
+    chainReceiptPda: "developer-agreement-receipt-pda",
+    chainReceiptDigest: "2".repeat(64),
+    txSignature: "developer-agreement-tx",
+  };
 }
 
 describe("external apps routes", () => {
@@ -59,6 +95,290 @@ describe("external apps routes", () => {
     });
   });
 
+  it("exposes scoped disclaimer terms before third-party acceptance", async () => {
+    const response = await request(buildApp({})).get(
+      "/api/v1/external-apps/risk-disclaimers/developer_registration",
+    );
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      scope: "developer_registration",
+      disclaimerVersion: "external-app-developer-agreement-v1",
+      onChainReceiptRequired: true,
+    });
+    expect(response.body.termsDigest).toMatch(/^sha256:[0-9a-f]{64}$/);
+    expect(response.body.terms).toContain("External app operators and participants accept their own app rules");
+  });
+
+  it("records chain-backed participant disclaimer acceptance", async () => {
+    const terms = buildRiskDisclaimerTerms("external_app_entry");
+    const acceptanceDigest = computeRiskDisclaimerAcceptanceDigest({
+      externalAppId: "last-ignition",
+      actorPubkey: "player-wallet",
+      scope: "external_app_entry",
+      policyEpochId: "epoch-1",
+      disclaimerVersion: terms.disclaimerVersion,
+      termsDigest: terms.termsDigest,
+    });
+    const prisma = {
+      externalApp: {
+        findUnique: jest.fn(async () => ({ id: "last-ignition" })),
+      },
+      externalAppRiskDisclaimerAcceptance: {
+        create: jest.fn(async ({ data }: any) => data),
+      },
+    };
+    const response = await request(buildApp(prisma))
+      .post("/api/v1/external-apps/last-ignition/risk-disclaimer-acceptances")
+      .send({
+        actorPubkey: "player-wallet",
+        scope: "external_app_entry",
+        policyEpochId: "epoch-1",
+        disclaimerVersion: terms.disclaimerVersion,
+        termsDigest: terms.termsDigest,
+        acceptanceDigest,
+        signatureDigest: "sha256:" + "1".repeat(64),
+        chainReceiptPda: "entry-risk-receipt-pda",
+        chainReceiptDigest: "2".repeat(64),
+        txSignature: "entry-risk-tx",
+      });
+
+    expect(response.status).toBe(201);
+    expect(response.body.acceptance).toMatchObject({
+      externalAppId: "last-ignition",
+      actorPubkey: "player-wallet",
+      scope: "external_app_entry",
+      chainReceiptPda: "entry-risk-receipt-pda",
+      txSignature: "entry-risk-tx",
+    });
+    expect(prisma.externalAppRiskDisclaimerAcceptance.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        termsDigest: terms.termsDigest,
+        acceptanceDigest,
+      }),
+    });
+  });
+
+  it("verifies a chain-backed participant disclaimer receipt before recording it", async () => {
+    const terms = buildRiskDisclaimerTerms("external_app_entry");
+    const acceptanceDigest = computeRiskDisclaimerAcceptanceDigest({
+      externalAppId: "last-ignition",
+      actorPubkey: "player-wallet",
+      scope: "external_app_entry",
+      policyEpochId: "epoch-1",
+      disclaimerVersion: terms.disclaimerVersion,
+      termsDigest: terms.termsDigest,
+    });
+    const riskReceiptVerifier: RiskDisclaimerReceiptVerifier = {
+      verifyRiskDisclaimerReceipt: jest.fn(async () => undefined),
+    };
+    const prisma = {
+      externalApp: {
+        findUnique: jest.fn(async () => ({ id: "last-ignition" })),
+      },
+      externalAppRiskDisclaimerAcceptance: {
+        create: jest.fn(async ({ data }: any) => data),
+      },
+    };
+
+    const response = await request(buildApp(prisma, { riskReceiptVerifier }))
+      .post("/api/v1/external-apps/last-ignition/risk-disclaimer-acceptances")
+      .send({
+        actorPubkey: "player-wallet",
+        scope: "external_app_entry",
+        policyEpochId: "epoch-1",
+        disclaimerVersion: terms.disclaimerVersion,
+        termsDigest: terms.termsDigest,
+        acceptanceDigest,
+        signatureDigest: "sha256:" + "1".repeat(64),
+        chainReceiptPda: "entry-risk-receipt-pda",
+        chainReceiptDigest: "2".repeat(64),
+        txSignature: "entry-risk-tx",
+      });
+
+    expect(response.status).toBe(201);
+    expect(riskReceiptVerifier.verifyRiskDisclaimerReceipt).toHaveBeenCalledWith({
+      externalAppId: "last-ignition",
+      actorPubkey: "player-wallet",
+      scope: "external_app_entry",
+      termsDigest: terms.termsDigest,
+      acceptanceDigest,
+      chainReceiptPda: "entry-risk-receipt-pda",
+      chainReceiptDigest: "2".repeat(64),
+      txSignature: "entry-risk-tx",
+    });
+  });
+
+  it("rejects participant disclaimer acceptance when the chain receipt cannot be verified", async () => {
+    const terms = buildRiskDisclaimerTerms("external_app_entry");
+    const acceptanceDigest = computeRiskDisclaimerAcceptanceDigest({
+      externalAppId: "last-ignition",
+      actorPubkey: "player-wallet",
+      scope: "external_app_entry",
+      policyEpochId: "epoch-1",
+      disclaimerVersion: terms.disclaimerVersion,
+      termsDigest: terms.termsDigest,
+    });
+    const riskReceiptVerifier: RiskDisclaimerReceiptVerifier = {
+      verifyRiskDisclaimerReceipt: jest.fn(async () => {
+        throw new Error("external_app_risk_receipt_not_found");
+      }),
+    };
+    const prisma = {
+      externalApp: {
+        findUnique: jest.fn(async () => ({ id: "last-ignition" })),
+      },
+      externalAppRiskDisclaimerAcceptance: {
+        create: jest.fn(),
+      },
+    };
+
+    const response = await request(buildApp(prisma, { riskReceiptVerifier }))
+      .post("/api/v1/external-apps/last-ignition/risk-disclaimer-acceptances")
+      .send({
+        actorPubkey: "player-wallet",
+        scope: "external_app_entry",
+        policyEpochId: "epoch-1",
+        disclaimerVersion: terms.disclaimerVersion,
+        termsDigest: terms.termsDigest,
+        acceptanceDigest,
+        chainReceiptPda: "entry-risk-receipt-pda",
+        chainReceiptDigest: "2".repeat(64),
+        txSignature: "entry-risk-tx",
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe("external_app_risk_receipt_not_found");
+    expect(prisma.externalAppRiskDisclaimerAcceptance.create).not.toHaveBeenCalled();
+  });
+
+  it("requires a manifest binding digest for developer registration acceptances", async () => {
+    const terms = buildRiskDisclaimerTerms("developer_registration");
+    const acceptanceDigest = computeRiskDisclaimerAcceptanceDigest({
+      externalAppId: "last-ignition",
+      actorPubkey: "developer-wallet",
+      scope: "developer_registration",
+      policyEpochId: "external-app-review-v1:1",
+      disclaimerVersion: terms.disclaimerVersion,
+      termsDigest: terms.termsDigest,
+    });
+    const prisma = {
+      externalApp: {
+        findUnique: jest.fn(async () => ({ id: "last-ignition" })),
+      },
+      externalAppRiskDisclaimerAcceptance: {
+        create: jest.fn(),
+      },
+    };
+
+    const response = await request(buildApp(prisma))
+      .post("/api/v1/external-apps/last-ignition/risk-disclaimer-acceptances")
+      .send({
+        actorPubkey: "developer-wallet",
+        scope: "developer_registration",
+        policyEpochId: "external-app-review-v1:1",
+        disclaimerVersion: terms.disclaimerVersion,
+        termsDigest: terms.termsDigest,
+        acceptanceDigest,
+        chainReceiptPda: "developer-agreement-receipt-pda",
+        chainReceiptDigest: "2".repeat(64),
+        txSignature: "developer-agreement-tx",
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe(
+      "external_app_developer_agreement_binding_digest_required",
+    );
+    expect(prisma.externalAppRiskDisclaimerAcceptance.create).not.toHaveBeenCalled();
+  });
+
+  it("stores developer registration binding digest with the acceptance metadata", async () => {
+    const terms = buildRiskDisclaimerTerms("developer_registration");
+    const bindingDigest = "sha256:" + "4".repeat(64);
+    const acceptanceDigest = computeRiskDisclaimerAcceptanceDigest({
+      externalAppId: "last-ignition",
+      actorPubkey: "developer-wallet",
+      scope: "developer_registration",
+      policyEpochId: "external-app-review-v1:1",
+      disclaimerVersion: terms.disclaimerVersion,
+      termsDigest: terms.termsDigest,
+      bindingDigest,
+    });
+    const riskReceiptVerifier: RiskDisclaimerReceiptVerifier = {
+      verifyRiskDisclaimerReceipt: jest.fn(async () => undefined),
+    };
+    const prisma = {
+      externalApp: {
+        findUnique: jest.fn(async () => ({ id: "last-ignition" })),
+      },
+      externalAppRiskDisclaimerAcceptance: {
+        create: jest.fn(async ({ data }: any) => data),
+      },
+    };
+
+    const response = await request(buildApp(prisma, { riskReceiptVerifier }))
+      .post("/api/v1/external-apps/last-ignition/risk-disclaimer-acceptances")
+      .send({
+        actorPubkey: "developer-wallet",
+        scope: "developer_registration",
+        policyEpochId: "external-app-review-v1:1",
+        disclaimerVersion: terms.disclaimerVersion,
+        termsDigest: terms.termsDigest,
+        acceptanceDigest,
+        bindingDigest,
+        chainReceiptPda: "developer-agreement-receipt-pda",
+        chainReceiptDigest: "2".repeat(64),
+        txSignature: "developer-agreement-tx",
+        metadata: { source: "developer-dashboard" },
+      });
+
+    expect(response.status).toBe(201);
+    expect(prisma.externalAppRiskDisclaimerAcceptance.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        metadata: {
+          source: "developer-dashboard",
+          bindingDigest,
+        },
+      }),
+    });
+  });
+
+  it("rejects participant disclaimer acceptance for an unknown external app", async () => {
+    const terms = buildRiskDisclaimerTerms("external_app_entry");
+    const acceptanceDigest = computeRiskDisclaimerAcceptanceDigest({
+      externalAppId: "missing-game",
+      actorPubkey: "player-wallet",
+      scope: "external_app_entry",
+      policyEpochId: "epoch-1",
+      disclaimerVersion: terms.disclaimerVersion,
+      termsDigest: terms.termsDigest,
+    });
+    const prisma = {
+      externalApp: {
+        findUnique: jest.fn(async () => null),
+      },
+      externalAppRiskDisclaimerAcceptance: {
+        create: jest.fn(),
+      },
+    };
+    const response = await request(buildApp(prisma))
+      .post("/api/v1/external-apps/missing-game/risk-disclaimer-acceptances")
+      .send({
+        actorPubkey: "player-wallet",
+        scope: "external_app_entry",
+        policyEpochId: "epoch-1",
+        disclaimerVersion: terms.disclaimerVersion,
+        termsDigest: terms.termsDigest,
+        acceptanceDigest,
+        chainReceiptPda: "entry-risk-receipt-pda",
+        chainReceiptDigest: "2".repeat(64),
+        txSignature: "entry-risk-tx",
+      });
+
+    expect(response.status).toBe(404);
+    expect(response.body.error).toBe("external_app_not_found");
+    expect(prisma.externalAppRiskDisclaimerAcceptance.create).not.toHaveBeenCalled();
+  });
+
   it("lists only safe active discovery fields", async () => {
     const prisma = {
       externalApp: {
@@ -80,6 +400,41 @@ describe("external apps routes", () => {
           },
         ]),
       },
+      externalAppStabilityProjection: {
+        findMany: jest.fn(async () => [
+          {
+            externalAppId: "last-ignition",
+            policyEpochId: "epoch-1",
+            challengeState: "none",
+            projectionStatus: "normal",
+            publicLabels: ["Risk Notice"],
+            riskScore: 12,
+            trustScore: 78,
+            supportSignalLevel: 4,
+            supportIndependenceScore: 0.8,
+            rollout: { exposed: true, bucket: 42, exposureBasisPoints: 5000 },
+            formulaInputs: { parserVersion: "v3a.1" },
+            formulaOutputs: { riskScore: 12, trustScore: 78 },
+            bondDispositionState: {
+              state: "locked_for_case",
+              activeLockedAmountRaw: "100",
+              totalRoutedAmountRaw: "0",
+              activeCaseCount: 1,
+              riskDisclaimerAccepted: true,
+              riskDisclaimerRequired: true,
+            },
+            governanceState: {
+              captureReviewStatus: "open",
+              projectionDisputeStatus: "none",
+              emergencyHoldStatus: "none",
+              highImpactActionsPaused: true,
+              labels: ["Capture Review"],
+            },
+            statusProvenance: { registryStatus: { source: "external_apps" } },
+            updatedAt: new Date("2026-05-13T00:00:00.000Z"),
+          },
+        ]),
+      },
     };
 
     const response = await request(buildApp(prisma)).get("/api/v1/external-apps/discovery");
@@ -98,8 +453,168 @@ describe("external apps routes", () => {
       id: "last-ignition",
       capabilityPolicies: { voice: "normal" },
       updatedAt: "2026-05-13T00:00:00.000Z",
+      stabilityProjection: {
+        policyEpochId: "epoch-1",
+        challengeState: "none",
+        projectionStatus: "normal",
+        publicLabels: ["Risk Notice"],
+        bondDispositionState: {
+          state: "locked_for_case",
+          activeLockedAmountRaw: "100",
+          totalRoutedAmountRaw: "0",
+          activeCaseCount: 1,
+          riskDisclaimerAccepted: true,
+          riskDisclaimerRequired: true,
+        },
+        governanceState: {
+          captureReviewStatus: "open",
+          highImpactActionsPaused: true,
+          labels: ["Capture Review"],
+        },
+      },
     });
+    expect(prisma.externalAppStabilityProjection.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        select: expect.objectContaining({
+          bondDispositionState: true,
+          governanceState: true,
+        }),
+      }),
+    );
     expect(response.body.apps[0]).not.toHaveProperty("serverPublicKey");
+    expect(response.body.apps[0]).not.toHaveProperty("config");
+  });
+
+  it("returns a stability projection debug view without changing registry status", async () => {
+    const prisma = {
+      externalApp: {
+        findUnique: jest.fn(async () => ({
+          id: "last-ignition",
+          name: "Last Ignition",
+          status: "active",
+          environment: "mainnet_production",
+          registryStatus: "active",
+          discoveryStatus: "listed",
+          managedNodePolicy: "normal",
+          capabilityPolicies: {},
+          manifestHash: "sha256:abc",
+          trustScore: "80",
+          riskScore: "8",
+          communityBackingLevel: "4",
+          ownerBond: null,
+          updatedAt: new Date("2026-05-13T00:00:00.000Z"),
+        })),
+      },
+      externalAppStabilityProjection: {
+        findFirst: jest.fn(async () => ({
+          externalAppId: "last-ignition",
+          policyEpochId: "epoch-1",
+          challengeState: "dispute",
+          projectionStatus: "projection_disputed",
+          publicLabels: ["Under Challenge"],
+          riskScore: 70,
+          trustScore: 30,
+          supportSignalLevel: 2,
+          supportIndependenceScore: 0.4,
+          rollout: { exposed: false, bucket: 9000, exposureBasisPoints: 5000 },
+          formulaInputs: {},
+          formulaOutputs: {},
+          bondDispositionState: {
+            state: "routed_by_policy",
+            activeLockedAmountRaw: "0",
+            totalRoutedAmountRaw: "50",
+            activeCaseCount: 0,
+            riskDisclaimerAccepted: true,
+            riskDisclaimerRequired: true,
+          },
+          governanceState: {
+            captureReviewStatus: "none",
+            projectionDisputeStatus: "open",
+            emergencyHoldStatus: "none",
+            highImpactActionsPaused: true,
+            labels: ["Projection Disputed"],
+          },
+          statusProvenance: { registryStatus: { source: "external_apps" } },
+          updatedAt: new Date("2026-05-13T00:00:00.000Z"),
+        })),
+      },
+    };
+
+    const response = await request(buildApp(prisma)).get(
+      "/api/v1/external-apps/last-ignition/stability-projection",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.registryStatus).toBe("active");
+    expect(response.body.stabilityProjection).toMatchObject({
+      challengeState: "dispute",
+      projectionStatus: "projection_disputed",
+      publicLabels: ["Under Challenge"],
+      bondDispositionState: {
+        state: "routed_by_policy",
+        totalRoutedAmountRaw: "50",
+      },
+      governanceState: {
+        projectionDisputeStatus: "open",
+        highImpactActionsPaused: true,
+      },
+    });
+  });
+
+  it("applies store query filters without exposing app config", async () => {
+    const prisma = {
+      externalApp: {
+        findMany: jest.fn(async () => [
+          {
+            id: "last-ignition",
+            name: "Last Ignition",
+            status: "active",
+            environment: "sandbox",
+            registryStatus: "active",
+            discoveryStatus: "listed",
+            managedNodePolicy: "normal",
+            capabilityPolicies: {},
+            manifestHash: "sha256:abc",
+            trustScore: "80",
+            riskScore: "8",
+            ownerBond: null,
+            communityBackingLevel: "4",
+            config: { manifest: { categoryTags: ["game"] } },
+            updatedAt: new Date("2026-05-14T00:00:00.000Z"),
+          },
+          {
+            id: "old-puzzle",
+            name: "Old Puzzle",
+            status: "active",
+            environment: "sandbox",
+            registryStatus: "active",
+            discoveryStatus: "listed",
+            managedNodePolicy: "normal",
+            capabilityPolicies: {},
+            manifestHash: "sha256:def",
+            trustScore: "60",
+            riskScore: "20",
+            ownerBond: null,
+            communityBackingLevel: null,
+            config: { manifest: { categoryTags: ["puzzle"] } },
+            updatedAt: new Date("2026-05-10T00:00:00.000Z"),
+          },
+        ]),
+      },
+    };
+
+    const response = await request(buildApp(prisma)).get(
+      "/api/v1/external-apps/discovery?q=ignition&category=game&sort=featured&limit=1",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.apps.map((app: { id: string }) => app.id)).toEqual([
+      "last-ignition",
+    ]);
+    expect(response.body.apps[0].storeProjection).toMatchObject({
+      listingState: "listed_full",
+      categoryTags: ["game"],
+    });
     expect(response.body.apps[0]).not.toHaveProperty("config");
   });
 
@@ -197,6 +712,10 @@ describe("external apps routes", () => {
         nacl.sign.detached(Buffer.from(assertionPayload), keyPair.secretKey),
       ).toString("base64"),
     };
+    const developerAgreement = makeDeveloperAgreement({
+      actorPubkey: ownerPubkey,
+      manifestHash,
+    });
     const prisma = buildProductionPrismaMock();
 
     const response = await request(buildApp(prisma))
@@ -208,6 +727,7 @@ describe("external apps routes", () => {
         reviewPolicyVersion: 1,
         manifest,
         ownerAssertion,
+        developerAgreement,
       });
 
     expect(response.status).toBe(202);
@@ -248,6 +768,10 @@ describe("external apps routes", () => {
         nonce: "nonce-1",
       }),
     );
+    const developerAgreement = makeDeveloperAgreement({
+      actorPubkey: ownerPubkey,
+      manifestHash,
+    });
     const prisma = buildProductionPrismaMock({
       existingApp: { status: "active", registryStatus: "active" },
     });
@@ -266,6 +790,7 @@ describe("external apps routes", () => {
             nacl.sign.detached(Buffer.from(assertionPayload), keyPair.secretKey),
           ).toString("base64"),
         },
+        developerAgreement,
       });
 
     expect(response.status).toBe(202);
@@ -281,6 +806,20 @@ describe("external apps routes", () => {
 
 function buildProductionPrismaMock(options: { existingApp?: unknown } = {}) {
   return {
+    systemGovernanceRoleBinding: {
+      findFirst: jest.fn(async () => ({
+        id: "binding-1",
+        domain: "external_app",
+        roleKey: "external_app_review_primary",
+        environment: "production",
+        circleId: 7,
+        policyId: "external-app-review-v1",
+        policyVersionId: "external-app-review-v1:1",
+        policyVersion: 1,
+        status: "active",
+        activatedAt: new Date("2026-05-14T00:00:00.000Z"),
+      })),
+    },
     circle: {
       findUnique: jest.fn(async () => ({
         id: 7,
@@ -290,10 +829,20 @@ function buildProductionPrismaMock(options: { existingApp?: unknown } = {}) {
       })),
     },
     governancePolicy: {
-      findFirst: jest.fn(async () => ({ id: "external-app-review-v1" })),
+      findFirst: jest.fn(async () => ({
+        id: "external-app-review-v1",
+        scopeType: "external_app_review_circle",
+        scopeRef: "7",
+        status: "active",
+      })),
     },
     governancePolicyVersion: {
-      findFirst: jest.fn(async () => ({ id: "external-app-review-v1:1" })),
+      findFirst: jest.fn(async () => ({
+        id: "external-app-review-v1:1",
+        policyId: "external-app-review-v1",
+        version: 1,
+        status: "active",
+      })),
     },
     circleMember: {
       findMany: jest.fn(async () => [
@@ -307,6 +856,9 @@ function buildProductionPrismaMock(options: { existingApp?: unknown } = {}) {
       findUnique: jest.fn(async () => options.existingApp ?? null),
       create: jest.fn(async ({ data }: any) => data),
       update: jest.fn(async ({ data }: any) => data),
+    },
+    externalAppRiskDisclaimerAcceptance: {
+      create: jest.fn(async ({ data }: any) => data),
     },
     governanceRequest: {
       create: jest.fn(async ({ data }: any) => data),

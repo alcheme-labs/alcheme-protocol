@@ -241,7 +241,7 @@ export async function executeExternalAppDecision(input: {
       if (chainRegistrationEvidence.mode === "required") {
         await input.prisma.externalApp.update({
           where: { id: input.request.targetRef },
-          data: { status: "inactive", registryStatus: "pending_chain_receipt" },
+          data: { status: "inactive", registryStatus: "pending" },
         });
       }
     }

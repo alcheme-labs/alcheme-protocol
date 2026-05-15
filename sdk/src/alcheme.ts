@@ -10,6 +10,7 @@ import { MessagingModule } from "./modules/messaging";
 import { CirclesModule } from "./modules/circles";
 import { ContributionEngineModule } from "./modules/contribution-engine";
 import { ExternalAppRegistryModule } from "./modules/external-app-registry";
+import { ExternalAppEconomicsModule } from "./modules/external-app-economics";
 import { installAlreadyProcessedSendAndConfirmRecovery } from "./utils/transactions";
 
 export interface AlchemeConfig {
@@ -25,6 +26,7 @@ export interface AlchemeConfig {
     circles?: string;
     contributionEngine?: string;
     externalAppRegistry?: string;
+    externalAppEconomics?: string;
   };
 }
 
@@ -43,6 +45,7 @@ export class Alcheme {
   public circles: CirclesModule;
   public contributionEngine?: ContributionEngineModule;
   public externalAppRegistry?: ExternalAppRegistryModule;
+  public externalAppEconomics?: ExternalAppEconomicsModule;
 
   constructor(config: AlchemeConfig) {
     this.connection = config.connection;
@@ -94,6 +97,11 @@ export class Alcheme {
     if (config.programIds.externalAppRegistry) {
       this.externalAppRegistry = new ExternalAppRegistryModule(
         new PublicKey(config.programIds.externalAppRegistry)
+      );
+    }
+    if (config.programIds.externalAppEconomics) {
+      this.externalAppEconomics = new ExternalAppEconomicsModule(
+        new PublicKey(config.programIds.externalAppEconomics)
       );
     }
   }

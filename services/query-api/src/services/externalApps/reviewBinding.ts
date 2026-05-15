@@ -1,18 +1,17 @@
-export interface ReviewCircleLike {
-  id: number;
-  kind?: string | null;
-  mode?: string | null;
-  circleType?: string | null;
-}
+import {
+  assertReviewCircleShape,
+  type ReviewCircleLike,
+} from "../governance/systemRoleBindings";
 
+export type { ReviewCircleLike };
+
+/**
+ * Shape-only validator. This does not prove a circle is authorized for an
+ * ExternalApp protocol role; callers that need authority must resolve an active
+ * SystemGovernanceRoleBinding.
+ */
 export function assertReviewCircle(circle: ReviewCircleLike): void {
-  if (
-    circle.kind !== "auxiliary" ||
-    circle.mode !== "governance" ||
-    circle.circleType !== "Secret"
-  ) {
-    throw new Error("external_app_review_circle_requires_governance_circle");
-  }
+  assertReviewCircleShape(circle);
 }
 
 export function buildExternalAppReviewBinding(input: {

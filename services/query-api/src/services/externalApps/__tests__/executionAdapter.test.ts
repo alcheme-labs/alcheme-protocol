@@ -220,6 +220,70 @@ describe("external app execution adapter", () => {
     });
   });
 
+  it("keeps v2 registry status pending when required receipt anchor fails", async () => {
+    const receipts: unknown[] = [];
+    const updates: unknown[] = [];
+    const manifest = normalizeExternalAppManifest({
+      version: "1",
+      appId: "last-ignition",
+      name: "Last Ignition",
+      homeUrl: "https://game.example.com",
+      ownerWallet: "solana:devnet:11111111111111111111111111111111",
+      serverPublicKey: "server-key",
+      allowedOrigins: ["https://game.example.com"],
+      capabilities: ["communication.rooms"],
+    });
+    const manifestHash = computeManifestHash(manifest);
+    const prisma = {
+      externalApp: {
+        update: jest.fn(async (input: unknown) => {
+          updates.push(input);
+          return { id: "last-ignition" };
+        }),
+      },
+      externalAppRegistryAnchor: {
+        upsert: jest.fn(async (input: unknown) => input),
+      },
+    };
+    const chainRegistry = {
+      anchorExternalAppRegistration: jest.fn(async () => ({
+        mode: "required" as const,
+        status: "submitted" as const,
+        txSignature: "tx-registration",
+        recordPda: "record-pda",
+      })),
+      anchorExecutionReceipt: jest.fn(async () => {
+        throw new Error("receipt_anchor_failed");
+      }),
+    };
+
+    await executeExternalAppDecision({
+      prisma,
+      governanceStore: governanceStore(receipts),
+      request: {
+        id: "req-receipt-failed",
+        actionType: "external_app_register",
+        targetRef: "last-ignition",
+        payload: {
+          manifest,
+          manifestHash,
+          ownerAssertion: { payload: "payload", signature: "signature" },
+          reviewCircleId: 7,
+        },
+      },
+      decision: { decision: "accepted", decisionDigest: "1".repeat(64) },
+      now: new Date("2026-05-13T00:00:00.000Z"),
+      chainRegistry,
+    });
+
+    expect(chainRegistry.anchorExternalAppRegistration).toHaveBeenCalledTimes(1);
+    expect(chainRegistry.anchorExecutionReceipt).toHaveBeenCalledTimes(1);
+    expect(updates.at(-1)).toMatchObject({
+      where: { id: "last-ignition" },
+      data: { status: "inactive", registryStatus: "pending" },
+    });
+  });
+
   it("does not write local chain anchors or receipt anchors when optional registry skips", async () => {
     const receipts: unknown[] = [];
     const anchors: unknown[] = [];

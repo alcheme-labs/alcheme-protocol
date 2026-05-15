@@ -47,7 +47,9 @@
     ".next-playwright-profile/types/**/*.ts",
     ".next-playwright-profile/dev/types/**/*.ts",
     ".next-playwright-onboarding-only/types/**/*.ts",
-    ".next-playwright-onboarding-only/dev/types/**/*.ts"
+    ".next-playwright-onboarding-only/dev/types/**/*.ts",
+    ".next-playwright-external-app/types/**/*.ts",
+    ".next-playwright-external-app/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

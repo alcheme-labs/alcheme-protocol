@@ -35,20 +35,35 @@
       "require": "./dist/runtime/voice.js",
       "default": "./dist/runtime/voice.js"
     },
-    "./runtime/server": {
-      "types": "./dist/runtime/server.d.ts",
-      "require": "./dist/runtime/server.js",
-      "default": "./dist/runtime/server.js"
-    },
     "./runtime/errors": {
       "types": "./dist/runtime/errors.d.ts",
       "require": "./dist/runtime/errors.js",
       "default": "./dist/runtime/errors.js"
     },
+    "./runtime/server": {
+      "types": "./dist/runtime/server.d.ts",
+      "require": "./dist/runtime/server.js",
+      "default": "./dist/runtime/server.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "require": "./dist/server.js",
+      "default": "./dist/server.js"
+    },
+    "./protocol": {
+      "types": "./dist/protocol.d.ts",
+      "require": "./dist/protocol.js",
+      "default": "./dist/protocol.js"
+    },
     "./modules/external-app-registry": {
       "types": "./dist/modules/external-app-registry.d.ts",
       "require": "./dist/modules/external-app-registry.js",
       "default": "./dist/modules/external-app-registry.js"
+    },
+    "./modules/external-app-economics": {
+      "types": "./dist/modules/external-app-economics.d.ts",
+      "require": "./dist/modules/external-app-economics.js",
+      "default": "./dist/modules/external-app-economics.js"
     },
     "./idl/*.json": "./dist/idl/*.json",
     "./package.json": "./package.json"

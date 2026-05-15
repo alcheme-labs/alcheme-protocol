@@ -252,6 +252,24 @@ x-external-app-admin-token: <EXTERNAL_APP_ADMIN_TOKEN>
 Any reviewed production registration must use the ExternalApp manifest and
 governance request path, not `wallet_only_dev`.
 
+Before a production registration request is opened, the developer must accept the
+scoped developer agreement:
+
+```http
+GET /api/v1/external-apps/risk-disclaimers/developer_registration
+```
+
+The external app records the acceptance on chain through the ExternalApp
+Economics program, then submits the receipt evidence as `developerAgreement` in:
+
+```http
+POST /api/v1/external-apps/:appId/production-registration-requests
+```
+
+The agreement receipt stores terms and acceptance digests, not the full legal
+text. It binds to the manifest hash, so a changed production manifest needs a new
+developer agreement receipt.
+
 ### ExternalApp Registry V2 Modes
 
 ExternalApp Registry V2 is the Solana/SVM audit root for reviewed production
@@ -524,7 +542,7 @@ The SDK exports:
 - `createAlchemeGameChatClient`
 - `createAlchemeVoiceClient`
 - `joinExternalRoom` on the game chat client
-- `signAppRoomClaim` from `@alcheme/sdk/runtime/server`
+- `signAppRoomClaim` from `@alcheme/sdk/server`
 - `buildCommunicationSessionBootstrapMessage`
 - `buildCommunicationMessageSigningMessage`
 
