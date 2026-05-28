@@ -12,7 +12,7 @@ flowchart LR
     extension["contribution-engine"] -. "reputation settlement" .-> program
     program --> accounts["UserIdentityAccount\nHandleMappingAccount\nIdentityRegistryAccount"]
     program -. "identity events" .-> event["event-emitter"]
-    indexer["indexer-core"] --> readmodel["users read model"]
+    indexer["operator indexer"] --> readmodel["users read model"]
 ```
 
 ## Internal Map
@@ -54,4 +54,4 @@ flowchart TB
 | --- | --- |
 | Which reputation updates require extension registry authorization? | Trace `update_reputation_by_extension` in `instructions.rs`. |
 | Which identity events are projected into `User` rows? | Compare emitted identity events with the public event vocabulary and operator projection contract when available. |
-| Which profile fields are duplicated in the off-chain read model? | Compare `UserIdentityAccount` with the private runtime schema when available. |
+| Which profile fields are duplicated in an off-chain read model? | Compare `UserIdentityAccount` with the operator projection contract when available. |

@@ -114,11 +114,11 @@ authority keys in browser code.
 
 ## Runtime Endpoint
 
-The public baseline does not include the first-party managed runtime or local
-stack scripts. For integration testing, point the SDK at an official
-Alcheme-compatible runtime endpoint or at a runtime supplied by the Alcheme
-team. Private-tree maintainers can run the internal local stack, but that
-operator workflow is outside this public baseline.
+The public baseline does not include the first-party managed runtime, operator
+indexer/query implementations, or local stack scripts. For integration testing,
+point the SDK at an official Alcheme-compatible runtime endpoint or at a runtime
+supplied by the Alcheme team. Private-tree maintainers can run the internal
+local stack, but that operator workflow is outside this public baseline.
 
 ## Sandbox Registration
 

@@ -11,7 +11,7 @@ flowchart LR
     sdk["@alcheme/sdk messaging module"] --> program["messaging-manager"]
     program --> accounts["Conversation\nMessageMetadata\nMessageBatch\nUserPresence\nMessagingManager"]
     program -. "message events" .-> event["event-emitter"]
-    indexer["indexer-core"] --> readmodel["Conversation / Message read model"]
+    indexer["operator indexer"] --> readmodel["Conversation / Message read model"]
 ```
 
 ## Internal Map
@@ -55,5 +55,5 @@ flowchart TB
 | Question | Evidence Needed |
 | --- | --- |
 | How much of messaging-manager is used by current product messaging flows? | Compare SDK callers with the private runtime/product tree when available. |
-| Which message events are projected into Prisma `Conversation` and `Message` rows? | Compare emitted events with indexer parser coverage. |
+| Which message events are projected into off-chain read models? | Compare emitted events with the operator projection contract when available. |
 | Which data remains off-chain by design? | Inspect `storage_uri`, `message_hash`, and batch upload usage. |

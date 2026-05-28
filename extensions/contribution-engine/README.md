@@ -18,7 +18,7 @@ flowchart TB
     tracker["private tracker"] --> program
     program --> events["contribution events"]
     events --> indexer
-    indexer --> readmodel["Postgres projection tables"]
+    indexer --> readmodel["operator projection tables"]
     catalog --> product["private product surfaces"]
 ```
 
@@ -56,5 +56,5 @@ flowchart LR
 | Question | Evidence Needed |
 | --- | --- |
 | Which manifest event types are actually emitted by the program? | Compare `extension.manifest.json` with `program/src/*`. |
-| Which projection tables exist in schema or migrations? | Compare manifest projection tables with Prisma/schema SQL. |
+| Which projection tables should an operator maintain? | Compare manifest projection tables with the operator projection contract when available. |
 | Which contribution UI surfaces are active? | Check the private first-party product tree, not the public baseline. |

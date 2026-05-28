@@ -13,7 +13,7 @@ flowchart LR
     program --> accounts["Circle\nCircleMemberAccount\nKnowledge\nKnowledgeBinding\nForkAnchor\nAttestor registries"]
     program -. "circle / knowledge events" .-> event["event-emitter"]
     content["content-manager"] -. "read membership" .-> program
-    indexer["indexer-core"] --> readmodel["Circle / Knowledge read model"]
+    indexer["operator indexer"] --> readmodel["Circle / Knowledge read model"]
 ```
 
 ## Internal Map
@@ -52,6 +52,6 @@ flowchart TB
 
 | Question | Evidence Needed |
 | --- | --- |
-| Which circle hierarchy facts are copied, inherited, or only linked by fork metadata? | Compare `Circle`, `CircleForkAnchor`, `KnowledgeBinding`, and indexer projection. |
+| Which circle hierarchy facts are copied, inherited, or only linked by fork metadata? | Compare `Circle`, `CircleForkAnchor`, `KnowledgeBinding`, and the operator projection contract when available. |
 | Which membership gates are on-chain versus runtime gates? | Trace `claim_circle_membership`, SDK callers, and the private runtime/product tree when available. |
 | Which contributor proof bindings are required before crystallization is considered complete? | Trace `bind_contributor_proof`, `bind_and_update_contributors`, and receipt/entitlement code. |

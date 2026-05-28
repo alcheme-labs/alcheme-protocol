@@ -1,13 +1,15 @@
 # Alcheme Protocol Public Baseline
 
 Alcheme is an open-core Solana-native social and knowledge protocol. This public
-baseline is the protocol and integration surface intended for external review,
-auditing, and early ecosystem integration.
+repository is an Apache-2.0 protocol and integration baseline generated from a
+larger internal development tree. It is intended for external review, auditing,
+and early ecosystem integration.
 
-This is not the full internal product runtime. The Alcheme team maintains a
-private source tree with stronger runtime services, operational tooling,
-production signing infrastructure, prompts, evals, anti-abuse policy, and
-first-party product surfaces.
+This is not a full product release and it is not a source-available release of
+the first-party Alcheme runtime. The Alcheme team keeps the managed runtime,
+first-party product surfaces, operational tooling, production signing
+infrastructure, prompts, evals, anti-abuse policy, and deployment runbooks
+outside this first public baseline.
 
 ## What You Can Understand Here
 
@@ -18,8 +20,8 @@ This baseline is enough to inspect the protocol shape:
 - how external programs and clients can build against the public TypeScript SDK
 - how extension manifests describe program identity, permissions, events,
   parser contracts, and compatibility requirements
-- where an Alcheme-compatible managed runtime fits without exposing the
-  first-party runtime implementation
+- where an Alcheme-compatible managed runtime and operator projection layer fit
+  without exposing the first-party runtime implementation
 
 For the high-level system map, start with
 [`docs/public-architecture-overview.md`](./docs/public-architecture-overview.md)
@@ -40,7 +42,7 @@ and the static map at
 
 - First-party `query-api` managed runtime
 - First-party web/mobile product surfaces
-- Production indexer/query deployments and runbooks
+- Operator indexer/query implementations, production deployments, and runbooks
 - Signing sidecars, key-management topology, and operator scripts
 - Internal prompts, eval fixtures, anti-abuse policy, and rate-limit strategy
 - Private roadmap, funding, grant, incident, and security operations notes
@@ -64,6 +66,7 @@ back into the private development tree.
 
 ## License
 
-Protocol and integration components in this baseline are licensed under
-Apache-2.0 unless a file states otherwise. See `LICENSE`, `LICENSING.md`, and
+This public baseline is licensed under Apache-2.0 unless a file states
+otherwise. BUSL-covered first-party runtime and product surfaces are not
+included in this public baseline. See `LICENSE`, `LICENSING.md`, and
 `licenses/APACHE-2.0.txt`.

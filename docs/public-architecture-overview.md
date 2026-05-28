@@ -5,13 +5,14 @@ a full product runtime map and it is not a deployment runbook.
 
 Static HTML map: [`docs/public-architecture-map.html`](./public-architecture-map.html).
 
-Alcheme separates the open protocol surface from the first-party managed runtime.
-The public baseline exposes the parts that external developers, auditors, and
-integrators need to inspect: on-chain programs, shared protocol types, CPI
-interfaces, SDK code, extension manifests, schemas, quickstarts, and examples.
-The private tree keeps the operational product layer: managed runtime services,
-first-party UI, signing sidecars, prompts, evals, anti-abuse policy, rate-limit
-strategy, deployment runbooks, and production key-management topology.
+Alcheme separates the open protocol and integration surface from the first-party
+managed runtime. The public baseline exposes the parts that external developers,
+auditors, and integrators need to inspect: on-chain programs, shared protocol
+types, CPI interfaces, SDK code, extension manifests, schemas, quickstarts, and
+examples. The internal tree keeps the operational product layer: managed runtime
+services, first-party UI, operator indexer/query implementations, signing
+sidecars, prompts, evals, anti-abuse policy, rate-limit strategy, deployment
+runbooks, and production key-management topology.
 
 ## System Shape
 
@@ -31,9 +32,10 @@ flowchart TB
     private -. "not included in public baseline" .-> runtime
 ```
 
-The important boundary is that the chain-facing protocol is public and
-inspectable, while the managed runtime that operates the first-party product is
-not shipped as part of this baseline.
+The important boundary is that the chain-facing protocol and integration
+contracts are public and inspectable, while the managed runtime and operator
+projection layer that operate the first-party product are not shipped as part of
+this baseline.
 
 ## Public Layers
 
@@ -96,14 +98,16 @@ runtime.
 
 - A complete first-party web or mobile product.
 - The first-party managed runtime implementation.
+- Operator indexer/query implementations and production projection deployments.
 - Production signing sidecars or key-management topology.
 - Internal prompts, model-evaluation fixtures, anti-abuse rules, or rate-limit
   strategy.
 - Deployment runbooks, incident notes, funding material, or private roadmap
   planning.
 
-Those exclusions are intentional. They keep the protocol open while preserving a
-commercially defensible product and operations layer.
+Those exclusions are intentional. They keep the protocol and integration
+contracts open while preserving a commercially defensible product and operations
+layer.
 
 ## How To Read The Repository
 

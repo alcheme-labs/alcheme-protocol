@@ -12,7 +12,7 @@ flowchart LR
     content["content-manager"] -. "permission / relationship checks" .-> program
     program --> accounts["AccessControllerAccount\nFollowRelationshipAccount"]
     program -. "access events" .-> event["event-emitter"]
-    indexer["indexer-core"] --> readmodel["access / relationship read model"]
+    indexer["operator indexer"] --> readmodel["access / relationship read model"]
 ```
 
 ## Internal Map
@@ -53,5 +53,5 @@ flowchart TB
 | Question | Evidence Needed |
 | --- | --- |
 | Which permission checks are enforced before content writes? | Trace `check_permission_simple` callers in `programs/content-manager/src/instructions.rs`. |
-| Which access facts are projected into Prisma models? | Compare emitted events with `AccessRule`, `Permission`, and `UserRelationship` in `schema.prisma`. |
+| Which access facts are projected into read models? | Compare emitted events with the operator projection contract when available. |
 | Which audit features are live versus scaffolded? | Check SDK callers and the private runtime/product tree when available. |

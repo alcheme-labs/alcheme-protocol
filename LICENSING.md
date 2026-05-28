@@ -2,7 +2,8 @@
 
 This public baseline is an Apache-2.0 protocol and integration snapshot unless
 a file states otherwise. The public export uses the Apache-2.0 text as the root
-`LICENSE` file.
+`LICENSE` file and does not include the BUSL-covered first-party managed runtime
+or product surfaces from the internal development tree.
 
 This document does not grant rights to the Alcheme name, logos, domains,
 official deployments, governance authorities, program IDs, validator/node
@@ -35,12 +36,15 @@ surfaces that are intentionally not part of this public baseline, including:
 - `services/query-api/`
 - `frontend/`
 - `mobile-shell/`
+- operator indexer/query implementations and production deployments
 - `extensions/anchor-signer/`
 - `extensions/contribution-engine/tracker/`
 - internal prompts, evals, anti-abuse policy, rate-limit strategy, runbooks,
   deployment scripts, and production signing topology
 
-Those private surfaces may use different licensing or may remain unpublished.
+Those private surfaces may use different licensing, including BUSL-1.1, or may
+remain unpublished. Their internal license map does not make them part of this
+public baseline.
 
 ## Trademark And Official Network Boundary
 

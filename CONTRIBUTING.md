@@ -30,7 +30,8 @@ Run the narrowest checks that prove your change. Common public-baseline checks:
 - `cd packages/game-chat-react && npm ci && npm run typecheck`
 
 Some integration examples require an Alcheme-compatible runtime endpoint. The
-first-party managed runtime is not part of this public baseline.
+first-party managed runtime and operator indexer/query implementations are not
+part of this public baseline.
 
 ## Pull Request Guidelines
 
