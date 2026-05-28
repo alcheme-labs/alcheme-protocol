@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f7f9" />
+    <title>Alcheme Public Architecture Map</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f7f9;
+        --surface: #ffffff;
+        --ink: #17202a;
+        --muted: #5f6b7a;
+        --line: #d6dce3;
+        --blue: #2563eb;
+        --green: #0f766e;
+        --purple: #7c3aed;
+        --amber: #b45309;
+        --rose: #be123c;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        line-height: 1.5;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 32px 20px 48px;
+      }
+
+      header {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        line-height: 1.05;
+      }
+
+      .lede {
+        max-width: 820px;
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .links a {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--surface);
+        color: var(--muted);
+        padding: 6px 10px;
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
+
+      .map {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        overflow-x: auto;
+        padding: 16px;
+      }
+
+      svg {
+        display: block;
+        min-width: 1040px;
+        width: 100%;
+        height: auto;
+      }
+
+      .node rect {
+        fill: #fff;
+        stroke: var(--line);
+        stroke-width: 1.5;
+      }
+
+      .node text {
+        fill: var(--ink);
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .node .note {
+        fill: var(--muted);
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .protocol rect {
+        stroke: var(--green);
+      }
+
+      .sdk rect {
+        stroke: var(--blue);
+      }
+
+      .runtime rect {
+        stroke: var(--amber);
+        stroke-dasharray: 7 5;
+      }
+
+      .extension rect {
+        stroke: var(--rose);
+      }
+
+      .schema rect {
+        stroke: var(--purple);
+      }
+
+      .edge {
+        fill: none;
+        stroke: #8491a3;
+        stroke-width: 1.8;
+        marker-end: url(#arrow);
+      }
+
+      .edge.private {
+        stroke: var(--amber);
+        stroke-dasharray: 7 5;
+      }
+
+      .legend,
+      .notes {
+        display: grid;
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .legend {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+
+      .legend-item,
+      .note-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        padding: 12px;
+      }
+
+      .legend-item strong,
+      .note-card strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .legend-item span,
+      .note-card span {
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      @media (max-width: 760px) {
+        .shell {
+          padding: 24px 14px 36px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <h1>Alcheme Public Architecture Map</h1>
+        <p class="lede">
+          This public map shows the protocol and integration baseline. It keeps
+          the first-party managed runtime visible as a boundary, but not as an
+          implementation that ships in the public repository.
+        </p>
+        <nav class="links" aria-label="Related documents">
+          <a href="./public-architecture-overview.md">Architecture overview</a>
+          <a href="./public-baseline.md">Export policy</a>
+          <a href="../programs/README.md">Programs</a>
+          <a href="../sdk/README.md">SDK</a>
+          <a href="./integration/external-program-quickstart.md">Integration quickstart</a>
+        </nav>
+      </header>
+
+      <section class="map" aria-label="Public architecture diagram">
+        <svg viewBox="0 0 1040 640" role="img" aria-labelledby="title desc">
+          <title id="title">Alcheme public baseline architecture</title>
+          <desc id="desc">
+            External clients use the SDK to reach public protocol programs and
+            Alcheme-compatible runtime endpoints. Runtime implementation details
+            are private and outside the public baseline.
+          </desc>
+          <defs>
+            <marker
+              id="arrow"
+              markerWidth="10"
+              markerHeight="10"
+              refX="8"
+              refY="3"
+              orient="auto"
+              markerUnits="strokeWidth"
+            >
+              <path d="M0,0 L0,6 L9,3 z" fill="#8491a3" />
+            </marker>
+          </defs>
+
+          <g class="node sdk">
+            <rect x="40" y="72" width="210" height="96" rx="8" />
+            <text x="64" y="108">External apps</text>
+            <text x="64" y="132" class="note">wallets, clients, games</text>
+          </g>
+
+          <g class="node sdk">
+            <rect x="330" y="72" width="220" height="96" rx="8" />
+            <text x="354" y="108">@alcheme/sdk</text>
+            <text x="354" y="132" class="note">program and runtime clients</text>
+          </g>
+
+          <g class="node protocol">
+            <rect x="630" y="52" width="340" height="136" rx="8" />
+            <text x="654" y="88">Solana / Anchor programs</text>
+            <text x="654" y="112" class="note">identity, circles, content, access</text>
+            <text x="654" y="134" class="note">messaging, registries, external apps</text>
+          </g>
+
+          <path class="edge" d="M250 120 H330" />
+          <path class="edge" d="M550 120 H630" />
+
+          <g class="node schema">
+            <rect x="330" y="264" width="220" height="104" rx="8" />
+            <text x="354" y="300">Shared contracts</text>
+            <text x="354" y="324" class="note">shared types, CPI interfaces</text>
+            <text x="354" y="346" class="note">schemas and manifests</text>
+          </g>
+
+          <g class="node extension">
+            <rect x="630" y="264" width="340" height="104" rx="8" />
+            <text x="654" y="300">Public extension surface</text>
+            <text x="654" y="324" class="note">contribution-engine program</text>
+            <text x="654" y="346" class="note">manifest, events, compatibility</text>
+          </g>
+
+          <path class="edge" d="M440 168 V264" />
+          <path class="edge" d="M550 316 H630" />
+          <path class="edge" d="M800 264 V188" />
+
+          <g class="node runtime">
+            <rect x="40" y="448" width="360" height="112" rx="8" />
+            <text x="64" y="486">Alcheme-compatible managed runtime</text>
+            <text x="64" y="510" class="note">endpoint contract visible to integrators</text>
+            <text x="64" y="532" class="note">first-party implementation not included</text>
+          </g>
+
+          <g class="node runtime">
+            <rect x="520" y="448" width="450" height="112" rx="8" />
+            <text x="544" y="486">Private product and operations layer</text>
+            <text x="544" y="510" class="note">UI, signing sidecars, prompts, evals</text>
+            <text x="544" y="532" class="note">anti-abuse policy, rate limits, runbooks</text>
+          </g>
+
+          <path class="edge" d="M145 168 V448" />
+          <path class="edge" d="M330 504 H400" />
+          <path class="edge private" d="M520 504 H400" />
+          <path class="edge" d="M800 188 C800 410 250 348 220 448" />
+          <path class="edge private" d="M745 448 C745 410 855 410 855 368" />
+        </svg>
+      </section>
+
+      <section class="legend" aria-label="Legend">
+        <div class="legend-item">
+          <strong>Open protocol</strong>
+          <span>Apache-2.0 code and contracts intended for public review.</span>
+        </div>
+        <div class="legend-item">
+          <strong>SDK and integrations</strong>
+          <span>Public client surface for external apps and product clients.</span>
+        </div>
+        <div class="legend-item">
+          <strong>Runtime boundary</strong>
+          <span>Endpoint contracts are visible; first-party implementation is private.</span>
+        </div>
+        <div class="legend-item">
+          <strong>Private layer</strong>
+          <span>Product, operations, prompts, signing topology, and abuse defenses.</span>
+        </div>
+      </section>
+
+      <section class="notes" aria-label="Boundary notes">
+        <div class="note-card">
+          <strong>Why the private runtime is still shown</strong>
+          <span>
+            External developers need to know that runtime endpoints exist. They
+            do not need the first-party implementation to audit the public
+            protocol, SDK, schemas, or extension contracts.
+          </span>
+        </div>
+        <div class="note-card">
+          <strong>Why this is separate from the internal architecture map</strong>
+          <span>
+            The internal HTML maps describe the full development tree. This
+            public map is maintained separately so public exports do not become
+            a misleading source of truth for private development.
+          </span>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

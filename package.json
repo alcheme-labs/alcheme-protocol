@@ -1,0 +1,31 @@
+{
+  "name": "alcheme-protocol-public-baseline",
+  "private": true,
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "anchor build",
+    "test": "anchor test",
+    "build:sdk": "npm --prefix sdk run build",
+    "test:sdk": "npm --prefix sdk test",
+    "build:game-chat-react": "npm --prefix packages/game-chat-react run build",
+    "typecheck:game-chat-react": "npm --prefix packages/game-chat-react run typecheck"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.31.1",
+    "@metaplex-foundation/js": "^0.20.1",
+    "@solana/spl-token": "^0.3.9",
+    "@solana/web3.js": "^1.87.6"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^20.0.0",
+    "chai": "^4.3.0",
+    "mocha": "^10.0.0",
+    "prettier": "^3.0.0",
+    "ts-mocha": "^11.1.0",
+    "ts-node": "^10.9.0",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.0.0"
+  }
+}

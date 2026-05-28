@@ -1,0 +1,1190 @@
+{
+  "address": "FT4n9xkfEafYP2MSmqwur3xCeu361Vzrfpz8XNmaAG7J",
+  "metadata": {
+    "name": "external_app_registry",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "External App Registry Program for Alcheme Protocol"
+  },
+  "instructions": [
+    {
+      "name": "anchor_execution_receipt",
+      "discriminator": [
+        237,
+        244,
+        188,
+        182,
+        154,
+        107,
+        167,
+        19
+      ],
+      "accounts": [
+        {
+          "name": "registry_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "external_app_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "execution_receipt_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "anchor_external_app_registration",
+      "discriminator": [
+        64,
+        25,
+        118,
+        38,
+        185,
+        208,
+        96,
+        85
+      ],
+      "accounts": [
+        {
+          "name": "registry_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "external_app_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "type": "pubkey"
+        },
+        {
+          "name": "server_key_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "manifest_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "owner_assertion_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "policy_state_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "review_circle_id",
+          "type": "u32"
+        },
+        {
+          "name": "review_policy_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "decision_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "execution_intent_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "expires_at",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "initialize_registry",
+      "discriminator": [
+        189,
+        181,
+        20,
+        17,
+        174,
+        57,
+        249,
+        59
+      ],
+      "accounts": [
+        {
+          "name": "registry_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "governance_authority",
+          "type": "pubkey"
+        },
+        {
+          "name": "event_program",
+          "type": "pubkey"
+        },
+        {
+          "name": "event_emitter",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "pause_registry",
+      "discriminator": [
+        106,
+        147,
+        106,
+        131,
+        69,
+        218,
+        76,
+        249
+      ],
+      "accounts": [
+        {
+          "name": "registry_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "paused",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "rotate_server_key",
+      "discriminator": [
+        173,
+        89,
+        107,
+        100,
+        114,
+        184,
+        155,
+        143
+      ],
+      "accounts": [
+        {
+          "name": "registry_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "external_app_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "server_key_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "decision_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "execution_intent_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_governance_authority",
+      "discriminator": [
+        0,
+        113,
+        148,
+        253,
+        151,
+        181,
+        148,
+        42
+      ],
+      "accounts": [
+        {
+          "name": "registry_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "governance_authority",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "set_registry_status",
+      "discriminator": [
+        213,
+        205,
+        39,
+        126,
+        72,
+        74,
+        241,
+        178
+      ],
+      "accounts": [
+        {
+          "name": "registry_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "external_app_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "registry_status",
+          "type": {
+            "defined": {
+              "name": "ExternalAppRegistryStatus"
+            }
+          }
+        },
+        {
+          "name": "decision_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "execution_intent_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_manifest_hash",
+      "discriminator": [
+        239,
+        122,
+        84,
+        121,
+        188,
+        139,
+        225,
+        97
+      ],
+      "accounts": [
+        {
+          "name": "registry_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "external_app_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  97,
+                  112,
+                  112
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter",
+          "writable": true
+        },
+        {
+          "name": "event_batch",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "manifest_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "policy_state_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "decision_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "execution_intent_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "ExternalAppRecord",
+      "discriminator": [
+        37,
+        57,
+        36,
+        169,
+        97,
+        225,
+        113,
+        113
+      ]
+    },
+    {
+      "name": "ExternalAppRegistryConfig",
+      "discriminator": [
+        56,
+        5,
+        22,
+        153,
+        30,
+        253,
+        145,
+        205
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidDigest",
+      "msg": "invalid digest"
+    },
+    {
+      "code": 6001,
+      "name": "RegistryPaused",
+      "msg": "registry is paused"
+    },
+    {
+      "code": 6002,
+      "name": "UnauthorizedGovernanceAuthority",
+      "msg": "unauthorized governance authority"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidStatusTransition",
+      "msg": "invalid registry status transition"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidEventAccount",
+      "msg": "invalid event account"
+    }
+  ],
+  "types": [
+    {
+      "name": "ExternalAppRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "app_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "server_key_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "manifest_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "owner_assertion_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "policy_state_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "review_circle_id",
+            "type": "u32"
+          },
+          {
+            "name": "review_policy_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "decision_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "execution_intent_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "execution_receipt_digest",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "registry_status",
+            "type": {
+              "defined": {
+                "name": "ExternalAppRegistryStatus"
+              }
+            }
+          },
+          {
+            "name": "expires_at",
+            "type": "i64"
+          },
+          {
+            "name": "revoked_at",
+            "type": "i64"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExternalAppRegistryConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "governance_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "event_program",
+            "type": "pubkey"
+          },
+          {
+            "name": "event_emitter",
+            "type": "pubkey"
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          },
+          {
+            "name": "total_apps",
+            "type": "u64"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExternalAppRegistryStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Pending"
+          },
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Suspended"
+          },
+          {
+            "name": "Revoked"
+          }
+        ]
+      }
+    }
+  ]
+}

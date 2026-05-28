@@ -1,0 +1,13 @@
+[package]
+name = "alcheme-shared"
+version = "1.0.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "Shared types and utilities for Alcheme Protocol"
+
+[dependencies]
+anchor-lang = "0.31.1"
+solana-program = "^2.0"
+
+[features]
+default = []

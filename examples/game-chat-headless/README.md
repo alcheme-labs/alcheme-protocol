@@ -1,0 +1,114 @@
+# External Program Communication Headless Example
+
+HTML diagram: [Open this subproject map](../../docs/architecture/subproject-maps.html#game-chat-headless).
+
+This example shows the intended SDK-level integration shape for an external
+program or runtime client. It is a template, not a runnable app by itself.
+
+Product terminology: **External Program** is the user-facing umbrella term. The
+implementation object is still named `ExternalApp`, and this example path keeps
+the historical `game-chat-headless` name for compatibility.
+
+The current integration is headless:
+
+- no React UI requirement
+- no Plaza dependency
+- no audio recording
+- no transcript or recap
+- no temporary-room chain write
+- no automatic Plaza or draft write
+
+## System Position
+
+```mermaid
+flowchart LR
+    app["external program client"] --> sdk["@alcheme/sdk"]
+    app --> server["external program server"]
+    server --> claim["appRoomClaim"]
+    claim --> sdk
+    sdk --> runtime["operator runtime communication / voice routes"]
+    runtime --> external["ExternalApp / CommunicationRoom"]
+    sdk --> voice["voice provider adapter"]
+```
+
+## Runtime Flow
+
+```mermaid
+sequenceDiagram
+    participant App as External program client
+    participant Server as External program server
+    participant SDK as Alcheme SDK
+    participant API as Operator runtime
+    participant Voice as Voice provider
+
+    App->>Server: request appRoomClaim
+    Server-->>App: signed claim
+    App->>SDK: joinExternalRoom(claim)
+    SDK->>API: resolve/create communication room
+    SDK->>API: sync room member from appRoomClaim
+    SDK->>API: issue communication access token
+    App->>SDK: send/list/subscribe messages
+    SDK->>API: communication runtime routes
+    App->>SDK: joinVoice
+    SDK->>Voice: provider adapter join
+    Server->>API: submit selected source material candidate
+    API-->>App: accepted knowledge context package
+```
+
+## Files
+
+- `src/main.ts`: client-side SDK flow with an injected wallet signer and voice
+  provider client.
+
+## Required Runtime Pieces
+
+External program client:
+
+- a wallet object that exposes `publicKey` and `signMessage(message)`
+- an Alcheme-compatible runtime API base URL
+- a voice provider adapter if voice is enabled
+
+External program server:
+
+- an `ExternalApp` row in Alcheme
+- an Ed25519 server key whose public key is stored on `ExternalApp.serverPublicKey`
+- a short-lived `appRoomClaim` for each external room/member sync request
+
+## Minimal Flow
+
+1. Ask the external program server for an `appRoomClaim`.
+2. Call `joinExternalRoom` to resolve/create the room, sync membership, and create a wallet-signed communication session.
+3. Send/list/stream text and optional voice clip messages.
+4. Pass the communication session token to the voice client.
+5. Join voice through an injected provider client.
+6. When the host wants community continuity, submit selected runtime evidence as
+   a SourceMaterial candidate from the external program server.
+7. After Circle review accepts it, fetch a knowledge context package for the
+   room or server-side integration.
+
+Runtime helpers:
+
+```ts
+import { fetchKnowledgeContextPackage } from "@alcheme/sdk/runtime/knowledge-context";
+import { submitExternalProgramSourceMaterial } from "@alcheme/sdk/runtime/source-materials";
+```
+
+## Running As A Real Example Later
+
+To make this executable, add a small package around this directory and install:
+
+```bash
+npm install @alcheme/sdk livekit-client
+```
+
+Then replace the example wallet and `voiceProviderClient` in `src/main.ts`
+with real browser wallet and LiveKit code.
+
+## Blind Spots To Check
+
+| Question | Evidence Needed |
+| --- | --- |
+| What should the external program server sign into `appRoomClaim`? | Check the operator-provided runtime contract and SDK runtime types. |
+| What should the server sign into source and knowledge-context claims? | Check the public SDK server helpers and the operator-provided runtime contract. |
+| Which voice provider is used in production-like runs? | Check operator runtime configuration and the injected `VoiceProviderClient`. |
+| Which room metadata should external programs persist locally? | Compare `resolveRoom` responses with host runtime state requirements. |

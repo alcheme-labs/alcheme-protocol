@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f7f9" />
+    <title>Alcheme Public Subproject Map</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f7f9;
+        --surface: #ffffff;
+        --ink: #17202a;
+        --muted: #5f6b7a;
+        --line: #d6dce3;
+        --accent: #2563eb;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        line-height: 1.5;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      .shell {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 32px 20px 48px;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: clamp(2rem, 5vw, 3.25rem);
+        line-height: 1.05;
+      }
+
+      .lede {
+        max-width: 780px;
+        margin: 0 0 24px;
+        color: var(--muted);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 12px;
+      }
+
+      section {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        padding: 14px;
+      }
+
+      h2 {
+        margin: 0 0 6px;
+        font-size: 1rem;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <h1>Alcheme Public Subproject Map</h1>
+      <p class="lede">
+        This public overlay replaces the internal full-tree subproject map in
+        public exports. It keeps README links stable while pointing readers to
+        the public protocol, SDK, schema, extension, and integration surfaces.
+      </p>
+      <p class="lede">
+        For the visual system map, open
+        <a href="../public-architecture-map.html">docs/public-architecture-map.html</a>.
+      </p>
+
+      <div class="grid">
+        <section id="programs">
+          <h2>programs</h2>
+          <p>Public Anchor programs for protocol accounts, instructions, authorities, and events.</p>
+        </section>
+        <section id="shared">
+          <h2>shared</h2>
+          <p>Shared protocol types and utilities used by public program crates.</p>
+        </section>
+        <section id="cpi-interfaces">
+          <h2>cpi-interfaces</h2>
+          <p>CPI helper interfaces and permission contracts for external program integration.</p>
+        </section>
+        <section id="sdk">
+          <h2>sdk</h2>
+          <p>TypeScript SDK for public program clients, runtime contracts, and server-side helpers.</p>
+        </section>
+        <section id="game-chat-react">
+          <h2>game-chat-react</h2>
+          <p>Optional React UI components for Alcheme-compatible chat and voice integrations.</p>
+        </section>
+        <section id="game-chat-headless">
+          <h2>game-chat-headless</h2>
+          <p>Headless example showing how an external app can wire SDK runtime clients.</p>
+        </section>
+        <section id="contribution-engine">
+          <h2>contribution-engine</h2>
+          <p>Public extension manifest and contribution-engine program surface.</p>
+        </section>
+        <section id="contribution-engine-program">
+          <h2>contribution-engine-program</h2>
+          <p>Anchor program for contribution ledgers, references, and reputation settlement signals.</p>
+        </section>
+        <section id="identity-registry">
+          <h2>identity-registry</h2>
+          <p>Identity and reputation account surface.</p>
+        </section>
+        <section id="event-emitter">
+          <h2>event-emitter</h2>
+          <p>Typed event emission surface used by public protocol programs.</p>
+        </section>
+        <section id="access-controller">
+          <h2>access-controller</h2>
+          <p>Permission and relationship checks for protocol actions.</p>
+        </section>
+        <section id="content-manager">
+          <h2>content-manager</h2>
+          <p>Content publication and lifecycle instruction surface.</p>
+        </section>
+        <section id="registry-factory">
+          <h2>registry-factory</h2>
+          <p>Registry and extension discovery program surface.</p>
+        </section>
+        <section id="messaging-manager">
+          <h2>messaging-manager</h2>
+          <p>Public on-chain messaging program surface.</p>
+        </section>
+        <section id="circle-manager">
+          <h2>circle-manager</h2>
+          <p>Circle, membership, fork, and knowledge-binding program surface.</p>
+        </section>
+        <section id="external-app-registry">
+          <h2>external-app-registry</h2>
+          <p>External app identity and registration program surface.</p>
+        </section>
+        <section id="external-app-economics">
+          <h2>external-app-economics</h2>
+          <p>Bounded external-app economics and review-flow program surface.</p>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
