@@ -1,5 +1,6 @@
 import { parseApiErrorResponse } from "./errors";
 import { resolveRuntimeFetch } from "./fetch";
+import type { SourceSubmissionClaim } from "../server";
 
 type FetchLike = typeof fetch;
 
@@ -12,10 +13,7 @@ export interface ExternalProgramSourceMaterialSubmission {
   evidencePrivacyClass: "public" | "circle_only" | "reviewer_only" | "sealed";
   requestedLifecycleStatus?: "nominated" | "submitted" | "review_pending";
   submittedByPubkey?: string;
-  sourceSubmissionClaim?: {
-    payload: string;
-    signature: string;
-  };
+  sourceSubmissionClaim?: SourceSubmissionClaim;
 }
 
 export interface ExternalProgramSourceMaterialSubmissionResult {

@@ -1,5 +1,6 @@
 import { parseApiErrorResponse } from "./errors";
 import { resolveRuntimeFetch } from "./fetch";
+import type { KnowledgeContextClaim } from "../server";
 
 type FetchLike = typeof fetch;
 
@@ -12,10 +13,7 @@ export interface KnowledgeContextRequest {
   roomType?: string;
   requestedCapability: "knowledge_context";
   purpose: string;
-  knowledgeContextClaim?: {
-    payload: string;
-    signature: string;
-  };
+  knowledgeContextClaim?: KnowledgeContextClaim;
 }
 
 export interface KnowledgeContextPackage {

@@ -73,9 +73,9 @@ snapshot to generate local build output. Its default `npm test` command runs the
 public runtime-client source tests that do not depend on private runtime or
 unexported local build artifacts.
 
-`@alcheme/sdk/runtime/server` remains as a deprecated compatibility alias for
-early external program integrations. New code should import server authority
-helpers from `@alcheme/sdk/server`.
+`@alcheme/sdk/runtime/server` is not exported. Server authority helpers live only
+under `@alcheme/sdk/server`, keeping browser runtime subpaths free of signing
+helpers.
 
 ## Runtime Subpath Imports
 
@@ -93,13 +93,17 @@ import { submitExternalProgramSourceMaterial } from "@alcheme/sdk/runtime/source
 communication runtime client. New product copy should describe it as
 communication runtime, not as the full external program scope.
 
-External program servers can build and sign room claims from the server-only helper:
+External program servers can build and sign app room, source submission, and
+knowledge context claims from the server-only helper:
 
 ```ts
 import {
+  computeExternalProgramSummaryDigest,
   computeExternalAppManifestHash,
   computeExternalAppRiskDisclaimerAcceptanceDigest,
   signAppRoomClaim,
+  signKnowledgeContextClaim,
+  signSourceSubmissionClaim,
   signExternalAppOwnerAssertion,
 } from "@alcheme/sdk/server";
 ```

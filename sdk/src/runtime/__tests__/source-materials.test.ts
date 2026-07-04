@@ -1,5 +1,6 @@
 import { AlchemeApiError } from "../errors";
 import { submitExternalProgramSourceMaterial } from "../source-materials";
+import { signSourceSubmissionClaim } from "../../server";
 
 const API_BASE = "https://api.example.test/api/v1";
 
@@ -78,6 +79,23 @@ describe("external program source material runtime client", () => {
       });
     });
 
+    const sourceSubmissionClaim = await signSourceSubmissionClaim(
+      {
+        externalAppId: "example-program",
+        roomKey: "external:example-program:lobby",
+        originType: "external_summary",
+        originRef: "summary-1",
+        targetCircleId: 130,
+        summaryText: "Players agreed on the frost strategy.",
+        evidencePrivacyClass: "circle_only",
+        requestedLifecycleStatus: "review_pending",
+        submittedByPubkey: "wallet-111",
+        expiresAt: "2026-05-13T00:10:00.000Z",
+        nonce: "nonce-source-1",
+      },
+      async (payload) => `signed:${payload}`,
+    );
+
     const result = await submitExternalProgramSourceMaterial({
       apiBaseUrl: `${API_BASE}/`,
       appId: "example-program",
@@ -91,10 +109,7 @@ describe("external program source material runtime client", () => {
         evidencePrivacyClass: "circle_only",
         requestedLifecycleStatus: "review_pending",
         submittedByPubkey: "wallet-111",
-        sourceSubmissionClaim: {
-          payload: "payload",
-          signature: "signature",
-        },
+        sourceSubmissionClaim,
       },
     });
 
@@ -116,10 +131,7 @@ describe("external program source material runtime client", () => {
       evidencePrivacyClass: "circle_only",
       requestedLifecycleStatus: "review_pending",
       submittedByPubkey: "wallet-111",
-      sourceSubmissionClaim: {
-        payload: "payload",
-        signature: "signature",
-      },
+      sourceSubmissionClaim,
     });
   });
 

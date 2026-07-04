@@ -44,10 +44,6 @@
       "types": "./src/runtime/errors.ts",
       "default": "./src/runtime/errors.ts"
     },
-    "./runtime/server": {
-      "types": "./src/runtime/server.ts",
-      "default": "./src/runtime/server.ts"
-    },
     "./server": {
       "types": "./src/server.ts",
       "default": "./src/server.ts"

@@ -1,18 +1,30 @@
 import {
+  buildKnowledgeContextClaimPayload,
   buildAppRoomClaimPayload,
   buildExternalAppOwnerAssertionPayload,
   buildPlatformCallbackPayload,
+  buildSourceSubmissionClaimPayload,
   computeExternalAppEvidenceHash,
   computeExternalAppManifestHash,
   computeExternalAppReceiptDigest,
   computeExternalAppRiskDisclaimerAcceptanceDigest,
+  computeExternalProgramSummaryDigest,
   computePlatformCallbackDigest,
   encodeAppRoomClaimPayload,
+  encodeKnowledgeContextClaimPayload,
+  encodeSourceSubmissionClaimPayload,
+  EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION,
   normalizeExternalAppManifest,
   signExternalAppOwnerAssertion,
   signAppRoomClaim,
+  signKnowledgeContextClaim,
+  signSourceSubmissionClaim,
 } from "../../server";
 import * as root from "../../index";
+
+function decodePayload<T>(encodedPayload: string): T {
+  return JSON.parse(Buffer.from(encodedPayload, "base64url").toString("utf8")) as T;
+}
 
 describe("server runtime helpers", () => {
   const manifest = {
@@ -35,6 +47,8 @@ describe("server runtime helpers", () => {
   it("keeps server helpers out of the SDK root export", () => {
     expect(root).not.toHaveProperty("signAppRoomClaim");
     expect(root).not.toHaveProperty("signExternalAppOwnerAssertion");
+    expect(root).not.toHaveProperty("signSourceSubmissionClaim");
+    expect(root).not.toHaveProperty("signKnowledgeContextClaim");
   });
 
   it("builds stable manifest and owner assertion payloads", async () => {
@@ -111,12 +125,27 @@ describe("server runtime helpers", () => {
       externalAppId: "Last-Ignition",
       roomType: "Party",
       externalRoomId: "coop-1",
+      serverKeyVersion: "2026-07-04-primary",
+      transcriptionMode: "recap",
+      voicePolicy: {
+        maxSpeakers: 12,
+        overflowStrategy: "Listen_Only",
+        moderatorRoles: [" RaidLead ", "raidlead", "Guide"],
+      },
       walletPubkeys: ["wallet-1"],
       expiresAt: "2026-05-13T00:10:00.000Z",
       nonce: "nonce-1",
     });
+    expect(payload.claimContractVersion).toBe(EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION);
+    expect(payload.serverKeyVersion).toBe("2026-07-04-primary");
     expect(payload.externalAppId).toBe("last-ignition");
     expect(payload.roomType).toBe("party");
+    expect(payload.transcriptionMode).toBe("recap");
+    expect(payload.voicePolicy).toEqual({
+      maxSpeakers: 12,
+      overflowStrategy: "listen_only",
+      moderatorRoles: ["guide", "raidlead"],
+    });
   });
 
   it("encodes and signs app room claims with host-provided signer", async () => {
@@ -124,6 +153,8 @@ describe("server runtime helpers", () => {
       externalAppId: "last-ignition",
       roomType: "party",
       externalRoomId: "coop-1",
+      serverKeyVersion: "2026-07-04-primary",
+      transcriptionMode: "recap" as const,
       walletPubkeys: ["wallet-1"],
       expiresAt: "2026-05-13T00:10:00.000Z",
       nonce: "nonce-1",
@@ -131,6 +162,72 @@ describe("server runtime helpers", () => {
     const claim = await signAppRoomClaim(input, async (payload) => `signed:${payload}`);
     expect(claim.payload).toBe(encodeAppRoomClaimPayload(buildAppRoomClaimPayload(input)));
     expect(claim.signature).toBe(`signed:${claim.payload}`);
+    expect(decodePayload<{ claimContractVersion: string; serverKeyVersion: string }>(
+      claim.payload,
+    )).toMatchObject({
+      claimContractVersion: EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION,
+      serverKeyVersion: "2026-07-04-primary",
+    });
+  });
+
+  it("builds, encodes, and signs source submission claims", async () => {
+    const input = {
+      externalAppId: "last-ignition",
+      roomKey: "external:last-ignition:world:lobby",
+      originType: "communication_message" as const,
+      originRef: "envelope-1",
+      targetCircleId: 130,
+      summaryText: "Players agreed on a frost resistance strategy.",
+      evidencePrivacyClass: "circle_only" as const,
+      requestedLifecycleStatus: "submitted" as const,
+      submittedByPubkey: "wallet-1",
+      serverKeyVersion: "2026-07-04-primary",
+      expiresAt: "2026-05-13T00:10:00.000Z",
+      nonce: "nonce-source-1",
+    };
+    const payload = buildSourceSubmissionClaimPayload(input);
+    expect(payload).toMatchObject({
+      claimContractVersion: EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION,
+      serverKeyVersion: "2026-07-04-primary",
+      externalAppId: "last-ignition",
+      summaryDigest: computeExternalProgramSummaryDigest(input.summaryText),
+    });
+
+    const claim = await signSourceSubmissionClaim(
+      input,
+      async (encodedPayload) => `signed:${encodedPayload}`,
+    );
+    expect(claim.payload).toBe(encodeSourceSubmissionClaimPayload(payload));
+    expect(claim.signature).toBe(`signed:${claim.payload}`);
+    expect(decodePayload<typeof payload>(claim.payload)).toEqual(payload);
+  });
+
+  it("builds, encodes, and signs knowledge context claims", async () => {
+    const input = {
+      externalAppId: "last-ignition",
+      roomKey: "external:last-ignition:world:lobby",
+      circleId: 130,
+      walletPubkey: "wallet-1",
+      purpose: "room_sidebar",
+      serverKeyVersion: "2026-07-04-primary",
+      expiresAt: "2026-05-13T00:10:00.000Z",
+      nonce: "nonce-knowledge-1",
+    };
+    const payload = buildKnowledgeContextClaimPayload(input);
+    expect(payload).toMatchObject({
+      claimContractVersion: EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION,
+      serverKeyVersion: "2026-07-04-primary",
+      externalAppId: "last-ignition",
+      requestedCapability: "knowledge_context",
+    });
+
+    const claim = await signKnowledgeContextClaim(
+      input,
+      async (encodedPayload) => `signed:${encodedPayload}`,
+    );
+    expect(claim.payload).toBe(encodeKnowledgeContextClaimPayload(payload));
+    expect(claim.signature).toBe(`signed:${claim.payload}`);
+    expect(decodePayload<typeof payload>(claim.payload)).toEqual(payload);
   });
 
   it("builds callback, evidence, and receipt digests without private keys", () => {

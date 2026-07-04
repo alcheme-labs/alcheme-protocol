@@ -1,5 +1,6 @@
 import { AlchemeApiError } from "../errors";
 import { fetchKnowledgeContextPackage } from "../knowledge-context";
+import { signKnowledgeContextClaim } from "../../server";
 
 const API_BASE = "https://api.example.test/api/v1";
 
@@ -119,6 +120,19 @@ describe("knowledge context runtime client", () => {
       });
     });
 
+    const knowledgeContextClaim = await signKnowledgeContextClaim(
+      {
+        externalAppId: "example-program",
+        roomKey: "external:example-program:lobby",
+        circleId: 130,
+        walletPubkey: "wallet-111",
+        purpose: "room_sidebar",
+        expiresAt: "2026-05-13T00:10:00.000Z",
+        nonce: "nonce-knowledge-1",
+      },
+      async (payload) => `signed:${payload}`,
+    );
+
     const result = await fetchKnowledgeContextPackage({
       apiBaseUrl: `${API_BASE}/`,
       fetch: fetchImpl as any,
@@ -131,10 +145,7 @@ describe("knowledge context runtime client", () => {
         roomType: "lobby",
         requestedCapability: "knowledge_context",
         purpose: "room_sidebar",
-        knowledgeContextClaim: {
-          payload: "payload",
-          signature: "signature",
-        },
+        knowledgeContextClaim,
       },
     });
 
@@ -153,10 +164,7 @@ describe("knowledge context runtime client", () => {
       roomType: "lobby",
       requestedCapability: "knowledge_context",
       purpose: "room_sidebar",
-      knowledgeContextClaim: {
-        payload: "payload",
-        signature: "signature",
-      },
+      knowledgeContextClaim,
     });
   });
 

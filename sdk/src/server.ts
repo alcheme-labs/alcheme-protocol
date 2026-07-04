@@ -1,5 +1,7 @@
 import { sha256 } from "js-sha256";
 
+export const EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION = "external_program.claim.v1";
+
 export interface ExternalAppManifestInput {
   version: string;
   appId: string;
@@ -48,6 +50,9 @@ export interface BuildAppRoomClaimPayloadInput {
   externalAppId: string;
   roomType: string;
   externalRoomId: string;
+  serverKeyVersion?: string | null;
+  transcriptionMode?: "off" | "live_caption" | "transcript" | "recap" | "full" | null;
+  voicePolicy?: AppRoomVoicePolicy | null;
   walletPubkeys: string[];
   roles?: Record<string, string>;
   expiresAt: string;
@@ -55,23 +60,99 @@ export interface BuildAppRoomClaimPayloadInput {
 }
 
 export interface AppRoomClaimPayload {
+  claimContractVersion: typeof EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION;
+  serverKeyVersion?: string;
   externalAppId: string;
   roomType: string;
   externalRoomId: string;
+  transcriptionMode?: "off" | "live_caption" | "transcript" | "recap" | "full";
+  voicePolicy?: AppRoomVoicePolicy;
   walletPubkeys: string[];
   roles?: Record<string, string>;
   expiresAt: string;
   nonce: string;
 }
 
-export interface AppRoomClaim {
+export interface ExternalProgramClaimEnvelope {
   payload: string;
   signature: string;
 }
 
+export type AppRoomClaim = ExternalProgramClaimEnvelope;
+
 export type ExternalAppServerSigner = (payload: string) => Promise<string>;
 
 export type AppRoomClaimSigner = ExternalAppServerSigner;
+
+export type SourceSubmissionClaimSigner = ExternalAppServerSigner;
+
+export type KnowledgeContextClaimSigner = ExternalAppServerSigner;
+
+export interface AppRoomVoicePolicy {
+  maxSpeakers?: number;
+  overflowStrategy?: string;
+  moderatorRoles?: string[];
+}
+
+export interface BuildSourceSubmissionClaimPayloadInput {
+  externalAppId: string;
+  roomKey: string;
+  originType: "communication_message" | "voice_recap" | "external_summary";
+  originRef: string;
+  targetCircleId: number;
+  summaryText: string;
+  evidencePrivacyClass: "public" | "circle_only" | "reviewer_only" | "sealed";
+  requestedLifecycleStatus?: "nominated" | "submitted" | "review_pending" | null;
+  submittedByPubkey?: string | null;
+  expiresAt: string;
+  nonce: string;
+  serverKeyVersion?: string | null;
+}
+
+export interface SourceSubmissionClaimPayload {
+  claimContractVersion: typeof EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION;
+  serverKeyVersion?: string;
+  externalAppId: string;
+  roomKey: string;
+  originType: "communication_message" | "voice_recap" | "external_summary";
+  originRef: string;
+  targetCircleId: number;
+  summaryDigest: string;
+  evidencePrivacyClass: "public" | "circle_only" | "reviewer_only" | "sealed";
+  requestedLifecycleStatus?: "nominated" | "submitted" | "review_pending";
+  submittedByPubkey?: string;
+  expiresAt: string;
+  nonce: string;
+}
+
+export type SourceSubmissionClaim = ExternalProgramClaimEnvelope;
+
+export interface BuildKnowledgeContextClaimPayloadInput {
+  externalAppId: string;
+  roomKey: string;
+  circleId: number;
+  walletPubkey?: string | null;
+  requestedCapability?: "knowledge_context";
+  purpose: string;
+  expiresAt: string;
+  nonce: string;
+  serverKeyVersion?: string | null;
+}
+
+export interface KnowledgeContextClaimPayload {
+  claimContractVersion: typeof EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION;
+  serverKeyVersion?: string;
+  externalAppId: string;
+  roomKey: string;
+  circleId: number;
+  walletPubkey?: string;
+  requestedCapability: "knowledge_context";
+  purpose: string;
+  expiresAt: string;
+  nonce: string;
+}
+
+export type KnowledgeContextClaim = ExternalProgramClaimEnvelope;
 
 export interface ExternalAppPlatformCallbackPayload {
   externalAppId: string;
@@ -169,9 +250,13 @@ export function buildAppRoomClaimPayload(
   input: BuildAppRoomClaimPayloadInput,
 ): AppRoomClaimPayload {
   return {
+    claimContractVersion: EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION,
+    ...optionalServerKeyVersion(input.serverKeyVersion),
     externalAppId: normalizeRequiredId(input.externalAppId, "externalAppId"),
     roomType: input.roomType.trim().toLowerCase(),
     externalRoomId: input.externalRoomId.trim(),
+    ...optionalTranscriptionMode(input.transcriptionMode),
+    ...optionalVoicePolicy(input.voicePolicy),
     walletPubkeys: input.walletPubkeys.map((pubkey) => pubkey.trim()).filter(Boolean),
     ...(input.roles ? { roles: input.roles } : {}),
     expiresAt: input.expiresAt,
@@ -188,6 +273,85 @@ export async function signAppRoomClaim(
   signer: AppRoomClaimSigner,
 ): Promise<AppRoomClaim> {
   const payload = encodeAppRoomClaimPayload(buildAppRoomClaimPayload(input));
+  return {
+    payload,
+    signature: await signer(payload),
+  };
+}
+
+export function computeExternalProgramSummaryDigest(summaryText: string): string {
+  return sha256(summaryText);
+}
+
+export function buildSourceSubmissionClaimPayload(
+  input: BuildSourceSubmissionClaimPayloadInput,
+): SourceSubmissionClaimPayload {
+  return {
+    claimContractVersion: EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION,
+    ...optionalServerKeyVersion(input.serverKeyVersion),
+    externalAppId: normalizeRequiredId(input.externalAppId, "externalAppId"),
+    roomKey: normalizeRequiredString(input.roomKey, "roomKey"),
+    originType: normalizeSourceOriginType(input.originType),
+    originRef: normalizeRequiredString(input.originRef, "originRef"),
+    targetCircleId: normalizePositiveInteger(input.targetCircleId, "targetCircleId"),
+    summaryDigest: computeExternalProgramSummaryDigest(input.summaryText),
+    evidencePrivacyClass: normalizeEvidencePrivacyClass(input.evidencePrivacyClass),
+    ...optionalSourceLifecycleStatus(input.requestedLifecycleStatus),
+    ...optionalStringField("submittedByPubkey", input.submittedByPubkey),
+    expiresAt: input.expiresAt,
+    nonce: normalizeRequiredString(input.nonce, "nonce"),
+  };
+}
+
+export function encodeSourceSubmissionClaimPayload(
+  payload: SourceSubmissionClaimPayload,
+): string {
+  return encodeExternalAppServerPayload(payload);
+}
+
+export async function signSourceSubmissionClaim(
+  input: BuildSourceSubmissionClaimPayloadInput,
+  signer: SourceSubmissionClaimSigner,
+): Promise<SourceSubmissionClaim> {
+  const payload = encodeSourceSubmissionClaimPayload(
+    buildSourceSubmissionClaimPayload(input),
+  );
+  return {
+    payload,
+    signature: await signer(payload),
+  };
+}
+
+export function buildKnowledgeContextClaimPayload(
+  input: BuildKnowledgeContextClaimPayloadInput,
+): KnowledgeContextClaimPayload {
+  return {
+    claimContractVersion: EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION,
+    ...optionalServerKeyVersion(input.serverKeyVersion),
+    externalAppId: normalizeRequiredId(input.externalAppId, "externalAppId"),
+    roomKey: normalizeRequiredString(input.roomKey, "roomKey"),
+    circleId: normalizePositiveInteger(input.circleId, "circleId"),
+    ...optionalStringField("walletPubkey", input.walletPubkey),
+    requestedCapability: "knowledge_context",
+    purpose: normalizeRequiredString(input.purpose, "purpose"),
+    expiresAt: input.expiresAt,
+    nonce: normalizeRequiredString(input.nonce, "nonce"),
+  };
+}
+
+export function encodeKnowledgeContextClaimPayload(
+  payload: KnowledgeContextClaimPayload,
+): string {
+  return encodeExternalAppServerPayload(payload);
+}
+
+export async function signKnowledgeContextClaim(
+  input: BuildKnowledgeContextClaimPayloadInput,
+  signer: KnowledgeContextClaimSigner,
+): Promise<KnowledgeContextClaim> {
+  const payload = encodeKnowledgeContextClaimPayload(
+    buildKnowledgeContextClaimPayload(input),
+  );
   return {
     payload,
     signature: await signer(payload),
@@ -298,6 +462,127 @@ function normalizeRequiredId(value: string, fieldName: string): string {
     throw new Error(`invalid_external_app_${fieldName}`);
   }
   return normalized;
+}
+
+function optionalServerKeyVersion(
+  value: string | null | undefined,
+): { serverKeyVersion?: string } {
+  return optionalStringField("serverKeyVersion", value);
+}
+
+function optionalTranscriptionMode(
+  value: BuildAppRoomClaimPayloadInput["transcriptionMode"],
+): { transcriptionMode?: AppRoomClaimPayload["transcriptionMode"] } {
+  if (value === undefined || value === null) return {};
+  const normalized = String(value).trim().toLowerCase();
+  if (!normalized) return {};
+  if (
+    normalized === "off" ||
+    normalized === "live_caption" ||
+    normalized === "transcript" ||
+    normalized === "recap" ||
+    normalized === "full"
+  ) {
+    return { transcriptionMode: normalized };
+  }
+  throw new Error("invalid_external_app_transcriptionMode");
+}
+
+function optionalVoicePolicy(
+  value: AppRoomVoicePolicy | null | undefined,
+): { voicePolicy?: AppRoomVoicePolicy } {
+  if (value === undefined || value === null) return {};
+  if (typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("invalid_external_app_voicePolicy");
+  }
+  const voicePolicy: AppRoomVoicePolicy = {};
+  if (value.maxSpeakers !== undefined) {
+    if (!Number.isSafeInteger(value.maxSpeakers) || value.maxSpeakers <= 0) {
+      throw new Error("invalid_external_app_voicePolicy");
+    }
+    voicePolicy.maxSpeakers = value.maxSpeakers;
+  }
+  if (value.overflowStrategy !== undefined) {
+    voicePolicy.overflowStrategy = normalizeRequiredString(
+      value.overflowStrategy,
+      "voicePolicy",
+    ).toLowerCase();
+  }
+  if (value.moderatorRoles !== undefined) {
+    if (!Array.isArray(value.moderatorRoles)) {
+      throw new Error("invalid_external_app_voicePolicy");
+    }
+    const moderatorRoles = uniqueSorted(
+      value.moderatorRoles
+        .map((role) => String(role || "").trim().toLowerCase())
+        .filter(Boolean),
+    );
+    if (moderatorRoles.length > 0) {
+      voicePolicy.moderatorRoles = moderatorRoles;
+    }
+  }
+  return Object.keys(voicePolicy).length > 0 ? { voicePolicy } : {};
+}
+
+function normalizePositiveInteger(value: number, fieldName: string): number {
+  if (!Number.isSafeInteger(value) || value <= 0) {
+    throw new Error(`invalid_external_app_${fieldName}`);
+  }
+  return value;
+}
+
+function normalizeSourceOriginType(
+  value: BuildSourceSubmissionClaimPayloadInput["originType"],
+): SourceSubmissionClaimPayload["originType"] {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (
+    normalized === "communication_message" ||
+    normalized === "voice_recap" ||
+    normalized === "external_summary"
+  ) {
+    return normalized;
+  }
+  throw new Error("invalid_external_app_originType");
+}
+
+function normalizeEvidencePrivacyClass(
+  value: BuildSourceSubmissionClaimPayloadInput["evidencePrivacyClass"],
+): SourceSubmissionClaimPayload["evidencePrivacyClass"] {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (
+    normalized === "public" ||
+    normalized === "circle_only" ||
+    normalized === "reviewer_only" ||
+    normalized === "sealed"
+  ) {
+    return normalized;
+  }
+  throw new Error("invalid_external_app_evidencePrivacyClass");
+}
+
+function optionalSourceLifecycleStatus(
+  value: BuildSourceSubmissionClaimPayloadInput["requestedLifecycleStatus"],
+): Pick<SourceSubmissionClaimPayload, "requestedLifecycleStatus"> {
+  if (value === undefined || value === null) return {};
+  const normalized = String(value).trim().toLowerCase();
+  if (!normalized) return {};
+  if (
+    normalized === "nominated" ||
+    normalized === "submitted" ||
+    normalized === "review_pending"
+  ) {
+    return { requestedLifecycleStatus: normalized };
+  }
+  throw new Error("invalid_external_app_requestedLifecycleStatus");
+}
+
+function optionalStringField<K extends string>(
+  fieldName: K,
+  value: string | null | undefined,
+): { [P in K]?: string } {
+  if (value === undefined || value === null) return {};
+  const normalized = String(value).trim();
+  return normalized ? ({ [fieldName]: normalized } as { [P in K]?: string }) : {};
 }
 
 function normalizeAllowedOrigins(value: string[]): string[] {
