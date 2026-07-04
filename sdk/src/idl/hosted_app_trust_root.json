@@ -1,0 +1,4748 @@
+{
+  "address": "4eeDm2Qs6YSQMd5mj9KhtBuQdGUjpxbREfHGKbxnNzae",
+  "metadata": {
+    "name": "hosted_app_trust_root",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Hosted App Trust Root Program for Alcheme Protocol Route B"
+  },
+  "instructions": [
+    {
+      "name": "anchor_hosted_app_circle_installation_digest",
+      "discriminator": [
+        231,
+        86,
+        182,
+        227,
+        157,
+        191,
+        10,
+        58
+      ],
+      "accounts": [
+        {
+          "name": "app_trust_root_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  116,
+                  114,
+                  117,
+                  115,
+                  116,
+                  95,
+                  114,
+                  111,
+                  111,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "hosted_app_identity",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  105,
+                  100,
+                  101,
+                  110,
+                  116,
+                  105,
+                  116,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "current_release_commitment",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  108,
+                  101,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "current_release_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "installation_commitment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  105,
+                  110,
+                  115,
+                  116,
+                  97,
+                  108,
+                  108,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "circle_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_execution_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  103,
+                  111,
+                  118,
+                  101,
+                  114,
+                  110,
+                  97,
+                  110,
+                  99,
+                  101,
+                  95,
+                  101,
+                  120,
+                  101,
+                  99,
+                  117,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.replay_domain_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_nonce_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_receipt_target_guard",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  99,
+                  101,
+                  105,
+                  112,
+                  116,
+                  95,
+                  116,
+                  97,
+                  114,
+                  103,
+                  101,
+                  116,
+                  95,
+                  103,
+                  117,
+                  97,
+                  114,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.receipt_digest"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_target_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "circle_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "release_id_hash",
+          "type": {
+            "option": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "channel_id_hash",
+          "type": {
+            "option": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "current_release_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "manifest_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "update_policy_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "allowed_capabilities_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "trust_state_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "policy_epoch",
+          "type": "u64"
+        },
+        {
+          "name": "governance_receipt_digest",
+          "type": {
+            "option": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "installation_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "visibility",
+          "type": {
+            "defined": {
+              "name": "HostedAppInstallationVisibility"
+            }
+          }
+        },
+        {
+          "name": "proof",
+          "type": {
+            "defined": {
+              "name": "GovernanceExecutionProof"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "anchor_hosted_app_credential_digest",
+      "discriminator": [
+        4,
+        73,
+        92,
+        205,
+        108,
+        14,
+        76,
+        42
+      ],
+      "accounts": [
+        {
+          "name": "app_trust_root_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  116,
+                  114,
+                  117,
+                  115,
+                  116,
+                  95,
+                  114,
+                  111,
+                  111,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "credential_digest_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  99,
+                  114,
+                  101,
+                  100,
+                  101,
+                  110,
+                  116,
+                  105,
+                  97,
+                  108,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "object_ref_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "digest"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_execution_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  103,
+                  111,
+                  118,
+                  101,
+                  114,
+                  110,
+                  97,
+                  110,
+                  99,
+                  101,
+                  95,
+                  101,
+                  120,
+                  101,
+                  99,
+                  117,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.replay_domain_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_nonce_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_receipt_target_guard",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  99,
+                  101,
+                  105,
+                  112,
+                  116,
+                  95,
+                  116,
+                  97,
+                  114,
+                  103,
+                  101,
+                  116,
+                  95,
+                  103,
+                  117,
+                  97,
+                  114,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.receipt_digest"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_target_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "anchor_type",
+          "type": {
+            "defined": {
+              "name": "HostedAppCredentialAnchorType"
+            }
+          }
+        },
+        {
+          "name": "object_ref_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "schema_digest",
+          "type": {
+            "option": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "verifier_policy_digest",
+          "type": {
+            "option": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "revocation_feed_digest",
+          "type": {
+            "option": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "expires_at",
+          "type": {
+            "option": "i64"
+          }
+        },
+        {
+          "name": "proof",
+          "type": {
+            "defined": {
+              "name": "GovernanceExecutionProof"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "anchor_hosted_app_offline_bundle_digest",
+      "discriminator": [
+        157,
+        77,
+        67,
+        124,
+        71,
+        158,
+        189,
+        37
+      ],
+      "accounts": [
+        {
+          "name": "app_trust_root_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  116,
+                  114,
+                  117,
+                  115,
+                  116,
+                  95,
+                  114,
+                  111,
+                  111,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "credential_digest_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  99,
+                  114,
+                  101,
+                  100,
+                  101,
+                  110,
+                  116,
+                  105,
+                  97,
+                  108,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "object_ref_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "digest"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_execution_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  103,
+                  111,
+                  118,
+                  101,
+                  114,
+                  110,
+                  97,
+                  110,
+                  99,
+                  101,
+                  95,
+                  101,
+                  120,
+                  101,
+                  99,
+                  117,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.replay_domain_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_nonce_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_receipt_target_guard",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  99,
+                  101,
+                  105,
+                  112,
+                  116,
+                  95,
+                  116,
+                  97,
+                  114,
+                  103,
+                  101,
+                  116,
+                  95,
+                  103,
+                  117,
+                  97,
+                  114,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.receipt_digest"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_target_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "object_ref_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "bundle_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "issuer_key_set_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "verifier_policy_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "revocation_snapshot_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "expires_at",
+          "type": "i64"
+        },
+        {
+          "name": "proof",
+          "type": {
+            "defined": {
+              "name": "GovernanceExecutionProof"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "anchor_hosted_app_policy_digest",
+      "discriminator": [
+        36,
+        166,
+        183,
+        165,
+        119,
+        99,
+        42,
+        156
+      ],
+      "accounts": [
+        {
+          "name": "app_trust_root_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  116,
+                  114,
+                  117,
+                  115,
+                  116,
+                  95,
+                  114,
+                  111,
+                  111,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "policy_digest_anchor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  112,
+                  111,
+                  108,
+                  105,
+                  99,
+                  121,
+                  95,
+                  97,
+                  110,
+                  99,
+                  104,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "object_ref_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "digest"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_execution_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  103,
+                  111,
+                  118,
+                  101,
+                  114,
+                  110,
+                  97,
+                  110,
+                  99,
+                  101,
+                  95,
+                  101,
+                  120,
+                  101,
+                  99,
+                  117,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.replay_domain_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_nonce_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_receipt_target_guard",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  99,
+                  101,
+                  105,
+                  112,
+                  116,
+                  95,
+                  116,
+                  97,
+                  114,
+                  103,
+                  101,
+                  116,
+                  95,
+                  103,
+                  117,
+                  97,
+                  114,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.receipt_digest"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_target_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "anchor_type",
+          "type": {
+            "defined": {
+              "name": "HostedAppPolicyAnchorType"
+            }
+          }
+        },
+        {
+          "name": "object_ref_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "policy_version_hash",
+          "type": {
+            "option": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "governance_decision_digest",
+          "type": {
+            "option": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "effective_at",
+          "type": "i64"
+        },
+        {
+          "name": "expires_at",
+          "type": {
+            "option": "i64"
+          }
+        },
+        {
+          "name": "proof",
+          "type": {
+            "defined": {
+              "name": "GovernanceExecutionProof"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "anchor_hosted_app_release",
+      "discriminator": [
+        85,
+        26,
+        72,
+        108,
+        138,
+        102,
+        99,
+        228
+      ],
+      "accounts": [
+        {
+          "name": "app_trust_root_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  116,
+                  114,
+                  117,
+                  115,
+                  116,
+                  95,
+                  114,
+                  111,
+                  111,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "hosted_app_identity",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  105,
+                  100,
+                  101,
+                  110,
+                  116,
+                  105,
+                  116,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "release_commitment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  108,
+                  101,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "release_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_execution_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  103,
+                  111,
+                  118,
+                  101,
+                  114,
+                  110,
+                  97,
+                  110,
+                  99,
+                  101,
+                  95,
+                  101,
+                  120,
+                  101,
+                  99,
+                  117,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.replay_domain_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_nonce_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_receipt_target_guard",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  99,
+                  101,
+                  105,
+                  112,
+                  116,
+                  95,
+                  116,
+                  97,
+                  114,
+                  103,
+                  101,
+                  116,
+                  95,
+                  103,
+                  117,
+                  97,
+                  114,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.receipt_digest"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_target_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "release_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "manifest_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "bundle_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "bundle_uri_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "release_payload_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "bundle_cid_hash",
+          "type": {
+            "option": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "capability_set_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "developer_pubkey",
+          "type": "pubkey"
+        },
+        {
+          "name": "developer_signature_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "release_kind",
+          "type": {
+            "defined": {
+              "name": "HostedAppReleaseKind"
+            }
+          }
+        },
+        {
+          "name": "support_status",
+          "type": {
+            "defined": {
+              "name": "HostedAppSupportStatus"
+            }
+          }
+        },
+        {
+          "name": "promotion_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "proof",
+          "type": {
+            "defined": {
+              "name": "GovernanceExecutionProof"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "initialize_app_trust_root",
+      "discriminator": [
+        141,
+        219,
+        171,
+        25,
+        222,
+        178,
+        172,
+        171
+      ],
+      "accounts": [
+        {
+          "name": "app_trust_root_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  116,
+                  114,
+                  117,
+                  115,
+                  116,
+                  95,
+                  114,
+                  111,
+                  111,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "governance_authority",
+          "type": "pubkey"
+        },
+        {
+          "name": "emergency_authority",
+          "type": "pubkey"
+        },
+        {
+          "name": "event_program",
+          "type": "pubkey"
+        },
+        {
+          "name": "event_emitter",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "move_hosted_app_release_channel",
+      "discriminator": [
+        220,
+        33,
+        255,
+        14,
+        198,
+        138,
+        65,
+        47
+      ],
+      "accounts": [
+        {
+          "name": "app_trust_root_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  116,
+                  114,
+                  117,
+                  115,
+                  116,
+                  95,
+                  114,
+                  111,
+                  111,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "hosted_app_identity",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  105,
+                  100,
+                  101,
+                  110,
+                  116,
+                  105,
+                  116,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "current_release_commitment",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  108,
+                  101,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "current_release_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "release_channel_commitment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  108,
+                  101,
+                  97,
+                  115,
+                  101,
+                  95,
+                  99,
+                  104,
+                  97,
+                  110,
+                  110,
+                  101,
+                  108
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "channel_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_execution_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  103,
+                  111,
+                  118,
+                  101,
+                  114,
+                  110,
+                  97,
+                  110,
+                  99,
+                  101,
+                  95,
+                  101,
+                  120,
+                  101,
+                  99,
+                  117,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.replay_domain_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_nonce_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_receipt_target_guard",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  99,
+                  101,
+                  105,
+                  112,
+                  116,
+                  95,
+                  116,
+                  97,
+                  114,
+                  103,
+                  101,
+                  116,
+                  95,
+                  103,
+                  117,
+                  97,
+                  114,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.receipt_digest"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_target_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "channel_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "current_release_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "previous_release_id_hash",
+          "type": {
+            "option": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "channel_policy_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "movement_receipt_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "proof",
+          "type": {
+            "defined": {
+              "name": "GovernanceExecutionProof"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "pause_app_trust_root",
+      "discriminator": [
+        77,
+        135,
+        228,
+        115,
+        119,
+        127,
+        21,
+        172
+      ],
+      "accounts": [
+        {
+          "name": "app_trust_root_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  116,
+                  114,
+                  117,
+                  115,
+                  116,
+                  95,
+                  114,
+                  111,
+                  111,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_execution_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  103,
+                  111,
+                  118,
+                  101,
+                  114,
+                  110,
+                  97,
+                  110,
+                  99,
+                  101,
+                  95,
+                  101,
+                  120,
+                  101,
+                  99,
+                  117,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.replay_domain_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_nonce_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_receipt_target_guard",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  99,
+                  101,
+                  105,
+                  112,
+                  116,
+                  95,
+                  116,
+                  97,
+                  114,
+                  103,
+                  101,
+                  116,
+                  95,
+                  103,
+                  117,
+                  97,
+                  114,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.receipt_digest"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_target_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "paused",
+          "type": "bool"
+        },
+        {
+          "name": "emergency",
+          "type": "bool"
+        },
+        {
+          "name": "proof",
+          "type": {
+            "defined": {
+              "name": "GovernanceExecutionProof"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "register_hosted_app_identity",
+      "discriminator": [
+        98,
+        76,
+        18,
+        12,
+        72,
+        197,
+        195,
+        101
+      ],
+      "accounts": [
+        {
+          "name": "app_trust_root_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  116,
+                  114,
+                  117,
+                  115,
+                  116,
+                  95,
+                  114,
+                  111,
+                  111,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "hosted_app_identity",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  105,
+                  100,
+                  101,
+                  110,
+                  116,
+                  105,
+                  116,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_execution_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  103,
+                  111,
+                  118,
+                  101,
+                  114,
+                  110,
+                  97,
+                  110,
+                  99,
+                  101,
+                  95,
+                  101,
+                  120,
+                  101,
+                  99,
+                  117,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.replay_domain_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_nonce_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_receipt_target_guard",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  99,
+                  101,
+                  105,
+                  112,
+                  116,
+                  95,
+                  116,
+                  97,
+                  114,
+                  103,
+                  101,
+                  116,
+                  95,
+                  103,
+                  117,
+                  97,
+                  114,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.receipt_digest"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_target_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "type": "pubkey"
+        },
+        {
+          "name": "operator_authority",
+          "type": "pubkey"
+        },
+        {
+          "name": "governance_authority_ref_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "server_key_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "manifest_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "capability_policy_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "proof",
+          "type": {
+            "defined": {
+              "name": "GovernanceExecutionProof"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rotate_governance_authority",
+      "discriminator": [
+        45,
+        19,
+        124,
+        4,
+        111,
+        99,
+        144,
+        103
+      ],
+      "accounts": [
+        {
+          "name": "app_trust_root_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  116,
+                  114,
+                  117,
+                  115,
+                  116,
+                  95,
+                  114,
+                  111,
+                  111,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_execution_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  103,
+                  111,
+                  118,
+                  101,
+                  114,
+                  110,
+                  97,
+                  110,
+                  99,
+                  101,
+                  95,
+                  101,
+                  120,
+                  101,
+                  99,
+                  117,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.replay_domain_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_nonce_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_receipt_target_guard",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  99,
+                  101,
+                  105,
+                  112,
+                  116,
+                  95,
+                  116,
+                  97,
+                  114,
+                  103,
+                  101,
+                  116,
+                  95,
+                  103,
+                  117,
+                  97,
+                  114,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.receipt_digest"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_target_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "next_governance_authority",
+          "type": "pubkey"
+        },
+        {
+          "name": "proof",
+          "type": {
+            "defined": {
+              "name": "GovernanceExecutionProof"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_hosted_app_status",
+      "discriminator": [
+        170,
+        43,
+        58,
+        125,
+        41,
+        240,
+        241,
+        69
+      ],
+      "accounts": [
+        {
+          "name": "app_trust_root_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  116,
+                  114,
+                  117,
+                  115,
+                  116,
+                  95,
+                  114,
+                  111,
+                  111,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "hosted_app_identity",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  105,
+                  100,
+                  101,
+                  110,
+                  116,
+                  105,
+                  116,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_execution_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  103,
+                  111,
+                  118,
+                  101,
+                  114,
+                  110,
+                  97,
+                  110,
+                  99,
+                  101,
+                  95,
+                  101,
+                  120,
+                  101,
+                  99,
+                  117,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.replay_domain_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_nonce_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_receipt_target_guard",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  99,
+                  101,
+                  105,
+                  112,
+                  116,
+                  95,
+                  116,
+                  97,
+                  114,
+                  103,
+                  101,
+                  116,
+                  95,
+                  103,
+                  117,
+                  97,
+                  114,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.receipt_digest"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_target_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "next_status",
+          "type": {
+            "defined": {
+              "name": "HostedAppProductionStatus"
+            }
+          }
+        },
+        {
+          "name": "emergency",
+          "type": "bool"
+        },
+        {
+          "name": "proof",
+          "type": {
+            "defined": {
+              "name": "GovernanceExecutionProof"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "upsert_hosted_app_capability_deny",
+      "discriminator": [
+        116,
+        167,
+        65,
+        180,
+        212,
+        129,
+        124,
+        96
+      ],
+      "accounts": [
+        {
+          "name": "app_trust_root_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  116,
+                  114,
+                  117,
+                  115,
+                  116,
+                  95,
+                  114,
+                  111,
+                  111,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "hosted_app_identity",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  105,
+                  100,
+                  101,
+                  110,
+                  116,
+                  105,
+                  116,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "capability_deny_commitment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  99,
+                  97,
+                  112,
+                  97,
+                  98,
+                  105,
+                  108,
+                  105,
+                  116,
+                  121,
+                  95,
+                  100,
+                  101,
+                  110,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "app_id_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "capability_id_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_execution_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  103,
+                  111,
+                  118,
+                  101,
+                  114,
+                  110,
+                  97,
+                  110,
+                  99,
+                  101,
+                  95,
+                  101,
+                  120,
+                  101,
+                  99,
+                  117,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.replay_domain_hash"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_nonce_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_receipt_target_guard",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  116,
+                  101,
+                  100,
+                  95,
+                  97,
+                  112,
+                  112,
+                  95,
+                  114,
+                  101,
+                  99,
+                  101,
+                  105,
+                  112,
+                  116,
+                  95,
+                  116,
+                  97,
+                  114,
+                  103,
+                  101,
+                  116,
+                  95,
+                  103,
+                  117,
+                  97,
+                  114,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "proof.receipt_digest"
+              },
+              {
+                "kind": "arg",
+                "path": "proof.execution_target_hash"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "event_program"
+        },
+        {
+          "name": "event_emitter"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "release_id_hash",
+          "type": {
+            "option": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "capability_id_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "deny_scope_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "authority_ref_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "reason_code_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "effective_at",
+          "type": "i64"
+        },
+        {
+          "name": "expires_at",
+          "type": {
+            "option": "i64"
+          }
+        },
+        {
+          "name": "emergency",
+          "type": "bool"
+        },
+        {
+          "name": "proof",
+          "type": {
+            "defined": {
+              "name": "GovernanceExecutionProof"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "AppTrustRootConfig",
+      "discriminator": [
+        200,
+        39,
+        197,
+        134,
+        120,
+        79,
+        206,
+        194
+      ]
+    },
+    {
+      "name": "HostedAppCapabilityDenyCommitment",
+      "discriminator": [
+        121,
+        233,
+        132,
+        20,
+        228,
+        239,
+        146,
+        3
+      ]
+    },
+    {
+      "name": "HostedAppCircleInstallationCommitment",
+      "discriminator": [
+        35,
+        25,
+        140,
+        62,
+        230,
+        173,
+        72,
+        174
+      ]
+    },
+    {
+      "name": "HostedAppCredentialDigestAnchor",
+      "discriminator": [
+        127,
+        216,
+        147,
+        165,
+        20,
+        150,
+        161,
+        179
+      ]
+    },
+    {
+      "name": "HostedAppGovernanceExecutionRecord",
+      "discriminator": [
+        48,
+        117,
+        65,
+        138,
+        48,
+        34,
+        205,
+        96
+      ]
+    },
+    {
+      "name": "HostedAppGovernanceReceiptTargetGuard",
+      "discriminator": [
+        130,
+        36,
+        179,
+        201,
+        24,
+        80,
+        245,
+        186
+      ]
+    },
+    {
+      "name": "HostedAppIdentityRecord",
+      "discriminator": [
+        76,
+        123,
+        74,
+        3,
+        27,
+        138,
+        154,
+        43
+      ]
+    },
+    {
+      "name": "HostedAppPolicyDigestAnchor",
+      "discriminator": [
+        108,
+        9,
+        157,
+        84,
+        113,
+        111,
+        136,
+        114
+      ]
+    },
+    {
+      "name": "HostedAppReleaseChannelCommitment",
+      "discriminator": [
+        102,
+        41,
+        97,
+        150,
+        40,
+        146,
+        199,
+        168
+      ]
+    },
+    {
+      "name": "HostedAppReleaseCommitment",
+      "discriminator": [
+        224,
+        127,
+        7,
+        217,
+        106,
+        7,
+        200,
+        179
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "HostedAppTrustRootMutationEvent",
+      "discriminator": [
+        86,
+        179,
+        65,
+        92,
+        175,
+        46,
+        183,
+        40
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidDigest",
+      "msg": "invalid digest"
+    },
+    {
+      "code": 6001,
+      "name": "MissingRequiredDigest",
+      "msg": "missing required digest"
+    },
+    {
+      "code": 6002,
+      "name": "TrustRootPaused",
+      "msg": "trust root is paused"
+    },
+    {
+      "code": 6003,
+      "name": "UnauthorizedGovernanceAuthority",
+      "msg": "unauthorized governance authority"
+    },
+    {
+      "code": 6004,
+      "name": "UnauthorizedEmergencyAuthority",
+      "msg": "unauthorized emergency authority"
+    },
+    {
+      "code": 6005,
+      "name": "InvalidEventAccount",
+      "msg": "invalid event account"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidStatusTransition",
+      "msg": "invalid hosted app status transition"
+    },
+    {
+      "code": 6007,
+      "name": "EmergencyExpansionForbidden",
+      "msg": "emergency authority cannot expand hosted app authority"
+    },
+    {
+      "code": 6008,
+      "name": "StatePreconditionMismatch",
+      "msg": "state precondition digest mismatch"
+    },
+    {
+      "code": 6009,
+      "name": "GovernanceExecutionAlreadyConsumed",
+      "msg": "governance execution record already consumed"
+    },
+    {
+      "code": 6010,
+      "name": "HostedAppIdentityNotActive",
+      "msg": "hosted app identity is not active"
+    },
+    {
+      "code": 6011,
+      "name": "HostedAppReleaseBindingMismatch",
+      "msg": "hosted app release binding mismatch"
+    },
+    {
+      "code": 6012,
+      "name": "HostedAppReleaseNotServing",
+      "msg": "hosted app release is not serving"
+    },
+    {
+      "code": 6013,
+      "name": "HostedAppReleaseChannelBindingMismatch",
+      "msg": "hosted app release channel binding mismatch"
+    },
+    {
+      "code": 6014,
+      "name": "HostedAppReleaseChannelPreviousMismatch",
+      "msg": "hosted app release channel previous release mismatch"
+    },
+    {
+      "code": 6015,
+      "name": "HostedAppInstallationReleaseMismatch",
+      "msg": "hosted app installation release binding mismatch"
+    },
+    {
+      "code": 6016,
+      "name": "HostedAppInstallationChannelUnsupported",
+      "msg": "hosted app installation channel binding is not yet supported"
+    }
+  ],
+  "types": [
+    {
+      "name": "AppTrustRootConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "governance_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "emergency_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "event_program",
+            "type": "pubkey"
+          },
+          {
+            "name": "event_emitter",
+            "type": "pubkey"
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          },
+          {
+            "name": "total_apps",
+            "type": "u64"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GovernanceExecutionProof",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "receipt_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "operation_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "replay_domain_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "execution_nonce_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "execution_target_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "state_precondition_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "state_after_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "source_tx_signature",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  64
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "HostedAppCapabilityDenyCommitment",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "app_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "release_id_hash",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "capability_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "deny_scope_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "authority_ref_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "reason_code_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "effective_at",
+            "type": "i64"
+          },
+          {
+            "name": "expires_at",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "receipt_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HostedAppCircleInstallationCommitment",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "app_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "circle_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "release_id_hash",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "channel_id_hash",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "current_release_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "manifest_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "update_policy_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "allowed_capabilities_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "trust_state_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "policy_epoch",
+            "type": "u64"
+          },
+          {
+            "name": "governance_receipt_digest",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "installation_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "visibility",
+            "type": {
+              "defined": {
+                "name": "HostedAppInstallationVisibility"
+              }
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HostedAppCredentialAnchorType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RuntimeAttestation"
+          },
+          {
+            "name": "CredentialIssuer"
+          },
+          {
+            "name": "CredentialIssuerChange"
+          },
+          {
+            "name": "CredentialSchema"
+          },
+          {
+            "name": "CredentialSchemaChange"
+          },
+          {
+            "name": "VerifierPolicy"
+          },
+          {
+            "name": "RevocationFeed"
+          },
+          {
+            "name": "OfflineVerificationBundle"
+          },
+          {
+            "name": "VerifiableCredential"
+          },
+          {
+            "name": "GovernanceDecision"
+          },
+          {
+            "name": "ExternalExecution"
+          },
+          {
+            "name": "StorageGrant"
+          },
+          {
+            "name": "ForkGrant"
+          },
+          {
+            "name": "PaymentAuthorization"
+          },
+          {
+            "name": "PublishGrant"
+          },
+          {
+            "name": "PublishConfirmation"
+          },
+          {
+            "name": "AuditExport"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HostedAppCredentialDigestAnchor",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "anchor_type",
+            "type": {
+              "defined": {
+                "name": "HostedAppCredentialAnchorType"
+              }
+            }
+          },
+          {
+            "name": "object_ref_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "schema_digest",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "verifier_policy_digest",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "revocation_feed_digest",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "expires_at",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HostedAppGovernanceExecutionRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "receipt_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "operation_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "replay_domain_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "execution_nonce_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "execution_target_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "state_precondition_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "state_after_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "executed_by",
+            "type": "pubkey"
+          },
+          {
+            "name": "source_tx_signature",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  64
+                ]
+              }
+            }
+          },
+          {
+            "name": "executed_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HostedAppGovernanceReceiptTargetGuard",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "receipt_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "execution_target_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "replay_domain_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "execution_nonce_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "governance_execution_record",
+            "type": "pubkey"
+          },
+          {
+            "name": "consumed_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HostedAppIdentityRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "app_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "operator_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "governance_authority_ref_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "server_key_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "manifest_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "capability_policy_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "production_status",
+            "type": {
+              "defined": {
+                "name": "HostedAppProductionStatus"
+              }
+            }
+          },
+          {
+            "name": "latest_release_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "latest_deny_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "revoked_at",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HostedAppInstallationVisibility",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "PrivateDigest"
+          },
+          {
+            "name": "PublicCommitment"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HostedAppPolicyAnchorType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CapabilityChange"
+          },
+          {
+            "name": "OperationPackChange"
+          },
+          {
+            "name": "ScopeAuthorityLifecycle"
+          },
+          {
+            "name": "ScopeAuthorityChange"
+          },
+          {
+            "name": "DataReleaseProfile"
+          },
+          {
+            "name": "AppScopeBinding"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HostedAppPolicyDigestAnchor",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "anchor_type",
+            "type": {
+              "defined": {
+                "name": "HostedAppPolicyAnchorType"
+              }
+            }
+          },
+          {
+            "name": "object_ref_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "policy_version_hash",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "governance_decision_digest",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "effective_at",
+            "type": "i64"
+          },
+          {
+            "name": "expires_at",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HostedAppProductionStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Suspended"
+          },
+          {
+            "name": "Revoked"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HostedAppReleaseChannelCommitment",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "app_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "channel_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "current_release_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "previous_release_id_hash",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "channel_policy_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "movement_receipt_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "updated_by",
+            "type": "pubkey"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HostedAppReleaseCommitment",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u16"
+          },
+          {
+            "name": "app_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "release_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "manifest_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "bundle_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "bundle_uri_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "release_payload_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "bundle_cid_hash",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "capability_set_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "developer_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "developer_signature_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "release_kind",
+            "type": {
+              "defined": {
+                "name": "HostedAppReleaseKind"
+              }
+            }
+          },
+          {
+            "name": "support_status",
+            "type": {
+              "defined": {
+                "name": "HostedAppSupportStatus"
+              }
+            }
+          },
+          {
+            "name": "promotion_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HostedAppReleaseKind",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Production"
+          },
+          {
+            "name": "CandidateAnchor"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HostedAppSupportStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Superseded"
+          },
+          {
+            "name": "Lts"
+          },
+          {
+            "name": "Deprecated"
+          },
+          {
+            "name": "Grace"
+          },
+          {
+            "name": "Expired"
+          },
+          {
+            "name": "Revoked"
+          },
+          {
+            "name": "Suspended"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HostedAppTrustRootMutationEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "receipt_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "operation_id_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "replay_domain_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "execution_nonce_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "execution_target_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "state_after_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "executed_by",
+            "type": "pubkey"
+          },
+          {
+            "name": "executed_at",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ]
+}

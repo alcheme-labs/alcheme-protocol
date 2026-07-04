@@ -13,11 +13,29 @@
   "event_types": [
     "ContributionRecorded",
     "ContributionScoreUpdated",
+    "LedgerCreated",
     "ReferenceAdded",
+    "ReputationSettled"
+  ],
+  "current_projected_events": [
+    "ReferenceAdded"
+  ],
+  "reserved_event_types": [
+    "ContributionRecorded",
+    "ContributionScoreUpdated",
+    "LedgerCreated",
     "ReputationSettled"
   ],
   "parser_contract_version": "v1",
   "projection_tables": [
+    "contribution_ledgers",
+    "contribution_events",
+    "contribution_references"
+  ],
+  "current_projection_tables": [
+    "knowledge_references"
+  ],
+  "reserved_projection_tables": [
     "contribution_ledgers",
     "contribution_events",
     "contribution_references"

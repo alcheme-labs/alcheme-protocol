@@ -12,70 +12,59 @@
   "bugs": {
     "url": "https://github.com/alcheme-labs/alcheme-protocol/issues"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
   "files": [
-    "dist",
+    "src",
     "README.md",
     "STORAGE_GUIDE.md"
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.js",
-      "default": "./dist/index.js"
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
     },
     "./runtime/communication": {
-      "types": "./dist/runtime/communication.d.ts",
-      "require": "./dist/runtime/communication.js",
-      "default": "./dist/runtime/communication.js"
+      "types": "./src/runtime/communication.ts",
+      "default": "./src/runtime/communication.ts"
     },
     "./runtime/voice": {
-      "types": "./dist/runtime/voice.d.ts",
-      "require": "./dist/runtime/voice.js",
-      "default": "./dist/runtime/voice.js"
+      "types": "./src/runtime/voice.ts",
+      "default": "./src/runtime/voice.ts"
     },
     "./runtime/knowledge-context": {
-      "types": "./dist/runtime/knowledge-context.d.ts",
-      "require": "./dist/runtime/knowledge-context.js",
-      "default": "./dist/runtime/knowledge-context.js"
+      "types": "./src/runtime/knowledge-context.ts",
+      "default": "./src/runtime/knowledge-context.ts"
     },
     "./runtime/source-materials": {
-      "types": "./dist/runtime/source-materials.d.ts",
-      "require": "./dist/runtime/source-materials.js",
-      "default": "./dist/runtime/source-materials.js"
+      "types": "./src/runtime/source-materials.ts",
+      "default": "./src/runtime/source-materials.ts"
     },
     "./runtime/errors": {
-      "types": "./dist/runtime/errors.d.ts",
-      "require": "./dist/runtime/errors.js",
-      "default": "./dist/runtime/errors.js"
+      "types": "./src/runtime/errors.ts",
+      "default": "./src/runtime/errors.ts"
     },
     "./runtime/server": {
-      "types": "./dist/runtime/server.d.ts",
-      "require": "./dist/runtime/server.js",
-      "default": "./dist/runtime/server.js"
+      "types": "./src/runtime/server.ts",
+      "default": "./src/runtime/server.ts"
     },
     "./server": {
-      "types": "./dist/server.d.ts",
-      "require": "./dist/server.js",
-      "default": "./dist/server.js"
+      "types": "./src/server.ts",
+      "default": "./src/server.ts"
     },
     "./protocol": {
-      "types": "./dist/protocol.d.ts",
-      "require": "./dist/protocol.js",
-      "default": "./dist/protocol.js"
+      "types": "./src/protocol.ts",
+      "default": "./src/protocol.ts"
     },
     "./modules/external-app-registry": {
-      "types": "./dist/modules/external-app-registry.d.ts",
-      "require": "./dist/modules/external-app-registry.js",
-      "default": "./dist/modules/external-app-registry.js"
+      "types": "./src/modules/external-app-registry.ts",
+      "default": "./src/modules/external-app-registry.ts"
     },
     "./modules/external-app-economics": {
-      "types": "./dist/modules/external-app-economics.d.ts",
-      "require": "./dist/modules/external-app-economics.js",
-      "default": "./dist/modules/external-app-economics.js"
+      "types": "./src/modules/external-app-economics.ts",
+      "default": "./src/modules/external-app-economics.ts"
     },
-    "./idl/*.json": "./dist/idl/*.json",
+    "./idl/*.json": "./src/idl/*.json",
     "./package.json": "./package.json"
   },
   "publishConfig": {
@@ -85,8 +74,6 @@
   "scripts": {
     "build": "tsc",
     "prepack": "npm run build",
-    "check:runtime-imports": "node scripts/check-runtime-subpath-imports.mjs",
-    "lint": "eslint src --ext .ts",
     "test": "jest"
   },
   "dependencies": {

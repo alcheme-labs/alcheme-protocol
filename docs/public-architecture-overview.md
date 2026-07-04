@@ -79,7 +79,7 @@ not part of this baseline.
 
 ### Integration Material
 
-`docs/integration/`, `docs/schemas/`, `examples/`, and
+`docs/integration/external-program-quickstart.md`, `docs/schemas/`, `examples/`, and
 `packages/game-chat-react/` show how external developers can reason about
 Alcheme-compatible integration points without receiving the first-party product
 runtime.

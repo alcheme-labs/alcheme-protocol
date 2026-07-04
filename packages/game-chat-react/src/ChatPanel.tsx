@@ -7,6 +7,9 @@ export interface GameChatMessage {
   lamport?: number;
   messageKind?: "plain" | "voice_clip" | string;
   senderHandle?: string | null;
+  senderEffectiveDisplayName?: string | null;
+  senderDisplayName?: string | null;
+  senderCircleAlias?: string | null;
   senderPubkey?: string | null;
   text?: string | null;
   payloadText?: string | null;
@@ -210,7 +213,7 @@ function DefaultMessage({ message }: { message: GameChatMessage }) {
     <>
       <header className="alcheme-chat-panel__message-meta">
         <span>
-          {message.senderHandle || shortenPubkey(message.senderPubkey)}
+          {message.senderEffectiveDisplayName || message.senderDisplayName || message.senderCircleAlias || message.senderHandle || "A member"}
         </span>
         {message.createdAt ? (
           <time>{formatTimestamp(message.createdAt)}</time>
@@ -276,12 +279,6 @@ function formatTimestamp(value: string | Date): string {
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) return "";
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-}
-
-function shortenPubkey(pubkey?: string | null): string {
-  if (!pubkey) return "Unknown";
-  if (pubkey.length <= 10) return pubkey;
-  return `${pubkey.slice(0, 4)}...${pubkey.slice(-4)}`;
 }
 
 function reportError(error: unknown, onError?: (error: Error) => void): void {

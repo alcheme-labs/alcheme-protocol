@@ -18,6 +18,16 @@ export function isEventBatchSeedConflictError(error: unknown): boolean {
   return /event_batch/i.test(message) && /ConstraintSeeds/i.test(message);
 }
 
+export class WalletReauthorizationRequiredError extends Error {
+  constructor(message = "requires_wallet_reauthorization:event_batch_seed_conflict") {
+    super(message);
+    this.name = "WalletReauthorizationRequiredError";
+  }
+}
+
+// Do not wrap wallet-signing operations with this helper. Retrying after an
+// event batch seed conflict requires a new transaction signature, so the UI
+// must ask the user to retry explicitly instead of silently reprompting.
 export async function withEventBatchSeedRetry<T>(
   operation: () => Promise<T>,
   options?: { attempts?: number; delayMs?: number }
@@ -77,8 +87,9 @@ export class IdentityModule extends BaseModule<IdentityRegistryIdl> {
         dataRetentionDays: null,
     };
 
-    return this.withResolvedEventAccountsRetry((eventAccounts) =>
-      sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
+    const eventAccounts = await this.resolveEventAccounts();
+    try {
+      return await sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
         this.program.methods
           .registerIdentity(handle, privacySettings)
           .accounts({
@@ -93,8 +104,13 @@ export class IdentityModule extends BaseModule<IdentityRegistryIdl> {
             eventBatch: eventAccounts.eventBatch,
           })
           .transaction()
-      )
-    );
+      );
+    } catch (error) {
+      if (isEventBatchSeedConflictError(error)) {
+        throw new WalletReauthorizationRequiredError();
+      }
+      throw error;
+    }
   }
 
   async getIdentity(handle: string) {
@@ -116,8 +132,9 @@ export class IdentityModule extends BaseModule<IdentityRegistryIdl> {
     const userIdentityPda = this.pda.findUserIdentityPda(registry, handle);
     const normalizedUpdates = toIdentityUpdatePayload(updates);
 
-    return this.withResolvedEventAccountsRetry((eventAccounts) =>
-      sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
+    const eventAccounts = await this.resolveEventAccounts();
+    try {
+      return await sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
         this.program.methods
           .updateIdentity(normalizedUpdates)
           .accounts({
@@ -129,16 +146,22 @@ export class IdentityModule extends BaseModule<IdentityRegistryIdl> {
             eventBatch: eventAccounts.eventBatch,
           })
           .transaction()
-      )
-    );
+      );
+    } catch (error) {
+      if (isEventBatchSeedConflictError(error)) {
+        throw new WalletReauthorizationRequiredError();
+      }
+      throw error;
+    }
   }
 
   async addVerificationAttribute(handle: string, attribute: any) {
     const registry = this.pda.findIdentityRegistryPda("social_hub_identity");
     const userIdentityPda = this.pda.findUserIdentityPda(registry, handle);
 
-    return this.withResolvedEventAccountsRetry((eventAccounts) =>
-      sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
+    const eventAccounts = await this.resolveEventAccounts();
+    try {
+      return await sendTransactionWithAlreadyProcessedRecovery(this.provider, async () =>
         this.program.methods
           .addVerificationAttribute(attribute)
           .accounts({
@@ -150,8 +173,13 @@ export class IdentityModule extends BaseModule<IdentityRegistryIdl> {
             eventBatch: eventAccounts.eventBatch,
           })
           .transaction()
-      )
-    );
+      );
+    } catch (error) {
+      if (isEventBatchSeedConflictError(error)) {
+        throw new WalletReauthorizationRequiredError();
+      }
+      throw error;
+    }
   }
 
   async updateReputation(handle: string, reputationDelta: number, trustDelta: number, reason: string) {
@@ -260,18 +288,6 @@ export class IdentityModule extends BaseModule<IdentityRegistryIdl> {
     throw new Error("Failed to read event sequence from event_emitter account");
   }
 
-  private async withResolvedEventAccountsRetry<T>(
-    operation: (eventAccounts: {
-      eventProgram: PublicKey;
-      eventEmitter: PublicKey;
-      eventBatch: PublicKey;
-    }) => Promise<T>
-  ): Promise<T> {
-    return withEventBatchSeedRetry(async () => {
-      const eventAccounts = await this.resolveEventAccounts();
-      return operation(eventAccounts);
-    });
-  }
 }
 
 function toIdentityUpdatePayload(updates: any) {

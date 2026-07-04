@@ -130,12 +130,13 @@ describe("identity event batch retry", () => {
     ]);
   });
 
-  it("routes identity event writes through the retry wrapper", () => {
+  it("does not route wallet-signed identity writes through the retry wrapper", () => {
     const source = read(identityModulePath);
 
-    assert.match(source, /async registerIdentity[\s\S]*withResolvedEventAccountsRetry/);
-    assert.match(source, /async updateIdentity[\s\S]*withResolvedEventAccountsRetry/);
-    assert.match(source, /async addVerificationAttribute[\s\S]*withResolvedEventAccountsRetry/);
+    assert.doesNotMatch(source, /async registerIdentity[\s\S]*withResolvedEventAccountsRetry/);
+    assert.doesNotMatch(source, /async updateIdentity[\s\S]*withResolvedEventAccountsRetry/);
+    assert.doesNotMatch(source, /async addVerificationAttribute[\s\S]*withResolvedEventAccountsRetry/);
+    assert.match(source, /WalletReauthorizationRequiredError/);
     assert.match(source, /sendTransactionWithAlreadyProcessedRecovery/);
   });
 
@@ -198,13 +199,7 @@ describe("identity event batch retry", () => {
             },
           },
         },
-        withResolvedEventAccountsRetry: async (
-          operation: (accounts: {
-            eventProgram: string;
-            eventEmitter: string;
-            eventBatch: string;
-          }) => Promise<string>,
-        ) => operation({
+        resolveEventAccounts: async () => ({
           eventProgram: "event-program",
           eventEmitter: "event-emitter",
           eventBatch: "event-batch",

@@ -2075,6 +2075,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "hosted-app-trust-root"
+version = "0.1.0"
+dependencies = [
+ "alcheme-shared",
+ "anchor-lang",
+ "solana-program",
+ "solana-program-test",
+ "solana-sdk",
+ "tokio",
+]
+
+[[package]]
 name = "http"
 version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"

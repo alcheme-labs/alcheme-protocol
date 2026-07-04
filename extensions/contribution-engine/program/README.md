@@ -10,10 +10,10 @@ outside the public baseline.
 ```mermaid
 flowchart LR
     sdk["@alcheme/sdk contribution module"] --> program["contribution-engine program"]
-    tracker["private/runtime tracker"] --> program
+    tracker["private/runtime tracker\nreserve source-event writer"] -.-> program
     program --> accounts["ContributionConfig\nContributionLedger\nContributionEntry\nReference"]
     program -. "settle reputation CPI" .-> identity["identity-registry"]
-    program --> events["ContributionRecorded\nScoreUpdated\nReferenceAdded\nReputationSettled"]
+    program --> events["LedgerCreated\nContributionRecorded\nScoreUpdated\nReferenceAdded\nReputationSettled"]
     events --> indexer["operator extension parser"]
 ```
 
@@ -41,6 +41,18 @@ flowchart TB
 - Adds reference links and supports contribution detail and ledger-summary queries.
 - Settles reputation into `identity-registry` through the extension CPI path.
 
+## Current Projection Contract
+
+`ReferenceAdded` is the only current event routed into the read model, where it
+writes `knowledge_references`. `ContributionRecorded`,
+`ContributionScoreUpdated`, `LedgerCreated`, and `ReputationSettled` are
+reserved projection claims until the parser route, db writer, Prisma schema,
+read API, and backfill path are implemented.
+
+The private tracker source-event writer is reserved. Current core
+`ContentStatusChanged` events do not contain a `CRYSTAL` status or the
+contributor arrays required to build contribution ledgers.
+
 ## Entry Points
 
 | Surface | File |
@@ -55,6 +67,6 @@ flowchart TB
 
 | Question | Evidence Needed |
 | --- | --- |
-| Which contribution events are fully parsed into read-model rows? | Compare `extension.manifest.json` event list with the private runtime parser when available. |
+| Which contribution events are fully parsed into read-model rows? | Compare `current_projected_events` with the private runtime parser, writer, and read-model schema when available. |
 | Which settlement paths execute on-chain today? | Inspect `settle_reputation` tests and private tracker configuration when available. |
 | Which role weights are product-facing versus internal scoring configuration? | Trace `ContributionRole` and private runtime scoring configuration when available. |

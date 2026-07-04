@@ -13,7 +13,7 @@ for new content anchor writes.
 Typical callers should set `useV2: true` or use the dedicated v2 SDK methods
 when attaching private or custom storage.
 
-## Legacy V1 Guard
+## v1 URI 策略（严格模式） / Legacy V1 Guard
 
 The legacy v1 content path accepts only the URI schemes that the v1 on-chain
 and SDK contract can represent safely:

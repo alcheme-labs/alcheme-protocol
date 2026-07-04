@@ -66,7 +66,12 @@ flowchart TB
 | IDLs | `sdk/src/idl/*.json` |
 | Build | `cd sdk && npm run build` |
 | Tests | `cd sdk && npm test` |
-| Runtime subpath check | `cd sdk && npm run check:runtime-imports` |
+
+The public baseline exports SDK source and a source-first package manifest. It
+does not export prebuilt `dist/` artifacts; run the build command in the public
+snapshot to generate local build output. Its default `npm test` command runs the
+public runtime-client source tests that do not depend on private runtime or
+unexported local build artifacts.
 
 `@alcheme/sdk/runtime/server` remains as a deprecated compatibility alias for
 early external program integrations. New code should import server authority

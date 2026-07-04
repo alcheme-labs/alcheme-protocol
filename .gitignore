@@ -25,6 +25,7 @@ test-ledger
 **/*.p12
 
 # Local runtime / cache artifacts
+.alcheme-local/
 .surfpool/logs/
 dump.rdb
 services/query-api/.collab-data/

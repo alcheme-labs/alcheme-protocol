@@ -205,8 +205,9 @@
           <title id="title">Alcheme public baseline architecture</title>
           <desc id="desc">
             External clients use the SDK to reach public protocol programs and
-            Alcheme-compatible runtime endpoints. Runtime implementation details
-            are private and outside the public baseline.
+            Alcheme-compatible runtime endpoints. Hosted app trust root protocol
+            anchors stay visible while runtime implementation details remain
+            private and outside the public baseline.
           </desc>
           <defs>
             <marker
@@ -238,7 +239,8 @@
             <rect x="630" y="52" width="340" height="136" rx="8" />
             <text x="654" y="88">Solana / Anchor programs</text>
             <text x="654" y="112" class="note">identity, circles, content, access</text>
-            <text x="654" y="134" class="note">messaging, registries, external apps</text>
+            <text x="654" y="134" class="note">messaging, hosted app trust root</text>
+            <text x="654" y="156" class="note">registries, external apps</text>
           </g>
 
           <path class="edge" d="M250 120 H330" />
@@ -287,7 +289,7 @@
       <section class="legend" aria-label="Legend">
         <div class="legend-item">
           <strong>Open protocol</strong>
-          <span>Apache-2.0 code and contracts intended for public review.</span>
+          <span>Apache-2.0 code, protocol anchors, and contracts intended for public review.</span>
         </div>
         <div class="legend-item">
           <strong>SDK and integrations</strong>

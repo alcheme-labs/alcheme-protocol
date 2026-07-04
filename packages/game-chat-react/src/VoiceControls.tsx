@@ -3,6 +3,9 @@ import type { ReactNode } from "react";
 
 export interface VoiceParticipantState {
   walletPubkey: string;
+  displayName?: string | null;
+  effectiveDisplayName?: string | null;
+  circleAlias?: string | null;
   speaking?: boolean;
   muted?: boolean;
   mutedBySelf?: boolean;
@@ -183,7 +186,7 @@ export function VoiceControls({
             <span>
               {participantLabel
                 ? participantLabel(participant)
-                : shortenPubkey(participant.walletPubkey)}
+                : participant.effectiveDisplayName || participant.displayName || participant.circleAlias || "A member"}
             </span>
             {participant.speaking ? (
               <span className="alcheme-voice-controls__participant-state">
@@ -200,11 +203,6 @@ export function VoiceControls({
 function reportError(error: unknown, onError?: (error: Error) => void): void {
   const normalized = error instanceof Error ? error : new Error(String(error));
   onError?.(normalized);
-}
-
-function shortenPubkey(pubkey: string): string {
-  if (pubkey.length <= 10) return pubkey;
-  return `${pubkey.slice(0, 4)}...${pubkey.slice(-4)}`;
 }
 
 function joinClassNames(...values: Array<string | undefined>): string {

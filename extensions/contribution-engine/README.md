@@ -15,7 +15,7 @@ flowchart TB
     manifest["extension.manifest.json"] --> catalog["operator extension catalog"]
     manifest --> indexer["operator extension parser"]
     sdk["@alcheme/sdk contribution module"] --> program["program/"]
-    tracker["private tracker"] --> program
+    tracker["private tracker\nreserve source-event writer"] -.-> program
     program --> events["contribution events"]
     events --> indexer
     indexer --> readmodel["operator projection tables"]
@@ -37,9 +37,26 @@ flowchart LR
 
 - Declares extension identity, permissions, event types, parser contract, projection tables, and compatibility requirements.
 - Provides the on-chain contribution-engine program.
-- In the private tree, provides the tracker that adapts protocol events into
-  contribution ledgers and optional settlement cycles.
+- In the private tree, provides a tracker package whose source-event ledger
+  writer is reserve until a real contribution source contract exists.
 - Provides public tests for program behavior and CPI integration.
+
+## Current Projection Contract
+
+The current indexer-backed projection is limited to `ReferenceAdded ->
+knowledge_references`. Legacy `event_types` and `projection_tables` fields in
+the manifest are compatibility metadata, not proof that every listed event/table
+is currently written by the read model.
+
+Reserved projection events are `ContributionRecorded`,
+`ContributionScoreUpdated`, `LedgerCreated`, and `ReputationSettled`. Reserved
+projection tables are `contribution_ledgers`, `contribution_events`, and
+`contribution_references`.
+
+The private tracker does not currently register protocol events as contribution
+source inputs. `ContentStatusChanged` does not provide a `CRYSTAL` status or
+contributor/reviewer/reference arrays, so tracker ledger submission remains a
+reserve path.
 
 ## Entry Points
 
@@ -56,5 +73,5 @@ flowchart LR
 | Question | Evidence Needed |
 | --- | --- |
 | Which manifest event types are actually emitted by the program? | Compare `extension.manifest.json` with `program/src/*`. |
-| Which projection tables should an operator maintain? | Compare manifest projection tables with the operator projection contract when available. |
+| Which projection tables should an operator maintain? | Compare `current_projection_tables` with the operator projection contract when available. |
 | Which contribution UI surfaces are active? | Check the private first-party product tree, not the public baseline. |

@@ -87,6 +87,29 @@
       "minItems": 1,
       "maxItems": 50,
       "uniqueItems": true,
+      "description": "Declared extension event metadata. This is not proof that every event is currently projected.",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z][A-Za-z0-9_]{2,63}$"
+      }
+    },
+    "current_projected_events": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "uniqueItems": true,
+      "description": "Events with current parser, route, writer, and read-model schema evidence.",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z][A-Za-z0-9_]{2,63}$"
+      }
+    },
+    "reserved_event_types": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 50,
+      "uniqueItems": true,
+      "description": "Declared events reserved for future projection or non-current tracker workflows.",
       "items": {
         "type": "string",
         "pattern": "^[A-Za-z][A-Za-z0-9_]{2,63}$"
@@ -101,6 +124,29 @@
       "minItems": 1,
       "maxItems": 20,
       "uniqueItems": true,
+      "description": "Declared projection-table metadata. This is not proof that every table exists in the current read model.",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]{1,63}$"
+      }
+    },
+    "current_projection_tables": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "uniqueItems": true,
+      "description": "Read-model tables currently written by the extension projection path.",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]{1,63}$"
+      }
+    },
+    "reserved_projection_tables": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 20,
+      "uniqueItems": true,
+      "description": "Declared projection tables reserved for future add-only migrations or non-current tracker workflows.",
       "items": {
         "type": "string",
         "pattern": "^[a-z][a-z0-9_]{1,63}$"

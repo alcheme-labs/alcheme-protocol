@@ -2,13 +2,19 @@
   "name": "alcheme-protocol-public-baseline",
   "private": true,
   "license": "Apache-2.0",
+  "workspaces": [
+    "sdk",
+    "packages/game-chat-react"
+  ],
   "scripts": {
-    "build": "anchor build",
-    "test": "anchor test",
-    "build:sdk": "npm --prefix sdk run build",
-    "test:sdk": "npm --prefix sdk test",
-    "build:game-chat-react": "npm --prefix packages/game-chat-react run build",
-    "typecheck:game-chat-react": "npm --prefix packages/game-chat-react run typecheck"
+    "build": "anchor build && npm run build:sdk && npm run build:game-chat-react",
+    "test": "npm run test:anchor && npm run test:js",
+    "test:anchor": "anchor test",
+    "test:js": "npm run test:sdk && npm run typecheck:game-chat-react",
+    "build:sdk": "npm --workspace @alcheme/sdk run build",
+    "test:sdk": "npm --workspace @alcheme/sdk test",
+    "build:game-chat-react": "npm --workspace @alcheme/game-chat-react run build",
+    "typecheck:game-chat-react": "npm --workspace @alcheme/game-chat-react run typecheck"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.31.1",

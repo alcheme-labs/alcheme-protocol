@@ -1,9 +1,11 @@
 import {
   createAlchemeGameChatClient,
+  type WalletSigner,
+} from "@alcheme/sdk/runtime/communication";
+import {
   createAlchemeVoiceClient,
   type VoiceProviderClient,
-  type WalletSigner,
-} from "@alcheme/sdk";
+} from "@alcheme/sdk/runtime/voice";
 
 interface AppRoomClaim {
   payload: string;

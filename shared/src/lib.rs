@@ -36,11 +36,11 @@ pub use factory::*;
 pub use external_app::*;
 
 // Core program IDs
-pub const IDENTITY_REGISTRY_ID: Pubkey = pubkey!("2222222222222222222222222222222222222222222a");
-pub const CONTENT_MANAGER_ID: Pubkey = pubkey!("3333333333333333333333333333333333333333333b");
-pub const ACCESS_CONTROLLER_ID: Pubkey = pubkey!("4444444444444444444444444444444444444444444c");
-pub const EVENT_EMITTER_ID: Pubkey = pubkey!("5555555555555555555555555555555555555555555d");
-pub const REGISTRY_FACTORY_ID: Pubkey = pubkey!("6666666666666666666666666666666666666666666e");
+pub const IDENTITY_REGISTRY_ID: Pubkey = pubkey!("75fXAp66PU3sgUcQCGJxdA4MKhFcyXXoGW8rhVk8zm4x");
+pub const CONTENT_MANAGER_ID: Pubkey = pubkey!("FEut65PCemjUt7dRPe4GJhaj1u5czWndvgp7LCEbiV7y");
+pub const ACCESS_CONTROLLER_ID: Pubkey = pubkey!("BNbDZu2djPT6rdqgsSEtyiCw4b8wteBNQDiyKS6GFxun");
+pub const EVENT_EMITTER_ID: Pubkey = pubkey!("uhPvVgDANHaUzUq2rYEVXJ9vGEBjWjNZ1E6gQJqdBUC");
+pub const REGISTRY_FACTORY_ID: Pubkey = pubkey!("AYrzTqFdxpiH3VhCBzLsJQtzFqjoSRKYUvk29d797AQC");
 
 // Shared types version for compatibility checking
 pub const SHARED_TYPES_VERSION: &str = "1.0.0";

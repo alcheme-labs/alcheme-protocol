@@ -18,10 +18,12 @@ Cargo.lock
 config/public-baseline-allowlist.txt
 config/devnet-program-ids.json
 
+scripts/measure/
+
 docs/public-baseline.md
 docs/public-architecture-overview.md
 docs/public-architecture-map.html
-docs/integration/
+docs/integration/external-program-quickstart.md
 docs/schemas/
 
 shared/Cargo.toml
@@ -30,6 +32,7 @@ shared/src/
 cpi-interfaces/
 programs/
 tests/utils/event-test-helper.ts
+tests/cost/
 
 sdk/README.md
 sdk/STORAGE_GUIDE.md
@@ -37,6 +40,7 @@ sdk/package.json
 sdk/package-lock.json
 sdk/tsconfig.json
 sdk/jest.config.cjs
+sdk/localnet-config.json
 sdk/src/
 sdk/tests/
 
