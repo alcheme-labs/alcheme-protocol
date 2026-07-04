@@ -3,6 +3,7 @@ import {
   buildAppRoomClaimPayload,
   buildExternalAppOwnerAssertionPayload,
   buildPlatformCallbackPayload,
+  buildSourceMaterialStatusClaimPayload,
   buildSourceSubmissionClaimPayload,
   computeExternalAppEvidenceHash,
   computeExternalAppManifestHash,
@@ -12,12 +13,14 @@ import {
   computePlatformCallbackDigest,
   encodeAppRoomClaimPayload,
   encodeKnowledgeContextClaimPayload,
+  encodeSourceMaterialStatusClaimPayload,
   encodeSourceSubmissionClaimPayload,
   EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION,
   normalizeExternalAppManifest,
   signExternalAppOwnerAssertion,
   signAppRoomClaim,
   signKnowledgeContextClaim,
+  signSourceMaterialStatusClaim,
   signSourceSubmissionClaim,
 } from "../../server";
 import * as root from "../../index";
@@ -49,6 +52,7 @@ describe("server runtime helpers", () => {
     expect(root).not.toHaveProperty("signExternalAppOwnerAssertion");
     expect(root).not.toHaveProperty("signSourceSubmissionClaim");
     expect(root).not.toHaveProperty("signKnowledgeContextClaim");
+    expect(root).not.toHaveProperty("signSourceMaterialStatusClaim");
   });
 
   it("builds stable manifest and owner assertion payloads", async () => {
@@ -228,6 +232,55 @@ describe("server runtime helpers", () => {
     expect(claim.payload).toBe(encodeKnowledgeContextClaimPayload(payload));
     expect(claim.signature).toBe(`signed:${claim.payload}`);
     expect(decodePayload<typeof payload>(claim.payload)).toEqual(payload);
+  });
+
+  it("builds, encodes, and signs source material status claims", async () => {
+    const byIdInput = {
+      externalAppId: "Last-Ignition",
+      sourceMaterialId: 42,
+      serverKeyVersion: "2026-07-04-primary",
+      expiresAt: "2026-05-13T00:10:00.000Z",
+      nonce: "nonce-status-1",
+    };
+    const byIdPayload = buildSourceMaterialStatusClaimPayload(byIdInput);
+    expect(byIdPayload).toEqual({
+      claimContractVersion: EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION,
+      serverKeyVersion: "2026-07-04-primary",
+      externalAppId: "last-ignition",
+      sourceMaterialId: 42,
+      purpose: "source_material_status",
+      expiresAt: "2026-05-13T00:10:00.000Z",
+      nonce: "nonce-status-1",
+    });
+
+    const byOriginPayload = buildSourceMaterialStatusClaimPayload({
+      externalAppId: "last-ignition",
+      originType: "external_summary",
+      originRef: "boss-run-1",
+      expiresAt: "2026-05-13T00:10:00.000Z",
+      nonce: "nonce-status-2",
+    });
+    expect(byOriginPayload).toMatchObject({
+      externalAppId: "last-ignition",
+      originType: "external_summary",
+      originRef: "boss-run-1",
+      purpose: "source_material_status",
+    });
+
+    const claim = await signSourceMaterialStatusClaim(
+      byIdInput,
+      async (encodedPayload) => `signed:${encodedPayload}`,
+    );
+    expect(claim.payload).toBe(encodeSourceMaterialStatusClaimPayload(byIdPayload));
+    expect(claim.signature).toBe(`signed:${claim.payload}`);
+    expect(decodePayload<typeof byIdPayload>(claim.payload)).toEqual(byIdPayload);
+    expect(() =>
+      buildSourceMaterialStatusClaimPayload({
+        externalAppId: "last-ignition",
+        expiresAt: "2026-05-13T00:10:00.000Z",
+        nonce: "nonce-status-3",
+      }),
+    ).toThrow("invalid_external_app_sourceMaterialStatusScope");
   });
 
   it("builds callback, evidence, and receipt digests without private keys", () => {

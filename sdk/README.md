@@ -37,7 +37,7 @@ flowchart TB
     index --> voice["runtime/voice.ts"]
     index --> knowledge_context["runtime/knowledge-context.ts"]
     index --> source_materials["runtime/source-materials.ts"]
-    server["server.ts"] --> claims["manifest / owner assertion / appRoomClaim"]
+    server["server.ts"] --> claims["manifest / owner assertion / app/source/status/knowledge claims"]
     protocol["protocol.ts"] --> external["ExternalApp Registry / Economics builders"]
     index --> utils["crypto / storage / transactions"]
 ```
@@ -47,8 +47,9 @@ flowchart TB
 - Provides one `Alcheme` client that constructs typed program modules from configured program IDs.
 - Bundles IDLs for core programs and the contribution-engine extension.
 - Provides runtime clients for communication rooms, voice integrations,
-  knowledge context packages, and source material submission.
-- Provides server-side helpers for manifest hashes, owner assertions, app-room claims, callback digests, evidence hashes, and receipt digests through a server-only subpath.
+  knowledge context packages, source material submission, and source material
+  status reads.
+- Provides server-side helpers for manifest hashes, owner assertions, app-room claims, source submission claims, source material status claims, knowledge context claims, callback digests, evidence hashes, and receipt digests through a server-only subpath.
 - Provides protocol transaction helpers and ExternalApp IDL-backed builders through a protocol subpath.
 - Installs transaction recovery helpers for already-processed send/confirm cases.
 
@@ -86,15 +87,19 @@ the root Anchor/Solana SDK entry by default:
 import { createAlchemeGameChatClient } from "@alcheme/sdk/runtime/communication";
 import { createAlchemeVoiceClient } from "@alcheme/sdk/runtime/voice";
 import { fetchKnowledgeContextPackage } from "@alcheme/sdk/runtime/knowledge-context";
-import { submitExternalProgramSourceMaterial } from "@alcheme/sdk/runtime/source-materials";
+import {
+  fetchExternalProgramSourceMaterialStatusById,
+  fetchExternalProgramSourceMaterialStatusByOrigin,
+  submitExternalProgramSourceMaterial,
+} from "@alcheme/sdk/runtime/source-materials";
 ```
 
 `createAlchemeGameChatClient` is a compatibility name for the generic
 communication runtime client. New product copy should describe it as
 communication runtime, not as the full external program scope.
 
-External program servers can build and sign app room, source submission, and
-knowledge context claims from the server-only helper:
+External program servers can build and sign app room, source submission, source
+material status, and knowledge context claims from the server-only helper:
 
 ```ts
 import {
@@ -103,6 +108,7 @@ import {
   computeExternalAppRiskDisclaimerAcceptanceDigest,
   signAppRoomClaim,
   signKnowledgeContextClaim,
+  signSourceMaterialStatusClaim,
   signSourceSubmissionClaim,
   signExternalAppOwnerAssertion,
 } from "@alcheme/sdk/server";

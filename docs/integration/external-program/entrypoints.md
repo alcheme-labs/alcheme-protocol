@@ -66,11 +66,15 @@ Boundary:
 Routes:
 
 - `POST /api/v1/external-apps/:appId/source-materials`
+- `GET /api/v1/external-apps/:appId/source-materials/:sourceMaterialId/status`
+- `GET /api/v1/external-apps/:appId/source-materials/status?originType=...&originRef=...`
 - `POST /api/v1/external-apps/:appId/knowledge-context`
 
 Required developer evidence:
 
 - `sourceSubmissionClaim` signed by the registered external program server key.
+- `sourceMaterialStatusClaim` signed by the registered external program server
+  key for server-signed status reads.
 - `knowledgeContextClaim` signed by the registered external program server key.
 - Circle binding or attached Circle authority recognized by the operator
   runtime.
@@ -79,6 +83,9 @@ Boundary:
 
 - Source-material submission is available only when the operator exposes the
   `source_materials` private sidecar surface.
+- SourceMaterial status reads are app-scoped lifecycle projections. They return
+  status-group and display eligibility fields, not raw claim digests or private
+  evidence.
 - Knowledge context returns accepted, displayable references and summaries. It
   does not return sealed evidence, private locators, unpublished drafts, or raw
   room history.

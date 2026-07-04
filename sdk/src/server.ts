@@ -88,6 +88,8 @@ export type SourceSubmissionClaimSigner = ExternalAppServerSigner;
 
 export type KnowledgeContextClaimSigner = ExternalAppServerSigner;
 
+export type SourceMaterialStatusClaimSigner = ExternalAppServerSigner;
+
 export interface AppRoomVoicePolicy {
   maxSpeakers?: number;
   overflowStrategy?: string;
@@ -153,6 +155,31 @@ export interface KnowledgeContextClaimPayload {
 }
 
 export type KnowledgeContextClaim = ExternalProgramClaimEnvelope;
+
+export interface BuildSourceMaterialStatusClaimPayloadInput {
+  externalAppId: string;
+  sourceMaterialId?: number | null;
+  originType?: "communication_message" | "voice_recap" | "external_summary" | null;
+  originRef?: string | null;
+  purpose?: "source_material_status";
+  expiresAt: string;
+  nonce: string;
+  serverKeyVersion?: string | null;
+}
+
+export interface SourceMaterialStatusClaimPayload {
+  claimContractVersion: typeof EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION;
+  serverKeyVersion?: string;
+  externalAppId: string;
+  sourceMaterialId?: number;
+  originType?: "communication_message" | "voice_recap" | "external_summary";
+  originRef?: string;
+  purpose: "source_material_status";
+  expiresAt: string;
+  nonce: string;
+}
+
+export type SourceMaterialStatusClaim = ExternalProgramClaimEnvelope;
 
 export interface ExternalAppPlatformCallbackPayload {
   externalAppId: string;
@@ -351,6 +378,52 @@ export async function signKnowledgeContextClaim(
 ): Promise<KnowledgeContextClaim> {
   const payload = encodeKnowledgeContextClaimPayload(
     buildKnowledgeContextClaimPayload(input),
+  );
+  return {
+    payload,
+    signature: await signer(payload),
+  };
+}
+
+export function buildSourceMaterialStatusClaimPayload(
+  input: BuildSourceMaterialStatusClaimPayloadInput,
+): SourceMaterialStatusClaimPayload {
+  const byId = input.sourceMaterialId !== undefined && input.sourceMaterialId !== null;
+  const originType = input.originType === undefined || input.originType === null
+    ? null
+    : normalizeSourceOriginType(input.originType);
+  const originRef = optionalStringField("originRef", input.originRef);
+  if (!byId && (!originType || !originRef.originRef)) {
+    throw new Error("invalid_external_app_sourceMaterialStatusScope");
+  }
+  return {
+    claimContractVersion: EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION,
+    ...optionalServerKeyVersion(input.serverKeyVersion),
+    externalAppId: normalizeRequiredId(input.externalAppId, "externalAppId"),
+    ...(byId
+      ? { sourceMaterialId: normalizePositiveInteger(input.sourceMaterialId as number, "sourceMaterialId") }
+      : {
+          originType: originType as SourceMaterialStatusClaimPayload["originType"],
+          originRef: originRef.originRef as string,
+        }),
+    purpose: "source_material_status",
+    expiresAt: input.expiresAt,
+    nonce: normalizeRequiredString(input.nonce, "nonce"),
+  };
+}
+
+export function encodeSourceMaterialStatusClaimPayload(
+  payload: SourceMaterialStatusClaimPayload,
+): string {
+  return encodeExternalAppServerPayload(payload);
+}
+
+export async function signSourceMaterialStatusClaim(
+  input: BuildSourceMaterialStatusClaimPayloadInput,
+  signer: SourceMaterialStatusClaimSigner,
+): Promise<SourceMaterialStatusClaim> {
+  const payload = encodeSourceMaterialStatusClaimPayload(
+    buildSourceMaterialStatusClaimPayload(input),
   );
   return {
     payload,

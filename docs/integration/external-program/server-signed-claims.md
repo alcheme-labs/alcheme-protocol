@@ -15,6 +15,7 @@ public key is registered on the `ExternalApp` record:
 
 - `appRoomClaim`
 - `sourceSubmissionClaim`
+- `sourceMaterialStatusClaim`
 - `knowledgeContextClaim`
 
 The production registration `ownerAssertion` is different. It must be signed by
@@ -75,6 +76,7 @@ const appRoomClaim = await signAppRoomClaim(
 
 The runtime verifies that the claim:
 
+- uses the current `claimContractVersion` emitted by the SDK helper
 - is signed by the registered `serverPublicKey`
 - has not expired
 - matches the external program id and room tuple
@@ -94,6 +96,8 @@ Payload:
 
 ```ts
 type SourceSubmissionClaimPayload = {
+  claimContractVersion: "external_program.claim.v1";
+  serverKeyVersion?: string;
   externalAppId: string;
   roomKey: string;
   originType: "communication_message" | "voice_recap" | "external_summary";
@@ -121,6 +125,8 @@ const summaryText =
   "Players agreed the frost boss needs a resistance strategy.";
 
 const sourceSubmissionClaim = await signServerClaim({
+  claimContractVersion: "external_program.claim.v1",
+  serverKeyVersion: "2026-07-04-primary",
   externalAppId: "example-external-program",
   roomKey: joined.room.roomKey,
   originType: "communication_message",
@@ -140,6 +146,49 @@ The submitted request must use the same `roomKey`, `originType`, `originRef`,
 that the claim binds. `summaryDigest` is the SHA-256 hex digest of the exact
 `summaryText` string.
 
+## SourceMaterial Status Claim
+
+`sourceMaterialStatusClaim` is required when a server-signed external program
+checks the lifecycle status of a submitted candidate. The claim must bind either
+the numeric `sourceMaterialId` or the exact `originType + originRef` lookup
+scope used by the GET request.
+
+Payload by id:
+
+```ts
+type SourceMaterialStatusClaimPayload = {
+  claimContractVersion: "external_program.claim.v1";
+  serverKeyVersion?: string;
+  externalAppId: string;
+  sourceMaterialId: number;
+  purpose: "source_material_status";
+  expiresAt: string;
+  nonce: string;
+};
+```
+
+Payload by origin:
+
+```ts
+type SourceMaterialStatusByOriginClaimPayload = {
+  claimContractVersion: "external_program.claim.v1";
+  serverKeyVersion?: string;
+  externalAppId: string;
+  originType: "communication_message" | "voice_recap" | "external_summary";
+  originRef: string;
+  purpose: "source_material_status";
+  expiresAt: string;
+  nonce: string;
+};
+```
+
+Submit the envelope through headers:
+
+```http
+x-external-program-status-claim-payload: <payload>
+x-external-program-status-claim-signature: <base64-signature>
+```
+
 ## Knowledge Context Claim
 
 `knowledgeContextClaim` is required when a production-grade external program
@@ -150,6 +199,8 @@ Payload:
 
 ```ts
 type KnowledgeContextClaimPayload = {
+  claimContractVersion: "external_program.claim.v1";
+  serverKeyVersion?: string;
   externalAppId: string;
   roomKey: string;
   circleId: number;
@@ -167,6 +218,8 @@ Example:
 import { randomUUID } from "node:crypto";
 
 const knowledgeContextClaim = await signServerClaim({
+  claimContractVersion: "external_program.claim.v1",
+  serverKeyVersion: "2026-07-04-primary",
   externalAppId: "example-external-program",
   roomKey: joined.room.roomKey,
   circleId: 130,
