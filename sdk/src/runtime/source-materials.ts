@@ -38,6 +38,14 @@ export interface ExternalProgramSourceMaterialStatus {
   canAppearInKnowledgeContext: boolean;
   evidencePrivacyClass: string;
   claimDigestRecorded: boolean;
+  scope: {
+    appId: string;
+    circleId: number;
+    roomKey: string | null;
+    appScoped: boolean;
+    userScoped: boolean;
+    user: string | null;
+  };
   updatedAt: string | null;
 }
 
@@ -76,7 +84,7 @@ export async function fetchExternalProgramSourceMaterialStatusById(options: {
   apiBaseUrl: string;
   appId: string;
   sourceMaterialId: number;
-  sourceMaterialStatusClaim: SourceMaterialStatusClaim;
+  sourceMaterialStatusClaim?: SourceMaterialStatusClaim;
   fetch?: FetchLike;
 }): Promise<ExternalProgramSourceMaterialStatusResult> {
   const fetchImpl = resolveRuntimeFetch(options.fetch);
@@ -87,7 +95,9 @@ export async function fetchExternalProgramSourceMaterialStatusById(options: {
     `${apiBaseUrl}/external-apps/${appId}/source-materials/${sourceMaterialId}/status`,
     {
       method: "GET",
-      headers: sourceMaterialStatusClaimHeaders(options.sourceMaterialStatusClaim),
+      headers: sourceMaterialStatusClaimHeaders(
+        options.sourceMaterialStatusClaim,
+      ),
     },
   );
   if (!response.ok) {
@@ -104,7 +114,7 @@ export async function fetchExternalProgramSourceMaterialStatusByOrigin(options: 
   appId: string;
   originType: ExternalProgramSourceMaterialSubmission["originType"];
   originRef: string;
-  sourceMaterialStatusClaim: SourceMaterialStatusClaim;
+  sourceMaterialStatusClaim?: SourceMaterialStatusClaim;
   fetch?: FetchLike;
 }): Promise<ExternalProgramSourceMaterialStatusResult> {
   const fetchImpl = resolveRuntimeFetch(options.fetch);
@@ -118,7 +128,9 @@ export async function fetchExternalProgramSourceMaterialStatusByOrigin(options: 
     `${apiBaseUrl}/external-apps/${appId}/source-materials/status?${params.toString()}`,
     {
       method: "GET",
-      headers: sourceMaterialStatusClaimHeaders(options.sourceMaterialStatusClaim),
+      headers: sourceMaterialStatusClaimHeaders(
+        options.sourceMaterialStatusClaim,
+      ),
     },
   );
   if (!response.ok) {
@@ -135,8 +147,9 @@ function normalizeApiBaseUrl(apiBaseUrl: string): string {
 }
 
 function sourceMaterialStatusClaimHeaders(
-  claim: SourceMaterialStatusClaim,
+  claim: SourceMaterialStatusClaim | undefined,
 ): Record<string, string> {
+  if (!claim) return {};
   return {
     "x-external-program-status-claim-payload": claim.payload,
     "x-external-program-status-claim-signature": claim.signature,

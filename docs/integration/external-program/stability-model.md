@@ -101,8 +101,9 @@ For a production-facing external program:
 
 - Keep manifest, owner wallet, server key, origins, callbacks, and capabilities
   stable across review.
-- Use the operator-supplied active review policy version id when computing the
-  developer agreement receipt.
+- Use the active review policy version id from
+  `GET /api/v1/external-apps/review-policy/current` when computing the developer
+  agreement receipt.
 - Recompute receipts when terms, policy epoch, or manifest hash changes.
 - Surface scoped risk disclaimers before users enter risky actions.
 - Treat discovery and stability labels as context, not permission to bypass

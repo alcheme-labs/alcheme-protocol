@@ -186,6 +186,14 @@ describe("external program source material runtime client", () => {
           canAppearInKnowledgeContext: false,
           evidencePrivacyClass: "circle_only",
           claimDigestRecorded: true,
+          scope: {
+            appId: "example-program",
+            circleId: 130,
+            roomKey: "external:example-program:lobby",
+            appScoped: true,
+            userScoped: false,
+            user: null,
+          },
           updatedAt: "2026-05-15T00:00:00.000Z",
         },
       });
@@ -212,6 +220,11 @@ describe("external program source material runtime client", () => {
       id: 42,
       lifecycleStatus: "review_pending",
       claimDigestRecorded: true,
+      scope: {
+        appId: "example-program",
+        appScoped: true,
+        userScoped: false,
+      },
     });
     expect(calls[0].url).toBe(
       `${API_BASE}/external-apps/example-program/source-materials/42/status`,
@@ -219,9 +232,58 @@ describe("external program source material runtime client", () => {
     expect(calls[0].init).toMatchObject({
       method: "GET",
       headers: {
-        "x-external-program-status-claim-payload": sourceMaterialStatusClaim.payload,
-        "x-external-program-status-claim-signature": sourceMaterialStatusClaim.signature,
+        "x-external-program-status-claim-payload":
+          sourceMaterialStatusClaim.payload,
+        "x-external-program-status-claim-signature":
+          sourceMaterialStatusClaim.signature,
       },
+    });
+  });
+
+  test("fetches wallet-only sandbox source material status without status claim headers", async () => {
+    const calls: Array<{ url: string; init: RequestInit }> = [];
+    const fetchImpl = jest.fn(async (url: string, init: RequestInit = {}) => {
+      calls.push({ url, init });
+      return jsonResponse({
+        ok: true,
+        status: {
+          id: 42,
+          externalAppId: "example-program",
+          circleId: 130,
+          originType: "external_summary",
+          originRef: "boss-run-1",
+          roomKey: "external:example-program:lobby",
+          lifecycleStatus: "review_pending",
+          statusGroup: "review_queue",
+          canAppearInKnowledgeContext: false,
+          evidencePrivacyClass: "circle_only",
+          claimDigestRecorded: false,
+          scope: {
+            appId: "example-program",
+            circleId: 130,
+            roomKey: "external:example-program:lobby",
+            appScoped: true,
+            userScoped: false,
+            user: null,
+          },
+          updatedAt: null,
+        },
+      });
+    });
+
+    await fetchExternalProgramSourceMaterialStatusById({
+      apiBaseUrl: API_BASE,
+      appId: "example-program",
+      sourceMaterialId: 42,
+      fetch: fetchImpl as any,
+    });
+
+    expect(calls[0].url).toBe(
+      `${API_BASE}/external-apps/example-program/source-materials/42/status`,
+    );
+    expect(calls[0].init).toMatchObject({
+      method: "GET",
+      headers: {},
     });
   });
 
@@ -271,7 +333,8 @@ describe("external program source material runtime client", () => {
       `${API_BASE}/external-apps/example-program/source-materials/status?originType=external_summary&originRef=boss+run%2F1`,
     );
     expect(calls[0].init.headers).toMatchObject({
-      "x-external-program-status-claim-payload": sourceMaterialStatusClaim.payload,
+      "x-external-program-status-claim-payload":
+        sourceMaterialStatusClaim.payload,
     });
   });
 });

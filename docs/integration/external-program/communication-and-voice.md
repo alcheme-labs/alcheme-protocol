@@ -109,6 +109,9 @@ All routes below are operator-runtime routes under `/api/v1`.
 
 | Flow | Route |
 | --- | --- |
+| Discover runtime capabilities | `GET /external-apps/runtime-capabilities` |
+| Discover stable error contract | `GET /external-apps/error-contract` |
+| Check app integration status | `GET /external-apps/:appId/integration-status` |
 | Resolve external room | `POST /communication/rooms/resolve` |
 | Sync room member | `POST /communication/rooms/:roomKey/members` |
 | Create communication session | `POST /communication/sessions` |
@@ -123,9 +126,9 @@ All routes below are operator-runtime routes under `/api/v1`.
 | Submit risk-disclaimer receipt | `POST /external-apps/:appId/risk-disclaimer-acceptances` |
 | Open production registration request | `POST /external-apps/:appId/production-registration-requests` |
 
-Operator runtimes may expose additional read surfaces such as discovery or
-stability projection. Treat those as product/read-model surfaces, not as app
-authority shortcuts.
+Discovery, integration status, and stability projection are product/read-model
+surfaces. Treat them as diagnostics and display facts, not as app authority
+shortcuts.
 
 `POST /external-apps/:appId/source-materials` requires an operator runtime that
 exposes the `source_materials` private sidecar surface. Production
@@ -179,6 +182,7 @@ Before calling an external program integration ready:
 - Knowledge context requests use a signed claim that binds the same room, Circle,
   wallet, capability, and purpose as the request.
 - Production registration uses manifest hash, owner assertion, developer terms,
-  chain receipt evidence, and operator-supplied `policyEpochId`.
+  chain receipt evidence, and the `policyEpochId` from
+  `GET /external-apps/review-policy/current`.
 - No server private key, admin token, program authority key, or settlement
   authority key is shipped to browser code.

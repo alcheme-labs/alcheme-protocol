@@ -43,6 +43,8 @@ Boundary:
 
 Operator-runtime routes under `/api/v1`:
 
+- `GET /external-apps/runtime-capabilities`
+- `GET /external-apps/error-contract`
 - `POST /communication/rooms/resolve`
 - `POST /communication/rooms/:roomKey/members`
 - `POST /communication/sessions`
@@ -60,6 +62,8 @@ Boundary:
   to chain by this integration.
 - Live voice depends on the operator voice policy and the external program's
   injected provider adapter.
+- Use `runtime-capabilities` to discover claim TTLs, sidecar mode, voice mode,
+  and current contract versions before assuming a capability is available.
 
 ## 3. Community Knowledge Entrypoints
 
@@ -96,17 +100,20 @@ Boundary:
 
 Route:
 
-- `POST /api/v1/external-apps`
+- `POST /api/v1/external-apps/sandbox-registrations`
 
-Required operator data:
+Required developer evidence:
 
-- `EXTERNAL_APP_ADMIN_TOKEN` or developer portal authorization.
-- App id, owner wallet, allowed origins, server public key, and claim auth mode.
+- normalized sandbox manifest.
+- owner assertion signed by the manifest owner wallet.
+- allowed origins and server public key accepted by sandbox policy.
 
 Boundary:
 
 - Sandbox registration is for local, devnet, demo, and CI-style integration
   testing.
+- `POST /api/v1/external-apps` with `EXTERNAL_APP_ADMIN_TOKEN` is a
+  local/operator fallback, not the normal sandbox onboarding path.
 - It is not production approval and must not be presented as an app-store
   listing, managed-node entitlement, or safety endorsement.
 
@@ -114,6 +121,7 @@ Boundary:
 
 Routes:
 
+- `GET /api/v1/external-apps/review-policy/current`
 - `GET /api/v1/external-apps/risk-disclaimers/developer_registration`
 - `POST /api/v1/external-apps/:appId/risk-disclaimer-acceptances`
 - `POST /api/v1/external-apps/:appId/production-registration-requests`
@@ -124,7 +132,8 @@ Required developer evidence:
 - owner assertion from the registered owner wallet.
 - developer terms shown to the developer.
 - chain risk-disclaimer receipt evidence.
-- active External Program review policy version id from the operator.
+- active External Program review policy version id from
+  `review-policy/current`.
 
 Boundary:
 
@@ -147,11 +156,15 @@ Common read routes exposed by compatible operator runtimes:
 
 - `GET /api/v1/external-apps/discovery`
 - `GET /api/v1/external-apps/:appId`
+- `GET /api/v1/external-apps/:appId/integration-status`
 - `GET /api/v1/external-apps/:appId/stability-projection`
 
 Boundary:
 
 - Discovery and projection are read surfaces.
+- `integration-status` is the developer diagnostic spine for registration,
+  Circle binding, runtime capability, production review, source-material mode,
+  voice mode, key lifecycle, and next action.
 - Labels such as reviewed, listed, limited, risk, or stability are not Alcheme
   guarantees, insurance, reimbursement promises, or endorsements.
 - External programs remain operated by their owners.
@@ -168,7 +181,7 @@ Boundary:
 - They may help users find an app-operated path, but the app operator remains
   responsible for that route.
 
-## 7. Verification Entrypoints
+## 8. Verification Entrypoints
 
 Public baseline commands:
 

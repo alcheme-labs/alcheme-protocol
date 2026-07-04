@@ -1,7 +1,6 @@
 # External Program Server-Signed Claims
 
-Status: public signing contract for production-grade external program
-integrations.
+Status: public server-signed claim contract for External Program integrations.
 
 External programs use short-lived signed claims to bind runtime requests to the
 registered app, room, Circle, user, and review context. The browser should never
@@ -34,23 +33,32 @@ type SignedClaim = {
 `payload` is a base64url encoded JSON payload. `signature` is a base64 Ed25519
 signature over the encoded payload string exactly as submitted.
 
-Use the SDK encoder from server-side code when building custom claims:
+Use the SDK server helpers from server-side code. The helper builds the versioned
+payload and passes the encoded payload string to your signer:
 
 ```ts
-import { encodeExternalAppServerPayload } from "@alcheme/sdk/server";
+import { signAppRoomClaim } from "@alcheme/sdk/server";
 
-async function signServerClaim(payload: unknown) {
-  const encodedPayload = encodeExternalAppServerPayload(payload);
-  return {
-    payload: encodedPayload,
-    signature: await signBase64Ed25519WithExternalProgramServerKey(encodedPayload),
-  };
-}
+const claim = await signAppRoomClaim(input, async (encodedPayload) =>
+  signBase64Ed25519WithExternalProgramServerKey(encodedPayload),
+);
 ```
 
 `signBase64Ed25519WithExternalProgramServerKey` is intentionally app-specific:
 implement it with your server key manager, HSM, KMS, or deployment secret store.
 It must return base64, not hex.
+
+The lower-level SDK encoder remains available for advanced cases, but routine
+app room, source submission, source status, and knowledge-context claims should
+use their dedicated helpers so external programs do not hand-roll canonical
+JSON or digests.
+
+Current claim helpers and runtime verifiers implement the v1 server-signed
+contract. Production runtime readiness is still gated by the operator runtime's
+server key lifecycle state. Read `runtime-capabilities` and
+`integration-status`; if `serverKeyLifecycle.productionStable` is false, the app
+can be reviewed/activated while production claim acceptance remains blocked
+until key lifecycle activation is complete.
 
 ## App Room Claim
 
@@ -84,7 +92,7 @@ The runtime verifies that the claim:
 
 ## Source Submission Claim
 
-`sourceSubmissionClaim` is required when a production-grade external program
+`sourceSubmissionClaim` is required when a server-signed external program
 submits selected communication or voice evidence as a `SourceMaterial` candidate.
 
 The source-material route is not a generic public read/write route. It is
@@ -115,36 +123,36 @@ type SourceSubmissionClaimPayload = {
 Example:
 
 ```ts
-import { createHash, randomUUID } from "node:crypto";
-
-function sha256Hex(value: string) {
-  return createHash("sha256").update(value).digest("hex");
-}
+import { randomUUID } from "node:crypto";
+import { signSourceSubmissionClaim } from "@alcheme/sdk/server";
 
 const summaryText =
   "Players agreed the frost boss needs a resistance strategy.";
 
-const sourceSubmissionClaim = await signServerClaim({
-  claimContractVersion: "external_program.claim.v1",
-  serverKeyVersion: "2026-07-04-primary",
-  externalAppId: "example-external-program",
-  roomKey: joined.room.roomKey,
-  originType: "communication_message",
-  originRef: "envelope-1",
-  targetCircleId: 130,
-  summaryDigest: sha256Hex(summaryText),
-  evidencePrivacyClass: "circle_only",
-  requestedLifecycleStatus: "submitted",
-  submittedByPubkey: walletPubkey,
-  expiresAt: new Date(Date.now() + 60_000).toISOString(),
-  nonce: randomUUID(),
-});
+const sourceSubmissionClaim = await signSourceSubmissionClaim(
+  {
+    serverKeyVersion: "2026-07-04-primary",
+    externalAppId: "example-external-program",
+    roomKey: joined.room.roomKey,
+    originType: "communication_message",
+    originRef: "envelope-1",
+    targetCircleId: 130,
+    summaryText,
+    evidencePrivacyClass: "circle_only",
+    requestedLifecycleStatus: "submitted",
+    submittedByPubkey: walletPubkey,
+    expiresAt: new Date(Date.now() + 60_000).toISOString(),
+    nonce: randomUUID(),
+  },
+  async (encodedPayload) =>
+    signBase64Ed25519WithExternalProgramServerKey(encodedPayload),
+);
 ```
 
 The submitted request must use the same `roomKey`, `originType`, `originRef`,
 `targetCircleId`, `summaryText`, privacy class, lifecycle status, and submitter
-that the claim binds. `summaryDigest` is the SHA-256 hex digest of the exact
-`summaryText` string.
+that the claim binds. The SDK computes `summaryDigest` as the SHA-256 hex digest
+of the exact `summaryText` string.
 
 ## SourceMaterial Status Claim
 
@@ -182,6 +190,26 @@ type SourceMaterialStatusByOriginClaimPayload = {
 };
 ```
 
+Example:
+
+```ts
+import { randomUUID } from "node:crypto";
+import { signSourceMaterialStatusClaim } from "@alcheme/sdk/server";
+
+const sourceMaterialStatusClaim = await signSourceMaterialStatusClaim(
+  {
+    serverKeyVersion: "2026-07-04-primary",
+    externalAppId: "example-external-program",
+    originType: "communication_message",
+    originRef: "envelope-1",
+    expiresAt: new Date(Date.now() + 60_000).toISOString(),
+    nonce: randomUUID(),
+  },
+  async (encodedPayload) =>
+    signBase64Ed25519WithExternalProgramServerKey(encodedPayload),
+);
+```
+
 Submit the envelope through headers:
 
 ```http
@@ -191,7 +219,7 @@ x-external-program-status-claim-signature: <base64-signature>
 
 ## Knowledge Context Claim
 
-`knowledgeContextClaim` is required when a production-grade external program
+`knowledgeContextClaim` is required when a server-signed external program
 fetches accepted Circle knowledge for room UI, server logic, or in-program
 community surfaces.
 
@@ -216,19 +244,22 @@ Example:
 
 ```ts
 import { randomUUID } from "node:crypto";
+import { signKnowledgeContextClaim } from "@alcheme/sdk/server";
 
-const knowledgeContextClaim = await signServerClaim({
-  claimContractVersion: "external_program.claim.v1",
-  serverKeyVersion: "2026-07-04-primary",
-  externalAppId: "example-external-program",
-  roomKey: joined.room.roomKey,
-  circleId: 130,
-  walletPubkey,
-  requestedCapability: "knowledge_context",
-  purpose: "room_sidebar",
-  expiresAt: new Date(Date.now() + 60_000).toISOString(),
-  nonce: randomUUID(),
-});
+const knowledgeContextClaim = await signKnowledgeContextClaim(
+  {
+    serverKeyVersion: "2026-07-04-primary",
+    externalAppId: "example-external-program",
+    roomKey: joined.room.roomKey,
+    circleId: 130,
+    walletPubkey,
+    purpose: "room_sidebar",
+    expiresAt: new Date(Date.now() + 60_000).toISOString(),
+    nonce: randomUUID(),
+  },
+  async (encodedPayload) =>
+    signBase64Ed25519WithExternalProgramServerKey(encodedPayload),
+);
 ```
 
 The `circleId` must match the `primaryCircleId` or `parentCircleId` used in the
@@ -239,8 +270,12 @@ capability policy.
 
 ## Production Owner Assertion
 
-Production registration requires an `ownerAssertion` signed by the manifest
-owner wallet.
+Sandbox self-service registration and production registration both require an
+`ownerAssertion` signed by the manifest owner wallet. The audience distinguishes
+the flow:
+
+- Sandbox: `alcheme:external-app-sandbox-registration`
+- Production: `alcheme:external-app-production-registration`
 
 ```ts
 import { signExternalAppOwnerAssertion } from "@alcheme/sdk/server";
@@ -250,6 +285,7 @@ const ownerAssertion = await signExternalAppOwnerAssertion(
     appId: "example-external-program",
     ownerWallet: "solana:devnet:<owner-wallet-pubkey>",
     manifestHash,
+    audience: "alcheme:external-app-production-registration",
     expiresAt: new Date(Date.now() + 10 * 60_000).toISOString(),
     nonce: crypto.randomUUID(),
   },
@@ -275,5 +311,5 @@ audience, expiry, and nonce before opening a production registration request.
 | `source_submission_claim_summary_mismatch` | `summaryDigest` does not match `summaryText`. | Recompute SHA-256 over the exact submitted summary text. |
 | `knowledge_context_claim_required` | Production knowledge-context request did not include a claim. | Build and attach `knowledgeContextClaim` server-side. |
 | `knowledge_context_claim_mismatch` | Claim fields do not match the request. | Reuse the exact room, Circle, capability, and purpose values. |
-| `private_sidecar_required` | The operator did not expose the required private sidecar surface. | Ask the operator whether `source_materials` is enabled for this endpoint. |
+| `private_sidecar_required` | The target runtime did not expose the required private sidecar surface. | Check `runtime-capabilities.sourceMaterialMode`; use a provisioned community-knowledge endpoint or skip SourceMaterial submission. |
 | `external_app_owner_assertion_signature_invalid` | Owner assertion was not signed by the owner wallet key. | Sign with the manifest owner wallet, not the app server key. |

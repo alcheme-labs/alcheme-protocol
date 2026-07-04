@@ -1,6 +1,7 @@
 import { sha256 } from "js-sha256";
 
-export const EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION = "external_program.claim.v1";
+export const EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION =
+  "external_program.claim.v1";
 
 export interface ExternalAppManifestInput {
   version: string;
@@ -41,17 +42,27 @@ export interface ExternalAppOwnerAssertionPayload {
   appId: string;
   ownerWallet: string;
   manifestHash: string;
-  audience: "alcheme:external-app-production-registration";
+  audience: ExternalAppOwnerAssertionAudience;
   expiresAt: string;
   nonce: string;
 }
+
+export type ExternalAppOwnerAssertionAudience =
+  | "alcheme:external-app-production-registration"
+  | "alcheme:external-app-sandbox-registration";
 
 export interface BuildAppRoomClaimPayloadInput {
   externalAppId: string;
   roomType: string;
   externalRoomId: string;
   serverKeyVersion?: string | null;
-  transcriptionMode?: "off" | "live_caption" | "transcript" | "recap" | "full" | null;
+  transcriptionMode?:
+    | "off"
+    | "live_caption"
+    | "transcript"
+    | "recap"
+    | "full"
+    | null;
   voicePolicy?: AppRoomVoicePolicy | null;
   walletPubkeys: string[];
   roles?: Record<string, string>;
@@ -104,7 +115,11 @@ export interface BuildSourceSubmissionClaimPayloadInput {
   targetCircleId: number;
   summaryText: string;
   evidencePrivacyClass: "public" | "circle_only" | "reviewer_only" | "sealed";
-  requestedLifecycleStatus?: "nominated" | "submitted" | "review_pending" | null;
+  requestedLifecycleStatus?:
+    | "nominated"
+    | "submitted"
+    | "review_pending"
+    | null;
   submittedByPubkey?: string | null;
   expiresAt: string;
   nonce: string;
@@ -159,7 +174,11 @@ export type KnowledgeContextClaim = ExternalProgramClaimEnvelope;
 export interface BuildSourceMaterialStatusClaimPayloadInput {
   externalAppId: string;
   sourceMaterialId?: number | null;
-  originType?: "communication_message" | "voice_recap" | "external_summary" | null;
+  originType?:
+    | "communication_message"
+    | "voice_recap"
+    | "external_summary"
+    | null;
   originRef?: string | null;
   purpose?: "source_material_status";
   expiresAt: string;
@@ -204,10 +223,12 @@ export function normalizeExternalAppManifest(
   if (allowedOrigins.some((origin) => !origin.startsWith("https://"))) {
     throw new Error("invalid_external_app_manifest");
   }
-  const capabilities = uniqueSorted(
-    input.capabilities.map((capability) => capability.trim()).filter(Boolean),
-  );
-  const serverPublicKey = input.serverPublicKey ? String(input.serverPublicKey) : "";
+  const capabilities = input.capabilities
+    .map((capability) => capability.trim())
+    .filter(Boolean);
+  const serverPublicKey = input.serverPublicKey
+    ? String(input.serverPublicKey)
+    : "";
   if (
     input.version !== "1" ||
     !input.name ||
@@ -232,14 +253,55 @@ export function normalizeExternalAppManifest(
   };
 }
 
-export function computeExternalAppManifestHash(input: ExternalAppManifestInput): string {
+export function computeExternalAppManifestHash(
+  input: ExternalAppManifestInput,
+): string {
   return `sha256:${sha256(stableStringify(normalizeExternalAppManifest(input)))}`;
+}
+
+export function normalizeSandboxExternalAppManifest(
+  input: ExternalAppManifestInput,
+): ExternalAppManifest {
+  const serverPublicKey = String(input.serverPublicKey || "").trim();
+  if (!serverPublicKey) {
+    throw new Error("invalid_external_app_manifest");
+  }
+  const allowedOrigins = normalizeSandboxAllowedOrigins(input.allowedOrigins);
+  if (allowedOrigins.length === 0) {
+    throw new Error("invalid_external_app_manifest");
+  }
+  const capabilities = (input.capabilities || [])
+    .map((capability) => String(capability).trim())
+    .filter(Boolean);
+  if (!input.version || input.version !== "1" || !input.name || !input.homeUrl || !input.ownerWallet) {
+    throw new Error("invalid_external_app_manifest");
+  }
+  return {
+    version: "1",
+    appId: normalizeRequiredId(input.appId, "appId"),
+    name: String(input.name).trim(),
+    homeUrl: normalizeSandboxManifestUrl(input.homeUrl),
+    ownerWallet: String(input.ownerWallet).trim(),
+    serverPublicKey,
+    allowedOrigins,
+    capabilities,
+    ...(asRecord(input.platforms) ? { platforms: asRecord(input.platforms) } : {}),
+    ...(asRecord(input.callbacks) ? { callbacks: asRecord(input.callbacks) } : {}),
+    ...(asRecord(input.policy) ? { policy: asRecord(input.policy) } : {}),
+  };
+}
+
+export function computeSandboxExternalAppManifestHash(
+  input: ExternalAppManifestInput,
+): string {
+  return `sha256:${sha256(stableStringify(normalizeSandboxExternalAppManifest(input)))}`;
 }
 
 export function buildExternalAppOwnerAssertionPayload(input: {
   appId: string;
   ownerWallet: string;
   manifestHash: string;
+  audience?: ExternalAppOwnerAssertionAudience;
   expiresAt: string;
   nonce: string;
 }): ExternalAppOwnerAssertionPayload {
@@ -247,7 +309,7 @@ export function buildExternalAppOwnerAssertionPayload(input: {
     appId: normalizeRequiredId(input.appId, "appId"),
     ownerWallet: input.ownerWallet.trim(),
     manifestHash: normalizeSha256Digest(input.manifestHash, "manifestHash"),
-    audience: "alcheme:external-app-production-registration",
+    audience: input.audience ?? "alcheme:external-app-production-registration",
     expiresAt: input.expiresAt,
     nonce: input.nonce,
   };
@@ -262,6 +324,7 @@ export async function signExternalAppOwnerAssertion(
     appId: string;
     ownerWallet: string;
     manifestHash: string;
+    audience?: ExternalAppOwnerAssertionAudience;
     expiresAt: string;
     nonce: string;
   },
@@ -284,14 +347,18 @@ export function buildAppRoomClaimPayload(
     externalRoomId: input.externalRoomId.trim(),
     ...optionalTranscriptionMode(input.transcriptionMode),
     ...optionalVoicePolicy(input.voicePolicy),
-    walletPubkeys: input.walletPubkeys.map((pubkey) => pubkey.trim()).filter(Boolean),
+    walletPubkeys: input.walletPubkeys
+      .map((pubkey) => pubkey.trim())
+      .filter(Boolean),
     ...(input.roles ? { roles: input.roles } : {}),
     expiresAt: input.expiresAt,
     nonce: input.nonce,
   };
 }
 
-export function encodeAppRoomClaimPayload(payload: AppRoomClaimPayload): string {
+export function encodeAppRoomClaimPayload(
+  payload: AppRoomClaimPayload,
+): string {
   return encodeExternalAppServerPayload(payload);
 }
 
@@ -306,7 +373,9 @@ export async function signAppRoomClaim(
   };
 }
 
-export function computeExternalProgramSummaryDigest(summaryText: string): string {
+export function computeExternalProgramSummaryDigest(
+  summaryText: string,
+): string {
   return sha256(summaryText);
 }
 
@@ -320,9 +389,14 @@ export function buildSourceSubmissionClaimPayload(
     roomKey: normalizeRequiredString(input.roomKey, "roomKey"),
     originType: normalizeSourceOriginType(input.originType),
     originRef: normalizeRequiredString(input.originRef, "originRef"),
-    targetCircleId: normalizePositiveInteger(input.targetCircleId, "targetCircleId"),
+    targetCircleId: normalizePositiveInteger(
+      input.targetCircleId,
+      "targetCircleId",
+    ),
     summaryDigest: computeExternalProgramSummaryDigest(input.summaryText),
-    evidencePrivacyClass: normalizeEvidencePrivacyClass(input.evidencePrivacyClass),
+    evidencePrivacyClass: normalizeEvidencePrivacyClass(
+      input.evidencePrivacyClass,
+    ),
     ...optionalSourceLifecycleStatus(input.requestedLifecycleStatus),
     ...optionalStringField("submittedByPubkey", input.submittedByPubkey),
     expiresAt: input.expiresAt,
@@ -388,22 +462,30 @@ export async function signKnowledgeContextClaim(
 export function buildSourceMaterialStatusClaimPayload(
   input: BuildSourceMaterialStatusClaimPayloadInput,
 ): SourceMaterialStatusClaimPayload {
-  const byId = input.sourceMaterialId !== undefined && input.sourceMaterialId !== null;
-  const originType = input.originType === undefined || input.originType === null
-    ? null
-    : normalizeSourceOriginType(input.originType);
+  const byId =
+    input.sourceMaterialId !== undefined && input.sourceMaterialId !== null;
+  const originType =
+    input.originType === undefined || input.originType === null
+      ? null
+      : normalizeSourceOriginType(input.originType);
   const originRef = optionalStringField("originRef", input.originRef);
   if (!byId && (!originType || !originRef.originRef)) {
-    throw new Error("invalid_external_app_sourceMaterialStatusScope");
+    throw new Error("invalid_source_material_status_scope");
   }
   return {
     claimContractVersion: EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION,
     ...optionalServerKeyVersion(input.serverKeyVersion),
     externalAppId: normalizeRequiredId(input.externalAppId, "externalAppId"),
     ...(byId
-      ? { sourceMaterialId: normalizePositiveInteger(input.sourceMaterialId as number, "sourceMaterialId") }
+      ? {
+          sourceMaterialId: normalizePositiveInteger(
+            input.sourceMaterialId as number,
+            "sourceMaterialId",
+          ),
+        }
       : {
-          originType: originType as SourceMaterialStatusClaimPayload["originType"],
+          originType:
+            originType as SourceMaterialStatusClaimPayload["originType"],
           originRef: originRef.originRef as string,
         }),
     purpose: "source_material_status",
@@ -516,7 +598,10 @@ export function computeExternalAppRiskDisclaimerAcceptanceDigest(input: {
       externalAppId: normalizeRequiredId(input.externalAppId, "externalAppId"),
       actorPubkey: normalizeRequiredString(input.actorPubkey, "actorPubkey"),
       scope: normalizeRiskDisclaimerScope(input.scope),
-      policyEpochId: normalizeRequiredString(input.policyEpochId, "policyEpochId"),
+      policyEpochId: normalizeRequiredString(
+        input.policyEpochId,
+        "policyEpochId",
+      ),
       disclaimerVersion: normalizeRequiredString(
         input.disclaimerVersion,
         "disclaimerVersion",
@@ -537,9 +622,9 @@ function normalizeRequiredId(value: string, fieldName: string): string {
   return normalized;
 }
 
-function optionalServerKeyVersion(
-  value: string | null | undefined,
-): { serverKeyVersion?: string } {
+function optionalServerKeyVersion(value: string | null | undefined): {
+  serverKeyVersion?: string;
+} {
   return optionalStringField("serverKeyVersion", value);
 }
 
@@ -561,9 +646,9 @@ function optionalTranscriptionMode(
   throw new Error("invalid_external_app_transcriptionMode");
 }
 
-function optionalVoicePolicy(
-  value: AppRoomVoicePolicy | null | undefined,
-): { voicePolicy?: AppRoomVoicePolicy } {
+function optionalVoicePolicy(value: AppRoomVoicePolicy | null | undefined): {
+  voicePolicy?: AppRoomVoicePolicy;
+} {
   if (value === undefined || value === null) return {};
   if (typeof value !== "object" || Array.isArray(value)) {
     throw new Error("invalid_external_app_voicePolicy");
@@ -587,7 +672,11 @@ function optionalVoicePolicy(
     }
     const moderatorRoles = uniqueSorted(
       value.moderatorRoles
-        .map((role) => String(role || "").trim().toLowerCase())
+        .map((role) =>
+          String(role || "")
+            .trim()
+            .toLowerCase(),
+        )
         .filter(Boolean),
     );
     if (moderatorRoles.length > 0) {
@@ -607,7 +696,9 @@ function normalizePositiveInteger(value: number, fieldName: string): number {
 function normalizeSourceOriginType(
   value: BuildSourceSubmissionClaimPayloadInput["originType"],
 ): SourceSubmissionClaimPayload["originType"] {
-  const normalized = String(value || "").trim().toLowerCase();
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase();
   if (
     normalized === "communication_message" ||
     normalized === "voice_recap" ||
@@ -621,7 +712,9 @@ function normalizeSourceOriginType(
 function normalizeEvidencePrivacyClass(
   value: BuildSourceSubmissionClaimPayloadInput["evidencePrivacyClass"],
 ): SourceSubmissionClaimPayload["evidencePrivacyClass"] {
-  const normalized = String(value || "").trim().toLowerCase();
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase();
   if (
     normalized === "public" ||
     normalized === "circle_only" ||
@@ -655,7 +748,9 @@ function optionalStringField<K extends string>(
 ): { [P in K]?: string } {
   if (value === undefined || value === null) return {};
   const normalized = String(value).trim();
-  return normalized ? ({ [fieldName]: normalized } as { [P in K]?: string }) : {};
+  return normalized
+    ? ({ [fieldName]: normalized } as { [P in K]?: string })
+    : {};
 }
 
 function normalizeAllowedOrigins(value: string[]): string[] {
@@ -663,6 +758,17 @@ function normalizeAllowedOrigins(value: string[]): string[] {
     return [];
   }
   return uniqueSorted(value.map(normalizeAllowedOrigin));
+}
+
+function normalizeSandboxAllowedOrigins(value: string[]): string[] {
+  const origins = normalizeAllowedOrigins(value);
+  for (const origin of origins) {
+    const parsed = new URL(origin);
+    if (parsed.protocol === "http:" && !isLocalDevelopmentHost(parsed.hostname)) {
+      throw new Error("invalid_external_app_manifest");
+    }
+  }
+  return origins;
 }
 
 function normalizeAllowedOrigin(value: string): string {
@@ -699,10 +805,36 @@ function normalizeManifestUrl(value: string): string {
   }
 }
 
+function normalizeSandboxManifestUrl(value: string): string {
+  const raw = String(value || "").trim();
+  try {
+    const parsed = new URL(raw);
+    if (parsed.protocol === "https:") return parsed.toString();
+    if (parsed.protocol === "http:" && isLocalDevelopmentHost(parsed.hostname)) {
+      return parsed.toString();
+    }
+  } catch {
+    // handled below
+  }
+  throw new Error("invalid_external_app_manifest");
+}
+
+function isLocalDevelopmentHost(hostname: string): boolean {
+  return (
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "::1" ||
+    hostname === "[::1]"
+  );
+}
+
 function normalizeUrl(value: string, fieldName: string): string {
   try {
     const url = new URL(value.trim());
-    if (url.protocol !== "https:" && !url.hostname.match(/^(localhost|127\.0\.0\.1)$/)) {
+    if (
+      url.protocol !== "https:" &&
+      !url.hostname.match(/^(localhost|127\.0\.0\.1)$/)
+    ) {
       throw new Error("external_app_url_requires_https");
     }
     return url.toString().replace(/\/$/, "");

@@ -20,12 +20,20 @@ names, not the product definition.
 
 Implemented surfaces:
 
-- Register a sandbox external program for local or devnet testing.
+- Discover runtime requirements, review policy, stable error codes, and app
+  integration status through public-safe status endpoints.
+- Register a sandbox external program through self-service owner proof for
+  local or devnet testing.
 - Resolve deterministic communication rooms for external program contexts.
 - Create wallet-signed communication sessions.
 - Send, list, and stream signed text messages.
 - Send voice clip messages by referencing externally stored audio.
 - Create or reuse voice sessions and receive provider join tokens.
+- Submit selected runtime evidence as SourceMaterial candidates when the target
+  runtime exposes the private sidecar surface, then read app-scoped candidate
+  status.
+- Fetch accepted knowledge context packages with explicit empty-state and
+  app/user scope fields.
 - Use optional React chat and voice controls through an adapter package.
 - Open reviewed production registration requests with a manifest, owner
   assertion, and developer risk-disclaimer receipt.
@@ -44,7 +52,7 @@ Current boundaries:
 
 | Mode | Use It For | Entry |
 | --- | --- | --- |
-| Sandbox | Local/dev integration, early prototype, CI smoke. | Developer portal or `POST /api/v1/external-apps` with `EXTERNAL_APP_ADMIN_TOKEN` when the operator enables bootstrap. |
+| Sandbox | Local/dev integration, early prototype, CI smoke. | `POST /api/v1/external-apps/sandbox-registrations` with owner proof. Admin token bootstrap is fallback only. |
 | Reviewed production | Public exposure, official discovery, stricter CORS and room authority. | Manifest + owner assertion + developer agreement receipt + governance review request. |
 | Direct external route | Continuity through an app-operated route outside Alcheme managed nodes. | Route declaration/read projection; not a public Alcheme-certified node network. |
 
@@ -95,10 +103,14 @@ Server code should import server-only helpers:
 import type { ExternalAppManifestInput } from "@alcheme/sdk/server";
 import {
   computeExternalAppManifestHash,
+  computeSandboxExternalAppManifestHash,
   computeExternalAppRiskDisclaimerAcceptanceDigest,
   encodeExternalAppServerPayload,
   signAppRoomClaim,
+  signKnowledgeContextClaim,
   signExternalAppOwnerAssertion,
+  signSourceMaterialStatusClaim,
+  signSourceSubmissionClaim,
 } from "@alcheme/sdk/server";
 ```
 
@@ -133,26 +145,66 @@ portal:
 | Server Ed25519 public key | `appRoomClaim` verification | The matching private key stays on the external program server. |
 | Owner wallet pubkey | manifest, owner assertion, review | Must be a valid base58 Solana public key. |
 | Chain cluster and program ids | protocol transactions and receipts | Do not reuse localnet ids for devnet or mainnet. |
-| Active review policy version id | `developerAgreement.policyEpochId` | Must come from the operator; do not invent this client-side. |
+| Runtime capabilities | claim TTLs, sidecar mode, voice mode | Read `GET /api/v1/external-apps/runtime-capabilities`; do not infer from docs alone. |
+| Active review policy version id | `developerAgreement.policyEpochId` | Read `GET /api/v1/external-apps/review-policy/current`; do not invent this client-side. |
+| Stable error contract | UI copy and remediation | Read `GET /api/v1/external-apps/error-contract`. |
 | Voice provider policy | Live voice behavior | Voice may be disabled, token-only, or backed by a provider such as LiveKit. |
 | Source-material sidecar access | `POST /external-apps/:appId/source-materials` | Required only for community knowledge continuity; unavailable runtimes return `private_sidecar_required`. |
 
 An external program can build the client and server integration without the
-private runtime source, but it cannot complete sandbox registration, CORS
-authorization, production review, or managed-node exposure without an operator
-runtime endpoint and operator-issued onboarding data.
+private runtime source. Routine sandbox field discovery should come from the
+runtime endpoints above and the self-service registration route below.
+Production review, emergency actions, and fallback bootstrap remain operator
+or governance responsibilities.
 
 ## Sandbox Registration
 
 Sandbox registration creates an `ExternalApp` runtime record so room claim
-verification and CORS policy can recognize the external program. Register
-through the operator-provided developer portal or through the bootstrap route
-below when an operator has enabled it.
+verification and CORS policy can recognize the external program. The normal
+path is self-service owner proof:
+
+```ts
+import {
+  computeSandboxExternalAppManifestHash,
+  signExternalAppOwnerAssertion,
+} from "@alcheme/sdk/server";
+
+const manifest = {
+  version: "1",
+  appId: "example-external-program",
+  name: "Example External Program",
+  homeUrl: "http://localhost:5173",
+  ownerWallet: "solana:devnet:<owner-wallet-pubkey>",
+  serverPublicKey: "<ed25519-server-public-key>",
+  allowedOrigins: ["http://localhost:5173"],
+  capabilities: ["communication.rooms"],
+};
+
+const manifestHash = computeSandboxExternalAppManifestHash(manifest);
+const ownerAssertion = await signExternalAppOwnerAssertion(
+  {
+    appId: manifest.appId,
+    ownerWallet: manifest.ownerWallet,
+    manifestHash,
+    audience: "alcheme:external-app-sandbox-registration",
+    expiresAt: new Date(Date.now() + 10 * 60_000).toISOString(),
+    nonce: crypto.randomUUID(),
+  },
+  signWithOwnerWalletAsBase64Ed25519,
+);
+
+await fetch(`${apiBaseUrl}/external-apps/sandbox-registrations`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ manifest, ownerAssertion }),
+});
+```
 
 `owner-wallet-pubkey` and `ed25519-server-public-key` must be valid base58
-Solana public keys. Sandbox mode does not accept arbitrary labels.
+Solana public keys. Sandbox mode does not accept arbitrary labels. Remote
+non-local HTTP origins are rejected; production manifests must use HTTPS.
 
-The matching admin route exists for sandbox or operator bootstrap:
+The admin route exists only for local/operator fallback:
 
 ```http
 POST /api/v1/external-apps
@@ -175,7 +227,8 @@ Example bootstrap body:
 ```
 
 `EXTERNAL_APP_ADMIN_TOKEN` is a local/operator bootstrap token. It is not a
-production approval mechanism and must not be shipped to users.
+production approval mechanism, not the normal sandbox onboarding path, and must
+not be shipped to users.
 
 Demo or hosted environments should set bootstrap tokens through deployment
 secrets and should not expose them to external program clients.
@@ -214,9 +267,15 @@ The signer must return a base64 Ed25519 signature over the encoded payload
 string. The server public key must match the registered `ExternalApp`
 `serverPublicKey`.
 
-The same server key model is used for `sourceSubmissionClaim` and
-`knowledgeContextClaim`. See [Server-Signed Claims](./server-signed-claims.md)
-for the exact payload fields and signing examples.
+The same server key model is used for `sourceSubmissionClaim`,
+`sourceMaterialStatusClaim`, and `knowledgeContextClaim`. See
+[Server-Signed Claims](./server-signed-claims.md) for the exact payload fields
+and signing examples. For non-sandbox server-signed claims, provide the accepted
+`serverKeyVersion`. Production runtime readiness also depends on
+`runtime-capabilities.serverKeyLifecycle.productionStable` and the app's
+`integration-status`; if production-stable key lifecycle is false, review can
+activate the app record while runtime claim acceptance remains blocked until key
+lifecycle activation is complete.
 
 ## Browser Runtime Flow
 
@@ -341,6 +400,20 @@ await submitExternalProgramSourceMaterial({
 });
 ```
 
+Check candidate status with either the source material id or the exact origin
+tuple. Server-signed apps attach a `sourceMaterialStatusClaim`; wallet-only
+sandbox reads can omit it. Status responses are app-scoped and do not expose
+the raw claim digest:
+
+```http
+GET /api/v1/external-apps/:appId/source-materials/:sourceMaterialId/status
+GET /api/v1/external-apps/:appId/source-materials/status?originType=communication_message&originRef=envelope-1
+```
+
+The response includes `status.lifecycleStatus`, `status.statusGroup`,
+`status.canAppearInKnowledgeContext`, `status.claimDigestRecorded`, and
+`status.scope`. The scope is explicitly app-scoped and not user-scoped.
+
 Fetching accepted knowledge context:
 
 ```ts
@@ -382,6 +455,14 @@ const context = await fetchKnowledgeContextPackage({
 The package returns references, summaries, permissions, cache metadata, and the
 non-endorsement boundary. It does not return sealed evidence, private locators,
 raw room history, unpublished drafts, or automatic crystals.
+
+If the app and Circle binding are valid but no accepted content is available,
+the package returns `items: []` with `emptyReason:
+"no_accepted_source_material"`. If accepted rows exist but none are available
+to external apps because of audience/provenance policy, the response uses
+`emptyReason: "no_external_app_visible_source_material"`. The response `scope`
+also distinguishes app-level context from user-scoped context through
+`scope.appScoped` and `scope.userScoped`.
 
 If the source-material route returns `private_sidecar_required`, the target
 operator endpoint has not exposed the `source_materials` sidecar surface. The
@@ -593,14 +674,14 @@ Fetch the developer terms:
 GET /api/v1/external-apps/risk-disclaimers/developer_registration
 ```
 
-Before computing the acceptance digest, obtain the active External Program
-review policy version id. This value becomes `policyEpochId` and must match the
-production review role binding used by the operator runtime. Do not invent this
-value in an external program client.
+Before computing the acceptance digest, call the review policy endpoint and use
+its active External Program review policy version id. This value becomes
+`policyEpochId` and must match the production review role binding used by the
+operator runtime. Do not invent this value in an external program client.
 
-Hosted/demo environments should expose this value through the developer portal
-or operator onboarding material before asking the developer to sign the
-agreement.
+```http
+GET /api/v1/external-apps/review-policy/current
+```
 
 Compute the acceptance digest with `bindingDigest = manifestHash`, record the
 acceptance on chain through `ExternalAppEconomics`, then submit the receipt
@@ -687,7 +768,8 @@ Request body:
 
 The operator may also require `reviewCircleId`, `reviewPolicyId`,
 `reviewPolicyVersion`, or `reviewRoleKey` when multiple production review
-bindings exist. Use the operator-supplied values; do not invent them client-side.
+bindings exist. Use values returned by `review-policy/current` or the developer
+portal for that runtime; do not invent them client-side.
 
 The operator runtime verifies the manifest hash, owner wallet signature, active
 review binding, developer agreement digest, receipt PDA, account owner, account
@@ -710,19 +792,28 @@ For runtime verification against an operator endpoint, run this integration
 checklist:
 
 1. Confirm the operator supplied a runtime API base URL with `/api/v1`.
-2. Fetch the scoped developer terms:
+2. Fetch runtime capabilities, review policy, and error contract:
+
+```http
+GET /api/v1/external-apps/runtime-capabilities
+GET /api/v1/external-apps/review-policy/current
+GET /api/v1/external-apps/error-contract
+```
+
+3. Fetch the scoped developer terms:
 
 ```http
 GET /api/v1/external-apps/risk-disclaimers/developer_registration
 ```
 
-3. Register or obtain a sandbox `ExternalApp` record from the developer portal.
-4. Generate an `appRoomClaim` on the external program server.
-5. Call `joinExternalRoom` from a browser client with a real wallet signer.
-6. Send, list, and stream a signed text message.
-7. If voice is enabled, request a voice token and join through the configured
+4. Register a sandbox `ExternalApp` through `/external-apps/sandbox-registrations`.
+5. Check `GET /api/v1/external-apps/:appId/integration-status`.
+6. Generate an `appRoomClaim` on the external program server.
+7. Call `joinExternalRoom` from a browser client with a real wallet signer.
+8. Send, list, and stream a signed text message.
+9. If voice is enabled, request a voice token and join through the configured
    provider adapter.
-8. If knowledge continuity is enabled, submit selected evidence as source
+10. If knowledge continuity is enabled, submit selected evidence as source
    material and fetch a knowledge context package after Circle review accepts it.
 
 Private-tree smoke commands such as `smoke:external-game-local` and
@@ -738,10 +829,10 @@ not part of the public baseline command surface.
 | Room join fails with claim or signature errors | `appRoomClaim` was signed with the wrong key, expired, wrong room id, or missing wallet | Regenerate the claim server-side with the registered Ed25519 key and the exact wallet/room tuple. |
 | Messages fail after room join | Communication session token was not stored or passed to the SDK method | Use `joinExternalRoom` and reuse the returned `communicationAccessToken`. |
 | Voice token succeeds but microphone audio does not work | Provider adapter or provider health is not actually connected | Check the operator voice policy and verify the injected provider client with the real provider. |
-| Source material submission returns `private_sidecar_required` | The target runtime did not expose the `source_materials` private sidecar surface | Ask the operator for a community-knowledge-enabled endpoint or skip SourceMaterial submission. |
+| Source material submission returns `private_sidecar_required` | The target runtime did not expose the `source_materials` private sidecar surface | Check `runtime-capabilities.sourceMaterialMode`; use a provisioned community-knowledge endpoint or skip SourceMaterial submission. |
 | Source material submission returns claim mismatch | The signed payload does not match the submitted room, origin, Circle, summary, privacy, or submitter | Regenerate `sourceSubmissionClaim` from the exact request values. |
 | Knowledge context returns claim mismatch | `knowledgeContextClaim` does not match the room, Circle, wallet, capability, or purpose | Regenerate the claim with the same `parentCircleId` or `primaryCircleId` used by the request. |
-| Production registration rejects `policyEpochId` | The value was guessed or stale | Request the active External Program review policy version id from the operator. |
+| Production registration rejects `policyEpochId` | The value was guessed or stale | Re-read `GET /api/v1/external-apps/review-policy/current` and rebuild the developer agreement receipt with the current policy version id. |
 | Production registration rejects owner assertion | The owner assertion was signed by the wrong key, expired, or bound to a different manifest hash | Sign the assertion with the manifest owner wallet and the exact manifest hash submitted. |
 | Receipt digest mismatch | Manifest, terms, policy epoch, or account digest changed between signing and submission | Recompute the manifest hash and acceptance digest from the exact values submitted. |
 | Discovery does not list the app after review request creation | Production review request is pending, rejected, or not executed | Wait for governance execution; request creation alone does not activate discovery. |

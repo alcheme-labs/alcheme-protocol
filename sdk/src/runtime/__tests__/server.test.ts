@@ -7,6 +7,7 @@ import {
   buildSourceSubmissionClaimPayload,
   computeExternalAppEvidenceHash,
   computeExternalAppManifestHash,
+  computeSandboxExternalAppManifestHash,
   computeExternalAppReceiptDigest,
   computeExternalAppRiskDisclaimerAcceptanceDigest,
   computeExternalProgramSummaryDigest,
@@ -17,6 +18,7 @@ import {
   encodeSourceSubmissionClaimPayload,
   EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION,
   normalizeExternalAppManifest,
+  normalizeSandboxExternalAppManifest,
   signExternalAppOwnerAssertion,
   signAppRoomClaim,
   signKnowledgeContextClaim,
@@ -26,7 +28,9 @@ import {
 import * as root from "../../index";
 
 function decodePayload<T>(encodedPayload: string): T {
-  return JSON.parse(Buffer.from(encodedPayload, "base64url").toString("utf8")) as T;
+  return JSON.parse(
+    Buffer.from(encodedPayload, "base64url").toString("utf8"),
+  ) as T;
 }
 
 describe("server runtime helpers", () => {
@@ -68,14 +72,14 @@ describe("server runtime helpers", () => {
       platforms: {
         webOrigins: ["https://game.example.com"],
       },
-      capabilities: ["communication.rooms", "voice.livekit"],
+      capabilities: ["voice.livekit", "communication.rooms"],
       callbacks: {
         eventsUrl: "https://game.example.com/callback",
       },
       policy: undefined,
     });
     expect(manifestHash).toBe(
-      "sha256:55408284923202ecce82cb388d5c179b34847a79cdb6b6b075b7468ebb0b6257",
+      "sha256:b44a49a2a6083e0c9f891c0ca4f726a40dd13a48ca96a5cde06bf408dbfc7265",
     );
     expect(
       buildExternalAppOwnerAssertionPayload({
@@ -90,6 +94,20 @@ describe("server runtime helpers", () => {
       audience: "alcheme:external-app-production-registration",
       manifestHash,
     });
+    expect(
+      buildExternalAppOwnerAssertionPayload({
+        appId: "Last-Ignition",
+        ownerWallet: manifest.ownerWallet,
+        manifestHash,
+        audience: "alcheme:external-app-sandbox-registration",
+        expiresAt: "2026-05-13T00:10:00.000Z",
+        nonce: "nonce-sandbox",
+      }),
+    ).toMatchObject({
+      appId: "last-ignition",
+      audience: "alcheme:external-app-sandbox-registration",
+      manifestHash,
+    });
     const assertion = await signExternalAppOwnerAssertion(
       {
         appId: "last-ignition",
@@ -101,6 +119,20 @@ describe("server runtime helpers", () => {
       async (payload) => `signed:${payload}`,
     );
     expect(assertion.signature).toBe(`signed:${assertion.payload}`);
+    const sandboxAssertion = await signExternalAppOwnerAssertion(
+      {
+        appId: "last-ignition",
+        ownerWallet: manifest.ownerWallet,
+        manifestHash,
+        audience: "alcheme:external-app-sandbox-registration",
+        expiresAt: "2026-05-13T00:10:00.000Z",
+        nonce: "nonce-sandbox",
+      },
+      async (payload) => `signed:${payload}`,
+    );
+    expect(
+      decodePayload<{ audience: string }>(sandboxAssertion.payload).audience,
+    ).toBe("alcheme:external-app-sandbox-registration");
   });
 
   it("matches production manifest canonicalization rules", () => {
@@ -124,6 +156,29 @@ describe("server runtime helpers", () => {
     ).toThrow("invalid_external_app_manifest");
   });
 
+  it("builds sandbox manifest hashes for local development origins", () => {
+    const sandboxManifest = {
+      ...manifest,
+      homeUrl: "http://localhost:5173",
+      allowedOrigins: ["http://localhost:5173", "http://127.0.0.1:4173"],
+    };
+
+    expect(normalizeSandboxExternalAppManifest(sandboxManifest)).toMatchObject({
+      appId: "last-ignition",
+      homeUrl: "http://localhost:5173/",
+      allowedOrigins: ["http://127.0.0.1:4173", "http://localhost:5173"],
+    });
+    expect(computeSandboxExternalAppManifestHash(sandboxManifest)).toMatch(
+      /^sha256:[0-9a-f]{64}$/,
+    );
+    expect(() =>
+      normalizeSandboxExternalAppManifest({
+        ...sandboxManifest,
+        allowedOrigins: ["http://game.example.com"],
+      }),
+    ).toThrow("invalid_external_app_manifest");
+  });
+
   it("builds normalized app room claim payload", () => {
     const payload = buildAppRoomClaimPayload({
       externalAppId: "Last-Ignition",
@@ -140,7 +195,9 @@ describe("server runtime helpers", () => {
       expiresAt: "2026-05-13T00:10:00.000Z",
       nonce: "nonce-1",
     });
-    expect(payload.claimContractVersion).toBe(EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION);
+    expect(payload.claimContractVersion).toBe(
+      EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION,
+    );
     expect(payload.serverKeyVersion).toBe("2026-07-04-primary");
     expect(payload.externalAppId).toBe("last-ignition");
     expect(payload.roomType).toBe("party");
@@ -163,12 +220,19 @@ describe("server runtime helpers", () => {
       expiresAt: "2026-05-13T00:10:00.000Z",
       nonce: "nonce-1",
     };
-    const claim = await signAppRoomClaim(input, async (payload) => `signed:${payload}`);
-    expect(claim.payload).toBe(encodeAppRoomClaimPayload(buildAppRoomClaimPayload(input)));
+    const claim = await signAppRoomClaim(
+      input,
+      async (payload) => `signed:${payload}`,
+    );
+    expect(claim.payload).toBe(
+      encodeAppRoomClaimPayload(buildAppRoomClaimPayload(input)),
+    );
     expect(claim.signature).toBe(`signed:${claim.payload}`);
-    expect(decodePayload<{ claimContractVersion: string; serverKeyVersion: string }>(
-      claim.payload,
-    )).toMatchObject({
+    expect(
+      decodePayload<{ claimContractVersion: string; serverKeyVersion: string }>(
+        claim.payload,
+      ),
+    ).toMatchObject({
       claimContractVersion: EXTERNAL_PROGRAM_CLAIM_CONTRACT_VERSION,
       serverKeyVersion: "2026-07-04-primary",
     });
@@ -271,16 +335,20 @@ describe("server runtime helpers", () => {
       byIdInput,
       async (encodedPayload) => `signed:${encodedPayload}`,
     );
-    expect(claim.payload).toBe(encodeSourceMaterialStatusClaimPayload(byIdPayload));
+    expect(claim.payload).toBe(
+      encodeSourceMaterialStatusClaimPayload(byIdPayload),
+    );
     expect(claim.signature).toBe(`signed:${claim.payload}`);
-    expect(decodePayload<typeof byIdPayload>(claim.payload)).toEqual(byIdPayload);
+    expect(decodePayload<typeof byIdPayload>(claim.payload)).toEqual(
+      byIdPayload,
+    );
     expect(() =>
       buildSourceMaterialStatusClaimPayload({
         externalAppId: "last-ignition",
         expiresAt: "2026-05-13T00:10:00.000Z",
         nonce: "nonce-status-3",
       }),
-    ).toThrow("invalid_external_app_sourceMaterialStatusScope");
+    ).toThrow("invalid_source_material_status_scope");
   });
 
   it("builds callback, evidence, and receipt digests without private keys", () => {
@@ -293,7 +361,9 @@ describe("server runtime helpers", () => {
       timestamp: "2026-05-13T00:10:00.000Z",
       nonce: "nonce-1",
     });
-    expect(computePlatformCallbackDigest(callbackPayload)).toMatch(/^sha256:[a-f0-9]{64}$/);
+    expect(computePlatformCallbackDigest(callbackPayload)).toMatch(
+      /^sha256:[a-f0-9]{64}$/,
+    );
     const evidenceHash = computeExternalAppEvidenceHash({
       externalAppId: "last-ignition",
       evidenceKind: "retained_log",
@@ -325,6 +395,8 @@ describe("server runtime helpers", () => {
         termsDigest: "sha256:" + "1".repeat(64),
         bindingDigest: "sha256:" + "2".repeat(64),
       }),
-    ).toBe("sha256:b498509a2f778d5bf9963b5489a75e338cdc98ce24c6a8d11cfaa266276b96f2");
+    ).toBe(
+      "sha256:b498509a2f778d5bf9963b5489a75e338cdc98ce24c6a8d11cfaa266276b96f2",
+    );
   });
 });

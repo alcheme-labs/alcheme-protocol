@@ -105,7 +105,8 @@ Before requesting reviewed production access:
 - Verify the manifest hash against the exact manifest submitted.
 - Show the scoped developer agreement before signing or submitting receipt
   evidence.
-- Use the operator-supplied active review policy version id.
+- Use the active review policy version id from
+  `GET /api/v1/external-apps/review-policy/current`.
 - Verify communication session, message, stream, and voice behavior against the
   target operator endpoint.
 - If using community knowledge continuity, verify source-material sidecar access

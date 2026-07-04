@@ -22,13 +22,22 @@ export interface KnowledgeContextPackage {
   roomKey: string;
   circleId: number;
   scope: {
-    user: string;
+    appId: string;
+    circleId: number;
+    roomKey: string;
+    user: string | null;
+    appScoped: boolean;
+    userScoped: boolean;
     capability: "knowledge_context";
     purpose: string;
   };
   items: KnowledgeContextItem[];
+  emptyReason?:
+    | "no_accepted_source_material"
+    | "no_external_app_visible_source_material";
   cache: {
     keyScope: string;
+    keyDigest?: string;
     ttlSec: number;
   };
   disclaimer: {
