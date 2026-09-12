@@ -1,0 +1,235 @@
+.panel {
+    display: grid;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid rgba(231, 228, 221, 0.1);
+    border-radius: 8px;
+    background: rgba(18, 22, 26, 0.66);
+}
+
+.header {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.titleBlock {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+    min-width: 0;
+}
+
+.icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid rgba(134, 207, 184, 0.22);
+    border-radius: 8px;
+    color: #9ee6ce;
+    background: rgba(134, 207, 184, 0.1);
+}
+
+.title {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+.description,
+.reason,
+.notice,
+.error {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.error {
+    color: #f2a6a6;
+}
+
+.contextNote {
+    display: grid;
+    gap: 4px;
+    padding: 10px;
+    border: 1px solid rgba(134, 207, 184, 0.16);
+    border-radius: 8px;
+    color: var(--color-text-secondary);
+    background: rgba(134, 207, 184, 0.055);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.contextNote p {
+    margin: 0;
+}
+
+.contextLabel {
+    color: var(--color-text-primary);
+    font-weight: 700;
+}
+
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.diffList {
+    display: grid;
+    gap: 8px;
+}
+
+.diffItem {
+    display: grid;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid rgba(231, 228, 221, 0.09);
+    border-radius: 8px;
+    background: rgba(231, 228, 221, 0.035);
+}
+
+.diffItemAccepted {
+    border-color: rgba(134, 207, 184, 0.24);
+    background: rgba(134, 207, 184, 0.055);
+}
+
+.diffTopline {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.fieldName {
+    color: var(--color-text-primary);
+    font-size: 12px;
+    font-weight: 680;
+    overflow-wrap: anywhere;
+}
+
+.riskBadge {
+    flex: 0 0 auto;
+    padding: 3px 7px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.risklow {
+    color: #9ee6ce;
+    background: rgba(134, 207, 184, 0.12);
+}
+
+.riskmedium {
+    color: #f2d78d;
+    background: rgba(199, 168, 107, 0.14);
+}
+
+.riskhigh {
+    color: #f2a6a6;
+    background: rgba(235, 112, 112, 0.14);
+}
+
+.valueGrid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+    color: var(--color-text-primary);
+    font-size: 12px;
+}
+
+.valueGrid span {
+    min-width: 0;
+    padding: 8px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.16);
+    overflow-wrap: anywhere;
+}
+
+.conflicts {
+    margin: 0;
+    padding-left: 16px;
+    color: #f2a6a6;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.itemActions,
+.footerActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.footerActions {
+    padding-top: 2px;
+}
+
+.primaryButton,
+.secondaryButton,
+.ghostButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 34px;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 680;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.primaryButton {
+    padding: 0 10px;
+    border: 1px solid rgba(134, 207, 184, 0.28);
+    color: #9ee6ce;
+    background: rgba(134, 207, 184, 0.12);
+}
+
+.secondaryButton {
+    padding: 0 9px;
+    border: 1px solid rgba(231, 228, 221, 0.12);
+    color: var(--color-text-primary);
+    background: rgba(231, 228, 221, 0.055);
+}
+
+.ghostButton {
+    padding: 0 9px;
+    border: 1px solid transparent;
+    color: var(--color-text-secondary);
+    background: transparent;
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled,
+.ghostButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.52;
+}
+
+@media (max-width: 520px) {
+    .header,
+    .diffTopline {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .valueGrid {
+        grid-template-columns: 1fr;
+    }
+}

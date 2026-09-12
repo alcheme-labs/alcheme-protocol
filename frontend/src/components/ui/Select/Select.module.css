@@ -1,0 +1,295 @@
+.root {
+  --select-control-bg: color-mix(in srgb, currentColor 4%, transparent);
+  --select-control-color: inherit;
+  --select-control-border: color-mix(in srgb, currentColor 18%, transparent);
+  --select-control-border-open: color-mix(in srgb, var(--color-accent-gold, #b99a55) 70%, currentColor);
+  --select-control-radius: 12px;
+  --select-control-min-height: 44px;
+  --select-control-padding: 0 14px;
+  --select-menu-bg: var(--color-bg-elevated, var(--color-ore-bg, #fff));
+  --select-menu-border: color-mix(in srgb, currentColor 14%, transparent);
+  --select-option-color: inherit;
+  --select-option-active-bg: color-mix(in srgb, var(--color-accent-gold, #b99a55) 14%, transparent);
+  --select-option-active-color: inherit;
+  --select-focus-ring: var(--color-accent-gold, #b99a55);
+  position: relative;
+  min-width: 0;
+  width: 100%;
+}
+
+.disabled {
+  opacity: 0.64;
+}
+
+.button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: var(--select-control-min-height);
+  padding: var(--select-control-padding);
+  border-radius: var(--select-control-radius);
+  border: 1px solid var(--select-control-border);
+  background: var(--select-control-bg);
+  color: var(--select-control-color);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.button:focus-visible,
+.sheetClose:focus-visible,
+.option:focus-visible {
+  outline: 2px solid var(--select-focus-ring, #b99a55);
+  outline-offset: 2px;
+}
+
+.button[aria-expanded="true"] {
+  border-color: var(--select-control-border-open);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent-gold, #b99a55) 22%, transparent);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+}
+
+.value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  flex: 0 0 auto;
+  color: color-mix(in srgb, currentColor 55%, transparent);
+  font-size: 1.05rem;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.overlay {
+  /* The menu is portaled to document.body, so its tokens must live here too. */
+  --select-menu-bg: var(--color-bg-elevated, var(--color-ore-bg, #fff));
+  --select-menu-border: color-mix(in srgb, currentColor 14%, transparent);
+  --select-option-color: inherit;
+  --select-option-active-bg: color-mix(in srgb, var(--color-accent-gold, #b99a55) 14%, transparent);
+  --select-option-active-color: inherit;
+  --select-focus-ring: var(--color-accent-gold, #b99a55);
+  --select-vv-height: 100dvh;
+  --select-vv-offset-top: 0px;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--select-vv-offset-top);
+  width: 100%;
+  height: var(--select-vv-height);
+  min-height: var(--select-vv-height);
+  z-index: 10000;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: color-mix(in srgb, #0f1210 28%, transparent);
+  cursor: pointer;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.menu {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 18%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0;
+  width: min(420px, calc(100% - 32px));
+  max-height: min(60vh, 420px);
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--select-menu-border);
+  border-radius: 16px;
+  background: var(--select-menu-bg);
+  color: inherit;
+  box-shadow: 0 18px 46px color-mix(in srgb, #000 22%, transparent);
+}
+
+.sheetHeader {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.sheetHandle {
+  display: none;
+  width: 40px;
+  height: 4px;
+  margin: 0 auto;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.sheetTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 36px;
+  font-size: .92rem;
+  font-weight: 650;
+}
+
+.sheetClose {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: .86rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.optionList {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px 12px;
+  scroll-padding-top: 8px;
+  scroll-padding-bottom: 12px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--select-option-color);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.option:active,
+.optionActive {
+  background: var(--select-option-active-bg);
+  color: var(--select-option-active-color);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .option:hover {
+    background: var(--select-option-active-bg);
+    color: var(--select-option-active-color);
+  }
+}
+
+.optionDisabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.optionLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.check {
+  flex: 0 0 auto;
+  color: var(--color-accent-gold, #b99a55);
+}
+
+@media (max-width: 720px) {
+  .backdrop {
+    background: color-mix(in srgb, #0f1210 46%, transparent);
+  }
+
+  .menu {
+    /* Plan: >=12px visual inset PLUS device safe-area (not max()). */
+    left: calc(12px + env(safe-area-inset-left, 0px));
+    right: calc(12px + env(safe-area-inset-right, 0px));
+    top: auto;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    transform: none;
+    width: auto;
+    max-height: min(
+      70dvh,
+      calc(
+        var(--select-vv-height) - 24px
+        - env(safe-area-inset-top, 0px)
+        - env(safe-area-inset-bottom, 0px)
+      )
+    );
+    border-radius: 20px;
+    background: var(--select-menu-bg, #2E3632);
+    animation: selectSheetIn 180ms ease-out;
+  }
+
+  .optionList {
+    padding-top: 12px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    scroll-padding-top: 12px;
+    scroll-padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .sheetHandle {
+    display: block;
+  }
+
+  .sheetClose {
+    min-height: 44px;
+  }
+
+  .option {
+    min-height: 48px;
+    font-size: 1rem;
+  }
+}
+
+@keyframes selectSheetIn {
+  from {
+    transform: translateY(12%);
+    opacity: 0.72;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu {
+    animation: none;
+  }
+}

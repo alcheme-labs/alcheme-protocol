@@ -1,0 +1,108 @@
+.description {
+    margin: 0 0 16px;
+    color: rgba(246, 239, 221, 0.62);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.content {
+    padding-bottom: 18px;
+}
+
+.labelList {
+    display: grid;
+    gap: 0;
+    overflow: hidden;
+    border-top: 1px solid rgba(246, 239, 221, 0.08);
+    border-bottom: 1px solid rgba(246, 239, 221, 0.08);
+}
+
+.labelCard {
+    position: relative;
+    display: grid;
+    gap: 7px;
+    padding: 13px 0;
+    background: transparent;
+}
+
+.labelCard:not(:last-child) {
+    border-bottom: 1px solid rgba(246, 239, 221, 0.065);
+}
+
+.labelCardActive {
+    background: linear-gradient(90deg, rgba(214, 183, 104, 0.055), transparent 72%);
+}
+
+.labelHeader {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+}
+
+.labelName {
+    margin: 0;
+    width: max-content;
+    max-width: 100%;
+    border: 1px solid rgba(214, 183, 104, 0.32);
+    border-radius: 999px;
+    background: rgba(214, 183, 104, 0.10);
+    color: rgba(214, 183, 104, 0.96);
+    padding: 2px 8px;
+    font-size: 12px;
+    line-height: 1.35;
+    font-weight: 560;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.labelDescription {
+    margin: 0;
+    color: rgba(246, 239, 221, 0.78);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.labelLine {
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    color: rgba(246, 239, 221, 0.58);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.labelBlockTitle {
+    flex: 0 0 auto;
+    color: rgba(246, 239, 221, 0.48);
+    font-size: inherit;
+    line-height: inherit;
+    font-weight: 500;
+}
+
+.labelBlockTitle::after {
+    content: '·';
+    margin-left: 6px;
+    color: rgba(246, 239, 221, 0.28);
+}
+
+.labelLineText {
+    min-width: 0;
+    flex: 1;
+    color: rgba(246, 239, 221, 0.62);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.empty {
+    min-height: 132px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed rgba(246, 239, 221, 0.14);
+    border-radius: 12px;
+    color: rgba(246, 239, 221, 0.56);
+    font-size: 13px;
+}

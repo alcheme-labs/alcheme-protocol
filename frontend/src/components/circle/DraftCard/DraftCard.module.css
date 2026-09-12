@@ -1,0 +1,196 @@
+/* ══════════════════════════════════════
+   DraftCard — Heat Decay Visual System
+   Live temperature gauge + frost/glow effects
+   ══════════════════════════════════════ */
+
+.wrapper {
+    position: relative;
+}
+
+/* ── Title & Meta ── */
+.title {
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-2);
+    line-height: 1.4;
+}
+
+.statusRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+.statusBadge {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    padding: 3px 8px;
+    border: 1px solid;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: var(--font-weight-medium);
+    line-height: 1.3;
+}
+
+.statusBlocked {
+    color: #f4c7be;
+    border-color: rgba(220, 108, 90, 0.48);
+    background: rgba(220, 108, 90, 0.12);
+}
+
+.statusActive {
+    color: var(--color-accent-ivory-glow);
+    border-color: rgba(199, 168, 107, 0.4);
+    background: rgba(199, 168, 107, 0.1);
+}
+
+.statusComplete {
+    color: var(--color-text-secondary);
+    border-color: rgba(180, 195, 210, 0.25);
+    background: rgba(180, 195, 210, 0.07);
+}
+
+.activityLabel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    min-width: 0;
+    color: var(--color-text-tertiary);
+    font-size: 11px;
+    line-height: 1.35;
+    text-align: right;
+}
+
+.blocker {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin: 0 0 var(--space-2);
+    padding: 8px 10px;
+    border: 1px solid rgba(220, 108, 90, 0.4);
+    border-radius: 10px;
+    background: rgba(220, 108, 90, 0.1);
+    color: #f4c7be;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.blocker svg {
+    flex: 0 0 auto;
+    margin-top: 1px;
+}
+
+.meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--font-size-caption);
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-1);
+}
+
+@media (max-width: 420px) {
+    .statusRow {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .activityLabel {
+        justify-content: flex-start;
+        text-align: left;
+    }
+}
+
+.metaItem {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.metaDot {
+    opacity: 0.4;
+}
+
+/* ── Footer (heat section) ── */
+.footer {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    transition: all 1s ease;
+}
+
+.gaugeWrap {
+    width: 100%;
+}
+
+.heatInfo {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+}
+
+.heatLabel {
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.02em;
+}
+
+.heatTemp {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Heat state colors ── */
+.flameIcon {
+    color: var(--color-accent-gold);
+}
+
+.frozenIcon {
+    color: var(--color-text-tertiary);
+    opacity: 0.6;
+}
+
+.active {
+    color: var(--color-accent-gold);
+}
+
+.cooling {
+    color: var(--color-text-secondary);
+}
+
+.frozen {
+    color: var(--color-text-tertiary);
+    opacity: 0.7;
+}
+
+/* ── Frost overlay ── */
+.frostOverlay {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg,
+            rgba(180, 195, 210, 0.08) 0%,
+            rgba(180, 195, 210, 0.04) 50%,
+            rgba(180, 195, 210, 0.10) 100%);
+    pointer-events: none;
+    animation: frostShimmer 8s ease-in-out infinite;
+}
+
+@keyframes frostShimmer {
+
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}

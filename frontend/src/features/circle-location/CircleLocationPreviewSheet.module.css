@@ -1,0 +1,100 @@
+.sheet {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--safe-area-bottom, 0px) + 14px);
+    z-index: calc(var(--z-overlay) + 1);
+    width: min(440px, calc(100vw - 28px));
+    transform: translateX(-50%);
+    border: 1px solid rgba(231, 228, 221, 0.1);
+    border-radius: 8px;
+    background: rgba(31, 36, 33, 0.96);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.42);
+    backdrop-filter: blur(16px);
+}
+
+.closeButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 8px;
+    background: rgba(231, 228, 221, 0.06);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+}
+
+.content {
+    display: grid;
+    gap: 10px;
+    padding: 16px;
+    padding-right: 48px;
+}
+
+.kicker {
+    color: rgba(243, 209, 80, 0.92);
+    font-size: 12px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.content h2 {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: 18px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+}
+
+.content p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.metaRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.metaRow span {
+    min-height: 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 8px;
+    border: 1px solid rgba(231, 228, 221, 0.08);
+    border-radius: 8px;
+    color: var(--color-text-muted);
+    background: rgba(231, 228, 221, 0.04);
+    font-size: 12px;
+}
+
+.enterButton {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: fit-content;
+    padding: 0 12px;
+    border: 1px solid rgba(122, 240, 143, 0.22);
+    border-radius: 8px;
+    background: rgba(122, 240, 143, 0.1);
+    color: rgba(226, 244, 218, 0.95);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+@media (max-width: 420px) {
+    .content {
+        padding-right: 44px;
+    }
+}

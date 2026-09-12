@@ -1,0 +1,45 @@
+/* BreathingBg.module.css */
+.container {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.base {
+    position: absolute;
+    inset: 0;
+    transition: background-color 800ms var(--easing-standard);
+}
+
+.breathLayer {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 40%,
+            rgba(38, 45, 41, 0.6) 0%,
+            transparent 70%);
+}
+
+.warmLayer {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 60%,
+            rgba(199, 168, 107, 0.03) 0%,
+            transparent 60%);
+}
+
+/* ── Temperature States ── */
+/* "色温切换必须缓慢渐变（>800ms），绝不能瞬间变化" */
+
+.cold .base {
+    background-color: #1C201E;
+}
+
+.neutral .base {
+    background-color: var(--color-bg-base);
+}
+
+.warm .base {
+    background-color: #22261F;
+}

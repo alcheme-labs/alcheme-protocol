@@ -1,0 +1,291 @@
+.panel {
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.025);
+    overflow: hidden;
+}
+
+.panelContentOnly {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    overflow: visible;
+}
+
+.panelContentOnly .body {
+    padding: 0;
+}
+
+.header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    text-align: left;
+}
+
+.titleRow {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.title {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.meta {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+}
+
+.chevron {
+    color: var(--color-text-tertiary);
+    transition: transform var(--motion-fast) var(--easing-standard);
+}
+
+.chevronOpen {
+    transform: rotate(180deg);
+}
+
+.body {
+    display: grid;
+    gap: 10px;
+    padding: 0 12px 12px;
+}
+
+.searchRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+}
+
+.searchBox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 7px 9px;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.searchInput {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--color-text-primary);
+    font-size: 12px;
+}
+
+.searchInput::placeholder {
+    color: var(--color-text-tertiary);
+}
+
+.pinSummary {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 9px;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.list {
+    display: grid;
+    gap: 4px;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    min-height: 36px;
+    padding: 6px 8px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-secondary);
+}
+
+.rowMainCircle {
+    background: transparent;
+}
+
+.rowAuxiliaryCircle {
+    background: transparent;
+}
+
+.depthMarker {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 28px;
+    color: var(--color-text-tertiary);
+}
+
+.depthMarkerMain {
+    color: rgba(199, 168, 107, 0.78);
+}
+
+.depthMarkerAuxiliary {
+    color: var(--color-text-tertiary);
+}
+
+.depthMarkerNested::after {
+    content: "";
+    position: absolute;
+    left: -7px;
+    top: -8px;
+    bottom: -8px;
+    border-left: 1px solid rgba(199, 168, 107, 0.18);
+}
+
+.depthMarkerNested::before {
+    content: "";
+    position: absolute;
+    left: -7px;
+    top: 50%;
+    width: 8px;
+    border-top: 1px solid rgba(199, 168, 107, 0.2);
+}
+
+.depthMarkerAuxiliary::after {
+    content: "";
+    position: absolute;
+    left: -7px;
+    top: -8px;
+    bottom: -8px;
+    border-left: 1px dashed rgba(231, 228, 221, 0.22);
+}
+
+.depthMarkerAuxiliary::before {
+    content: "";
+    position: absolute;
+    left: -7px;
+    top: 50%;
+    width: 9px;
+    border-top: 1px dashed rgba(231, 228, 221, 0.24);
+}
+
+.rowActive {
+    border-color: rgba(199, 168, 107, 0.28);
+    background: rgba(199, 168, 107, 0.08);
+    color: var(--color-text-primary);
+}
+
+.rowButton {
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.rowMain {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    flex-wrap: wrap;
+}
+
+.rowName {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 500;
+    max-width: 100%;
+}
+
+.levelBadge,
+.kindBadge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 18px;
+    padding: 0 6px;
+    border-radius: 999px;
+    font-size: 9.5px;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.levelBadge {
+    font-variant-numeric: tabular-nums;
+}
+
+.levelBadgeMain {
+    border: 1px solid rgba(199, 168, 107, 0.22);
+    background: rgba(199, 168, 107, 0.08);
+    color: var(--color-accent-gold);
+}
+
+.levelBadgeAuxiliary {
+    border: 1px solid rgba(231, 228, 221, 0.08);
+    background: rgba(231, 228, 221, 0.025);
+    color: var(--color-text-tertiary);
+}
+
+.kindBadge {
+    border: 1px solid rgba(231, 228, 221, 0.08);
+    background: rgba(231, 228, 221, 0.035);
+    color: var(--color-text-tertiary);
+}
+
+.rowMeta {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 10px;
+    color: var(--color-text-tertiary);
+}
+
+.pinButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+}
+
+.pinButton:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text-secondary);
+}
+
+.pinButtonActive {
+    color: var(--color-accent-gold);
+}
+
+.empty {
+    padding: 10px 8px;
+    color: var(--color-text-tertiary);
+    font-size: 12px;
+}

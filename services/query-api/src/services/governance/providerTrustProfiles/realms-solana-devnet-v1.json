@@ -1,0 +1,273 @@
+{
+  "schemaVersion": 1,
+  "profileRef": "realms:solana:devnet:shared-governance",
+  "version": 1,
+  "provider": "realms",
+  "readinessState": "ready",
+  "riskMaturity": "stable",
+  "chain": {
+    "chainId": "solana:devnet",
+    "cluster": "devnet",
+    "genesisHash": "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG"
+  },
+  "deployment": {
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "loaderProgramId": "BPFLoaderUpgradeab1e11111111111111111111111",
+    "programDataAddress": "BZYjZ2ZbtAawP9WPt5yXszcoMWTvNFFX4AMbnDojtSGL",
+    "upgradeAuthority": "HsjQHG73wm2RzGRg7t8d2MthLAFFSnuEvBMAKJ2PkB6r",
+    "lastDeployedSlot": 399231146,
+    "deployedProgramBytesLength": 1195568,
+    "deployedProgramBytesSha256": "d20c06dd21cc99fa245d39c3533fcc1e959ea6efda3b1220d30ce2e67b2ca4eb",
+    "observation": {
+      "commitment": "finalized",
+      "slot": 476931161,
+      "observedAt": "2026-07-17T14:54:19Z"
+    }
+  },
+  "clientDecoder": {
+    "packageName": "@solana/spl-governance",
+    "version": "0.3.28",
+    "npmShasum": "63ff71f235206f069f8ea1e66a40e7cdb6252d3f",
+    "npmIntegrity": "sha512-CUi1hMvzId2rAtMFTlxMwOy0EmFeT0VcmiC+iQnDhRBuM8LLLvRrbTYBWZo3xIvtPQW9HfhVBoL7P/XNFIqYVQ==",
+    "tarballSha256": "092f2624c654ab19eda6e06f9554390090ab87b843a45fc72c675c8ed5f96af0",
+    "gitHead": "6a23631ad30fb7761107b8316479c14519217560",
+    "publishedManifestSha256": "4268899fbb7e17cbc83ba30e565b54d12c413d58be0642f2a0289b8394d8b042",
+    "accountTypes": [
+      "Realm",
+      "RealmConfigAccount",
+      "Governance",
+      "Proposal",
+      "ProposalTransaction",
+      "TokenOwnerRecord",
+      "VoteRecord"
+    ]
+  },
+  "accountGraph": {
+    "mode": "standard_token_weight_no_addins",
+    "voterWeightAddin": null,
+    "maxVoterWeightAddin": null,
+    "customPlugins": "unavailable"
+  },
+  "decisionPolicyMapping": {
+    "admission": {
+      "status": "not_applicable",
+      "providerPolicy": "realm_membership_admission_not_used_by_current_alcheme_case",
+      "activationGate": "not_applicable",
+      "authorityImpact": false,
+      "reason": "Realms Devnet profile is used for provider-bound governance execution/readback, while current membership admission remains Alcheme Circle policy."
+    },
+    "proposalCreation": {
+      "status": "exact",
+      "providerPolicy": "spl_governance_proposal_owner_and_governance_authority",
+      "activationGate": "ready",
+      "authorityImpact": true,
+      "reason": "Current profile binds proposal creation to the frozen Realm/Governance accounts and the governed authority signer."
+    },
+    "voterEligibility": {
+      "status": "exact",
+      "providerPolicy": "token_owner_record_for_frozen_realm_governance",
+      "activationGate": "ready",
+      "authorityImpact": true,
+      "reason": "Only the selected TokenOwnerRecord / Realm account graph is accepted; voter add-ins are explicitly absent."
+    },
+    "votingPower": {
+      "status": "exact",
+      "providerPolicy": "standard_token_weight_no_addins",
+      "activationGate": "ready",
+      "authorityImpact": true,
+      "reason": "The profile declares no VSR/VWR/add-in mapping and therefore cannot silently weaken or strengthen voting power."
+    },
+    "executionAuthority": {
+      "status": "exact",
+      "providerPolicy": "spl_governance_governed_account_authority",
+      "activationGate": "ready",
+      "authorityImpact": true,
+      "reason": "Execution authority is the frozen governance authority read back from the provider account graph, not the workflow assignee or payer."
+    },
+    "signerSetAsVoterPolicy": {
+      "status": "not_applicable",
+      "providerPolicy": "realms_has_no_squads_signer_set",
+      "activationGate": "not_applicable",
+      "authorityImpact": false,
+      "reason": "Realms voting policy is not derived from a multisig signer set."
+    }
+  },
+  "decoderConformance": {
+    "observedAtSlot": 476931161,
+    "commitment": "finalized",
+    "accounts": {
+      "realm": {
+        "address": "19YMfhJ9PHbCyeUuH4DgzP76qeWoFd9ZtLfd4xo9uzn",
+        "ownerProgram": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+        "dataLength": 161,
+        "dataSha256": "30b12a78cf47e268f41b65b821a55a869d8531ea7756ceb73032f63376f4b47e",
+        "expected": {
+          "name": "ckvmn90gi0006b5td3xsk1nns",
+          "communityMint": "4KAtqMCS3KkQmr8iEzE5qpGZwP3fj34gBE5g2mmHjThF",
+          "authority": "5z5h8D5FWUiCJsLjvYL8sWLc9xtP9iTrkEBmckf9AbZY",
+          "realmConfig": "not_present"
+        }
+      },
+      "governance": {
+        "address": "AKGKs2PW3oY3T3CZGWiXeowo2QiF5MA6XbU4L9nC2oX3",
+        "ownerProgram": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+        "dataLength": 108,
+        "dataSha256": "c5c979088e069512176753a0cf271844a15e51c43681f3d04e4c22f3053799a4",
+        "expected": {
+          "realm": "19YMfhJ9PHbCyeUuH4DgzP76qeWoFd9ZtLfd4xo9uzn",
+          "governedAccount": "4KAtqMCS3KkQmr8iEzE5qpGZwP3fj34gBE5g2mmHjThF",
+          "proposalCount": 0
+        }
+      }
+    }
+  },
+  "readback": {
+    "rpc": {
+      "endpoint": "https://api.devnet.solana.com",
+      "access": "public_no_credentials",
+      "purpose": "provider_execution_and_authoritative_readback"
+    },
+    "commitment": "finalized",
+    "timeoutMs": 12000,
+    "maximumAttempts": 5,
+    "backoffSeconds": [1, 2, 4, 8, 16],
+    "slotConvergenceWindow": 32,
+    "resubmitPolicy": "never_automatic"
+  },
+  "reconciliationPolicy": {
+    "schemaVersion": 1,
+    "authorityRef": "provider_trust_profile_reconciliation_policy",
+    "reconciliationAuthorityRef": "independent_provider_readback",
+    "decisionAuthorityRef": "DEC-P06-M9-INDEPENDENT-RECONCILIATION-MANUAL-FALLBACK-v1",
+    "conflictRule": "questioned_provider_program_decoder_cannot_adjudicate_itself",
+    "fallbackMechanism": {
+      "mode": "manual_recovery_only",
+      "independentFallbackProviderRef": null,
+      "activation": "fail_closed_when_independent_fallback_absent",
+      "operatorMaySelectProvider": false,
+      "questionedProviderMayAdjudicate": false
+    },
+    "superseding": {
+      "artifactOwner": "DecisionOutputArtifact",
+      "receiptOwner": "GovernanceExecutionReceipt",
+      "materialChangeGate": "new_decision_stage_or_superseding_case",
+      "required": true
+    }
+  },
+  "keyCustodyRecord": {
+    "schemaVersion": 1,
+    "recordRef": "realms-devnet-key-custody:v1",
+    "decisionRef": "DEC-P06-M3-SOLO-DEVNET-CUSTODY-v1",
+    "approvedAt": "2026-07-17T00:00:00.000Z",
+    "scope": "solana:devnet_no_real_assets",
+    "signerProvider": "openbao_transit",
+    "serviceTopology": "local_single_node_integrated_raft",
+    "endpoint": "https://127.0.0.1:18200",
+    "networkExposure": "localhost_only",
+    "tls": {
+      "serverName": "localhost",
+      "minimumVersion": "tls13",
+      "trustAnchorRef": "openbao-realms-devnet-local-server-crt",
+      "certificateSha256": "7045db09cd73ead7acac8df9e16ae0b7fb6950321674dab2d25ca0220a4d2231",
+      "notBefore": "2026-07-17T16:24:00.000Z",
+      "notAfter": "2027-07-17T16:24:00.000Z"
+    },
+    "transitMount": "transit",
+    "keyContracts": [
+      {
+        "keyRef": "alcheme-realms-devnet-bootstrap-authority-v1",
+        "role": "bootstrap_authority",
+        "allowedOperations": ["create_community_mint", "create_realm", "create_governance", "configure_realm", "transfer_or_retire_authority"],
+        "publicKey": null,
+        "status": "pending_generation"
+      },
+      {
+        "keyRef": "alcheme-realms-devnet-proposer-v1",
+        "role": "proposer",
+        "allowedOperations": ["create_proposal", "sign_off_proposal"],
+        "publicKey": null,
+        "status": "pending_generation"
+      },
+      {
+        "keyRef": "alcheme-realms-devnet-voter-v1",
+        "role": "voter",
+        "allowedOperations": ["cast_vote", "set_governance_delegate", "revoke_governance_delegate"],
+        "publicKey": null,
+        "status": "pending_generation"
+      },
+      {
+        "keyRef": "alcheme-realms-devnet-executor-v1",
+        "role": "executor",
+        "allowedOperations": ["execute_approved_no_asset_instruction"],
+        "publicKey": null,
+        "status": "pending_generation"
+      },
+      {
+        "keyRef": "alcheme-realms-devnet-fee-payer-v1",
+        "role": "fee_payer",
+        "allowedOperations": ["pay_approved_devnet_fee_and_rent"],
+        "publicKey": null,
+        "status": "pending_generation"
+      }
+    ],
+    "keyAlgorithm": "ed25519",
+    "derived": false,
+    "exportable": false,
+    "allowPlaintextBackup": false,
+    "applicationAccess": "exact_key_sign_and_read_only",
+    "managementApplicationIdentitySeparation": "required",
+    "runtimeLocations": "config_raft_snapshot_recovery_outside_git_and_agent_temporary_directories",
+    "operatorRunbookRef": "docs/ops/governance-openbao-custody-runbook.zh-CN.md",
+    "recoveryMaterial": {
+      "provider": "keepassxc",
+      "purpose": "openbao_unseal_and_recovery_material_only",
+      "databaseName": "Alcheme Devnet Governance.kdbx",
+      "primaryLocationPolicy": "outside_git_repository_and_agent_temporary_directories",
+      "encryptedBackup": "required_independent_location",
+      "accessMode": "interactive_keepassxc_cli"
+    },
+    "verification": {
+      "raftPersistence": "verified",
+      "restartSealUnseal": "verified",
+      "tlsLocalhost": "verified",
+      "auditReadback": "verified",
+      "backupRestore": "verified",
+      "leastPrivilegeDenial": "verified",
+      "solanaCanonicalMessageConformance": "verified",
+      "runtimeOwnerReadback": "pending",
+      "receipt": {
+        "openBaoVersion": "2.6.0",
+        "raftNodeId": "alcheme-realms-devnet-1",
+        "clusterId": "f6820a25-d8a2-dc2d-d48d-2839084371bb",
+        "snapshotSha256": "d514817121dc7ae982c46baa6a622d8c6c6e99d838b07ed2f767746d542649e3",
+        "snapshotBytes": 25628,
+        "snapshotPrimaryRef": "openbao_devnet_external_snapshot_primary",
+        "snapshotIndependentBackupRef": "alcheme_devnet_governance_encrypted_snapshot_copy",
+        "originalUnsealVerifiedAt": "2026-07-17T20:02:15.157Z",
+        "isolatedRestoreVerifiedAt": "2026-07-17T20:03:55.965Z"
+      }
+    },
+    "primaryMaintainer": "Taiyi",
+    "recoveryOwner": "Taiyi",
+    "samePersonRecoveryException": true,
+    "inventoryOwner": "payer_policy_and_resource_authority_binding",
+    "secretMaterial": "openbao_sealed_storage_only_never_exported_to_application_git_business_database_log_evidence_chat_command_output_or_plaintext_file",
+    "fundingSource": "solana_devnet_faucet_only",
+    "walletSpecificCapRequiredBeforeFunding": true,
+    "feePayerAuthoritySeparation": "required",
+    "rotationProcedure": "create_replacement_transit_key_conformance_governed_rebind_chain_readback_then_retire_old",
+    "lossProcedure": "fail_closed_rebootstrap_devnet_environment_no_owner_operator_fallback",
+    "incidentProcedure": "disable_dispatch_preserve_audit_and_raft_revoke_identity_rebootstrap_and_read_back_all_authority_changes",
+    "retirementProcedure": "disable_binding_disposition_in_flight_read_back_authorities_revoke_identity_seal_and_record_evidence",
+    "environmentRetention": "repeatable_bootstrap_with_explicit_retirement_evidence",
+    "status": "verified_pre_wallet_pending_runtime_owner",
+    "createdAt": "2026-07-17T00:00:00.000Z",
+    "lastVerifiedAt": "2026-07-17T20:03:55.965Z"
+  },
+  "environmentBoundary": {
+    "activationScope": "circle_capability_contract_profile_version",
+    "inPlaceClusterSwitch": "forbidden",
+    "openCaseProfileSwitch": "forbidden",
+    "mainnet": "unavailable"
+  }
+}

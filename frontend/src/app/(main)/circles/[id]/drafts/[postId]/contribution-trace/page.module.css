@@ -1,0 +1,273 @@
+.page {
+    min-height: 100vh;
+    background: var(--color-bg-primary);
+}
+
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 18px 16px 0;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.state,
+.error {
+    width: min(100% - 32px, 720px);
+    margin: 32px auto;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.state {
+    border: 1px solid rgba(231, 228, 221, 0.08);
+    color: var(--color-text-secondary);
+}
+
+.error {
+    border: 1px solid rgba(235, 112, 112, 0.28);
+    background: rgba(235, 112, 112, 0.1);
+    color: #f2a6a6;
+}
+
+.reviewPanel,
+.correctionPanel {
+    width: min(100% - 32px, 720px);
+    margin: 18px auto 0;
+    padding: 14px;
+    border: 1px solid rgba(119, 231, 199, 0.18);
+    border-radius: 8px;
+    background: rgba(31, 67, 57, 0.24);
+    color: var(--color-text-primary);
+}
+
+.correctionPanel {
+    display: grid;
+    gap: 14px;
+}
+
+.correctionToggle {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-primary);
+    text-align: left;
+    cursor: pointer;
+}
+
+.correctionToggle > span {
+    display: grid;
+    gap: 3px;
+}
+
+.correctionToggle strong {
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+.correctionToggle small {
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.correctionToggle > svg:last-child {
+    transition: transform 160ms ease;
+}
+
+.chevronOpen {
+    transform: rotate(180deg);
+}
+
+.correctionForm {
+    display: grid;
+    gap: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(231, 228, 221, 0.08);
+}
+
+.correctionRefs {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.correctionRefs legend,
+.correctionReason > span {
+    margin-bottom: 8px;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.correctionRefs .evidenceChoice {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid rgba(231, 228, 221, 0.08);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.1);
+    color: var(--color-text-primary);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.correctionRefs .evidenceChoice input {
+    margin-top: 3px;
+}
+
+.evidenceChoiceBody {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+}
+
+.evidenceChoiceBody strong {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    color: var(--color-text-primary);
+    font-size: 12px;
+}
+
+.evidenceChoiceBody > span,
+.evidenceChoiceBody > small {
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.correctionRefs label span,
+.technicalDetails code {
+    overflow-wrap: anywhere;
+}
+
+.technicalDetails {
+    margin-top: 3px;
+    color: var(--color-text-tertiary);
+}
+
+.technicalDetails summary {
+    width: fit-content;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.technicalDetails code {
+    display: block;
+    margin-top: 5px;
+    font-size: 10px;
+    white-space: normal;
+}
+
+.correctionReason {
+    display: grid;
+}
+
+.correctionReason textarea {
+    width: 100%;
+    resize: vertical;
+    padding: 10px 12px;
+    border: 1px solid rgba(231, 228, 221, 0.12);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.16);
+    color: var(--color-text-primary);
+    font: inherit;
+    line-height: 1.5;
+}
+
+.reviewCopy {
+    display: grid;
+    gap: 6px;
+}
+
+.reviewCopy h2 {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.35;
+}
+
+.reviewCopy p,
+.reviewError,
+.reviewNotice {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.reviewAuthority {
+    margin: 14px 0 0;
+    padding: 10px 12px;
+    border: 1px solid rgba(199, 168, 107, 0.28);
+    border-radius: 8px;
+    background: rgba(199, 168, 107, 0.1);
+    color: #f2d78d;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.reviewActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.primaryReviewButton,
+.secondaryReviewButton {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.primaryReviewButton {
+    border: 1px solid rgba(119, 231, 199, 0.36);
+    background: rgba(119, 231, 199, 0.14);
+    color: #9bf0d0;
+}
+
+.secondaryReviewButton {
+    border: 1px solid rgba(231, 228, 221, 0.12);
+    background: rgba(231, 228, 221, 0.05);
+    color: var(--color-text-secondary);
+}
+
+.primaryReviewButton:disabled,
+.secondaryReviewButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.58;
+}
+
+.reviewError,
+.reviewNotice {
+    margin-top: 12px;
+}
+
+.reviewError {
+    color: #f2a6a6;
+}
+
+.reviewNotice {
+    color: #9bf0d0;
+}

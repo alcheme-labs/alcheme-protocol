@@ -1,0 +1,221 @@
+.panel {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    overflow: hidden;
+    border: 1px solid rgba(202, 83, 73, 0.26);
+    border-radius: var(--radius-sm);
+    background:
+        linear-gradient(135deg, rgba(202, 83, 73, 0.08), transparent 44%),
+        rgba(18, 22, 20, 0.58);
+}
+
+.header,
+.cardTopline,
+.readbackHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.eyebrow {
+    color: #eaa39c;
+    font-size: 10px;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.title {
+    margin: 3px 0 0;
+    color: var(--color-text-primary);
+    font-size: 15px;
+    font-weight: var(--font-weight-semibold);
+}
+
+.description,
+.empty,
+.blocked,
+.field,
+.readbackHeader {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-caption);
+    line-height: 1.45;
+}
+
+.description {
+    max-width: 52ch;
+    margin: 4px 0 0;
+}
+
+.stateBadge {
+    flex: none;
+    padding: 4px 7px;
+    border: 1px solid rgba(234, 163, 156, 0.24);
+    border-radius: 999px;
+    color: #eaa39c;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.boundary {
+    display: grid;
+    gap: 2px;
+    padding: var(--space-2);
+    border-left: 2px solid rgba(202, 83, 73, 0.72);
+    background: rgba(202, 83, 73, 0.08);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-caption);
+}
+
+.boundary strong {
+    color: #f0b5af;
+}
+
+.form,
+.stack {
+    display: grid;
+    gap: var(--space-2);
+}
+
+.twoColumns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+}
+
+.field {
+    display: grid;
+    min-width: 0;
+    gap: var(--space-1);
+}
+
+.field input {
+    width: 100%;
+    min-height: 38px;
+    padding: 8px 10px;
+    border: 1px solid rgba(231, 228, 221, 0.16);
+    border-radius: var(--radius-button);
+    outline: none;
+    background: rgba(231, 228, 221, 0.04);
+    color: var(--color-text-primary);
+}
+
+.field input:focus-visible {
+    border-color: rgba(234, 163, 156, 0.7);
+    box-shadow: 0 0 0 2px rgba(202, 83, 73, 0.14);
+}
+
+.secondary,
+.danger {
+    min-height: 38px;
+    padding: 8px 12px;
+    border-radius: var(--radius-button);
+    cursor: pointer;
+}
+
+.secondary {
+    border: 1px solid rgba(231, 228, 221, 0.14);
+    background: transparent;
+    color: var(--color-text-secondary);
+}
+
+.danger {
+    border: 1px solid rgba(202, 83, 73, 0.42);
+    background: rgba(202, 83, 73, 0.15);
+    color: #f0b5af;
+    font-weight: var(--font-weight-semibold);
+}
+
+.secondary:disabled,
+.danger:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.readbackHeader {
+    padding-top: var(--space-2);
+    border-top: 1px solid rgba(231, 228, 221, 0.08);
+}
+
+.readbackHeader strong {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--color-text-primary);
+    text-align: right;
+}
+
+.card {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    border: 1px solid rgba(231, 228, 221, 0.1);
+    border-radius: var(--radius-sm);
+    background: rgba(0, 0, 0, 0.12);
+}
+
+.cardTopline strong {
+    color: #eaa39c;
+}
+
+.cardTopline span {
+    color: var(--color-text-secondary);
+    font-size: 11px;
+}
+
+.facts {
+    display: grid;
+    grid-template-columns: minmax(92px, max-content) 1fr;
+    gap: var(--space-1) var(--space-2);
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-caption);
+}
+
+.facts dt,
+.facts dd {
+    margin: 0;
+}
+
+.facts dd,
+.facts a {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--color-text-primary);
+}
+
+.blocked {
+    color: #eaa39c;
+}
+
+.error {
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    background: rgba(202, 83, 73, 0.14);
+    color: #f2a39c;
+    font-size: var(--font-size-caption);
+}
+
+@media (max-width: 420px) {
+    .header,
+    .cardTopline,
+    .readbackHeader {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .stateBadge {
+        align-self: flex-start;
+    }
+
+    .twoColumns,
+    .facts {
+        grid-template-columns: 1fr;
+    }
+
+    .readbackHeader strong {
+        text-align: left;
+    }
+}

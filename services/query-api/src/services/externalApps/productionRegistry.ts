@@ -1,0 +1,794 @@
+import { randomUUID } from "node:crypto";
+
+import { Prisma, type PrismaClient } from "@prisma/client";
+
+import {
+  createPrismaGovernanceRequestStore,
+  type GovernanceEligibleActor,
+} from "../governance/policyEngine";
+import { createGovernedActionRegistry } from '../governance/actionRegistry';
+import {
+  GovernedActionGateway,
+  normalizeGovernedActionPayload,
+} from '../governance/governedActionGateway';
+import {
+  assertActiveExternalAppReviewBinding,
+  ensureExternalAppSystemGovernanceHome,
+  EXTERNAL_APP_REVIEW_PRIMARY_ROLE,
+  normalizeExternalAppGovernanceRoleKey,
+  type ExternalAppGovernanceRoleKey,
+  type SystemGovernanceRoleBindingPrisma,
+} from "../governance/systemRoleBindings";
+import { resolveGovernedSystemRoleActionRuntime } from '../governance/governedActionGatewayRuntime';
+import { resolveDeploymentAllowedNetworks } from '../governance/governedActionRuntimeContext';
+import {
+  computeManifestHash,
+  normalizeExternalAppManifest,
+  type ExternalAppManifest,
+} from "./manifest";
+import { validateProductionManifestPlatformIdentity } from "./manifestPlatformValidation";
+import {
+  extractSolanaOwnerPubkey,
+  verifyExternalAppKeyOperationOwnerAssertion,
+  verifyExternalAppOwnerAssertion,
+} from "./ownerAssertion";
+import { normalizeHash32Hex, serverKeyHash } from "./chainRegistryDigest";
+import {
+  assertRiskDisclaimerAcceptanceMatches,
+  buildRiskDisclaimerAcceptance,
+} from "./riskDisclaimer";
+import {
+  createRiskDisclaimerReceiptVerifierFromEnv,
+  type RiskDisclaimerReceiptVerifier,
+} from "./riskDisclaimerChainVerifier";
+import { normalizeExternalAppId } from "./validation";
+
+interface DeveloperAgreementEvidence {
+  scope: "developer_registration";
+  disclaimerVersion: string;
+  termsDigest: string;
+  acceptanceDigest: string;
+  signatureDigest: string | null;
+  chainReceiptPda: string;
+  chainReceiptDigest: string;
+  txSignature: string;
+}
+
+export function buildProductionExternalAppRegistrationRequest(input: {
+  externalAppId: string;
+  proposerPubkey: string;
+  reviewPolicyId: string;
+  reviewPolicyVersionId: string;
+  reviewPolicyVersion: number;
+  reviewCircleId: number;
+  reviewRoleKey?: ExternalAppGovernanceRoleKey;
+  eligibleActors: GovernanceEligibleActor[];
+  manifestHash: string;
+  manifest: ExternalAppManifest;
+  ownerAssertion: { payload: string; signature: string };
+  developerAgreement: DeveloperAgreementEvidence;
+  idempotencyKey: string;
+  openedAt: Date;
+}) {
+  if (input.eligibleActors.length === 0) {
+    throw new Error("external_app_review_requires_eligible_actors");
+  }
+  return {
+    id: randomUUID(),
+    policyId: input.reviewPolicyId,
+    policyVersionId: input.reviewPolicyVersionId,
+    policyVersion: input.reviewPolicyVersion,
+    ruleId: "external_app_register",
+    scope: { type: "external_app_review_circle", ref: String(input.reviewCircleId) },
+    action: {
+      type: "external_app_register",
+      targetType: "external_app",
+      targetRef: input.externalAppId,
+      payload: {
+        manifestHash: input.manifestHash,
+        manifest: input.manifest,
+        ownerAssertion: input.ownerAssertion,
+        developerAgreement: input.developerAgreement,
+        reviewCircleId: input.reviewCircleId,
+        reviewPolicyId: input.reviewPolicyId,
+        reviewPolicyVersionId: input.reviewPolicyVersionId,
+        reviewPolicyVersion: input.reviewPolicyVersion,
+        reviewRoleKey: input.reviewRoleKey ?? EXTERNAL_APP_REVIEW_PRIMARY_ROLE,
+      },
+      idempotencyKey: input.idempotencyKey,
+    },
+    proposerPubkey: input.proposerPubkey,
+    eligibleActors: input.eligibleActors,
+    openedAt: input.openedAt,
+  };
+}
+
+export async function openExternalAppProductionRegistrationRequest(
+  prisma: PrismaClient,
+  rawAppId: string,
+  body: Record<string, unknown>,
+  deps: { riskReceiptVerifier?: RiskDisclaimerReceiptVerifier } = {},
+) {
+  const externalAppId = normalizeExternalAppId(rawAppId);
+  const reviewRoleKey = normalizeExternalAppGovernanceRoleKey(
+    body.reviewRoleKey ?? EXTERNAL_APP_REVIEW_PRIMARY_ROLE,
+  );
+
+  const manifest = normalizeExternalAppManifest(body.manifest);
+  if (manifest.appId !== externalAppId) {
+    throw new Error("external_app_manifest_app_id_mismatch");
+  }
+  validateProductionManifestPlatformIdentity(manifest);
+  const manifestHash = computeManifestHash(manifest);
+  const ownerAssertion = body.ownerAssertion as
+    | { payload?: unknown; signature?: unknown }
+    | undefined;
+  if (!ownerAssertion?.payload || !ownerAssertion.signature) {
+    throw new Error("external_app_owner_assertion_required");
+  }
+  verifyExternalAppOwnerAssertion({
+    assertion: {
+      payload: String(ownerAssertion.payload),
+      signature: String(ownerAssertion.signature),
+    },
+    expected: {
+      appId: externalAppId,
+      ownerWallet: manifest.ownerWallet,
+      manifestHash,
+      audience: "alcheme:external-app-production-registration",
+    },
+    now: new Date(),
+  });
+  const proposerPubkey = extractSolanaOwnerPubkey(manifest.ownerWallet);
+
+  const resolvedReviewBinding = await assertActiveExternalAppReviewBinding(
+    prisma as unknown as SystemGovernanceRoleBindingPrisma,
+    {
+      roleKey: reviewRoleKey,
+      environment: "production",
+      circleId: optionalPositiveInteger(body.reviewCircleId),
+      policyId: optionalNonEmptyString(body.reviewPolicyId),
+      policyVersionId: optionalNonEmptyString(body.reviewPolicyVersionId),
+      policyVersion: optionalPositiveInteger(body.reviewPolicyVersion),
+    },
+  );
+  const reviewCircleId = resolvedReviewBinding.binding.circleId;
+  const reviewPolicyId = resolvedReviewBinding.binding.policyId;
+  const reviewPolicyVersionId = resolvedReviewBinding.binding.policyVersionId;
+  const reviewPolicyVersion = resolvedReviewBinding.binding.policyVersion;
+  const developerAgreement = normalizeDeveloperAgreementEvidence(
+    body.developerAgreement,
+    {
+      externalAppId,
+      proposerPubkey,
+      policyEpochId: reviewPolicyVersionId,
+      manifestHash,
+    },
+  );
+  const riskReceiptVerifier =
+    deps.riskReceiptVerifier ?? createRiskDisclaimerReceiptVerifierFromEnv();
+  await riskReceiptVerifier.verifyRiskDisclaimerReceipt({
+    externalAppId,
+    actorPubkey: proposerPubkey,
+    scope: "developer_registration",
+    termsDigest: developerAgreement.termsDigest,
+    acceptanceDigest: developerAgreement.acceptanceDigest,
+    chainReceiptPda: developerAgreement.chainReceiptPda,
+    chainReceiptDigest: developerAgreement.chainReceiptDigest,
+    txSignature: developerAgreement.txSignature,
+  });
+
+  const reviewMembers = await prisma.circleMember.findMany({
+    where: { circleId: reviewCircleId, status: "Active" },
+    include: { user: { select: { pubkey: true } } },
+  });
+  const eligibleActors = reviewMembers.map((member) => ({
+    pubkey: member.user.pubkey,
+    role: String(member.role),
+    weight: "1",
+    source: "external_app_review_circle",
+  }));
+  if (eligibleActors.length === 0) {
+    throw new Error("external_app_review_requires_eligible_actors");
+  }
+
+  const existingApp = await prisma.externalApp.findUnique({
+    where: { id: externalAppId },
+    select: {
+      status: true,
+      registryStatus: true,
+      environment: true,
+      serverPublicKey: true,
+    },
+  });
+  const preservesActiveRuntime =
+    existingApp?.status === "active" && existingApp.registryStatus === "active"
+      ? true
+      : false;
+  if (
+    preservesActiveRuntime &&
+    existingApp?.environment === "mainnet_production" &&
+    existingApp.serverPublicKey &&
+    existingApp.serverPublicKey !== manifest.serverPublicKey
+  ) {
+    throw new Error("external_app_server_key_rotation_required");
+  }
+
+  if (!existingApp) {
+    await prisma.externalApp.create({
+      data: {
+        id: externalAppId,
+        name: manifest.name,
+        ownerPubkey: proposerPubkey,
+        status: "inactive",
+        serverPublicKey: manifest.serverPublicKey,
+        claimAuthMode: "server_ed25519",
+        allowedOrigins: manifest.allowedOrigins,
+        config: { manifest } as unknown as Prisma.InputJsonValue,
+        environment: "mainnet_production",
+        registryStatus: "pending",
+        discoveryStatus: "unlisted",
+        managedNodePolicy: "restricted",
+        manifestHash,
+        reviewCircleId,
+        reviewPolicyId,
+      },
+    });
+  } else if (preservesActiveRuntime) {
+    await prisma.externalApp.update({
+      where: { id: externalAppId },
+      data: {
+        reviewCircleId,
+        reviewPolicyId,
+      },
+    });
+  } else {
+    await prisma.externalApp.update({
+      where: { id: externalAppId },
+      data: {
+        name: manifest.name,
+        ownerPubkey: proposerPubkey,
+        status: "inactive",
+        serverPublicKey: manifest.serverPublicKey,
+        allowedOrigins: manifest.allowedOrigins,
+        config: { manifest } as unknown as Prisma.InputJsonValue,
+        environment: "mainnet_production",
+        registryStatus: "pending",
+        manifestHash,
+        reviewCircleId,
+        reviewPolicyId,
+      },
+    });
+  }
+
+  await (prisma as any).externalAppRiskDisclaimerAcceptance.create({
+    data: buildRiskDisclaimerAcceptance({
+      externalAppId,
+      actorPubkey: proposerPubkey,
+      scope: "developer_registration",
+      policyEpochId: reviewPolicyVersionId,
+      disclaimerVersion: developerAgreement.disclaimerVersion,
+      termsDigest: developerAgreement.termsDigest,
+      acceptanceDigest: developerAgreement.acceptanceDigest,
+      source: "wallet_signature",
+      signatureDigest: developerAgreement.signatureDigest,
+      chainReceiptPda: developerAgreement.chainReceiptPda,
+      chainReceiptDigest: developerAgreement.chainReceiptDigest,
+      txSignature: developerAgreement.txSignature,
+      metadata: {
+        manifestHash,
+        ownerWallet: manifest.ownerWallet,
+        audience: "alcheme:external-app-developer-agreement",
+      },
+    }),
+  });
+
+  const requestInput = buildProductionExternalAppRegistrationRequest({
+    externalAppId,
+    proposerPubkey,
+    reviewPolicyId,
+    reviewPolicyVersionId,
+    reviewPolicyVersion,
+    reviewCircleId,
+    reviewRoleKey,
+    eligibleActors,
+    manifestHash,
+    manifest,
+    ownerAssertion: {
+      payload: String(ownerAssertion.payload),
+      signature: String(ownerAssertion.signature),
+    },
+    developerAgreement,
+    idempotencyKey: `${externalAppId}:${manifestHash}`,
+    openedAt: new Date(),
+  });
+  return openExternalAppGovernedRequest(prisma, resolvedReviewBinding.binding, requestInput);
+}
+
+export async function openExternalAppServerKeyRotationRequest(
+  prisma: PrismaClient,
+  rawAppId: string,
+  body: Record<string, unknown>,
+) {
+  return openExternalAppServerKeyOperationRequest(prisma, rawAppId, body, {
+    actionType: "external_app_server_key_rotate",
+    audience: "alcheme:external-app-server-key-rotation",
+  });
+}
+
+export async function openExternalAppServerKeyRevocationRequest(
+  prisma: PrismaClient,
+  rawAppId: string,
+  body: Record<string, unknown>,
+) {
+  return openExternalAppServerKeyOperationRequest(prisma, rawAppId, body, {
+    actionType: "external_app_server_key_revoke",
+    audience: "alcheme:external-app-server-key-revocation",
+  });
+}
+
+async function openExternalAppServerKeyOperationRequest(
+  prisma: PrismaClient,
+  rawAppId: string,
+  body: Record<string, unknown>,
+  mode:
+    | {
+        actionType: "external_app_server_key_rotate";
+        audience: "alcheme:external-app-server-key-rotation";
+      }
+    | {
+        actionType: "external_app_server_key_revoke";
+        audience: "alcheme:external-app-server-key-revocation";
+      },
+) {
+  const externalAppId = normalizeExternalAppId(rawAppId);
+  const app = await prisma.externalApp.findUnique({
+    where: { id: externalAppId },
+    select: {
+      id: true,
+      ownerPubkey: true,
+      status: true,
+      registryStatus: true,
+      environment: true,
+    },
+  });
+  if (!app) throw new Error("external_app_not_found");
+  if (app.environment !== "mainnet_production") {
+    throw new Error("external_app_production_required");
+  }
+  if (app.status !== "active" || app.registryStatus !== "active") {
+    throw new Error("external_app_not_active");
+  }
+
+  const reviewRoleKey = normalizeExternalAppGovernanceRoleKey(
+    body.reviewRoleKey ?? EXTERNAL_APP_REVIEW_PRIMARY_ROLE,
+  );
+  const resolvedReviewBinding = await assertActiveExternalAppReviewBinding(
+    prisma as unknown as SystemGovernanceRoleBindingPrisma,
+    {
+      roleKey: reviewRoleKey,
+      environment: "production",
+      circleId: optionalPositiveInteger(body.reviewCircleId),
+      policyId: optionalNonEmptyString(body.reviewPolicyId),
+      policyVersionId: optionalNonEmptyString(body.reviewPolicyVersionId),
+      policyVersion: optionalPositiveInteger(body.reviewPolicyVersion),
+    },
+  );
+  const reviewCircleId = resolvedReviewBinding.binding.circleId;
+  const reviewMembers = await prisma.circleMember.findMany({
+    where: { circleId: reviewCircleId, status: "Active" },
+    include: { user: { select: { pubkey: true } } },
+  });
+  const eligibleActors = reviewMembers.map((member) => ({
+    pubkey: member.user.pubkey,
+    role: String(member.role),
+    weight: "1",
+    source: "external_app_review_circle",
+  }));
+  if (eligibleActors.length === 0) {
+    throw new Error("external_app_review_requires_eligible_actors");
+  }
+
+  const newServerPublicKey =
+    mode.actionType === "external_app_server_key_rotate"
+      ? requiredString(body.newServerPublicKey, "external_app_server_public_key_required")
+      : null;
+  const newServerPublicKeyHash = newServerPublicKey
+    ? serverKeyHash(newServerPublicKey)
+    : null;
+  const previousKeyVersion =
+    mode.actionType === "external_app_server_key_rotate"
+      ? requiredString(
+          body.previousKeyVersion,
+          "external_app_server_key_version_required",
+        )
+      : null;
+  const previousKeyGraceUntil =
+    mode.actionType === "external_app_server_key_rotate"
+      ? optionalString(body.previousKeyGraceUntil)
+      : null;
+  const keyVersion =
+    mode.actionType === "external_app_server_key_revoke"
+      ? requiredString(body.keyVersion, "external_app_server_key_version_required")
+      : previousKeyVersion;
+  const idempotencyKey =
+    optionalString(body.idempotencyKey) ??
+    [
+      externalAppId,
+      mode.actionType,
+      newServerPublicKeyHash ?? keyVersion,
+    ].join(":");
+  const ownerAssertion = body.ownerAssertion as
+    | { payload?: unknown; signature?: unknown }
+    | undefined;
+  if (!ownerAssertion?.payload || !ownerAssertion.signature) {
+    throw new Error("external_app_owner_assertion_required");
+  }
+  verifyExternalAppKeyOperationOwnerAssertion({
+    assertion: {
+      payload: String(ownerAssertion.payload),
+      signature: String(ownerAssertion.signature),
+    },
+    expected: {
+      appId: externalAppId,
+      ownerPubkey: app.ownerPubkey,
+      audience: mode.audience,
+      action: mode.actionType,
+      newServerPublicKeyHash,
+      previousKeyVersion:
+        mode.actionType === "external_app_server_key_rotate"
+          ? previousKeyVersion
+          : null,
+      previousKeyGraceUntil,
+      keyVersion:
+        mode.actionType === "external_app_server_key_revoke"
+          ? keyVersion
+          : null,
+      idempotencyKey,
+    },
+    now: new Date(),
+  });
+  const rotationRegistryState =
+    previousKeyVersion
+      ? await loadCanonicalServerKeyRotationState(prisma, {
+          externalAppId,
+          previousKeyVersion,
+        })
+      : null;
+
+  return openExternalAppGovernedRequest(
+    prisma,
+    resolvedReviewBinding.binding,
+    {
+      id: randomUUID(),
+      policyId: resolvedReviewBinding.binding.policyId,
+      policyVersionId: resolvedReviewBinding.binding.policyVersionId,
+      policyVersion: resolvedReviewBinding.binding.policyVersion,
+      ruleId: mode.actionType,
+      scope: {
+        type: "external_app_review_circle",
+        ref: String(reviewCircleId),
+      },
+      action: {
+        type: mode.actionType,
+        targetType: "external_app",
+        targetRef: externalAppId,
+        payload: {
+          ...(newServerPublicKey
+            ? {
+                newServerPublicKey,
+                newServerPublicKeyHash,
+                previousKeyVersion,
+                previousKeyGraceUntil,
+                expectedServerKeyHash:
+                  rotationRegistryState!.expectedServerKeyHash,
+                expectedDecisionDigest:
+                  rotationRegistryState!.expectedDecisionDigest,
+                expectedExecutionIntentDigest:
+                  rotationRegistryState!.expectedExecutionIntentDigest,
+              }
+            : {
+                keyVersion,
+                reason: requiredString(
+                  body.reason,
+                  "external_app_server_key_revocation_reason_required",
+                ),
+              }),
+          ownerAssertion: {
+            payload: String(ownerAssertion.payload),
+            signature: String(ownerAssertion.signature),
+          },
+          reviewCircleId,
+          reviewPolicyId: resolvedReviewBinding.binding.policyId,
+          reviewPolicyVersionId:
+            resolvedReviewBinding.binding.policyVersionId,
+          reviewPolicyVersion: resolvedReviewBinding.binding.policyVersion,
+          reviewRoleKey,
+          idempotencyKey,
+        },
+        idempotencyKey,
+      },
+      proposerPubkey: app.ownerPubkey,
+      eligibleActors,
+      openedAt: new Date(),
+    },
+  );
+}
+
+async function loadCanonicalServerKeyRotationState(
+  prisma: PrismaClient,
+  input: { externalAppId: string; previousKeyVersion: string },
+): Promise<{
+  expectedServerKeyHash: string;
+  expectedDecisionDigest: string;
+  expectedExecutionIntentDigest: string;
+}> {
+  const [anchor, previousKey] = await Promise.all([
+    prisma.externalAppRegistryAnchor.findUnique({
+      where: { externalAppId: input.externalAppId },
+      select: {
+        externalAppId: true,
+        registryStatus: true,
+        finalityStatus: true,
+        receiptFinalityStatus: true,
+        serverKeyHash: true,
+        decisionDigest: true,
+        executionIntentDigest: true,
+      },
+    }),
+    prisma.externalAppServerKey.findUnique({
+      where: {
+        externalAppId_keyVersion: {
+          externalAppId: input.externalAppId,
+          keyVersion: input.previousKeyVersion,
+        },
+      },
+      select: {
+        externalAppId: true,
+        keyVersion: true,
+        publicKey: true,
+        status: true,
+      },
+    }),
+  ]);
+  if (!anchor) {
+    throw new Error("external_app_registry_anchor_required");
+  }
+  if (anchor.registryStatus !== "active") {
+    throw new Error("external_app_registry_anchor_not_active");
+  }
+  if (
+    anchor.finalityStatus !== "finalized" ||
+    anchor.receiptFinalityStatus !== "finalized"
+  ) {
+    throw new Error("external_app_registry_anchor_not_finalized");
+  }
+  if (!previousKey) {
+    throw new Error("external_app_server_key_not_found");
+  }
+  if (previousKey.status !== "active") {
+    throw new Error("external_app_previous_server_key_not_active");
+  }
+  const expectedServerKeyHash = normalizeHash32Hex(
+    anchor.serverKeyHash,
+    "external_app_registry_expected_server_key_hash",
+  );
+  if (serverKeyHash(previousKey.publicKey) !== expectedServerKeyHash) {
+    throw new Error("external_app_registry_server_key_hash_mismatch");
+  }
+  return {
+    expectedServerKeyHash,
+    expectedDecisionDigest: normalizeHash32Hex(
+      requiredString(
+        anchor.decisionDigest,
+        "external_app_registry_decision_digest_required",
+      ),
+      "external_app_registry_expected_decision_digest",
+    ),
+    expectedExecutionIntentDigest: normalizeHash32Hex(
+      requiredString(
+        anchor.executionIntentDigest,
+        "external_app_registry_execution_intent_digest_required",
+      ),
+      "external_app_registry_expected_execution_intent_digest",
+    ),
+  };
+}
+
+export async function openExternalAppGovernedRequest(
+  prisma: PrismaClient,
+  roleBinding: {
+    id: string;
+    roleKey: string;
+    environment: 'sandbox' | 'production';
+    circleId: number;
+    policyId: string;
+    policyVersionId: string;
+    policyVersion: number;
+  },
+  request: ReturnType<typeof buildProductionExternalAppRegistrationRequest> | {
+    policyId: string;
+    policyVersionId: string;
+    policyVersion: number;
+    ruleId: string;
+    scope: { type: string; ref: string };
+    action: {
+      type: string;
+      targetType: string;
+      targetRef: string;
+      payload: Record<string, unknown>;
+      idempotencyKey: string;
+    };
+    proposerPubkey: string;
+    eligibleActors: GovernanceEligibleActor[];
+    openedAt: Date;
+    expiresAt?: Date | null;
+  },
+) {
+  const registry = createGovernedActionRegistry({ includeExternalAppActions: true });
+  const definition = registry.get(request.action.type);
+  if (!definition) throw new Error('external_app_governed_action_not_registered');
+  const authority = {
+    id: roleBinding.id,
+    policyId: request.policyId,
+    policyVersionId: request.policyVersionId,
+    policyVersion: request.policyVersion,
+    ruleId: request.ruleId,
+    committeeCircleId: roleBinding.circleId,
+    authoritySourceType: 'system_governance_role_binding',
+    authoritySourceRef: roleBinding.id,
+    authoritySourceVersion: `${roleBinding.policyVersionId}:${roleBinding.roleKey}:${roleBinding.environment}`,
+    authorityPurpose: 'system_governance_review',
+    authoritySelector: {
+      actionType: request.action.type,
+      systemEnvironment: roleBinding.environment,
+      environment: roleBinding.environment === 'production'
+        ? 'production'
+        : 'local_development',
+      network: resolveSystemRoleAuthorityNetwork(roleBinding.environment),
+      reviewCircleId: roleBinding.circleId,
+      roleKey: roleBinding.roleKey,
+    },
+    authorityLimits: {
+      policyId: request.policyId,
+      policyVersionId: request.policyVersionId,
+      policyVersion: request.policyVersion,
+      ruleId: request.ruleId,
+    },
+  };
+  const { home } = await ensureExternalAppSystemGovernanceHome(prisma, {
+    environment: roleBinding.environment,
+    now: request.openedAt,
+  });
+  const payload = normalizeGovernedActionPayload(request.action.payload);
+  const runtime = await resolveGovernedSystemRoleActionRuntime({ prisma: prisma as any }, {
+    definition,
+    home,
+    binding: authority,
+    targetType: request.action.targetType,
+    targetRef: request.action.targetRef,
+    payload,
+    now: request.openedAt,
+  });
+  const gateway = new GovernedActionGateway({
+    registry,
+    resolveBinding: async () => null,
+    listCommitteeEligibleActors: async () => [],
+    requestStore: createPrismaGovernanceRequestStore(prisma),
+    runtimePrisma: prisma as any,
+    now: () => request.openedAt,
+  });
+  return gateway.openPreResolvedRequest({
+    actionType: request.action.type,
+    targetType: request.action.targetType,
+    targetRef: request.action.targetRef,
+    payload,
+    idempotencyKey: request.action.idempotencyKey,
+    proposerPubkey: request.proposerPubkey,
+    expiresAt: 'expiresAt' in request ? request.expiresAt ?? null : null,
+    authority,
+    eligibleActors: request.eligibleActors,
+    scope: request.scope,
+    runtime,
+    caseRef: null,
+    stageRef: null,
+    executionAuthorizationReason: 'verified_system_governance_role_binding',
+  });
+}
+
+function normalizeDeveloperAgreementEvidence(
+  value: unknown,
+  expected: {
+    externalAppId: string;
+    proposerPubkey: string;
+    policyEpochId: string;
+    manifestHash: string;
+  },
+): DeveloperAgreementEvidence {
+  if (!value || typeof value !== "object") {
+    throw new Error("external_app_developer_agreement_required");
+  }
+  const record = value as Record<string, unknown>;
+  const evidence: DeveloperAgreementEvidence = {
+    scope: "developer_registration",
+    disclaimerVersion: requiredString(
+      record.disclaimerVersion,
+      "external_app_developer_agreement_version_required",
+    ),
+    termsDigest: requiredString(
+      record.termsDigest,
+      "external_app_developer_agreement_terms_digest_required",
+    ),
+    acceptanceDigest: requiredString(
+      record.acceptanceDigest,
+      "external_app_developer_agreement_acceptance_digest_required",
+    ),
+    signatureDigest: optionalString(record.signatureDigest),
+    chainReceiptPda: requiredString(
+      record.chainReceiptPda,
+      "external_app_developer_agreement_chain_receipt_required",
+    ),
+    chainReceiptDigest: requiredString(
+      record.chainReceiptDigest,
+      "external_app_developer_agreement_chain_receipt_digest_required",
+    ),
+    txSignature: requiredString(
+      record.txSignature,
+      "external_app_developer_agreement_tx_required",
+    ),
+  };
+  assertRiskDisclaimerAcceptanceMatches({
+    externalAppId: expected.externalAppId,
+    actorPubkey: expected.proposerPubkey,
+    scope: "developer_registration",
+    policyEpochId: expected.policyEpochId,
+    disclaimerVersion: evidence.disclaimerVersion,
+    termsDigest: evidence.termsDigest,
+    acceptanceDigest: evidence.acceptanceDigest,
+    bindingDigest: expected.manifestHash,
+    chainReceiptPda: evidence.chainReceiptPda,
+    chainReceiptDigest: evidence.chainReceiptDigest,
+    txSignature: evidence.txSignature,
+    requireChainReceipt: true,
+  });
+  return evidence;
+}
+
+function requiredString(value: unknown, errorCode: string): string {
+  const normalized = String(value || "").trim();
+  if (!normalized) throw new Error(errorCode);
+  return normalized;
+}
+
+function optionalString(value: unknown): string | null {
+  const normalized = String(value || "").trim();
+  return normalized || null;
+}
+
+function optionalNonEmptyString(value: unknown): string | undefined {
+  if (value === undefined || value === null || value === "") return undefined;
+  const normalized = String(value).trim();
+  return normalized || undefined;
+}
+
+function optionalPositiveInteger(value: unknown): number | undefined {
+  if (value === undefined || value === null || value === "") return undefined;
+  const numeric = Number(value);
+  if (!Number.isSafeInteger(numeric) || numeric <= 0) {
+    throw new Error("invalid_external_app_review_binding_assertion");
+  }
+  return numeric;
+}
+
+function resolveSystemRoleAuthorityNetwork(environment: string): string {
+  const allowed = resolveDeploymentAllowedNetworks();
+  if (allowed.length === 0) {
+    throw new Error('governed_action_allowed_networks_invalid');
+  }
+  if (environment === 'production') {
+    if (allowed.includes('solana:devnet')) return 'solana:devnet';
+    return allowed[0];
+  }
+  if (allowed.includes('solana:localnet')) return 'solana:localnet';
+  return allowed[0];
+}

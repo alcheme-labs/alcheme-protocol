@@ -1,0 +1,477 @@
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 18px;
+    border: 1px solid rgba(199, 168, 107, 0.1);
+    background:
+        linear-gradient(165deg, rgba(199, 168, 107, 0.08), rgba(199, 168, 107, 0.02) 40%),
+        rgba(17, 24, 22, 0.74);
+}
+
+.heading {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.titleRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.eyebrow {
+    margin: 0;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--color-text-tertiary);
+}
+
+.title {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.3;
+    color: var(--color-accent-ivory-glow);
+}
+
+.count {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    border: 1px solid rgba(199, 168, 107, 0.24);
+    background: rgba(199, 168, 107, 0.14);
+    color: var(--color-accent-gold);
+    font-size: 11px;
+    line-height: 18px;
+    text-align: center;
+}
+
+.hint,
+.status,
+.error,
+.empty,
+.meta {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.hint,
+.meta {
+    color: var(--color-text-secondary);
+}
+
+.status {
+    color: var(--color-accent-gold);
+}
+
+.error {
+    color: #f8b4b4;
+}
+
+.empty {
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px dashed rgba(199, 168, 107, 0.18);
+    color: var(--color-text-secondary);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.uploadCard {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.hiddenFileInput {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.filePicker {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px dashed rgba(199, 168, 107, 0.28);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--color-accent-ivory-glow);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.filePicker:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.filePickerCopy {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.filePickerLabel {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.filePickerName {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+.field {
+    display: grid;
+    gap: 6px;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+}
+
+.fieldInput,
+.fieldTextarea {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid rgba(199, 168, 107, 0.18);
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: var(--color-accent-ivory-glow);
+    background: rgba(231, 228, 221, 0.04);
+    font: inherit;
+    font-size: 16px;
+    outline: none;
+}
+
+.fieldInput {
+    min-height: 44px;
+}
+
+.fieldTextarea {
+    min-height: 96px;
+    resize: vertical;
+}
+
+.fieldInput:focus,
+.fieldTextarea:focus {
+    border-color: rgba(199, 168, 107, 0.4);
+}
+
+.fieldInput::placeholder,
+.fieldTextarea::placeholder {
+    color: var(--color-text-tertiary);
+}
+
+.checkRow {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    min-height: 44px;
+    padding: 8px 0;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 1.45;
+    cursor: pointer;
+}
+
+.nativeCheck {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.checkbox {
+    width: 22px;
+    height: 22px;
+    margin-top: 1px;
+    border-radius: 6px;
+    border: 1.5px solid rgba(199, 168, 107, 0.35);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.checkboxSelected {
+    background: var(--color-accent-gold);
+    border-color: var(--color-accent-gold);
+}
+
+.captureShell {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(199, 168, 107, 0.12);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.captureToggle {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 14px;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-primary);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.captureToggleCopy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.captureToggleTitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-accent-ivory-glow);
+}
+
+.captureToggleHint {
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--color-text-tertiary);
+}
+
+.chevron {
+    color: var(--color-text-tertiary);
+    transition: transform var(--motion-fast) var(--easing-standard);
+}
+
+.chevronOpen {
+    transform: rotate(180deg);
+}
+
+.captureForm {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin: 0;
+    padding: 0 14px 14px;
+    border: 0;
+    min-width: 0;
+}
+
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.captureForm > p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.recaptureNotice {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 9px;
+    background: rgba(199, 168, 107, 0.08);
+    color: var(--color-accent-ivory-glow);
+    font-size: 11px;
+}
+
+.recaptureNotice button,
+.recaptureButton {
+    border: 0;
+    padding: 0;
+    color: var(--color-accent-gold);
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.captureForm label {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+}
+
+.captureContent {
+    grid-column: 1;
+}
+
+.captureForm .checkRow {
+    display: flex;
+    padding: 4px 0;
+}
+
+.uploadButton {
+    width: 100%;
+    min-height: 44px;
+    border-radius: 12px;
+    border: 1px solid rgba(199, 168, 107, 0.24);
+    background: rgba(199, 168, 107, 0.14);
+    color: var(--color-accent-ivory-glow);
+    padding: 0 14px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.uploadButton:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(199, 168, 107, 0.12);
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.cardHeader {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 12px;
+}
+
+.cardBody {
+    min-width: 0;
+}
+
+.name {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-accent-ivory-glow);
+    overflow-wrap: anywhere;
+}
+
+.sourceMeta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 10px;
+    margin: 6px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 11px;
+}
+
+.sourceMeta a {
+    color: var(--color-accent-gold);
+    overflow-wrap: anywhere;
+}
+
+.badge {
+    align-self: flex-start;
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(199, 168, 107, 0.24);
+    font-size: 11px;
+    color: var(--color-accent-gold);
+}
+
+.cardActions {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.openButton {
+    border: 1px solid rgba(199, 168, 107, 0.24);
+    border-radius: 999px;
+    padding: 6px 10px;
+    min-height: 28px;
+    color: var(--color-accent-gold);
+    background: rgba(199, 168, 107, 0.12);
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.openButton:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.preview {
+    margin: 8px 0 0;
+    max-height: 240px;
+    overflow: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    border-radius: 9px;
+    border: 1px solid rgba(199, 168, 107, 0.12);
+    padding: 8px 10px;
+    color: var(--color-accent-ivory-glow);
+    background: rgba(0, 0, 0, 0.18);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+@media (max-width: 560px) {
+    .cardHeader {
+        grid-template-columns: 1fr;
+    }
+
+    .cardActions {
+        justify-content: flex-start;
+    }
+}

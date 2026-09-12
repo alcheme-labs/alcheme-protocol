@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "profileRef": "kora:solana:devnet:fee-abstraction-contract",
+  "version": 1,
+  "provider": "kora",
+  "readinessState": "ready",
+  "riskMaturity": "experimental",
+  "capabilityRole": "fee_abstraction",
+  "chain": {
+    "chainId": "solana:devnet",
+    "cluster": "devnet",
+    "genesisHash": "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG"
+  },
+  "nodeContract": {
+    "nodeRef": "kora-devnet-contract-node:v1",
+    "sdkPackageName": "@solana/kora",
+    "sdkVersion": "0.2.1",
+    "npmShasum": "pending_operator_binding",
+    "operatorRef": "kora-devnet-operator:unbound",
+    "liveOperatorBinding": "unavailable",
+    "liveFeeTransaction": "forbidden_until_operator_approved"
+  },
+  "authoritySeparation": {
+    "koraIsNotDecisionAuthority": true,
+    "koraIsNotExecutionAuthority": true,
+    "feeSponsorSignerCannotMutateGovernedAction": true,
+    "feePayerIsNotActionIssuerAssetOrProgramAuthority": true
+  },
+  "requiredPlanFields": [
+    "economicBearer",
+    "nodeRef",
+    "nodeVersion",
+    "operatorRef",
+    "feePayerSignerRef",
+    "userTokenPayment",
+    "solCostLamports",
+    "rentLamports",
+    "outflowLamports",
+    "paymentInstructionDigest",
+    "providerMarginLamports",
+    "quoteExpiresAt",
+    "transactionDigest",
+    "quota",
+    "receiptRef"
+  ],
+  "readback": {
+    "commitment": "finalized",
+    "timeoutMs": 12000,
+    "purpose": "fee_abstraction_plan_contract_and_cost_preflight_projection"
+  },
+  "environmentBoundary": {
+    "activationScope": "cost_preflight_quote_context",
+    "inPlaceClusterSwitch": "forbidden",
+    "mainnet": "unavailable",
+    "nativeOffchainVote": "must_not_invoke"
+  }
+}

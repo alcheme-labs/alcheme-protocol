@@ -1,72 +1,87 @@
-# Alcheme Protocol Public Baseline
+# Alcheme Protocol (Archived)
 
-Alcheme is an open-core Solana-native social and knowledge protocol. This public
-repository is an Apache-2.0 protocol and integration baseline generated from a
-larger internal development tree. It is intended for external review, auditing,
-and early ecosystem integration.
+> [!IMPORTANT]
+> This project is no longer maintained. The repository is preserved as a
+> historical source snapshot; the code may not build or run, and no support,
+> security updates, or future releases are planned.
 
-This is not a full product release and it is not a source-available release of
-the first-party Alcheme runtime. The Alcheme team keeps the managed runtime,
-first-party product surfaces, operational tooling, production signing
-infrastructure, prompts, evals, anti-abuse policy, and deployment runbooks
-outside this first public baseline.
+Alcheme was an exploration of a Solana-native social, knowledge, and governance
+protocol.
 
-## What You Can Understand Here
+During development, I came to believe that the blockchain and community layers,
+as they were framed in this project, did not address a sufficiently clear,
+real, and urgent need. At the same time, the codebase kept growing in complexity
+without arriving at a distinctive and focused core. For those reasons, I have
+ended active development.
 
-This baseline is enough to inspect the protocol shape:
+The exploration was not wasted. I carry forward many of the ideas developed
+here, and the process connected them into new questions, directions, and ways
+of thinking. I am publishing this curated source archive to preserve an honest
+record of what was built, not to present Alcheme as a maintained product or to
+promise continued support.
 
-- how Alcheme models identity, circles, content, access, messaging, external
-  applications, and extension registries on Solana
-- how external programs and clients can build against the public TypeScript SDK
-- how extension manifests describe program identity, permissions, events,
-  parser contracts, and compatibility requirements
-- where an Alcheme-compatible managed runtime and operator projection layer fit
-  without exposing the first-party runtime implementation
+本项目现已停止维护。在持续开发与验证的过程中，我逐渐意识到：以本项目当时的形态来看，
+区块链与社区并没有对应到足够明确、真实且迫切的需求；与此同时，项目规模不断扩大，
+复杂度持续上升，却始终没有形成足够鲜明、聚焦的核心。因此，我决定停止继续维护。
 
-For the high-level system map, start with
-[`docs/public-architecture-overview.md`](./docs/public-architecture-overview.md)
-and the static map at
-[`docs/public-architecture-map.html`](./docs/public-architecture-map.html).
+不过，这段探索并非没有价值。我从中继承并沉淀了许多重要思想，也在实践中把它们串联起来，
+延伸出了新的问题、新的方向与新的思考。现在将经过筛选的核心代码作为历史存档公开，
+是为了诚实地保留这段实践的痕迹，证明这些工作曾经真实发生过；它不再代表一个持续维护的产品，
+也不承诺后续支持。
 
-## Included
+Development logs and project recordings are available on the
+[Alcheme Protocol YouTube channel](https://www.youtube.com/@alchemeprotocol).
+
+## What Is Preserved Here
+
+This archive includes selected source code that shows the main shape of the
+project:
 
 - Solana / Anchor programs under `programs/`
-- Shared protocol types under `shared/`
-- CPI permission and helper interfaces under `cpi-interfaces/`
-- TypeScript SDK source under `sdk/`
-- Public extension manifest and contribution-engine program surface
-- Public schemas and integration quickstarts under `docs/`
-- Minimal examples and public integration packages
+- shared protocol types and CPI interfaces under `shared/` and
+  `cpi-interfaces/`
+- the public TypeScript SDK under `sdk/`
+- the contribution-engine extension and integration examples
+- the chain event indexer under `services/indexer-core/src/`
+- the first-party API, governance, discussion, knowledge, and runtime source
+  under `services/query-api/src/`
+- the first-party web product source under `frontend/src/`
 
-## Not Included
+The first-party source is included to document the work that existed. This is
+not a complete release bundle and is not expected to be runnable from this
+repository alone.
 
-- First-party `query-api` managed runtime
-- First-party web/mobile product surfaces
-- Operator indexer/query implementations, production deployments, and runbooks
-- Signing sidecars, key-management topology, and operator scripts
-- Internal prompts, eval fixtures, anti-abuse policy, and rate-limit strategy
-- Private roadmap, funding, grant, incident, and security operations notes
+Some older public integration and architecture documents are retained as
+historical context. They may describe the earlier, narrower public baseline and
+should not be read as current maintenance or support commitments.
 
-## Development Model
+## Intentionally Not Published
 
-The public baseline is generated from the private development repository using
-an allowlist, not by deleting paths in-place. External contributions should
-target the public baseline surface; the Alcheme team can merge suitable changes
-back into the private development tree.
+This archive intentionally excludes:
+
+- environment files, credentials, keys, signer material, and private endpoints
+- deployment manifests, containers, infrastructure configuration, operator
+  scripts, runbooks, backups, and incident or security operations material
+- database migrations and live-data tooling
+- the signing sidecar and mobile packaging shell
+- internal prompts, evaluation fixtures, anti-abuse details, private plans,
+  research notes, product Wiki, and founder or strategy documents
+- first-party product test suites, generated builds, caches, logs, reports,
+  screenshots, and test artifacts
 
 ## Suggested Reading Path
 
-1. Read [`docs/public-architecture-overview.md`](./docs/public-architecture-overview.md)
-   and open [`docs/public-architecture-map.html`](./docs/public-architecture-map.html).
-2. Inspect [`programs/README.md`](./programs/README.md) and the individual
-   program directories.
-3. Inspect [`sdk/README.md`](./sdk/README.md) and `sdk/src/`.
-4. Try the public integration material under `docs/integration/` and
-   `examples/`.
+1. Inspect the on-chain programs in [`programs/`](./programs/).
+2. Read the client surface in [`sdk/src/`](./sdk/src/).
+3. Follow the product path through [`frontend/src/`](./frontend/src/) and
+   [`services/query-api/src/`](./services/query-api/src/).
+4. Inspect chain event projection in
+   [`services/indexer-core/src/`](./services/indexer-core/src/).
 
 ## License
 
-This public baseline is licensed under Apache-2.0 unless a file states
-otherwise. BUSL-covered first-party runtime and product surfaces are not
-included in this public baseline. See `LICENSE`, `LICENSING.md`, and
-`licenses/APACHE-2.0.txt`.
+This archive uses a mixed-license model. Protocol, SDK, integration, and
+indexer components are Apache-2.0. The first-party managed runtime and web
+product source are BUSL-1.1 with the parameters recorded in `LICENSING.md`.
+See [`LICENSING.md`](./LICENSING.md), [`LICENSE`](./LICENSE), and the texts under
+[`licenses/`](./licenses/).

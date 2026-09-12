@@ -1,0 +1,112 @@
+/* ============================================================
+   Alcheme Global Styles
+   "温顺、沉稳、好奇且有秩序"
+   ============================================================ */
+@import '../styles/tokens.css';
+@import '../styles/animations.css';
+@import '../styles/typography.css';
+@import '../styles/patina.css';
+@import '../alchemy/life-feel.css';
+
+/* ── Reset ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  /* 防止橡皮筋效果破坏沉稳感 */
+  overscroll-behavior: none;
+}
+
+/* ── Links ── */
+a {
+  color: var(--color-accent-gold);
+  text-decoration: none;
+  transition: opacity var(--motion-fast) var(--easing-standard);
+}
+
+a:active {
+  opacity: 0.7;
+}
+
+/* ── Buttons Reset ── */
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ── Images ── */
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* ── Scrollbar (subtle) ── */
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-medium);
+  border-radius: var(--radius-full);
+}
+
+/* ── Selection ── */
+::selection {
+  background: rgba(199, 168, 107, 0.25);
+  color: var(--color-text-primary);
+}
+
+/* ── Focus Visible ── */
+:focus-visible {
+  outline: 2px solid var(--color-accent-gold);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Safe Area Utility ── */
+.safe-area-padding {
+  padding-top: var(--safe-area-top);
+  padding-bottom: var(--safe-area-bottom);
+  padding-left: var(--safe-area-left);
+  padding-right: var(--safe-area-right);
+}
+
+/* ── Content Container ── */
+.content-container {
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+/* ── Screen padding for bottom nav ── */
+.screen-with-nav {
+  padding-bottom: calc(var(--bottom-nav-height) + var(--safe-area-bottom) + var(--space-4));
+}

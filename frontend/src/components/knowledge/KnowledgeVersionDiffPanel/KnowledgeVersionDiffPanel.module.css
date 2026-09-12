@@ -1,0 +1,160 @@
+.panel {
+  display: grid;
+  gap: 16px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(14, 17, 23, 0.82), rgba(10, 12, 17, 0.9)),
+    radial-gradient(circle at top right, rgba(212, 175, 55, 0.12), transparent 44%);
+}
+
+.panel > * {
+  min-width: 0;
+}
+
+.header {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 248, 230, 0.96);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: rgba(228, 226, 218, 0.72);
+  overflow-wrap: anywhere;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.85);
+}
+
+.note {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(212, 175, 55, 0.1);
+  color: rgba(255, 233, 194, 0.88);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.snapshot {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.snapshotTitle {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: rgba(255, 248, 230, 0.92);
+}
+
+.snapshotMeta {
+  display: grid;
+  gap: 6px;
+  font-size: 0.84rem;
+  color: rgba(228, 226, 218, 0.78);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.changes {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.changeRow {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.changeLabel {
+  font-size: 0.82rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.88);
+}
+
+.changeValues {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  font-size: 0.88rem;
+  color: rgba(255, 248, 230, 0.9);
+  min-width: 0;
+}
+
+.changeValue {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.changeHint {
+  font-size: 0.78rem;
+  color: rgba(228, 226, 218, 0.66);
+}
+
+.empty {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(228, 226, 218, 0.72);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .controls,
+  .grid,
+  .changeValues {
+    grid-template-columns: 1fr;
+  }
+}

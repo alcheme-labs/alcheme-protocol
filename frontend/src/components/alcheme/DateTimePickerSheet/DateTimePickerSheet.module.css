@@ -1,0 +1,156 @@
+.root {
+    display: grid;
+    gap: 12px;
+}
+
+.presets {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.presetButton,
+.primaryButton,
+.secondaryButton,
+.navButton {
+    border: 1px solid rgba(231, 228, 221, 0.1);
+    border-radius: 10px;
+    background: rgba(231, 228, 221, 0.04);
+    color: var(--color-text-secondary);
+    font: inherit;
+    cursor: pointer;
+}
+
+.presetButton {
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 12px;
+}
+
+.calendar {
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid rgba(231, 228, 221, 0.08);
+    border-radius: 14px;
+    background: rgba(11, 16, 13, 0.36);
+}
+
+.calendarHeader {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) 34px;
+    align-items: center;
+    gap: 8px;
+}
+
+.calendarHeading {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.3;
+    text-align: center;
+}
+
+.navButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+}
+
+.calendarGrid {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 3px;
+}
+
+.headerCell {
+    width: 14.285%;
+    height: 28px;
+    color: var(--color-text-tertiary);
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.calendarCell {
+    width: 100%;
+    height: 34px;
+    border-radius: 10px;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 34px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.calendarCell[data-hovered],
+.calendarCell[data-focused] {
+    background: rgba(231, 228, 221, 0.06);
+    color: var(--color-text-primary);
+}
+
+.calendarCell[data-selected] {
+    background: rgba(199, 168, 107, 0.2);
+    color: #f2d78d;
+}
+
+.calendarCell[data-disabled] {
+    cursor: not-allowed;
+    opacity: 0.32;
+}
+
+.timeField {
+    display: grid;
+    gap: 6px;
+}
+
+.timeLabel,
+.dateLabel {
+    color: var(--color-text-secondary);
+    font-size: 12px;
+}
+
+.dateLabel {
+    margin-bottom: -6px;
+}
+
+.timeInput {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    width: 100%;
+    padding: 0 10px;
+    border: 1px solid rgba(231, 228, 221, 0.1);
+    border-radius: 11px;
+    background: rgba(11, 16, 13, 0.48);
+    color: var(--color-text-primary);
+}
+
+.timeSegment {
+    min-width: 1ch;
+    padding: 2px 1px;
+    border-radius: 4px;
+    outline: none;
+}
+
+.timeSegment[data-focused] {
+    background: rgba(199, 168, 107, 0.18);
+    color: #f2d78d;
+}
+
+.primaryButton,
+.secondaryButton {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 12px;
+}
+
+.primaryButton {
+    border-color: rgba(199, 168, 107, 0.38);
+    background: rgba(199, 168, 107, 0.16);
+    color: #f2d78d;
+}

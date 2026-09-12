@@ -1,0 +1,15 @@
+.page { width: min(760px, calc(100% - 32px)); margin: 32px auto 72px; }
+.page header { display: flex; align-items: center; gap: 10px; }
+.page header h1 { margin: 0; font-size: 1.5rem; }
+.page > p { color: var(--text-secondary, #74706a); }
+.purpose { display: grid; gap: 6px; margin-top: 22px; font-size: .86rem; }
+.purpose textarea { min-height: 80px; border: 1px solid color-mix(in srgb, currentColor 18%, transparent); border-radius: 10px; padding: 10px; color: inherit; background: transparent; }
+.actions { display: flex; gap: 8px; margin-top: 12px; }
+.actions button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid color-mix(in srgb, currentColor 18%, transparent); border-radius: 999px; padding: 9px 14px; color: inherit; background: transparent; cursor: pointer; }
+.actions button:disabled { opacity: .48; cursor: not-allowed; }
+.package { display: grid; gap: 10px; margin-top: 22px; padding: 20px; border: 1px solid color-mix(in srgb, currentColor 14%, transparent); border-radius: 16px; }
+.package p { margin: 0; }
+.package code { overflow-wrap: anywhere; font-size: .75rem; }
+.package ul { display: grid; gap: 6px; padding-left: 20px; }
+.error { color: #b42318; }
+@media (max-width: 560px) { .page { width: min(100% - 24px, 760px); margin-top: 20px; } .actions { display: grid; } .package { padding: 16px; } }

@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "profileRef": "sns:solana:devnet:name-service-display",
+  "version": 1,
+  "provider": "solana_name_service",
+  "readinessState": "ready",
+  "riskMaturity": "stable",
+  "capabilityRole": "name_resolution_display_input",
+  "chain": {
+    "chainId": "solana:devnet",
+    "cluster": "devnet",
+    "genesisHash": "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG"
+  },
+  "deployment": {
+    "programId": "namesLPneVptA9Z5rqUDD9tMTWEJwofgaYwp8cawRkX",
+    "loaderProgramId": "BPFLoaderUpgradeab1e11111111111111111111111",
+    "programDataAddress": "78Rc4MEoSPTGgNebYAtht9nBA5MZQS8zZuGeZbVHUMPz",
+    "upgradeAuthority": "NAMESwRMGCgyHhZoMZHXz1jNt4VhGUQ69FBiEKPZTSr",
+    "lastDeployedSlot": 258169812,
+    "deployedProgramBytesLength": 264561,
+    "deployedProgramBytesSha256": "1b2f25f17e8f33260278fd0211b468b16e3f5b0a9aa5a8648af7074bb171c1ed",
+    "observation": {
+      "commitment": "finalized",
+      "slot": 478463183,
+      "observedAt": "2026-07-24T02:50:18Z"
+    }
+  },
+  "clientDecoder": {
+    "packageName": "@bonfida/spl-name-service",
+    "version": "3.0.26",
+    "npmShasum": "ec583f9a52d64e462672bef954ac4988fc4bd098",
+    "npmIntegrity": "sha512-WT8AlOnvTtaF+Iqo6jlwLZzmxF+5/qElrXniHJsXD7p806r1EBScoRwS/7YkaqRv821q0wj2LzJyFfUsxoe6Yw==",
+    "tarballSha256": "8f09af93283c4096dd201cef8c44174967f335d27c64c57e245c4ea058b70710",
+    "gitHead": "ba2bddb1c997f77f64bbc8fb3b6b555291f1dea9",
+    "publishedManifestSha256": "8dbb8d5ba8122aa74b0ebd338aa7300ed2cab5e46750fa57839c4189920b0f9f"
+  },
+  "resolutionPolicy": {
+    "mode": "primary_domain_only",
+    "tld": ".sol",
+    "arbitraryDomainPick": "forbidden",
+    "noPrimaryDisposition": "hide_sns_label",
+    "displayCacheTtlSeconds": 300,
+    "highRiskFreshResolve": "required_before_transfer_invite_allowlist_authority_input",
+    "staleRecordDisposition": "fail_closed_display_fallback",
+    "tokenizedDomainDisposition": "require_current_owner_record_authority",
+    "outageFallback": "alcheme_profile_or_generic_member",
+    "unverifiedSolText": "forbidden"
+  },
+  "authoritySeparation": {
+    "snsDisplayIsNotEligibility": true,
+    "snsDisplayIsNotAuthority": true,
+    "snsDisplayIsNotActorIdentity": true,
+    "canonicalActorKey": "solana_pubkey",
+    "officialAlchemeCertification": false
+  },
+  "readback": {
+    "rpc": {
+      "endpoint": "https://api.devnet.solana.com",
+      "access": "public_no_credentials",
+      "purpose": "name_service_program_presence_and_display_resolve"
+    },
+    "commitment": "finalized",
+    "timeoutMs": 12000,
+    "maximumAttempts": 3,
+    "programPresenceRequired": true,
+    "domainResolveClusterNote": "primary_.sol_domain_inventory_is_mainnet_dominant;_devnet_smoke_verifies_frozen_program_account_only"
+  },
+  "privacyBoundary": {
+    "defaultCircleSurfaces": "circle_alias_only",
+    "autoExposePrimarySol": false,
+    "optInDisclosureRequired": true,
+    "crossCircleWalletLinkageRisk": "disclosed_before_enable"
+  },
+  "environmentBoundary": {
+    "activationScope": "display_input_profile_version",
+    "inPlaceClusterSwitch": "forbidden",
+    "mainnet": "unavailable",
+    "registrationRenewalPrimaryUpdate": "external_optional_action"
+  }
+}

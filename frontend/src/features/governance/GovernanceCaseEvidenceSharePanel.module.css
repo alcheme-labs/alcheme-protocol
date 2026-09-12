@@ -1,0 +1,34 @@
+.panel {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: clip;
+    margin-top: 18px;
+    padding: 20px;
+    border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+    border-radius: 16px;
+}
+.heading { display: flex; align-items: center; gap: 10px; }
+.heading p { margin: 0 0 4px; color: var(--text-secondary, #74706a); font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; }
+.heading h2 { margin: 0; font-size: 1.15rem; }
+.boundary { color: var(--text-secondary, #74706a); font-size: .88rem; }
+.requestLink { display: inline-flex; margin: 4px 0 14px; font-weight: 650; }
+.controls { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin: 8px 0 16px; }
+.controls label { display: grid; gap: 5px; color: var(--text-secondary, #74706a); font-size: .8rem; }
+.controls label:last-child { grid-column: 1 / -1; }
+.controls textarea, .controls input { min-width: 0; border: 1px solid color-mix(in srgb, currentColor 18%, transparent); border-radius: 10px; padding: 9px 10px; color: inherit; background: transparent; }
+.list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.list > li { display: grid; gap: 7px; padding: 14px; border-radius: 12px; background: color-mix(in srgb, currentColor 5%, transparent); }
+.list p { margin: 0; }
+.list code { overflow-wrap: anywhere; font-size: .72rem; }
+.list small { color: var(--text-secondary, #74706a); }
+.packageHeader { display: flex; justify-content: space-between; gap: 10px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+.actions button, .actions a { border: 1px solid color-mix(in srgb, currentColor 18%, transparent); border-radius: 999px; padding: 7px 11px; color: inherit; background: transparent; cursor: pointer; font-size: .82rem; }
+.actions button:disabled { opacity: .48; cursor: not-allowed; }
+.list details ol { display: grid; gap: 4px; margin-bottom: 0; color: var(--text-secondary, #74706a); font-size: .78rem; }
+.empty { padding: 12px; border: 1px dashed color-mix(in srgb, currentColor 18%, transparent); border-radius: 10px; color: var(--text-secondary, #74706a); }
+.error { color: #b42318; }
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 560px) { .panel { padding: 16px; } .controls { grid-template-columns: 1fr; } .controls label:last-child { grid-column: 1; } .actions button, .actions a { width: 100%; text-align: center; } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }

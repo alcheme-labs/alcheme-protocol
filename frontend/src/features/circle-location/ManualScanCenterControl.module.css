@@ -1,0 +1,156 @@
+.control {
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid rgba(231, 228, 221, 0.08);
+    border-radius: 8px;
+    background: rgba(8, 10, 9, 0.18);
+}
+
+.header,
+.radiusHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+}
+
+.header {
+    justify-content: flex-start;
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+.manualMap {
+    position: relative;
+    aspect-ratio: 2 / 1;
+    min-height: 140px;
+    overflow: hidden;
+    border: 1px solid rgba(47, 55, 47, 0.22);
+    border-radius: 8px;
+    background:
+        linear-gradient(rgba(216, 208, 186, 0.42), rgba(191, 199, 176, 0.34)),
+        #D8D0BA;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.manualMap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background-image:
+        linear-gradient(rgba(30, 63, 42, 0.26) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 63, 42, 0.26) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+}
+
+.manualMap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background:
+        radial-gradient(circle at 50% 50%, transparent 44%, rgba(47, 55, 47, 0.1) 100%),
+        linear-gradient(180deg, rgba(216, 208, 186, 0.22), rgba(191, 199, 176, 0.08));
+    pointer-events: none;
+    mix-blend-mode: multiply;
+}
+
+.manualMarker {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 4;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(242, 211, 91, 0.34);
+    border: 1px solid rgba(83, 66, 20, 0.48);
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 5px rgba(242, 211, 91, 0.14);
+    pointer-events: none;
+}
+
+.manualMarker::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #F2D35B;
+    transform: translate(-50%, -50%);
+}
+
+.radiusHeader strong {
+    color: rgba(243, 209, 80, 0.94);
+    font-weight: 600;
+}
+
+.fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.fields label {
+    display: grid;
+    gap: 5px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.fields input {
+    min-height: 34px;
+    width: 100%;
+    border: 1px solid rgba(231, 228, 221, 0.1);
+    border-radius: 8px;
+    background: rgba(31, 36, 33, 0.62);
+    color: var(--color-text-primary);
+    padding: 0 9px;
+}
+
+.radiusSlider {
+    width: 100%;
+    accent-color: #63D471;
+}
+
+.radiusOptions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.radiusOptions button {
+    min-height: 30px;
+    border: 1px solid rgba(231, 228, 221, 0.1);
+    border-radius: 8px;
+    background: rgba(231, 228, 221, 0.04);
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.radiusOptions button:disabled {
+    opacity: 0.54;
+    cursor: not-allowed;
+}
+
+.radiusOptions .radiusActive {
+    border-color: rgba(99, 212, 113, 0.46);
+    background: rgba(99, 212, 113, 0.1);
+    color: rgba(226, 244, 218, 0.94);
+}
+
+@media (max-width: 440px) {
+    .fields,
+    .radiusOptions {
+        grid-template-columns: 1fr;
+    }
+}

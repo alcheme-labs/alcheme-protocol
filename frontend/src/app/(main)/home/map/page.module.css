@@ -1,0 +1,185 @@
+.page {
+    min-height: 100dvh;
+    padding: calc(var(--safe-area-top, 0px) + 18px) var(--space-4) calc(var(--safe-area-bottom, 0px) + 24px);
+    background:
+        linear-gradient(180deg, rgba(31, 36, 33, 0.98), rgba(20, 24, 22, 1));
+}
+
+.shell {
+    width: min(960px, 100%);
+    margin: 0 auto;
+    display: grid;
+    gap: 16px;
+}
+
+.header {
+    display: grid;
+    gap: 14px;
+}
+
+.backLink {
+    width: fit-content;
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.titleBlock {
+    display: grid;
+    gap: 6px;
+}
+
+.eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: rgba(243, 209, 80, 0.88);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.titleBlock h1 {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: clamp(24px, 5vw, 34px);
+    line-height: 1.14;
+    font-weight: 700;
+}
+
+.titleBlock p {
+    max-width: 620px;
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.mapStage {
+    min-width: 0;
+}
+
+.controls {
+    display: grid;
+    gap: 10px;
+}
+
+.actionRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.primaryButton,
+.secondaryButton {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.primaryButton {
+    border: 1px solid rgba(99, 212, 113, 0.24);
+    background: rgba(99, 212, 113, 0.12);
+    color: rgba(226, 244, 218, 0.96);
+}
+
+.secondaryButton {
+    border: 1px solid rgba(231, 228, 221, 0.1);
+    background: rgba(231, 228, 221, 0.05);
+    color: var(--color-text-secondary);
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+.scanMeta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.scanMeta span {
+    min-height: 26px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 8px;
+    border: 1px solid rgba(231, 228, 221, 0.08);
+    border-radius: 8px;
+    background: rgba(231, 228, 221, 0.04);
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.emptyState,
+.errorState {
+    margin: 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.emptyState {
+    border: 1px solid rgba(231, 228, 221, 0.08);
+    background: rgba(231, 228, 221, 0.04);
+    color: var(--color-text-muted);
+}
+
+.errorState {
+    border: 1px solid rgba(216, 75, 61, 0.2);
+    background: rgba(216, 75, 61, 0.08);
+    color: rgba(255, 212, 207, 0.92);
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (min-width: 860px) {
+    .shell {
+        grid-template-columns: minmax(0, 1fr) 320px;
+        align-items: start;
+    }
+
+    .header,
+    .mapStage {
+        grid-column: 1;
+    }
+
+    .controls {
+        grid-column: 2;
+        position: sticky;
+        top: calc(var(--safe-area-top, 0px) + 18px);
+    }
+}
+
+@media (max-width: 440px) {
+    .page {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .primaryButton,
+    .secondaryButton {
+        width: 100%;
+    }
+}

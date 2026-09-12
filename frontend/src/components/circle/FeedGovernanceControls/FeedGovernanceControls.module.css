@@ -1,0 +1,162 @@
+.panel {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border: 1px solid rgba(199, 168, 107, 0.18);
+    border-radius: var(--radius-sm);
+    background: rgba(18, 22, 20, 0.48);
+}
+
+.header,
+.actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.title {
+    color: var(--color-text-primary);
+    font-size: 14px;
+    font-weight: var(--font-weight-semibold);
+}
+
+.description,
+.notice,
+.field,
+.fieldset {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-caption);
+    line-height: 1.45;
+}
+
+.refresh,
+.primary,
+.secondary {
+    min-height: 38px;
+    padding: 8px 12px;
+    border-radius: var(--radius-button);
+    cursor: pointer;
+}
+
+.refresh,
+.secondary {
+    border: 1px solid rgba(231, 228, 221, 0.14);
+    background: transparent;
+    color: var(--color-text-secondary);
+}
+
+.primary {
+    border: 1px solid rgba(199, 168, 107, 0.3);
+    background: rgba(199, 168, 107, 0.14);
+    color: var(--color-accent-gold);
+}
+
+.refresh:disabled,
+.primary:disabled,
+.secondary:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.readback {
+    display: grid;
+    grid-template-columns: minmax(88px, max-content) 1fr;
+    gap: var(--space-1) var(--space-2);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-caption);
+}
+
+.readback strong,
+.readback a {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-medium);
+}
+
+.controls {
+    display: grid;
+    gap: var(--space-2);
+}
+
+.fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: var(--space-2);
+    border: 1px solid rgba(231, 228, 221, 0.1);
+    border-radius: var(--radius-sm);
+}
+
+.signalGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+}
+
+.signalGrid label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.field {
+    display: grid;
+    gap: var(--space-1);
+}
+
+.field input,
+.field select,
+.field textarea {
+    width: 100%;
+    min-height: 38px;
+    padding: 8px 10px;
+    border: 1px solid rgba(231, 228, 221, 0.16);
+    border-radius: var(--radius-button);
+    background: rgba(231, 228, 221, 0.04);
+    color: var(--color-text-primary);
+}
+
+.field textarea {
+    resize: vertical;
+}
+
+.readbackRow {
+    display: contents;
+}
+
+.divider {
+    height: 1px;
+    background: rgba(231, 228, 221, 0.08);
+}
+
+.actions > * {
+    flex: 1;
+}
+
+.error {
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    background: rgba(202, 83, 73, 0.12);
+    color: #f2a39c;
+    font-size: var(--font-size-caption);
+}
+
+.failure {
+    overflow-wrap: anywhere;
+    color: #f2a39c;
+}
+
+@media (max-width: 420px) {
+    .header,
+    .actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .signalGrid,
+    .readback {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,46 @@
+.surface {
+    position: fixed;
+    left: 50%;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 88px);
+    z-index: var(--z-toast, 80);
+    width: min(420px, calc(100vw - 32px));
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid rgba(215, 183, 104, 0.35);
+    border-radius: 12px;
+    background: rgba(24, 32, 26, 0.96);
+    color: rgba(245, 240, 224, 0.92);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+}
+
+.content {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.title {
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.meta {
+    font-size: 12px;
+    line-height: 1.35;
+    color: rgba(245, 240, 224, 0.68);
+}
+
+.dismiss {
+    flex: 0 0 auto;
+    border: 1px solid rgba(215, 183, 104, 0.32);
+    border-radius: 999px;
+    background: rgba(215, 183, 104, 0.12);
+    color: rgba(245, 240, 224, 0.86);
+    padding: 5px 10px;
+    font-size: 12px;
+}

@@ -1,0 +1,217 @@
+.rail {
+    margin-top: 14px;
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+    max-width: 100%;
+    /* Fit eyebrow + title + status + short body without clipping; only scroll for outliers. */
+    max-height: min(42dvh, 240px);
+    overflow-x: clip;
+    overflow-y: auto;
+    padding: 10px 14px;
+    border: 1px solid var(--color-alloy-border, rgba(185, 138, 84, 0.25));
+    border-radius: var(--radius-card, 16px);
+    background: var(--color-alloy-bg, #2a2f2b);
+    box-shadow: 0 0 0 1px var(--color-alloy-glow, rgba(185, 138, 84, 0.08));
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    animation: composeEnter var(--motion-normal, 360ms) var(--easing-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+}
+
+.railEyebrow,
+.railMeta {
+    margin: 0;
+    color: var(--color-text-tertiary, #a29e96);
+    font-size: 12px;
+}
+
+.railTitle {
+    margin: 0;
+    min-width: 0;
+    font-size: 16px;
+    font-weight: var(--font-weight-semibold, 600);
+    line-height: 1.35;
+    color: var(--color-text-primary, #e7e4dd);
+    overflow-wrap: anywhere;
+}
+
+.railBody {
+    margin: 0;
+    color: var(--color-text-secondary, #c5c0b7);
+    font-size: 13px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+}
+
+.railToolbar {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.railToolbar .ghostButton {
+    flex: 0 0 auto;
+}
+
+.railToolbarSpacer {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.chip {
+    margin-top: 10px;
+    width: 100%;
+    min-height: 36px;
+    max-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--color-border-soft, rgba(231, 228, 221, 0.08));
+    border-radius: var(--radius-sm, 8px);
+    background: var(--color-bg-elevated, #2e3632);
+    color: var(--color-text-secondary, #c5c0b7);
+    font-size: 12px;
+    text-align: left;
+    cursor: pointer;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    animation: composeEnter var(--motion-normal, 360ms) var(--easing-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+}
+
+.chip strong {
+    color: var(--color-text-primary, #e7e4dd);
+    font-weight: var(--font-weight-medium, 500);
+    overflow-wrap: anywhere;
+}
+
+.ghostButton,
+.primaryButton {
+    min-height: 44px;
+    touch-action: manipulation;
+    border-radius: var(--radius-button, 12px);
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: var(--font-weight-semibold, 600);
+    cursor: pointer;
+}
+
+.ghostButton {
+    border: 1px solid var(--color-border-medium, rgba(231, 228, 221, 0.14));
+    background: transparent;
+    color: var(--color-text-primary, #e7e4dd);
+}
+
+.primaryButton {
+    min-height: 48px;
+    border: 1px solid color-mix(in srgb, var(--color-accent-gold, #c7a86b) 55%, transparent);
+    background: var(--color-accent-gold, #c7a86b);
+    color: var(--color-text-inverse, #1f2421);
+}
+
+.primaryButton:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+}
+
+.disabledHint {
+    margin: 0;
+    width: 100%;
+    color: var(--color-text-tertiary, #a29e96);
+    font-size: 12px;
+}
+
+.detail {
+    margin: 8px 0 0;
+    color: var(--color-text-secondary, #c5c0b7);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.detail a {
+    color: var(--color-accent-gold, #c7a86b);
+    font-weight: 650;
+}
+
+.dock {
+    /* L2: sticky-in-scroller OR fixed + body pad. Case uses fixed thumb zone + .composeDockPad. */
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--bottom-nav-height, 64px) + var(--safe-area-bottom, 0px) + 8px);
+    z-index: 40;
+    margin: 0;
+    min-width: 0;
+    max-width: 100%;
+    max-height: min(45dvh, 360px);
+    overflow-x: clip;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: var(--space-3, 12px) var(--space-4, 16px);
+    padding-bottom: var(--space-3, 12px);
+    border-top: 1px solid var(--color-border-soft, rgba(231, 228, 221, 0.08));
+    background: var(--color-bg-elevated, #2e3632);
+    box-shadow: var(--shadow-float, 0 12px 32px rgba(8, 12, 10, 0.36));
+    animation: composeEnter var(--motion-normal, 360ms) var(--easing-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+}
+
+.dockRoot {
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+}
+
+.dockRoot :global([data-compose-review-cluster]) {
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+}
+
+.dockRoot :global([data-compose-review-cluster] p),
+.dockRoot :global([data-compose-review-cluster] h3),
+.dockRoot :global([data-compose-review-cluster] small) {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.dockCtaRow {
+    display: grid;
+    gap: 8px;
+}
+
+@keyframes composeEnter {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rail,
+    .chip,
+    .dock {
+        animation: none;
+        transition: none;
+    }
+}
+
+.rail:focus-visible,
+.chip:focus-visible,
+.ghostButton:focus-visible,
+.primaryButton:focus-visible {
+    outline: 2px solid var(--color-accent-gold, #c7a86b);
+    outline-offset: 2px;
+}

@@ -1,0 +1,63 @@
+.optionList {
+    display: grid;
+    gap: 8px;
+}
+
+.optionButton {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 48px;
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid rgba(231, 228, 221, 0.09);
+    border-radius: 12px;
+    background: rgba(231, 228, 221, 0.04);
+    color: var(--color-text-primary);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.optionButton[aria-checked="true"] {
+    border-color: rgba(199, 168, 107, 0.42);
+    background: rgba(199, 168, 107, 0.14);
+}
+
+.optionButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.52;
+}
+
+.optionText {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+}
+
+.optionLabel {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 560;
+    line-height: 1.35;
+}
+
+.optionDescription {
+    color: var(--color-text-tertiary);
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.optionCheck {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 auto;
+    border-radius: 999px;
+    color: #f2d78d;
+}

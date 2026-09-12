@@ -1,0 +1,41 @@
+.panel {
+    display: grid;
+    gap: 7px;
+    margin-top: 2px;
+    padding: 8px;
+    border: 1px dashed rgba(199, 168, 107, 0.24);
+    border-radius: var(--radius-sm);
+    background: rgba(199, 168, 107, 0.055);
+}
+
+.title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.body {
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--color-text-tertiary);
+}
+
+.action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    min-height: 28px;
+    padding: 0 10px;
+    border: 1px solid rgba(199, 168, 107, 0.32);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-accent-gold);
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.action:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}

@@ -1,0 +1,74 @@
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    white-space: nowrap;
+    transition:
+        color 0.3s ease,
+        border-color 0.3s ease,
+        background-color 0.3s ease;
+}
+
+.compact {
+    justify-content: center;
+    box-sizing: border-box;
+    min-width: 20px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 8px;
+    line-height: 1;
+    letter-spacing: 0;
+    overflow: hidden;
+}
+
+.icon {
+    font-size: 11px;
+    line-height: 1;
+}
+
+.label {
+    line-height: 1.2;
+}
+
+.observer {
+    background: rgba(180, 195, 210, 0.08);
+    border: 1px dashed rgba(180, 195, 210, 0.2);
+    color: var(--color-text-tertiary);
+    opacity: 0.8;
+}
+
+.participant {
+    background: rgba(134, 179, 119, 0.10);
+    border: 1px solid rgba(134, 179, 119, 0.2);
+    color: rgba(134, 179, 119, 0.9);
+}
+
+.contributor {
+    background: rgba(199, 168, 107, 0.10);
+    border: 1px solid rgba(199, 168, 107, 0.2);
+    color: var(--color-accent-gold);
+}
+
+.seniorContributor {
+    background: rgba(160, 140, 200, 0.10);
+    border: 1px solid rgba(160, 140, 200, 0.25);
+    color: rgba(180, 160, 220, 0.9);
+}
+
+.notJoined {
+    background: rgba(180, 195, 210, 0.06);
+    border: 1px dashed rgba(180, 195, 210, 0.16);
+    color: var(--color-text-tertiary);
+}
+
+.unknown {
+    background: rgba(180, 195, 210, 0.06);
+    border: 1px solid rgba(180, 195, 210, 0.14);
+    color: var(--color-text-tertiary);
+}

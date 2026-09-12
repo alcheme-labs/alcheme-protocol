@@ -1,0 +1,195 @@
+import express, { type Express } from 'express';
+import helmet from 'helmet';
+import { ApolloServer } from 'apollo-server-express';
+import type { PrismaClient } from '@prisma/client';
+import Redis from 'ioredis';
+
+import { prisma as defaultPrisma } from './database';
+import { typeDefs } from './graphql/schema';
+import { resolvers } from './graphql/resolvers';
+import { buildContext } from './graphql/context';
+import { restRouter } from './rest';
+import { errorHandler } from './middleware/errorHandler';
+import {
+    createCorsPolicy,
+    defaultDevExternalOrigins,
+    parseOriginList,
+} from './middleware/corsPolicy';
+import { requestLogger } from './middleware/logger';
+import { metricsMiddleware } from './middleware/metrics';
+import { rateLimiter } from './middleware/rateLimiter';
+import { communicationIngressLimiter } from './middleware/communicationIngressLimiter';
+import { communicationRateLimitSessionActor } from './middleware/communicationRateLimitSession';
+import { sessionAuth } from './middleware/sessionAuth';
+import { resolveQueryApiTrustProxyHops } from './middleware/trustedProxy';
+import { loadNodeRuntimeConfig } from './config/services';
+import { loadConsistencyStatus } from './services/consistency';
+
+export interface CreateAppOptions {
+    prisma?: PrismaClient;
+    redis?: Redis;
+}
+
+export interface QueryApiAppContext {
+    app: Express;
+    prisma: PrismaClient;
+    redis: Redis;
+    apolloServer: ApolloServer;
+    dispose: () => Promise<void>;
+}
+
+export async function createApp(options: CreateAppOptions = {}): Promise<QueryApiAppContext> {
+    const prisma = options.prisma ?? defaultPrisma;
+    const redis = options.redis ?? new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+    const ownsRedis = !options.redis;
+
+    const app = express();
+    const trustProxyHops = resolveQueryApiTrustProxyHops();
+    if (trustProxyHops > 0) {
+        app.set('trust proxy', trustProxyHops);
+    }
+    const consistencyHeaderTtlMs = Number(process.env.CONSISTENCY_HEADER_TTL_MS || '1000');
+    let consistencyCache:
+        | {
+            value: Awaited<ReturnType<typeof loadConsistencyStatus>>;
+            cachedAt: number;
+        }
+        | null = null;
+
+    const getConsistencyStatus = async (force = false) => {
+        const now = Date.now();
+        if (!force && consistencyCache && now - consistencyCache.cachedAt < consistencyHeaderTtlMs) {
+            return consistencyCache.value;
+        }
+
+        const status = await loadConsistencyStatus(prisma);
+        consistencyCache = {
+            value: status,
+            cachedAt: now,
+        };
+        return status;
+    };
+
+    const firstPartyOrigins = parseOriginList(process.env.CORS_ALLOWED_ORIGINS);
+    const devExternalOrigins = parseOriginList(process.env.EXTERNAL_APP_DEV_ORIGINS);
+    const corsPolicy = createCorsPolicy(prisma, {
+        firstPartyOrigins: firstPartyOrigins.length > 0 ? firstPartyOrigins : [
+            'http://localhost:3000',
+            'http://127.0.0.1:3000',
+        ],
+        devExternalOrigins: devExternalOrigins.length > 0
+            ? devExternalOrigins
+            : defaultDevExternalOrigins(),
+        cacheTtlMs: Number(process.env.EXTERNAL_APP_CORS_CACHE_TTL_MS || '5000'),
+    });
+
+    app.use(helmet());
+    app.use(metricsMiddleware);
+    // This IP-scoped guard must stay ahead of CORS, body parsing, session auth,
+    // consistency reads, and communication-session lookup.
+    app.use('/api/v1/communication', communicationIngressLimiter);
+    app.use(corsPolicy.corsMiddleware);
+    app.use((req, res, next) => {
+        const isAvatarUpload = req.method === 'POST' && /\/users\/me\/avatar\/?$/.test(req.path);
+        express.json({ limit: isAvatarUpload ? '1mb' : '100kb' })(req, res, next);
+    });
+    app.use(sessionAuth(redis));
+    app.use(async (_req, res, next) => {
+        try {
+            const runtime = loadNodeRuntimeConfig();
+            const status = await getConsistencyStatus();
+            res.setHeader('X-Alcheme-Node-Role', runtime.runtimeRole);
+            res.setHeader('X-Alcheme-Deployment-Profile', runtime.deploymentProfile);
+            res.setHeader('X-Alcheme-Indexer-Id', status.indexerId);
+            res.setHeader('X-Alcheme-Read-Commitment', status.readCommitment);
+            res.setHeader('X-Alcheme-Indexed-Slot', String(status.indexedSlot));
+            res.setHeader('X-Alcheme-Consistency-Stale', status.stale ? '1' : '0');
+            if (status.chainProjectionAudit.enabled) {
+                res.setHeader(
+                    'X-Alcheme-Chain-Projection-Issues',
+                    String(status.chainProjectionAudit.issueCounts.total),
+                );
+                res.setHeader(
+                    'X-Alcheme-Chain-Projection-Auth-Split-Risk',
+                    status.chainProjectionAudit.authSplitRisk ? '1' : '0',
+                );
+            }
+            if (status.settlement) {
+                res.setHeader('X-Alcheme-Settlement-Adapter', status.settlement.adapterId);
+                res.setHeader('X-Alcheme-Settlement-Chain-Family', status.settlement.chainFamily);
+            }
+        } catch (error) {
+            console.warn('Failed to attach consistency headers:', error);
+        }
+        next();
+    });
+    app.use(requestLogger);
+
+    app.get('/health', async (_req, res) => {
+        try {
+            await prisma.$queryRaw`SELECT 1`;
+            await redis.ping();
+            res.json({
+                status: 'healthy',
+                timestamp: new Date().toISOString(),
+                services: {
+                    database: 'up',
+                    redis: 'up',
+                },
+            });
+        } catch (error) {
+            res.status(503).json({
+                status: 'unhealthy',
+                error: error instanceof Error ? error.message : 'Unknown error',
+            });
+        }
+    });
+
+    app.get('/sync/status', async (_req, res) => {
+        try {
+            const status = await getConsistencyStatus(true);
+            res.json(status);
+        } catch (error) {
+            res.status(503).json({
+                error: 'sync_status_unavailable',
+                message: error instanceof Error ? error.message : 'Unknown error',
+            });
+        }
+    });
+
+    app.use('/api/v1/communication', communicationRateLimitSessionActor(prisma));
+    app.use('/api/v1', rateLimiter, restRouter(prisma, redis));
+
+    const apolloServer = new ApolloServer({
+        typeDefs,
+        resolvers,
+        context: ({ req }) => buildContext(req as any, prisma, redis),
+        introspection: process.env.NODE_ENV !== 'production',
+        formatError: (error) => {
+            console.error('GraphQL Error:', error);
+            return error;
+        },
+    });
+
+    await apolloServer.start();
+    apolloServer.applyMiddleware({
+        app: app as any,
+        path: '/graphql',
+        cors: false,
+    });
+
+    app.use(errorHandler);
+
+    return {
+        app,
+        prisma,
+        redis,
+        apolloServer,
+        dispose: async () => {
+            await apolloServer.stop();
+            if (ownsRedis) {
+                await redis.quit();
+            }
+        },
+    };
+}

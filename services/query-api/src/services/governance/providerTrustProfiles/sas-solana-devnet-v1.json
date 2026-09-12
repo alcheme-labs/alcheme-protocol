@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "profileRef": "sas:solana:devnet:attestation-transport-contract",
+  "version": 1,
+  "provider": "solana_attestation_service",
+  "readinessState": "ready",
+  "riskMaturity": "experimental",
+  "capabilityRole": "attestation_transport",
+  "chain": {
+    "chainId": "solana:devnet",
+    "cluster": "devnet",
+    "genesisHash": "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG"
+  },
+  "deployment": {
+    "programId": "3jtR45S8H3RuxHCsaDzMybK6fasiyPLEoA2U8faaXsqL",
+    "credentialAccountRef": "sas-credential:devnet:v1",
+    "schemaAccountRef": "sas-schema:devnet:v1",
+    "schemaVersion": 1,
+    "authorizedSignerRef": "sas-authorized-signer:devnet:v1",
+    "liveAttestationBinding": "unavailable"
+  },
+  "clientDecoder": {
+    "packageName": "sas-lib",
+    "version": "1.0.10"
+  },
+  "transportRole": "attestation_transport_not_sybil_detector",
+  "authoritySeparation": {
+    "sasIsNotSybilDetector": true,
+    "contributionIsNotUniqueness": true,
+    "eligibilityIsNotVotingPower": true
+  },
+  "environmentBoundary": {
+    "activationScope": "sybil_evidence_policy_version",
+    "inPlaceClusterSwitch": "forbidden",
+    "mainnet": "unavailable",
+    "civicPassLegacy": "deprecated_unavailable"
+  }
+}

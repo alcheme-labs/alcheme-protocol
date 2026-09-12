@@ -1,0 +1,14 @@
+.wrapper,
+.compact {
+    display: grid;
+    gap: 12px;
+    min-width: 0;
+}
+
+.wrapper {
+    margin: 0 0 16px;
+}
+
+.compact {
+    margin: 0 0 12px;
+}

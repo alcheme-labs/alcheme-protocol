@@ -1,0 +1,46 @@
+.page { width: min(100% - 32px, 980px); margin: 0 auto; padding: 30px 0 calc(var(--bottom-nav-height) + 36px); }
+.back { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; color: var(--color-text-secondary); text-decoration: none; }
+.header { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; margin-top: 10px; }
+.header > svg { padding: 10px; box-sizing: content-box; border: 1px solid color-mix(in srgb, #dc8b86 45%, transparent); border-radius: 14px; color: #dc8b86; background: color-mix(in srgb, #dc8b86 9%, transparent); }
+.header p, .header h1, .header span, .scope p, .scope h2, .scope span, .card p, .card h2, .card > span, .sectionTitle p, .sectionTitle h2 { margin: 0; }
+.header p, .card p, .sectionTitle p { color: var(--color-accent-gold); font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.header h1 { margin: 3px 0 6px; font-size: clamp(1.5rem, 4vw, 2.25rem); }
+.header span, .scope span, .card > span { color: var(--color-text-tertiary); line-height: 1.5; }
+.scope { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 24px; padding: 16px; border: 1px solid var(--color-border-soft); border-radius: 16px; }
+.scope p { color: var(--color-text-tertiary); font-size: .74rem; }
+.scope h2 { margin: 3px 0; font-size: 1rem; }
+.scope button, .card button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; border: 1px solid color-mix(in srgb, var(--color-accent-gold) 45%, transparent); border-radius: 11px; padding: 9px 13px; color: var(--color-text-primary); background: color-mix(in srgb, var(--color-accent-gold) 10%, transparent); cursor: pointer; }
+.scope button:disabled, .card button:disabled { opacity: .45; cursor: not-allowed; }
+.message { padding: 11px 13px; border-left: 3px solid var(--color-accent-gold); color: var(--color-text-secondary); background: color-mix(in srgb, var(--color-accent-gold) 7%, transparent); }
+.grid { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 14px; margin-top: 18px; }
+.card { display: grid; align-content: start; gap: 12px; padding: 18px; border: 1px solid var(--color-border-soft); border-radius: 18px; background: color-mix(in srgb, var(--color-bg-elevated, #282d2a) 84%, transparent); }
+.card h2 { font-size: 1.1rem; }
+.card label { display: grid; gap: 5px; color: var(--color-text-secondary); font-size: .8rem; }
+.card input, .card select, .card textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--color-border-soft); border-radius: 9px; padding: 10px; color: var(--color-text-primary); background: var(--color-bg-primary); font: inherit; }
+.card textarea { resize: vertical; }
+.card small { color: var(--color-text-tertiary); line-height: 1.45; }
+.twoColumns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.incidents { margin-top: 18px; padding: 18px; border: 1px solid var(--color-border-soft); border-radius: 18px; }
+.sectionTitle { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sectionTitle h2 { margin-top: 3px; font-size: 1.1rem; }
+.sectionTitle > span { padding: 4px 8px; border-radius: 999px; color: var(--color-accent-gold); background: color-mix(in srgb, var(--color-accent-gold) 10%, transparent); }
+.incident { margin-top: 12px; padding: 14px; border: 1px solid var(--color-border-soft); border-radius: 13px; }
+.incident > div { display: flex; justify-content: space-between; gap: 10px; }
+.incident > div span { color: var(--color-text-tertiary); }
+.incident dl { display: grid; gap: 6px; margin: 12px 0 0; }
+.incident dl div { display: grid; grid-template-columns: 92px 1fr; gap: 8px; }
+.incident dt { color: var(--color-text-tertiary); }
+.incident dd { margin: 0; overflow-wrap: anywhere; }
+.incident button { min-height: 44px; margin-top: 12px; border: 1px solid var(--color-border-soft); border-radius: 10px; padding: 8px 12px; color: var(--color-text-primary); background: transparent; cursor: pointer; }
+.incident button:disabled { opacity: .45; cursor: not-allowed; }
+.reviewForm { display: grid; gap: 9px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-border-soft); }
+.reviewForm label { display: grid; gap: 5px; color: var(--color-text-secondary); font-size: .8rem; }
+.reviewForm textarea { width: 100%; box-sizing: border-box; resize: vertical; border: 1px solid var(--color-border-soft); border-radius: 9px; padding: 10px; color: var(--color-text-primary); background: var(--color-bg-primary); font: inherit; }
+.reviewForm > div { display: flex; gap: 8px; }
+.reviewForm > div button { flex: 1; margin-top: 0; }
+.empty { margin: 18px 0 0; color: var(--color-text-tertiary); text-align: center; }
+.back:focus-visible, .scope button:focus-visible, .card button:focus-visible, .card input:focus-visible, .card select:focus-visible, .card textarea:focus-visible, .incident button:focus-visible, .reviewForm textarea:focus-visible { outline: 3px solid var(--color-accent-gold); outline-offset: 3px; }
+.spin { animation: spin .9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 720px) { .page { width: min(100% - 24px, 980px); } .scope, .incident > div { align-items: start; flex-direction: column; } .grid, .twoColumns { grid-template-columns: 1fr; } .incident dl div { grid-template-columns: 1fr; gap: 2px; } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }

@@ -1,0 +1,271 @@
+{
+  "schemaVersion": 1,
+  "profileRef": "squads:solana:devnet:shared-v4",
+  "version": 1,
+  "provider": "squads_v4",
+  "readinessState": "ready",
+  "riskMaturity": "stable",
+  "chain": {
+    "chainId": "solana:devnet",
+    "cluster": "devnet",
+    "genesisHash": "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG"
+  },
+  "deployment": {
+    "programId": "SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf",
+    "loaderProgramId": "BPFLoaderUpgradeab1e11111111111111111111111",
+    "programDataAddress": "Fy3YMJCvwbAXUgUM5b91ucUVA3jYzwWLHL3MwBqKsh8n",
+    "upgradeAuthority": "HM5y4mz3Bt9JY9mr1hkyhnvqxSH4H2u2451j7Hc2dtvK",
+    "lastDeployedSlot": 446638068,
+    "deployedProgramBytesSha256": "97fb2a5c08e5df5e862d8354ac5b97d3587117f98c4457754ca12e30bef0664d",
+    "sourceReproducibility": "unverified",
+    "observation": {
+      "commitment": "finalized",
+      "slot": 477202154,
+      "observedAt": "2026-07-18T00:00:00.000Z"
+    }
+  },
+  "programConfig": {
+    "address": "BSTq9w3kZwNwpBXJEvTZz2G9ZTNyKBvoSeXMvwb4cNZr",
+    "authority": "HM5y4mz3Bt9JY9mr1hkyhnvqxSH4H2u2451j7Hc2dtvK",
+    "treasury": "HM5y4mz3Bt9JY9mr1hkyhnvqxSH4H2u2451j7Hc2dtvK",
+    "multisigCreationFeeLamports": 0,
+    "verifiedFinalizedSlot": 477202154
+  },
+  "clientDecoder": {
+    "packageName": "@sqds/multisig",
+    "version": "2.1.4",
+    "npmIntegrity": "sha512-5w+NmwHOzl96nI50R/fjSD6uFydRLNUquhoEmmWbGepS4D9DnQyF2TKcUBfTyxV3sgJt00ypBt7SXB3y8WOzUQ==",
+    "gitHead": "15c665384343827728dfe505a1a781a4381b5e9b",
+    "idlSha256": "cb9a0a29040ec3853a5105c547ffc608bb0e3175d78dacf30d463aff939f9b9b",
+    "accountTypes": ["Multisig", "Proposal", "VaultTransaction"]
+  },
+  "decoderConformance": {
+    "commitment": "finalized",
+    "twoOfThree": {
+      "observedAtSlot": 477222518,
+      "multisig": "1icwWqjz4JtRRrmaaqNg3hUrvKxV8f847mu4C6zSx8Q",
+      "proposal": "EhBcmJXvFG2gWrYNyAythkv5vSCUNJ1UABRK1qzZyQmo",
+      "vaultTransaction": "HyuuxPF6Sjck8ut49FaNkhJbWMA7VdNx71eBUZvr6vq2",
+      "vault": "5NduKELYZrFq7tgeTxB8JNxdA3LMRysSuRYRvmDEpQv2",
+      "threshold": 2,
+      "memberCount": 3,
+      "proposalStatus": "Executed"
+    },
+    "memo": {
+      "observedAtSlot": 477222634,
+      "multisig": "6ffDDMrJTBQm8e6Df2pnNrEFcjbJPrhYdsTZG1fCJS8t",
+      "proposal": "AhQTHdAxxsGEcmCNvivdSJ7dmmVxDxsrTK7FghdGFVZg",
+      "vaultTransaction": "GLw96qaCFfE4NT2kS8hT7HoJaZ2utuUsjb9GS5wzhF3P",
+      "vault": "3xPT2JhMv9Gma9AShvNRQUQTjqskaaR1ySL1CsbeQZrn",
+      "memoProgram": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+      "proposalStatus": "Executed"
+    }
+  },
+  "resourceContract": {
+    "capability": "squads_multisig_vault",
+    "contractVersion": 1,
+    "threshold": 2,
+    "memberCount": 3,
+    "timeLockSeconds": 0,
+    "vaultIndex": 0,
+    "memberPermissions": {
+      "proposer_member": 3,
+      "approver_member": 2,
+      "executor_member": 4
+    },
+    "effect": "vault_authority_no_asset_memo",
+    "memoProgram": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+    "noRealAssets": true
+  },
+  "decisionPolicyMapping": {
+    "admission": {
+      "status": "not_applicable",
+      "providerPolicy": "squads_multisig_has_no_membership_admission_policy",
+      "activationGate": "not_applicable",
+      "authorityImpact": false,
+      "reason": "Squads is used as an execution authority provider, not as the Circle membership admission owner."
+    },
+    "proposalCreation": {
+      "status": "exact",
+      "providerPolicy": "proposer_member_permission_mask_3",
+      "activationGate": "ready",
+      "authorityImpact": true,
+      "reason": "Vault transaction proposal creation is limited to the frozen proposer member role and permission mask."
+    },
+    "voterEligibility": {
+      "status": "not_applicable",
+      "providerPolicy": "squads_signer_set_is_not_voter_electorate",
+      "activationGate": "not_applicable",
+      "authorityImpact": false,
+      "reason": "The Squads signer/member set authorizes multisig execution and is never mapped into a voter eligibility policy."
+    },
+    "votingPower": {
+      "status": "not_applicable",
+      "providerPolicy": "squads_threshold_is_not_voting_power",
+      "activationGate": "not_applicable",
+      "authorityImpact": false,
+      "reason": "The 2-of-3 threshold is an execution signer rule, not a governance voter-weight rule."
+    },
+    "executionAuthority": {
+      "status": "exact",
+      "providerPolicy": "two_of_three_member_permissions_and_vault_pda",
+      "activationGate": "ready",
+      "authorityImpact": true,
+      "reason": "Execution authority is the frozen Squads member permissions, threshold and vault PDA readback."
+    },
+    "signerSetAsVoterPolicy": {
+      "status": "not_applicable",
+      "providerPolicy": "explicitly_forbidden_mapping",
+      "activationGate": "not_applicable",
+      "authorityImpact": true,
+      "reason": "Squads signer membership must not be represented as voter eligibility or voting power."
+    }
+  },
+  "readback": {
+    "rpc": {
+      "endpoint": "https://api.devnet.solana.com",
+      "access": "public_no_credentials",
+      "purpose": "provider_execution_and_authoritative_readback"
+    },
+    "commitment": "finalized",
+    "timeoutMs": 12000,
+    "maximumAttempts": 5,
+    "backoffSeconds": [1, 2, 4, 8, 16],
+    "slotConvergenceWindow": 32,
+    "resubmitPolicy": "never_automatic"
+  },
+  "reconciliationPolicy": {
+    "schemaVersion": 1,
+    "authorityRef": "provider_trust_profile_reconciliation_policy",
+    "reconciliationAuthorityRef": "independent_provider_readback",
+    "decisionAuthorityRef": "DEC-P06-M9-INDEPENDENT-RECONCILIATION-MANUAL-FALLBACK-v1",
+    "conflictRule": "questioned_provider_program_decoder_cannot_adjudicate_itself",
+    "fallbackMechanism": {
+      "mode": "manual_recovery_only",
+      "independentFallbackProviderRef": null,
+      "activation": "fail_closed_when_independent_fallback_absent",
+      "operatorMaySelectProvider": false,
+      "questionedProviderMayAdjudicate": false
+    },
+    "superseding": {
+      "artifactOwner": "DecisionOutputArtifact",
+      "receiptOwner": "GovernanceExecutionReceipt",
+      "materialChangeGate": "new_decision_stage_or_superseding_case",
+      "required": true
+    }
+  },
+  "payerPolicy": {
+    "fundingSource": "solana_devnet_faucet_only",
+    "singleTransactionLimitLamports": 50000000,
+    "totalVerticalLimitLamports": 500000000,
+    "maximumWalletBalanceLamports": 1000000000,
+    "refundRequiresSeparateApproval": true
+  },
+  "keyCustodyRecord": {
+    "schemaVersion": 1,
+    "recordRef": "squads-devnet-key-custody:v1",
+    "decisionRef": "DEC-P06-M4-SQUADS-DEVNET-ONLY-v1",
+    "approvedAt": "2026-07-18T00:00:00.000Z",
+    "scope": "solana:devnet_no_real_assets",
+    "signerProvider": "openbao_transit",
+    "serviceTopology": "local_single_node_integrated_raft",
+    "endpoint": "https://127.0.0.1:18200",
+    "networkExposure": "localhost_only",
+    "tls": {
+      "serverName": "localhost",
+      "minimumVersion": "tls13",
+      "trustAnchorRef": "openbao-realms-devnet-local-server-crt",
+      "certificateSha256": "7045db09cd73ead7acac8df9e16ae0b7fb6950321674dab2d25ca0220a4d2231",
+      "notBefore": "2026-07-17T16:24:00.000Z",
+      "notAfter": "2027-07-17T16:24:00.000Z"
+    },
+    "transitMount": "transit",
+    "keyContracts": [
+      {
+        "keyRef": "alcheme-squads-devnet-config-authority-v1",
+        "role": "config_authority",
+        "allowedOperations": ["create_multisig"],
+        "permissionMask": null,
+        "applicationIdentity": {
+          "policyName": "alcheme-squads-devnet-config-authority",
+          "credentialRef": "macos-keychain:Alcheme Governance OS OpenBao Devnet/squads-config-authority-runtime-token",
+          "tokenPeriodSeconds": 86400
+        },
+        "publicKey": null,
+        "status": "pending_generation"
+      },
+      {
+        "keyRef": "alcheme-squads-devnet-proposer-member-v1",
+        "role": "proposer_member",
+        "allowedOperations": ["create_vault_transaction", "create_proposal", "approve_proposal"],
+        "permissionMask": 3,
+        "applicationIdentity": {
+          "policyName": "alcheme-squads-devnet-proposer-member",
+          "credentialRef": "macos-keychain:Alcheme Governance OS OpenBao Devnet/squads-proposer-member-runtime-token",
+          "tokenPeriodSeconds": 86400
+        },
+        "publicKey": null,
+        "status": "pending_generation"
+      },
+      {
+        "keyRef": "alcheme-squads-devnet-approver-member-v1",
+        "role": "approver_member",
+        "allowedOperations": ["approve_proposal"],
+        "permissionMask": 2,
+        "applicationIdentity": {
+          "policyName": "alcheme-squads-devnet-approver-member",
+          "credentialRef": "macos-keychain:Alcheme Governance OS OpenBao Devnet/squads-approver-member-runtime-token",
+          "tokenPeriodSeconds": 86400
+        },
+        "publicKey": null,
+        "status": "pending_generation"
+      },
+      {
+        "keyRef": "alcheme-squads-devnet-executor-member-v1",
+        "role": "executor_member",
+        "allowedOperations": ["execute_vault_transaction"],
+        "permissionMask": 4,
+        "applicationIdentity": {
+          "policyName": "alcheme-squads-devnet-executor-member",
+          "credentialRef": "macos-keychain:Alcheme Governance OS OpenBao Devnet/squads-executor-member-runtime-token",
+          "tokenPeriodSeconds": 86400
+        },
+        "publicKey": null,
+        "status": "pending_generation"
+      },
+      {
+        "keyRef": "alcheme-squads-devnet-fee-payer-v1",
+        "role": "fee_payer",
+        "allowedOperations": ["pay_approved_devnet_fee_and_rent"],
+        "permissionMask": null,
+        "applicationIdentity": {
+          "policyName": "alcheme-squads-devnet-fee-payer",
+          "credentialRef": "macos-keychain:Alcheme Governance OS OpenBao Devnet/squads-fee-payer-runtime-token",
+          "tokenPeriodSeconds": 86400
+        },
+        "publicKey": null,
+        "status": "pending_generation"
+      }
+    ],
+    "keyAlgorithm": "ed25519",
+    "derived": false,
+    "exportable": false,
+    "allowPlaintextBackup": false,
+    "managementApplicationIdentitySeparation": "required",
+    "runtimeLocations": "config_raft_snapshot_recovery_outside_git_and_agent_temporary_directories",
+    "operatorRunbookRef": "docs/ops/governance-openbao-custody-runbook.zh-CN.md",
+    "primaryMaintainer": "Taiyi",
+    "recoveryOwner": "Taiyi",
+    "samePersonRecoveryException": true,
+    "inventoryOwner": "payer_policy_and_resource_authority_binding",
+    "fundingSource": "solana_devnet_faucet_only",
+    "lossProcedure": "fail_closed_rebootstrap_devnet_environment_no_owner_operator_fallback",
+    "status": "verified_pre_wallet_pending_runtime_owner"
+  },
+  "environmentBoundary": {
+    "activationScope": "circle_capability_contract_profile_version",
+    "inPlaceClusterSwitch": "forbidden",
+    "openCaseProfileSwitch": "forbidden",
+    "mainnet": "unavailable"
+  }
+}

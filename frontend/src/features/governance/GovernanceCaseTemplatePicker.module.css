@@ -1,0 +1,166 @@
+.root {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-column: 1 / -1;
+    gap: var(--space-3);
+    color: var(--color-text-primary);
+}
+
+.root label {
+    display: grid;
+    gap: 6px;
+    color: var(--color-text-tertiary);
+    font-size: .8rem;
+}
+
+.field :global([class*="button"]),
+.root select {
+    min-height: 42px;
+    border: 1px solid var(--color-border-medium);
+    border-radius: 10px;
+    padding: 0 12px;
+    outline: 0;
+    background: var(--color-bg-elevated);
+    color: var(--color-text-primary);
+    font: inherit;
+    width: 100%;
+}
+
+.root select:focus-visible {
+    border-color: var(--color-accent-gold);
+    box-shadow: 0 0 0 3px var(--color-alloy-glow);
+}
+
+.status,
+.error,
+.unavailable,
+.profile {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: .82rem;
+}
+
+.mechanisms,
+.providers,
+.participation {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 10px;
+    border: 0;
+    border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 0;
+    padding: var(--space-3) 0 0;
+    background: transparent;
+}
+
+.participation span,
+.mechanisms > p,
+.profile {
+    color: var(--color-text-tertiary);
+}
+
+.mechanisms li,
+.providers li {
+    display: grid;
+    gap: 4px;
+    border: 0;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+    border-radius: 0;
+    padding: 10px 0;
+    background: transparent;
+}
+
+.mechanisms summary,
+.providers summary {
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+}
+
+.mechanisms > p { margin: 8px 0; }
+
+.mechanisms ul,
+.providers ul {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.mechanisms li[data-availability='unavailable'] {
+    color: var(--color-text-tertiary);
+    opacity: .78;
+}
+
+.mechanisms dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 12px;
+    margin: 4px 0;
+}
+
+.mechanisms dl div,
+.providers li > div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.mechanisms dt,
+.mechanisms dd { margin: 0; }
+
+.mechanisms dt { color: var(--color-text-tertiary); }
+
+.mechanisms dd {
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.error,
+.unavailable { color: var(--color-state-error); }
+
+.unavailable {
+    display: grid;
+    gap: 4px;
+    border: 1px solid currentColor;
+    border-radius: 10px;
+    padding: var(--space-3);
+    background: color-mix(in srgb, var(--color-bg-surface) 90%, var(--color-state-error) 10%);
+}
+
+.profile { overflow-wrap: anywhere; }
+
+/* Only the action catalog needs full technical labels and readiness states.
+   Reuse Select's portal styling hooks without changing other menus. */
+.actionMenu {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+/* Select's scrollable list follows its sheet header. Auto grid rows can shrink
+   to the minimum tap height when a long catalog exceeds the sheet height. */
+.actionMenu > div:last-child {
+    grid-auto-rows: max-content;
+    align-content: start;
+}
+
+.actionOption {
+    min-width: 0;
+    padding-block: 10px;
+}
+
+.actionOption > span:first-child {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    overflow: visible;
+}
+
+.providers small,
+.mechanisms small,
+.unavailable span {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+    .root, .mechanisms dl { grid-template-columns: 1fr; }
+}

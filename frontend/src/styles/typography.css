@@ -1,0 +1,71 @@
+/* ============================================================
+   Alcheme Typography System
+   Based on: 移动端设计最终版 §4 (字体风格与排版建议)
+   "一段话可以被完整读完，而不是扫过"
+   ============================================================ */
+
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    letter-spacing: var(--letter-spacing-body);
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-regular);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* ── Headings ── */
+.text-title {
+    font-size: var(--font-size-title);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-title);
+    letter-spacing: -0.2px;
+    color: var(--color-text-primary);
+}
+
+.text-h2 {
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-title);
+    letter-spacing: -0.1px;
+    color: var(--color-text-primary);
+}
+
+.text-body {
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-body);
+    color: var(--color-text-primary);
+}
+
+.text-caption {
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.4;
+    color: var(--color-text-secondary);
+}
+
+.text-small {
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.3;
+    color: var(--color-text-tertiary);
+}
+
+/* ── Special: when content is refined ──
+   "当内容被优化时：字重微升 3%、字体锐度轻微提升" */
+.text-refined {
+    font-weight: calc(var(--font-weight-regular) * 1.03);
+    text-shadow: 0 0 0.5px rgba(231, 228, 221, 0.1);
+}
+
+/* ── Emphasis ── */
+.text-accent {
+    color: var(--color-accent-gold);
+}
+
+.text-muted {
+    color: var(--color-text-tertiary);
+}

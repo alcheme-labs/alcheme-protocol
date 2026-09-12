@@ -1,0 +1,451 @@
+.radar {
+    --scan-green: #63D471;
+    --compass-heading: 0deg;
+    --radar-bearing: 0deg;
+    --radar-world-scale: 1.425;
+    position: relative;
+    width: min(100%, 680px);
+    aspect-ratio: 1;
+    min-height: 320px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 8px;
+    touch-action: pan-y;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(191, 199, 176, 0.82), rgba(216, 208, 186, 0.74) 72%),
+        linear-gradient(128deg, rgba(166, 184, 151, 0.26), rgba(216, 208, 186, 0.2) 46%, rgba(160, 173, 145, 0.18)),
+        #D8D0BA;
+    color: #2F372F;
+    border: 1px solid rgba(236, 229, 207, 0.34);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
+        inset 0 -22px 38px rgba(47, 55, 47, 0.2),
+        0 24px 62px rgba(0, 0, 0, 0.22);
+}
+
+.radarWorld {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    width: calc(100% * var(--radar-world-scale));
+    height: calc(100% * var(--radar-world-scale));
+    overflow: hidden;
+    transform: translate(-50%, -50%) rotate(var(--radar-bearing));
+    transform-origin: 50% 50%;
+    transition: transform 180ms ease-out;
+}
+
+.radarFace {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 3;
+    width: calc(100% / var(--radar-world-scale));
+    height: calc(100% / var(--radar-world-scale));
+    transform: translate(-50%, -50%);
+}
+
+.realMapLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    background: #D8D0BA;
+}
+
+.realMapLayer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(191, 199, 176, 0.16), rgba(216, 208, 186, 0.18) 70%),
+        linear-gradient(180deg, rgba(216, 208, 186, 0.36), rgba(191, 199, 176, 0.2));
+    pointer-events: none;
+    mix-blend-mode: multiply;
+}
+
+.realMapTile {
+    position: absolute;
+    object-fit: cover;
+    user-select: none;
+    pointer-events: none;
+    opacity: 0.74;
+    filter: grayscale(1) sepia(0.36) saturate(0.56) hue-rotate(52deg) contrast(0.82) brightness(1.05);
+    transform: translateZ(0);
+}
+
+.grid {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background-image:
+        linear-gradient(rgba(30, 63, 42, 0.23) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 63, 42, 0.23) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.66;
+}
+
+.rings {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+}
+
+.rings span {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    border: 1px solid rgba(47, 55, 47, 0.26);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.rings span:nth-child(1) {
+    width: 28%;
+    height: 28%;
+}
+
+.rings span:nth-child(2) {
+    width: 56%;
+    height: 56%;
+}
+
+.rings span:nth-child(3) {
+    width: 84%;
+    height: 84%;
+}
+
+.scanBeam {
+    position: absolute;
+    inset: -18%;
+    z-index: 5;
+    background: conic-gradient(from 222deg, transparent 0deg, rgba(99, 212, 113, 0.52) 15deg, rgba(99, 212, 113, 0.35) 35deg, rgba(99, 212, 113, 0.08) 58deg, transparent 76deg);
+    transform-origin: 50% 50%;
+    animation: scanRotate 4.8s linear infinite;
+    opacity: 0.86;
+    pointer-events: none;
+}
+
+.scanBeam[data-loading='true'] {
+    animation-duration: 1.8s;
+}
+
+.bootSignal {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(87, 88, 60, 0.22), rgba(26, 34, 26, 0.9) 68%),
+        linear-gradient(180deg, rgba(42, 46, 34, 0.96), rgba(24, 31, 25, 0.96));
+    opacity: 0.98;
+    transition: opacity 420ms ease, visibility 0s linear 420ms;
+}
+
+.bootSignal[data-ready='true'] {
+    visibility: hidden;
+    opacity: 0;
+}
+
+.bootSignal::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(99, 212, 113, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 212, 113, 0.08) 1px, transparent 1px),
+        linear-gradient(transparent 47%, rgba(99, 212, 113, 0.18) 48%, rgba(99, 212, 113, 0.18) 52%, transparent 53%);
+    background-size: 18px 18px, 18px 18px, 100% 100%;
+    opacity: 0.78;
+}
+
+.bootSignal::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(180deg, transparent 0%, rgba(99, 212, 113, 0.12) 48%, rgba(99, 212, 113, 0.2) 50%, rgba(99, 212, 113, 0.08) 52%, transparent 100%),
+        radial-gradient(circle at 50% 50%, transparent 36%, rgba(5, 12, 8, 0.42) 100%);
+    animation: bootSignalPulse 1.8s ease-in-out infinite;
+}
+
+.bootSignal svg {
+    position: relative;
+    z-index: 1;
+    width: 78%;
+    max-width: 460px;
+    height: auto;
+    filter:
+        drop-shadow(0 0 5px rgba(99, 212, 113, 0.36))
+        drop-shadow(0 0 14px rgba(99, 212, 113, 0.22));
+}
+
+.bootSignalBaseline,
+.bootSignalWave,
+.bootSignalEcho {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.bootSignalBaseline {
+    stroke: rgba(99, 212, 113, 0.38);
+    stroke-width: 3;
+}
+
+.bootSignalWave {
+    stroke: var(--scan-green);
+    stroke-width: 4;
+    stroke-dasharray: 360;
+    stroke-dashoffset: 360;
+    animation: bootSignalTrace 1.6s ease-in-out infinite;
+}
+
+.bootSignalEcho {
+    stroke: rgba(99, 212, 113, 0.62);
+    stroke-width: 2.5;
+    stroke-dasharray: 280;
+    stroke-dashoffset: 280;
+    animation: bootSignalTrace 1.8s ease-in-out 0.18s infinite;
+}
+
+.userArrow {
+    position: absolute;
+    z-index: 11;
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 1px 1px rgba(47, 55, 47, 0.48));
+}
+
+.userArrow span {
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 15px solid #C83A32;
+    transform: translateY(-1px);
+}
+
+.circleDot {
+    position: absolute;
+    z-index: 8;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(242, 211, 91, 0.34);
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+}
+
+.circleDot span {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #F2D35B;
+    border: 1px solid rgba(73, 55, 18, 0.62);
+    box-shadow: 0 0 16px rgba(242, 211, 91, 0.72);
+    animation: dotPulse 2.8s ease-in-out infinite;
+}
+
+.circleDotSelected {
+    background: rgba(200, 58, 50, 0.22);
+}
+
+.circleDotSelected span {
+    box-shadow: 0 0 0 4px rgba(200, 58, 50, 0.2), 0 0 18px rgba(242, 211, 91, 0.78);
+}
+
+.direction {
+    position: absolute;
+    z-index: 7;
+    color: rgba(47, 55, 47, 0.58);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.direction span {
+    display: block;
+    transform: rotate(var(--compass-heading));
+    transform-origin: 50% 50%;
+}
+
+.directionNorth {
+    left: 50%;
+    top: 12px;
+    transform: translateX(-50%);
+}
+
+.directionEast {
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.directionSouth {
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+}
+
+.directionWest {
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.zoomControls {
+    position: absolute;
+    right: 10px;
+    bottom: 30px;
+    z-index: 14;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid rgba(47, 55, 47, 0.16);
+    border-radius: 8px;
+    background: rgba(216, 208, 186, 0.76);
+    color: #2F372F;
+    box-shadow: 0 8px 20px rgba(47, 55, 47, 0.12);
+    backdrop-filter: blur(5px);
+}
+
+.zoomControls button {
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgba(47, 55, 47, 0.18);
+    border-radius: 7px;
+    background: rgba(236, 229, 207, 0.82);
+    color: #2F372F;
+    cursor: pointer;
+}
+
+.zoomControls button:disabled {
+    cursor: not-allowed;
+    opacity: 0.48;
+}
+
+.compassButton[data-state='active'] {
+    border-color: rgba(99, 212, 113, 0.42);
+    color: #1F6B3B;
+    box-shadow: inset 0 0 0 1px rgba(99, 212, 113, 0.18), 0 0 14px rgba(99, 212, 113, 0.22);
+}
+
+.compassButton[data-state='denied'] {
+    border-color: rgba(200, 58, 50, 0.28);
+    color: #8D2E2B;
+}
+
+.zoomControls span {
+    min-width: 36px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.mapAttribution {
+    position: absolute;
+    right: 10px;
+    bottom: 7px;
+    z-index: 14;
+    max-width: calc(100% - 20px);
+    color: rgba(47, 55, 47, 0.68);
+    font-size: 10px;
+    line-height: 1;
+    text-decoration: none;
+    text-shadow: 0 1px 0 rgba(236, 229, 207, 0.72);
+}
+
+.mapAttribution:hover {
+    color: #2F372F;
+    text-decoration: underline;
+}
+
+@keyframes scanRotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes dotPulse {
+    0%,
+    100% {
+        opacity: 0.82;
+        transform: scale(0.96);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.08);
+    }
+}
+
+@keyframes bootSignalTrace {
+    0% {
+        opacity: 0.28;
+        stroke-dashoffset: 360;
+    }
+    42% {
+        opacity: 1;
+    }
+    74% {
+        opacity: 0.82;
+        stroke-dashoffset: 0;
+    }
+    100% {
+        opacity: 0.26;
+        stroke-dashoffset: -90;
+    }
+}
+
+@keyframes bootSignalPulse {
+    0%,
+    100% {
+        opacity: 0.52;
+    }
+    50% {
+        opacity: 0.86;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scanBeam {
+        animation: scanFade 3.6s ease-in-out infinite;
+    }
+
+    .circleDot span {
+        animation: none;
+    }
+
+    .bootSignal::after,
+    .bootSignalWave,
+    .bootSignalEcho {
+        animation: none;
+    }
+}
+
+@keyframes scanFade {
+    0%,
+    100% {
+        opacity: 0.26;
+    }
+    50% {
+        opacity: 0.62;
+    }
+}

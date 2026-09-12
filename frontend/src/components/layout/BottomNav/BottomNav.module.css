@@ -1,0 +1,102 @@
+/* BottomNav.module.css — Enhanced Phase 4 with FAB + Badge */
+.nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: var(--z-header);
+    background-color: rgba(31, 36, 33, 0.88);
+    backdrop-filter: blur(var(--blur-sheet));
+    -webkit-backdrop-filter: blur(var(--blur-sheet));
+    border-top: 1px solid var(--color-border-soft);
+    padding-bottom: var(--safe-area-bottom);
+}
+
+.inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    height: var(--bottom-nav-height);
+}
+
+.item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    transition: color var(--motion-normal) var(--easing-standard);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.item:active {
+    transform: scale(0.95);
+}
+
+.item.active {
+    color: var(--color-accent-gold);
+}
+
+.icon {
+    flex-shrink: 0;
+}
+
+.label {
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
+    line-height: 1;
+}
+
+/* ── Icon wrapper for badge ── */
+.iconWrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Notification Badge ── */
+.badge {
+    position: absolute;
+    top: -4px;
+    right: -8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background-color: var(--color-accent-gold);
+    color: var(--color-bg-base);
+    font-size: 10px;
+    font-weight: var(--font-weight-semibold);
+    line-height: 1;
+}
+
+/* ── Center FAB ── */
+.fab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-accent-gold), var(--color-accent-amber));
+    color: var(--color-bg-base);
+    text-decoration: none;
+    box-shadow:
+        0 2px 8px rgba(199, 168, 107, 0.3),
+        0 0 0 3px rgba(31, 36, 33, 0.88);
+    transform: translateY(-8px);
+    transition: all var(--motion-fast) ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.fab:active {
+    transform: translateY(-8px) scale(0.92);
+}

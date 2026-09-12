@@ -1,0 +1,398 @@
+.root {
+    display: grid;
+    gap: var(--space-3);
+    margin: var(--space-5) 0 0;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-card);
+    padding: var(--space-4);
+    background: var(--color-ore-bg);
+    color: var(--color-text-primary);
+    box-shadow: var(--shadow-subtle);
+}
+
+.header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+    color: var(--color-accent-gold);
+}
+
+.header p,
+.header h2,
+.readiness h3,
+.auditTimeline h3,
+.recovery h3,
+.currentFacts h4,
+.boundary,
+.cutoverAction,
+.historyBoundary,
+.rollback,
+.blockers,
+.error {
+    margin: 0;
+}
+
+.header p {
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: .06em;
+}
+
+.header h2 {
+    margin-top: 4px;
+    color: var(--color-text-primary);
+    font-size: 1.15rem;
+}
+
+.boundary,
+.cutoverAction,
+.historyBoundary,
+.rollback,
+.blockers,
+.error {
+    color: var(--color-text-tertiary);
+    font-size: .82rem;
+    line-height: 1.55;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.actions button {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-button);
+    padding: 9px 13px;
+    background: var(--color-bg-elevated);
+    color: var(--color-text-primary);
+    font: inherit;
+    cursor: pointer;
+}
+
+.actions button:hover:not(:disabled),
+.actions button:focus-visible {
+    border-color: var(--color-alloy-border);
+    color: var(--color-accent-gold);
+}
+
+.actions button:focus-visible {
+    outline: 2px solid var(--color-accent-gold);
+    outline-offset: 2px;
+}
+
+.actions button:disabled {
+    opacity: .55;
+    cursor: default;
+}
+
+.report {
+    display: grid;
+    gap: var(--space-3);
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin: 0;
+}
+
+.summary > div,
+.matrix article,
+.readinessMetrics > div,
+.auditTimeline li,
+.recovery article {
+    min-width: 0;
+    border: 1px solid var(--color-border-soft);
+    border-radius: 10px;
+    padding: var(--space-3);
+    background: var(--color-bg-surface);
+}
+
+.currentFacts {
+    display: grid;
+    gap: var(--space-2);
+}
+
+.currentFacts h4,
+.currentFacts p {
+    margin: 0;
+}
+
+.currentFacts h4 {
+    font-size: .82rem;
+}
+
+.currentFacts > div {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+}
+
+.currentFacts article {
+    display: grid;
+    min-width: 0;
+    gap: 6px;
+    border: 1px solid var(--color-accent-gold);
+    border-radius: 10px;
+    padding: var(--space-3);
+    background: var(--color-bg-surface);
+}
+
+.currentFacts span,
+.currentFacts time,
+.currentFacts p {
+    overflow-wrap: anywhere;
+    color: var(--color-text-tertiary);
+    font-size: .76rem;
+}
+
+.caseLink {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    border-radius: var(--radius-button);
+    color: var(--color-accent-gold);
+    font-size: .76rem;
+    overflow-wrap: anywhere;
+}
+
+.caseLink:focus-visible {
+    outline: 2px solid var(--color-accent-gold);
+    outline-offset: 2px;
+}
+
+.summary dt,
+.matrix span,
+.readinessMetrics dt,
+.auditTimeline time,
+.auditTimeline li > span,
+.recovery span {
+    color: var(--color-text-tertiary);
+    font-size: .76rem;
+}
+
+.summary dd {
+    margin: 5px 0 0;
+    overflow-wrap: anywhere;
+    font-size: .82rem;
+}
+
+.matrix {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-2);
+}
+
+.matrix article,
+.recovery article {
+    display: grid;
+    gap: 6px;
+}
+
+.matrix strong,
+.recovery strong {
+    overflow-wrap: anywhere;
+    font-size: .82rem;
+}
+
+.recovery {
+    display: grid;
+    gap: var(--space-2);
+}
+
+.readiness {
+    display: grid;
+    gap: var(--space-2);
+}
+
+.readinessHeader {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.readinessHeader > div {
+    display: grid;
+    gap: 4px;
+}
+
+.readinessHeader h3 {
+    color: var(--color-text-primary);
+    font-size: .9rem;
+}
+
+.readinessHeader > span {
+    overflow-wrap: anywhere;
+    color: var(--color-text-tertiary);
+    font-size: .76rem;
+}
+
+.readinessHeader strong {
+    color: var(--color-accent-gold);
+    font-size: .82rem;
+}
+
+.readinessMetrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin: 0;
+}
+
+.readinessMetrics dd {
+    margin: 5px 0 0;
+    font-size: 1rem;
+    font-weight: var(--font-weight-semibold);
+}
+
+.readiness ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.readiness li {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    border: 1px solid var(--color-border-soft);
+    border-radius: 10px;
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-bg-surface);
+    font-size: .78rem;
+}
+
+.readiness li > span {
+    overflow-wrap: anywhere;
+}
+
+.readiness li > strong {
+    flex: 0 0 auto;
+    color: var(--color-accent-gold);
+}
+
+.auditTimeline {
+    display: grid;
+    gap: var(--space-2);
+}
+
+.auditHeader {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.auditHeader h3 {
+    color: var(--color-text-primary);
+    font-size: .9rem;
+}
+
+.auditHeader span {
+    overflow-wrap: anywhere;
+    color: var(--color-text-tertiary);
+    font-size: .76rem;
+}
+
+.auditTimeline ol {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.auditTimeline li {
+    display: grid;
+    gap: 6px;
+    border-left: 3px solid var(--color-accent-gold);
+}
+
+.auditTimeline strong,
+.auditTimeline time,
+.auditTimeline li > span {
+    overflow-wrap: anywhere;
+}
+
+.auditTimeline strong {
+    font-size: .82rem;
+}
+
+.recoveryHeader {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.recoveryHeader h3 {
+    color: var(--color-text-primary);
+    font-size: .9rem;
+}
+
+.recoveryHeader span {
+    overflow-wrap: anywhere;
+    color: var(--color-text-tertiary);
+    font-size: .76rem;
+}
+
+.recoveryGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+}
+
+.historyBoundary {
+    border-left: 3px solid var(--color-accent-gold);
+    padding-left: var(--space-3);
+    color: var(--color-text-secondary);
+}
+
+.error { color: var(--color-status-error); }
+
+.spin { animation: migration-spin .8s linear infinite; }
+
+@keyframes migration-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 900px) {
+    .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .matrix,
+    .readinessMetrics,
+    .auditTimeline ol,
+    .recoveryGrid,
+    .currentFacts > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+    .summary,
+    .matrix,
+    .readinessMetrics,
+    .readiness ul,
+    .auditTimeline ol,
+    .recoveryGrid,
+    .currentFacts > div { grid-template-columns: 1fr; }
+    .actions button { flex: 1 1 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .spin { animation: none; }
+}

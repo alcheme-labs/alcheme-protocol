@@ -1,0 +1,217 @@
+.editorWrapper {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    background-color: var(--color-bg-surface);
+    transition: border-color var(--motion-fast) ease;
+}
+
+.editorWrapper:focus-within {
+    border-color: rgba(199, 168, 107, 0.4);
+}
+
+.editorWrapperCompact {
+    background: rgba(255, 255, 255, 0.018);
+    border-color: rgba(199, 168, 107, 0.16);
+    border-radius: 14px;
+}
+
+.readOnly {
+    border-style: dashed;
+    opacity: 0.85;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--color-border-soft);
+    background-color: rgba(231, 228, 221, 0.03);
+    flex-wrap: wrap;
+}
+
+.toolbarBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 28px;
+    border: none;
+    border-radius: var(--radius-button);
+    background: none;
+    color: var(--color-text-tertiary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all var(--motion-fast) ease;
+}
+
+.toolbarBtn:hover {
+    background-color: rgba(231, 228, 221, 0.08);
+    color: var(--color-text-primary);
+}
+
+.toolbarBtnActive {
+    background-color: rgba(199, 168, 107, 0.15);
+    color: var(--color-accent-gold);
+}
+
+.toolbarDivider {
+    width: 1px;
+    height: 18px;
+    background-color: var(--color-border-soft);
+    margin: 0 var(--space-1);
+}
+
+.editorContent {
+    padding: var(--space-4);
+    min-height: 200px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.editorContentCompact {
+    padding: 12px;
+    min-height: 88px;
+    max-height: none;
+}
+
+.inlineReferencePicker {
+    padding: 0 12px 12px;
+}
+
+.prosemirror {
+    outline: none;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    color: var(--color-text-primary);
+}
+
+.prosemirrorCompact {
+    font-size: 24px;
+    line-height: 1.7;
+}
+
+.prosemirror > * + * {
+    margin-top: 0.75em;
+}
+
+.prosemirror h2 {
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    letter-spacing: -0.01em;
+}
+
+.prosemirror h3 {
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-top: 1.25em;
+    margin-bottom: 0.4em;
+}
+
+.prosemirror p {
+    margin: 0;
+    color: var(--color-text-primary);
+}
+
+.prosemirror p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: var(--color-text-tertiary);
+    pointer-events: none;
+    height: 0;
+    font-style: italic;
+}
+
+.prosemirror strong {
+    font-weight: var(--font-weight-semibold);
+}
+
+.prosemirror em {
+    font-style: italic;
+}
+
+.prosemirror s {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.prosemirror code {
+    background-color: rgba(231, 228, 221, 0.08);
+    border-radius: 3px;
+    padding: 0.15em 0.35em;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.88em;
+    color: var(--color-accent-gold);
+}
+
+.prosemirror mark {
+    background-color: rgba(199, 168, 107, 0.25);
+    border-radius: 2px;
+    padding: 0.05em 0.15em;
+    color: inherit;
+}
+
+.prosemirror blockquote {
+    border-left: 3px solid var(--color-accent-gold);
+    margin: 0;
+    padding-left: var(--space-4);
+    color: var(--color-text-secondary);
+    font-style: italic;
+}
+
+.prosemirror ul,
+.prosemirror ol {
+    margin: 0;
+    padding-left: 1.5em;
+}
+
+.prosemirror ul li::marker {
+    color: var(--color-accent-gold);
+}
+
+.prosemirror ol li::marker {
+    color: var(--color-text-tertiary);
+}
+
+.prosemirror li {
+    margin-bottom: 0.25em;
+}
+
+.prosemirror li p {
+    margin: 0;
+}
+
+.prosemirror pre {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: var(--radius-card);
+    padding: var(--space-4);
+    overflow-x: auto;
+    margin: 0;
+}
+
+.prosemirror pre code {
+    background: none;
+    padding: 0;
+    font-size: 13px;
+    color: var(--color-text-primary);
+}
+
+.prosemirror hr {
+    border: none;
+    border-top: 1px solid var(--color-border-soft);
+    margin: 1.5em 0;
+}
+
+@media (max-width: 768px) {
+    .prosemirrorCompact {
+        font-size: 20px;
+    }
+}

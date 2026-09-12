@@ -1,0 +1,192 @@
+.picker {
+    display: grid;
+    gap: 12px;
+}
+
+.radarPreview {
+    position: relative;
+    height: 116px;
+    overflow: hidden;
+    border: 1px solid rgba(81, 108, 82, 0.38);
+    border-radius: 8px;
+    background:
+        linear-gradient(135deg, rgba(250, 240, 202, 0.64), rgba(193, 178, 128, 0.28)),
+        #d8c79d;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.32),
+        inset 0 -12px 28px rgba(47, 60, 51, 0.14);
+}
+
+.radarPreview::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 38% 22%, rgba(255, 255, 255, 0.42), transparent 26%),
+        linear-gradient(160deg, rgba(255, 255, 255, 0.22), transparent 44%);
+    pointer-events: none;
+}
+
+.grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(47, 87, 55, 0.22) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(47, 87, 55, 0.22) 1px, transparent 1px);
+    background-size: 18px 18px;
+    opacity: 0.86;
+}
+
+.scan {
+    position: absolute;
+    inset: -20%;
+    background: conic-gradient(from 220deg, transparent 0deg, rgba(122, 240, 143, 0.22) 24deg, rgba(122, 240, 143, 0.08) 46deg, transparent 62deg);
+    transform-origin: 50% 50%;
+    animation: radarScan 5.8s linear infinite;
+}
+
+.rangeRing {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 82px;
+    height: 82px;
+    border: 1px solid rgba(47, 87, 55, 0.42);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 22px rgba(47, 87, 55, 0.08);
+}
+
+.redArrow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    color: #d84b3d;
+    filter: drop-shadow(0 1px 1px rgba(47, 60, 51, 0.5));
+    transform: translate(-50%, -50%);
+}
+
+.marker {
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #f3d150;
+    border: 1px solid rgba(83, 66, 20, 0.64);
+    box-shadow: 0 0 14px rgba(243, 209, 80, 0.68);
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+.locateButton {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid rgba(122, 240, 143, 0.2);
+    border-radius: 8px;
+    background: rgba(122, 240, 143, 0.08);
+    color: rgba(226, 244, 218, 0.92);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.locateButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.56;
+}
+
+.field {
+    display: grid;
+    gap: 6px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.field input {
+    width: 100%;
+    min-height: 36px;
+    border: 1px solid rgba(231, 228, 221, 0.1);
+    border-radius: 8px;
+    background: rgba(8, 10, 9, 0.24);
+    color: var(--color-text-primary);
+    font-size: 13px;
+    padding: 0 10px;
+}
+
+.field input:disabled {
+    opacity: 0.58;
+}
+
+.coordinateGrid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+}
+
+.radiusBlock,
+.visibilityBlock {
+    display: grid;
+    gap: 8px;
+}
+
+.inlineHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.inlineHeader strong {
+    color: rgba(243, 209, 80, 0.9);
+    font-weight: 600;
+}
+
+.radiusPresets,
+.visibilityOptions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.visibilityOptions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.radiusPreset,
+.visibilityOption {
+    min-height: 32px;
+    border: 1px solid rgba(231, 228, 221, 0.1);
+    border-radius: 8px;
+    background: rgba(231, 228, 221, 0.04);
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.radiusPresetActive,
+.visibilityOptionActive {
+    border-color: rgba(243, 209, 80, 0.5);
+    background: rgba(243, 209, 80, 0.12);
+    color: rgba(255, 244, 194, 0.96);
+}
+
+@keyframes radarScan {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 420px) {
+    .coordinateGrid,
+    .visibilityOptions {
+        grid-template-columns: 1fr;
+    }
+
+    .radiusPresets {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
